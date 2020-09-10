@@ -1,0 +1,8 @@
+DevData/
+TestBuild/
+Application/Temp/
+Application/Library/
+Application/Debug/
+Application/.vs/
+Application/obj/
+Application/Logs/

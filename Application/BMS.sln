@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BMS", "BMS.csproj", "{75BB6797-E2D7-2959-A349-C991817FE741}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BMS.Plugins", "BMS.Plugins.csproj", "{EABB364F-701F-045F-C5A8-67DCE04ACABF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BMS.Editor.Plugins", "BMS.Editor.Plugins.csproj", "{BBC28ECA-BCB4-5660-EC3D-E33E84604A29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BMS.Editor", "BMS.Editor.csproj", "{08B335E0-8D36-B16F-2987-32737B18E906}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{75BB6797-E2D7-2959-A349-C991817FE741}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75BB6797-E2D7-2959-A349-C991817FE741}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75BB6797-E2D7-2959-A349-C991817FE741}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75BB6797-E2D7-2959-A349-C991817FE741}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EABB364F-701F-045F-C5A8-67DCE04ACABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EABB364F-701F-045F-C5A8-67DCE04ACABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EABB364F-701F-045F-C5A8-67DCE04ACABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EABB364F-701F-045F-C5A8-67DCE04ACABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBC28ECA-BCB4-5660-EC3D-E33E84604A29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBC28ECA-BCB4-5660-EC3D-E33E84604A29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBC28ECA-BCB4-5660-EC3D-E33E84604A29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBC28ECA-BCB4-5660-EC3D-E33E84604A29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08B335E0-8D36-B16F-2987-32737B18E906}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B335E0-8D36-B16F-2987-32737B18E906}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B335E0-8D36-B16F-2987-32737B18E906}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B335E0-8D36-B16F-2987-32737B18E906}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
