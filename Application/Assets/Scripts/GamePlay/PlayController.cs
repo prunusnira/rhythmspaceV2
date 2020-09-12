@@ -74,6 +74,20 @@ namespace BMSPlayer {
             // beat per second는 bpm/60, 여기에 4 bar = 1박이므로 4로 추가로 나눈다
             // 모든 시간은 ms 단위로 한다
 
+            // 곡 정보 출력
+            UI.SetMusicInfo(
+                Data.BMS.getGerne(),
+                Data.BMS.getTitle(),
+                Data.BMS.getArtist()
+            );
+
+            // 기어 BPM 표시
+            UI.SetGearBPM(
+                Data.BMS.getBPMStart(),
+                Data.BMS.getBPMMin(),
+                Data.BMS.getBPMMax()
+            );
+
             if(analyzer.IsVideoExist())
             {
                 UI.BGAVideoActivate();
@@ -105,6 +119,7 @@ namespace BMSPlayer {
             Debug.Log("Music: " + Data.BMS.getTitle());
             Debug.Log("Artist: " + Data.BMS.getArtist());
             Debug.Log("BPM: " + Data.BMS.getBPMStart());
+            Debug.Log("Total: " + totalNotes.ToString());
 
             UI.UpdateSpeed(Data.CurrentBPM);
 
@@ -236,7 +251,6 @@ namespace BMSPlayer {
             {
                 Data.Notes.Remove(r);
             }*/
-            Debug.Log("test");
         }
 
         void Update ()

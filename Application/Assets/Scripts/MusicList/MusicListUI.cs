@@ -39,6 +39,8 @@ namespace BMSPlayer
         public SelectedMusicInfo info;
         public GameObject btnStart;
 
+        public Text optSpdAppend;
+
         public Sprite empty;
 
         // data
@@ -193,6 +195,19 @@ namespace BMSPlayer
                 infoBpm.text = "BPM " + Const.selectedMusic.BPMmin +
                     "~" + Const.selectedMusic.BPMmax +
                     " (" + Const.selectedMusic.BPMstart + " start)";
+            }
+
+            if(Const.GetSpdType() == SpdType.FIXED)
+            {
+                int spdfl = (int)(Const.selectedMusic.BPMstart * Const.GetSpeedFixed() / 100);
+                Const.SetSpeedFluid(spdfl);
+                optSpdAppend.text = "FLUID " + spdfl.ToString("0");
+            }
+            else
+            {
+                int spd = (int)(Const.GetSpeedFluid() / Const.selectedMusic.BPMstart * 100);
+                Const.SetSpeedFixed(spd);
+                optSpdAppend.text = "FIXED " + ((float)spd/100).ToString("0.00")+"x";
             }
         }
 

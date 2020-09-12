@@ -25,7 +25,6 @@ namespace BMSPlayer
         public GameObject bgaImage;
 
         // user play info
-        private int score = 0;
         private int exscore = 0;
         private int combo = 0;
         private int maxcombo = 0;
@@ -42,6 +41,8 @@ namespace BMSPlayer
         private double avgRate = 0;
 
         private int speed = 200;
+        private SpdType spdType;
+
         // 배속 변경 후 롱노트 넓이 변경에 사용
         // 초기설정이 true여야 처음에 변경됨
         private bool isSpeedChanged = true;
@@ -77,7 +78,9 @@ namespace BMSPlayer
         {
             ui = GetComponent<PlayUI>();
 
-            speed = Const.GetSpeed();
+            speed = Const.GetSpeedFixed();
+            spdType = Const.GetSpdType();
+
             isAxisPushed = new bool[8] { false, false, false, false, false, false, false, false };
             btnPushState = new bool[8];
             lnprocess = new bool[42];
@@ -787,7 +790,7 @@ namespace BMSPlayer
             }
 
             UpdateTiming(time, true);
-            UpdateScore(time, totalNotes);
+            UpdateScore(totalNotes);
             ui.UpdateHP(hpController.GetHP());
         }
 
@@ -796,7 +799,7 @@ namespace BMSPlayer
         {
             processedNotes++;
             UpdateTiming(time, true);
-            UpdateScore(time, totalNotes);
+            UpdateScore(totalNotes);
             Destroy(note.noteobj);
             note.setUsed(true);
             removeCandidate.Add(note);
@@ -883,14 +886,10 @@ namespace BMSPlayer
             else return TimingType.NONE;
         }
 
-        private void UpdateScore(double time, int totalNotes)
+        private void UpdateScore(int totalNotes)
         {
-            double percent = Math.Abs(time) / TIMING;
-            int scr = 0;
-            scr = (int)(100f * (float)percent);
-            score += scr;
-            ui.UpdateScore(score);
             ui.UpdateExScore(exscore);
+            ui.UpdateGraph(exscore, processedNotes, totalNotes);
         }
 
         private void ShowBeam(int lane, bool onoff)
@@ -932,7 +931,7 @@ namespace BMSPlayer
             Const.SetResultComboBreak(cb);
             Const.SetResultAvgRate((float)avgRate);
             Const.SetResultTimeDiff((float)avgTimeDiff);
-            Const.SetResultScore(score);
+            //Const.SetResultScore(score);
             Const.SetResultExScore(exscore);
             Const.SetResultMaxCombo(maxcombo);
         }
@@ -941,7 +940,7 @@ namespace BMSPlayer
             if (speed < 1000)
             {
                 speed += 25;
-                Const.SetSpeed(speed);
+                Const.SetSpeedFixed(speed);
                 ui.UpdateSpeed(bpm);
             }
         }
@@ -950,7 +949,7 @@ namespace BMSPlayer
             if (speed > 50)
             {
                 speed -= 25;
-                Const.SetSpeed(speed);
+                Const.SetSpeedFixed(speed);
                 ui.UpdateSpeed(bpm);
             }
         }

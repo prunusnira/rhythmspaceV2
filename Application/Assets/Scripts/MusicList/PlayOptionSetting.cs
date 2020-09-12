@@ -11,7 +11,14 @@ namespace BMSPlayer
     {
         // Speed
         public Text txtSpeed;
+        public Text txtSpdAnother;
         private int speed;
+        private int speedfl;
+
+        // Speed Type
+        public Image spSpdType;
+        public Sprite spdFixed;
+        public Sprite spdFluid;
 
         // Auto
         public Image spAutoOnOff;
@@ -23,8 +30,8 @@ namespace BMSPlayer
         public Sprite JudgeOn;
         public Sprite JudgeOff;
 
-        // Guage Type
-        public Image spGuage;
+        // Gauge Type
+        public Image spGauge;
         public Sprite GAssisted;
         public Sprite GEasy;
         public Sprite GNormal;
@@ -35,9 +42,6 @@ namespace BMSPlayer
         public void Awake()
         {
             // 현재 값 가져오기
-            speed = Const.GetSpeed();
-            txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
-
             if(Const.GetAuto() == 0)
             {
                 spAutoOnOff.sprite = AutoOff;
@@ -56,23 +60,36 @@ namespace BMSPlayer
                 spJudgeOnOff.sprite = JudgeOn;
             }
 
+            if(Const.GetSpdType() == SpdType.FIXED)
+            {
+                speed = Const.GetSpeedFixed();
+                spSpdType.sprite = spdFixed;
+                txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
+            }
+            else
+            {
+                speedfl = Const.GetSpeedFluid();
+                spSpdType.sprite = spdFluid;
+                txtSpeed.text = speedfl.ToString();
+            }
+
             currentJudge = Const.GetJudgeType();
             switch(currentJudge)
             {
                 case JudgeType.ASSISTED:
-                    spGuage.sprite = GAssisted;
+                    spGauge.sprite = GAssisted;
                     break;
                 case JudgeType.EASY:
-                    spGuage.sprite = GEasy;
+                    spGauge.sprite = GEasy;
                     break;
                 case JudgeType.NORMAL:
-                    spGuage.sprite = GNormal;
+                    spGauge.sprite = GNormal;
                     break;
                 case JudgeType.HARD:
-                    spGuage.sprite = GHard;
+                    spGauge.sprite = GHard;
                     break;
                 case JudgeType.EXHARD:
-                    spGuage.sprite = GExHard;
+                    spGauge.sprite = GExHard;
                     break;
             }
         }
@@ -81,41 +98,95 @@ namespace BMSPlayer
         {
             if(Input.GetKeyDown(KeyCode.F1))
             {
-                SpeedDown();
+                if(Const.GetSpdType() == SpdType.FIXED)
+                {
+                    SpeedDownFixed();
+                }
             }
             else if(Input.GetKeyDown(KeyCode.F2))
             {
-                SpeedUp();
+                if (Const.GetSpdType() == SpdType.FIXED)
+                {
+                    SpeedUpFixed();
+                }
             }
-            else if(Input.GetKeyDown(KeyCode.F3))
+            else if(Input.GetKey(KeyCode.F1))
+            {
+                if (Const.GetSpdType() == SpdType.FLUID)
+                {
+                    SpeedDownFluid();
+                }
+            }
+            else if (Input.GetKey(KeyCode.F2))
+            {
+                if (Const.GetSpdType() == SpdType.FLUID)
+                {
+                    SpeedUpFluid();
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.F3))
+            {
+                SpeedTypeChange();
+            }
+            else if(Input.GetKeyDown(KeyCode.F4))
             {
                 AutoOnOff();
             }
-            else if (Input.GetKeyDown(KeyCode.F4))
+            else if (Input.GetKeyDown(KeyCode.F5))
             {
                 JudgeOnOff();
             }
-            else if (Input.GetKeyDown(KeyCode.F5))
+            else if (Input.GetKeyDown(KeyCode.F6))
             {
                 JudgeTypeChange();
             }
         }
 
-        public void SpeedUp()
+        private void SpeedUpFixed()
         {
             if(speed < 1000) speed += 25;
-            Const.SetSpeed(speed);
+            Const.SetSpeedFixed(speed);
+            speedfl = (int)(Const.selectedMusic.BPMstart * speed / 100);
+            Const.SetSpeedFluid(speedfl);
+
             txtSpeed.text = ((float)speed/100).ToString("0.00") + "x";
+            txtSpdAnother.text = "FLUID " + speedfl.ToString();
         }
 
-        public void SpeedDown()
+        private void SpeedDownFixed()
         {
             if (speed > 50) speed -= 25;
-            Const.SetSpeed(speed);
+            Const.SetSpeedFixed(speed);
+            speedfl = (int)(Const.selectedMusic.BPMstart * speed / 100);
+            Const.SetSpeedFluid(speedfl);
+
             txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
+            txtSpdAnother.text = "FLUID " + speedfl.ToString();
         }
 
-        public void JudgeOnOff()
+        private void SpeedUpFluid()
+        {
+            if (speedfl < 1000) speedfl++;
+            Const.SetSpeedFluid(speedfl);
+            speed = (int)((double)speedfl / Const.selectedMusic.BPMstart * 100);
+            Const.SetSpeedFixed(speed);
+
+            txtSpeed.text = speedfl.ToString();
+            txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
+        }
+
+        private void SpeedDownFluid()
+        {
+            if (speedfl > 100) speedfl--;
+            Const.SetSpeedFluid(speedfl);
+            speed = (int)((double)speedfl / Const.selectedMusic.BPMstart * 100);
+            Const.SetSpeedFixed(speed);
+
+            txtSpeed.text = speedfl.ToString();
+            txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
+        }
+
+        private void JudgeOnOff()
         {
             if(Const.GetPJudge() == 0)
             {
@@ -129,7 +200,7 @@ namespace BMSPlayer
             }
         }
 
-        public void AutoOnOff()
+        private void AutoOnOff()
         {
             if(Const.GetAuto() == 0)
             {
@@ -143,32 +214,50 @@ namespace BMSPlayer
             }
         }
 
-        public void JudgeTypeChange()
+        private void JudgeTypeChange()
         {
             switch (currentJudge)
             {
                 case JudgeType.ASSISTED:
-                    spGuage.sprite = GEasy;
+                    spGauge.sprite = GEasy;
                     currentJudge = JudgeType.EASY;
                     break;
                 case JudgeType.EASY:
-                    spGuage.sprite = GNormal;
+                    spGauge.sprite = GNormal;
                     currentJudge = JudgeType.NORMAL;
                     break;
                 case JudgeType.NORMAL:
-                    spGuage.sprite = GHard;
+                    spGauge.sprite = GHard;
                     currentJudge = JudgeType.HARD;
                     break;
                 case JudgeType.HARD:
-                    spGuage.sprite = GExHard;
+                    spGauge.sprite = GExHard;
                     currentJudge = JudgeType.EXHARD;
                     break;
                 case JudgeType.EXHARD:
-                    spGuage.sprite = GAssisted;
+                    spGauge.sprite = GAssisted;
                     currentJudge = JudgeType.ASSISTED;
                     break;
             }
             Const.SetJudgeType(currentJudge);
+        }
+
+        private void SpeedTypeChange()
+        {
+            if (Const.GetSpdType() == SpdType.FIXED)
+            {
+                spSpdType.sprite = spdFluid;
+                Const.SetSpdType(SpdType.FLUID);
+                txtSpeed.text = speedfl.ToString();
+                txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
+            }
+            else
+            {
+                spSpdType.sprite = spdFixed;
+                Const.SetSpdType(SpdType.FIXED);
+                txtSpeed.text = ((float)speed/100).ToString("0.00");
+                txtSpdAnother.text = "FLUID " + speedfl.ToString();
+            }
         }
     }
 }

@@ -167,14 +167,34 @@ namespace BMSPlayer
 
         // Play Setting
         #region Play Setting
-        public static void SetSpeed(int speed)
+        public static void SetSpeedFixed(int speed)
         {
             PlayerPrefs.SetInt("speed", speed);
         }
 
-        public static int GetSpeed()
+        public static int GetSpeedFixed()
         {
             return PlayerPrefs.GetInt("speed", 200);
+        }
+
+        public static void SetSpeedFluid(int speed)
+        {
+            PlayerPrefs.SetInt("speedfl", speed);
+        }
+
+        public static int GetSpeedFluid()
+        {
+            return PlayerPrefs.GetInt("speedfl", 200);
+        }
+
+        public static void SetSpdType(SpdType type)
+        {
+            PlayerPrefs.SetInt("spdtype", (int)type);
+        }
+
+        public static SpdType GetSpdType()
+        {
+            return (SpdType)PlayerPrefs.GetInt("spdtype", (int)SpdType.FIXED);
         }
 
         public static void SetPlayline(int line)
@@ -225,6 +245,16 @@ namespace BMSPlayer
         public static JudgeUIType GetJudgeUIType()
         {
             return (JudgeUIType)PlayerPrefs.GetInt("judgeUIType", 0);
+        }
+
+        public static void SetGraphTarget(GraphTargetType type)
+        {
+            PlayerPrefs.SetInt("graphTargetType", (int)type);
+        }
+
+        public static GraphTargetType GetGraphTarget()
+        {
+            return (GraphTargetType)PlayerPrefs.GetInt("graphTargetType", (int)GraphTargetType.AA);
         }
         #endregion
 
@@ -298,16 +328,6 @@ namespace BMSPlayer
         public static int GetResultComboBreak()
         {
             return PlayerPrefs.GetInt("rst_cb", 0);
-        }
-
-        public static void SetResultScore(int score)
-        {
-            PlayerPrefs.SetInt("rst_score", score);
-        }
-
-        public static int GetResultScore()
-        {
-            return PlayerPrefs.GetInt("rst_score", 0);
         }
 
         public static void SetResultExScore(int score)

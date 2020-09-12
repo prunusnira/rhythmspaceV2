@@ -110,8 +110,10 @@
     <Compile Include="Assets\Scripts\GamePlay\Scroller.cs" />
     <Compile Include="Assets\Scripts\GamePlay\SoundControllerFMOD.cs" />
     <Compile Include="Assets\Scripts\GamePlay\SoundControllerUnity.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enums\GraphTargetType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enums\JudgeType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enums\JudgeUIType.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enums\SpdType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enums\TimingType.cs" />
     <Compile Include="Assets\Scripts\Intro\Intro.cs" />
     <Compile Include="Assets\Scripts\Loading\Loading.cs" />
@@ -407,28 +409,28 @@
       <HintPath>C:/Program Files/Unity/Unity2019.4.9f1/Editor/Data/Managed/UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="I18N.CJK">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Assets/Plugins/I18N.CJK.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/I18N.CJK.dll</HintPath>
     </Reference>
     <Reference Include="I18N">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Assets/Plugins/I18N.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/I18N.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Assets/Plugins/Mono.Data.Sqlite.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/Mono.Data.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="TextMeshPro-5.6-Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-5.6-Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-5.6-Editor.dll</HintPath>
     </Reference>
     <Reference Include="TextMeshPro-5.6-Runtime">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-5.6-Runtime.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-5.6-Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/PackageCache/com.unity.analytics@3.3.5/Unity.Analytics.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/PackageCache/com.unity.analytics@3.3.5/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/PackageCache/com.unity.analytics@3.3.5/Unity.Analytics.Tracker.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/PackageCache/com.unity.analytics@3.3.5/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/PackageCache/com.unity.analytics@3.3.5/AnalyticsStandardEvents/Unity.Analytics.StandardEvents.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/PackageCache/com.unity.analytics@3.3.5/AnalyticsStandardEvents/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>C:/Program Files/Unity/Unity2019.4.9f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
@@ -791,61 +793,61 @@
       <HintPath>C:/Program Files/Unity/Unity2019.4.9f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Monetization">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/UnityEngine.Monetization.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEngine.Monetization.dll</HintPath>
     </Reference>
     <Reference Include="com.unity.multiplayer-hlapi.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Advertisements">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/UnityEngine.Advertisements.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEngine.Advertisements.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="com.unity.multiplayer-weaver.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/com.unity.multiplayer-weaver.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/com.unity.multiplayer-weaver.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.XR.LegacyInputHelpers">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Tilemap.Editor">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.SpatialTracking">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/UnityEditor.SpatialTracking.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEditor.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.SpatialTracking">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.XR.LegacyInputHelpers">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/UnityEditor.XR.LegacyInputHelpers.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEditor.XR.LegacyInputHelpers.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="com.unity.multiplayer-hlapi.Runtime">
-      <HintPath>E:/programming/unity/rhythmspace/Application/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

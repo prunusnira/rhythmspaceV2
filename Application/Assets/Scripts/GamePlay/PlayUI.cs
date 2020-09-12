@@ -14,6 +14,7 @@ namespace BMSPlayer
         // UI Object
         public GameObject layerJudgeAll;
         public GameObject layerPauseMenu;
+        public Text FPSCounter;
 
         // Pause Menu
         public Button btnRestart;
@@ -71,11 +72,13 @@ namespace BMSPlayer
         // Gear
         public GameObject playArea;
         public TextMesh gearCombo;
-        public TextMesh gearScore;
         public TextMesh gearExScore;
         public TextMesh gearSpeed;
         public TextMesh gearHP;
         public TextMesh gearGuageType;
+        public TextMesh gearBPM;
+        public TextMesh gearBPMmin;
+        public TextMesh gearBPMmax;
 
         // Beam
         public GameObject beam1;
@@ -86,6 +89,20 @@ namespace BMSPlayer
         public GameObject beam6;
         public GameObject beam7;
         public GameObject beam8;
+
+        // Play Graph
+        public SpriteRenderer graphCurrent;
+        public SpriteRenderer graphMyBest;
+        public SpriteRenderer graphTarget;
+        public SpriteRenderer graphBestBase;
+        public SpriteRenderer graphTargetBase;
+        private GraphTargetType graphTargetType;
+        public TextMesh rankCurrent;
+        public TextMesh rankBest;
+        public TextMesh rankTarget;
+        public TextMesh scoreCurrent;
+        public TextMesh scoreBest;
+        public TextMesh scoreTarget;
 
         // HPBar
         private HPController hpController;
@@ -110,6 +127,7 @@ namespace BMSPlayer
         public GameObject btnWhite;
         public GameObject btnBlue;
 
+        // BGA
         public MPMP bgaVideo;
         public SpriteRenderer bgaImage;
         public GameObject[] touches;
@@ -121,11 +139,17 @@ namespace BMSPlayer
         public Sprite normalBtn;
         public Sprite selectBtn;
 
+        // Music Info
+        public TextMesh infoGerne;
+        public TextMesh infoTtile;
+        public TextMesh infoArtist;
+
         public void Awake()
         {
+            // 판정 패널 표시 설정
             if (Const.GetPJudge() == 0) layerJudgeAll.SetActive(false);
-            hpController = GetComponent<HPController>();
 
+            // HP bar 설정
             switch(Const.GetJudgeType())
             {
                 case JudgeType.ASSISTED:
@@ -160,9 +184,14 @@ namespace BMSPlayer
                     break;
             }
 
+            // HP 기본 수치 설정
+            hpController = GetComponent<HPController>();
+            UpdateHP(hpController.GetHP());
+
             btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
             btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
 
+            // 판정 표시 타입 변경
             if(Const.GetJudgeUIType() == JudgeUIType.BM)
             {
                 judgeTypeED.SetActive(false);
@@ -171,47 +200,14 @@ namespace BMSPlayer
             {
                 judgeTypeBM.SetActive(false);
             }
-            UpdateHP(hpController.GetHP());
-        }
 
-		public void UpdateSpeed(double bpm)
-        {
-			int speed = Const.GetSpeed();
-            txtSpeed.text = ((float)speed / 100).ToString("0.00");
-            txtBPM.text = bpm.ToString("0.00");
-            txtCalcSpd.text = ((bpm * speed) / 100).ToString("0.00");
-
-            gearSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
-        }
-
-		public void UpdateHP(int hp)
-        {
-            float chp = (float)hp / hpController.GetHPMax();
-            hpBar.material.SetFloat("_Progress", chp);
-            gearHP.text = (chp * 100).ToString("0.00") + "%";
-        }
-
-        public void SetFade()
-        {
-            isFading = true;
-            fadeCube.SetActive(true);
-        }
-
-        public float GetFaderAlpha()
-        {
-            return fadeCube.GetComponent<Renderer>().material.color.a;
-        }
-
-        private void OnGUI()
-        {
-            if (isFading)
-            {
-                StartCoroutine("FadeOut");
-            }
+            // 그래프 초기화
+            SetInitialGraph();
         }
 
         private void Update()
         {
+            FPSCounter.text = "FPS " + ((int)(1f / Time.unscaledDeltaTime)).ToString();
             if (DateTime.Now.Ticks / 10000 - timeLastComboPopup > 1000)
             {
                 if(Const.GetJudgeUIType() == JudgeUIType.ED)
@@ -226,6 +222,14 @@ namespace BMSPlayer
                     txtTimingPercentBM.gameObject.SetActive(false);
                     txtTimingMsBM.gameObject.SetActive(false);
                 }
+            }
+        }
+
+        private void OnGUI()
+        {
+            if (isFading)
+            {
+                StartCoroutine("FadeOut");
             }
         }
 
@@ -245,14 +249,120 @@ namespace BMSPlayer
             }
         }
 
-        public void UpdateScore(int score)
+        public void SetGearBPM(double bpm, double min, double max)
         {
-            gearScore.text = score.ToString();
+            if(min == 0 && max == 0)
+            {
+                gearBPM.text = bpm.ToString("0.00");
+                gearBPMmin.text = bpm.ToString("0.00");
+                gearBPMmax.text = bpm.ToString("0.00");
+            }
+            else
+            {
+                gearBPM.text = bpm.ToString("0.00");
+                gearBPMmin.text = min.ToString("0.00");
+                gearBPMmax.text = max.ToString("0.00");
+            }
+        }
+
+        private void SetInitialGraph()
+        {
+            graphCurrent.material.SetFloat("_Progress", 0f);
+            graphMyBest.material.SetFloat("_Progress", 0f);
+            graphTarget.material.SetFloat("_Progress", 0f);
+
+            graphBestBase.material.SetFloat("_Progress", 0f);
+            rankBest.text = "F";
+
+            switch(Const.GetGraphTarget())
+            {
+                case GraphTargetType.A:
+                    graphTargetBase.material.SetFloat("_Progress", 6f/9);
+                    rankTarget.text = "A";
+                    break;
+                case GraphTargetType.AA:
+                    graphTargetBase.material.SetFloat("_Progress", 7f/9);
+                    rankTarget.text = "AA";
+                    break;
+                case GraphTargetType.AAA:
+                    graphTargetBase.material.SetFloat("_Progress", 8f/9);
+                    rankTarget.text = "AAA";
+                    break;
+                case GraphTargetType.MAX:
+                    graphTargetBase.material.SetFloat("_Progress", 1f);
+                    rankTarget.text = "AAA";
+                    break;
+                default:
+                    graphTargetBase.material.SetFloat("_Progress", 0f);
+                    rankTarget.text = "F";
+                    break;
+            }
+        }
+
+        public void SetMusicInfo(string gerne, string name, string artist)
+        {
+            // 곡 정보 설정
+            infoGerne.text = gerne;
+            infoTtile.text = name;
+            infoArtist.text = artist;
+        }
+
+        public void UpdateSpeed(double bpm)
+        {
+            int speed = Const.GetSpeedFixed();
+            txtSpeed.text = ((float)speed / 100).ToString("0.00");
+            txtBPM.text = bpm.ToString("0.00");
+            txtCalcSpd.text = ((bpm * speed) / 100).ToString("0.00");
+
+            gearSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
+        }
+
+        public void UpdateHP(int hp)
+        {
+            float chp = (float)hp / hpController.GetHPMax();
+            hpBar.material.SetFloat("_Progress", chp);
+            gearHP.text = (chp * 100).ToString("0.00") + "%";
+        }
+
+        public void SetFade()
+        {
+            isFading = true;
+            fadeCube.SetActive(true);
+        }
+
+        public float GetFaderAlpha()
+        {
+            return fadeCube.GetComponent<Renderer>().material.color.a;
         }
 
         public void UpdateExScore(int score)
         {
             gearExScore.text = score.ToString();
+            scoreCurrent.text = score.ToString();
+        }
+
+        public void UpdateGraph(int ex, int procNotes, int totalNotes)
+        {
+            graphCurrent.material.SetFloat("_Progress", ((float)ex) / (totalNotes * 2));
+            switch(Const.GetGraphTarget())
+            {
+                case GraphTargetType.A:
+                    graphTarget.material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 6 / 9);
+                    scoreTarget.text = (procNotes * 2 * 6 / 9).ToString();
+                    break;
+                case GraphTargetType.AA:
+                    graphTarget.material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 7 / 9);
+                    scoreTarget.text = (procNotes * 2 * 7 / 9).ToString();
+                    break;
+                case GraphTargetType.AAA:
+                    graphTarget.material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 8 / 9);
+                    scoreTarget.text = (procNotes * 2 * 8 / 9).ToString();
+                    break;
+                case GraphTargetType.MAX:
+                    graphTarget.material.SetFloat("_Progress", ((float)procNotes) / totalNotes);
+                    scoreTarget.text = (procNotes * 2).ToString();
+                    break;
+            }
         }
 
         public void UpdateMaxCombo(int combo)
@@ -413,11 +523,6 @@ namespace BMSPlayer
             txtMiss.text = m.ToString();
             txtAvgRate.text = a;
             txtAvgDiff.text = d;
-        }
-
-        public void TextToImg(int number, int type)
-        {
-            
         }
 
         // Beam 보이기
