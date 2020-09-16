@@ -15,9 +15,8 @@ namespace BMSPlayer
             DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db1.sqlite";
 #endif
         }
-        public static int CHANNEL = 50;
-        public static int CHANNEL_NOTE = 8;
-        public static int CHANNEL_EXT = 32;
+        public static string FMOD_CHANNEL_GROUP = "bmsChnGroup";
+        public static int CHANNEL = 320;
 
         public static int frameMultiplier = 1000;
 
@@ -254,7 +253,7 @@ namespace BMSPlayer
 
         public static GraphTargetType GetGraphTarget()
         {
-            return (GraphTargetType)PlayerPrefs.GetInt("graphTargetType", (int)GraphTargetType.AA);
+            return (GraphTargetType)PlayerPrefs.GetInt("graphTargetType", (int)GraphTargetType.OFF);
         }
         #endregion
 

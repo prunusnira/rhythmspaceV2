@@ -110,6 +110,7 @@
     <Compile Include="Assets\Scripts\GamePlay\Scroller.cs" />
     <Compile Include="Assets\Scripts\GamePlay\SoundControllerFMOD.cs" />
     <Compile Include="Assets\Scripts\GamePlay\SoundControllerUnity.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enums\BPMNoteType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enums\GraphTargetType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enums\JudgeType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enums\JudgeUIType.cs" />

@@ -74,7 +74,9 @@ namespace BMSCore
         public Dictionary<string, AudioClip> mWavFilesAC = new Dictionary<string, AudioClip>();
         public Dictionary<string, FMOD.Sound> mWavFilesFM = new Dictionary<string, FMOD.Sound>();
         public Dictionary<int, List<string>> mMusic = new Dictionary<int, List<string>>();
-        public Dictionary<int, string> mBPMSet = new Dictionary<int, string>();
+        public Dictionary<int, string> mBPMNote = new Dictionary<int, string>();
+        public Dictionary<int, string> mBPMNoteType2 = new Dictionary<int, string>();
+        public Dictionary<string, double> mBPMNum = new Dictionary<string, double>();
         public Dictionary<int, Dictionary<int, string>> mNote = new Dictionary<int, Dictionary<int, string>>();
         public Dictionary<int, double> mBarLength = new Dictionary<int, double>();
         public Dictionary<string, Sprite> mBGAImages = new Dictionary<string, Sprite>();

@@ -80,28 +80,28 @@ namespace BMSPlayer
                 switch (name)
                 {
                     case "k51":
-                        Keys.btn1k = key;
+                        Keys.btnkb[0] = key;
                         break;
                     case "k52":
-                        Keys.btn2k = key;
+                        Keys.btnkb[1] = key;
                         break;
                     case "k53":
-                        Keys.btn3k = key;
+                        Keys.btnkb[2] = key;
                         break;
                     case "k54":
-                        Keys.btn4k = key;
+                        Keys.btnkb[3] = key;
                         break;
                     case "k55":
-                        Keys.btn5k = key;
+                        Keys.btnkb[4] = key;
                         break;
                     case "k56":
-                        Keys.btn6k = key;
+                        Keys.btnkb[5] = key;
                         break;
                     case "k87":
-                        Keys.btn7k = key;
+                        Keys.btnkb[6] = key;
                         break;
                     case "k88":
-                        Keys.btn8k = key;
+                        Keys.btnkb[7] = key;
                         break;
                 }
 

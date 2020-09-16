@@ -1,5 +1,6 @@
 ﻿using BMSCore;
 using BMSPlayer;
+using System;
 using UnityEngine;
 
 namespace BMSPlayer
@@ -11,18 +12,28 @@ namespace BMSPlayer
 
         public void Initialize()
         {
+            /*FMOD.RESULT result;
+            
+            result = FMODUnity.RuntimeManager.CoreSystem.init(
+                Const.CHANNEL,
+                FMOD.INITFLAGS.NORMAL,
+                (IntPtr)FMOD.OUTPUTTYPE.AUTODETECT
+            );
+
+            FMODErrorCheck(result);*/
+
             channel = new FMOD.Channel[Const.CHANNEL];
             channelGroup = new FMOD.ChannelGroup();
         }
 
         public void InitSoundChannels()
         {
-            for (int i = 0; i < Const.CHANNEL; i++)
+            /*for (int i = 0; i < Const.CHANNEL; i++)
             {
                 channel[i] = new FMOD.Channel();
                 channel[i].setLoopCount(0);
                 channel[i].setChannelGroup(channelGroup);
-            }
+            }*/
         }
 
         // Execute after BMSAnalyzer.FullAnalyzer worked
@@ -33,26 +44,30 @@ namespace BMSPlayer
             {
                 string filepath = bms.getFolderPath() + bms.mWavList[val];
                 FMOD.Sound snd;
-                FMODUnity.RuntimeManager.CoreSystem.createSound(filepath, FMOD.MODE.DEFAULT/*CREATESAMPLE*/, out snd);
+                FMODUnity.RuntimeManager.CoreSystem.createSound(filepath, FMOD.MODE.CREATESAMPLE, out snd);
                 bms.mWavFilesFM.Add(val, snd);
             }
         }
 
         public void PlayKeySound(int lane, string wavFile, ref BMS bms)
         {
+            FMOD.RESULT result = FMOD.RESULT.OK;
             try
             {
-                FMODUnity.RuntimeManager.CoreSystem.playSound(
+                FMOD.Channel channel;
+                result = FMODUnity.RuntimeManager.CoreSystem.playSound(
                     bms.mWavFilesFM[wavFile],
                     channelGroup,
                     false,
-                    out channel[lane]
+                    out channel
                 );
+                channel.setLoopCount(0);
             }
-            catch (System.Exception e)
+            catch(Exception e)
             {
-                Debug.Log("ERROR: " + wavFile);
+                FMODErrorCheck(result);
             }
+
         }
 
         public bool CheckSoundPlaying()
@@ -69,6 +84,15 @@ namespace BMSPlayer
         public void StopAll()
         {
             channelGroup.stop();
+            FMODUnity.RuntimeManager.CoreSystem.close();
+        }
+
+        public void FMODErrorCheck(FMOD.RESULT result)
+        {
+            if(result != FMOD.RESULT.OK)
+            {
+                Debug.LogError(FMOD.Error.String(result));
+            }
         }
     }
 }

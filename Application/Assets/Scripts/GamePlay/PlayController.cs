@@ -19,6 +19,8 @@ namespace BMSPlayer {
 		private NoteGenerator generator;
         private Scroller scroller;
         private LNObjConverter LNConverter;
+        private HPController hpController;
+        public GameObject startLine; // 노트가 생성되는 위치
 
         // Scene 관리
         private double musicStartTime;
@@ -30,6 +32,7 @@ namespace BMSPlayer {
         private int totalNotes;
         private double totalLen = 0; // Bar만 따진것이 아닌 가변 마디를 고려한 이전 마디까지의 길이
         private bool isPaused = false;
+        private bool isGameOver = false;
 
         // Audio Management
         private ISoundController soundController;
@@ -50,6 +53,9 @@ namespace BMSPlayer {
 
             // UI 가져오기
             UI = GetComponent<PlayUI>();
+
+            // HP Controller
+            hpController = GetComponent<HPController>();
 
             // 배속, 라인 수, BMS 로드 등의 기본 데이터 가져오기를 생성자에서 수행
             Data = new PlayData();
@@ -75,11 +81,7 @@ namespace BMSPlayer {
             // 모든 시간은 ms 단위로 한다
 
             // 곡 정보 출력
-            UI.SetMusicInfo(
-                Data.BMS.getGerne(),
-                Data.BMS.getTitle(),
-                Data.BMS.getArtist()
-            );
+            UI.SetMusicInfo(Data.BMS.getTitle());
 
             // 기어 BPM 표시
             UI.SetGearBPM(
@@ -112,7 +114,8 @@ namespace BMSPlayer {
             soundController.InitSoundChannels();
             soundController.PreloadSound(Data.BMS);
 
-			generator.AnalyzeNotes(Data.BMS, Data.Notes, Data.BMS.lastBar, Data.SPB,
+			generator.AnalyzeNotes(Data.BMS, Data.Notes, Data.LongNotes,
+                Data.BMS.lastBar, Data.SPB,
                 ref totalLen, ref noteCount, ref totalNotes, ref totalTime);
 
             Debug.Log("File Loaded: " + Data.BMS.getFilePath());
@@ -121,7 +124,7 @@ namespace BMSPlayer {
             Debug.Log("BPM: " + Data.BMS.getBPMStart());
             Debug.Log("Total: " + totalNotes.ToString());
 
-            UI.UpdateSpeed(Data.CurrentBPM);
+            UI.UpdateSpeed();
 
             // 분석된 데이터를 기반으로 스크롤러 준비
             scroller = GetComponent<Scroller>();
@@ -139,118 +142,6 @@ namespace BMSPlayer {
             {
                 lnadd[i] = false;
             }
-
-            // 라인 벗어나는 롱노트 END 삭제용
-            //List<Note> remove = new List<Note>();
-
-            // 일단 그냥 다 추가하고 롱노트만 따로 처리하면 될거 같은데
-            /*foreach (Note n in Data.Notes)
-            {
-                if (n.getNotetype() == Note.NOTETYPE.PLAYABLE)
-                {
-                    //if (n.getLane() <= Const.GetPlayline())
-                    //{
-                        GameObject noteObj = generator.AddNewNote(n.getLane(), Data.PlayLine, n.getPosition(), UI.playArea.transform);
-                        noteObj.transform.parent = UI.playArea.transform;
-                        n.setNote(noteObj);
-                    //}
-                    //else
-                    //{
-                        // 플레이 라인을 벗어나는 경우 MUSIC 타입으로 변경
-                    //    n.changeToMusic();
-                    //}
-                }
-            }*/
-
-            foreach (Note n in Data.Notes)
-            {
-                if (!n.isLong())
-                {
-                    if (n.getNotetype() == Note.NOTETYPE.PLAYABLE)
-                    {
-                        //if(n.getLane() <= Const.GetPlayline())
-                        //{
-                            GameObject noteObj = generator.AddNewNote(n.getLane(), Data.PlayLine, n.getPosition(), UI.playArea.transform);
-                            noteObj.transform.parent = UI.playArea.transform;
-                            n.setNote(noteObj);
-                        //}
-                        //else
-                        //{
-                            // 플레이 라인을 벗어나는 경우 MUSIC 타입으로 변경
-                        //    n.changeToMusic();
-                        //}
-                    }
-                }
-                else
-                {
-                    // 롱노트 중에 일단 라인을 벗어나는지 검사
-                    /*if (n.getLane() > Const.GetPlayline())
-                    {
-                        // 라인을 벗어나면 롱노트로 추가하지 않고
-                        // 시작 노트를 MUSIC 타입으로 변경 후 종료
-                        int cline = n.getLane();
-
-                        if (lnadd[cline])
-                        {
-                            remove.Add(n);
-                            lnadd[cline] = false;
-                        }
-                        else
-                        {
-                            n.changeToMusic();
-                            lnadd[cline] = true;
-                        }
-                    }
-                    else
-                    {*/
-                        // 롱노트 처리
-                        int cline = n.getLane();
-                        if (lnadd[cline])
-                        {
-                            // 이미 롱노트가 추가중인 상태이면 현재 라인의 lnlist를 갱신하고 노트 표시 추가
-                            for (int i = 0; i < Data.LongNotes.Count; i++)
-                            {
-                                if (Data.LongNotes[i].getLane() == cline && Data.LongNotes[i].getEnd() == null)
-                                {
-                                    GameObject noteObj = generator.AddNewNote(n.getLane(), Data.PlayLine, n.getPosition(), UI.playArea.transform);
-                                    noteObj.transform.parent = UI.playArea.transform;
-                                    n.setNote(noteObj);
-                                    Data.LongNotes[i].setEnd(n);
-                                    Data.LongNotes[i].setEndPos(n.getPosition());
-                                    Data.LongNotes[i].getMiddle().setPosition(
-                                        (Data.LongNotes[i].getStart().getPosition()+n.getPosition()) / 2
-                                    );
-                                    lnadd[cline] = false;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // 아직 롱노트가 없으면 일반 노트를 하나 추가하고
-                            // 롱노트를 이 노트의 위치와 시작 위치 사이에 추가할 수 있도록 함
-                            // 이 동작은 Scroller.moveNotes()에서 isLong()을 확인해서 표기한다
-                            GameObject noteObj = generator.AddNewNote(n.getLane(), Data.PlayLine, n.getPosition(), UI.playArea.transform);
-                            noteObj.transform.parent = UI.playArea.transform;
-                            n.setNote(noteObj);
-
-                            Note lnNote = new Note(n.getPosition() + 1, "L#", n.getBar(), n.getLane(), Note.NOTETYPE.LONGNOTE, true);
-                            GameObject lnObj = generator.AddNewNote(lnNote.getLane(), Data.PlayLine, lnNote.getPosition(), UI.playArea.transform);
-                            lnObj.transform.parent = UI.playArea.transform;
-                            lnNote.setNote(lnObj);
-
-                            Data.LongNotes.Add(new Longnote(cline, n, n.getPosition(), lnNote));
-                            // 롱노트 길이 표기용 노트는 L# 이라는 WAV 명을 표기하고 노트 타입도 LONGNOTE
-                            // (단 롱노트의 시작과 끝은 일반 Note이다)
-                            lnadd[cline] = true;
-                        }
-                    //}
-                }
-            }
-
-            /*foreach (Note r in remove)
-            {
-                Data.Notes.Remove(r);
-            }*/
         }
 
         void Update ()
@@ -268,33 +159,60 @@ namespace BMSPlayer {
                 double spb = Data.SPB;
 
                 // 변속곡 때문에 총 플레이 시간과 bps만으로 계산하는 것은 불가능함
-                scroller.moveNotes(deltaTime, Data.BPS, Data.SPB,
-                            Data.LongNotes, Data.Notes);
+                scroller.moveNotes(deltaTime, Data.BPS, Data.LongNotes, Data.Notes);
 
-                scroller.play(Data.Notes, UI.touches, Data.LongNotes,
-                        //ref unityAudio, ref channelGroup, ref fmodChannel,
-                        Data.BMS, ref bpm, ref bps, ref spb,
-                        totalNotes, Data.PlayLine, totalLen, isPlayAuto);
+                if(isPlayAuto)
+                {
+                    scroller.autoPlay(Data.Notes, Data.LongNotes, Data.BMS,
+                        ref bps, totalNotes);
+                }
+
+                scroller.play(Data.Notes, Data.LongNotes, Data.BMS,
+                        ref bpm, ref bps, ref spb, totalNotes, isPlayAuto);
 
                 Data.CurrentBPM = bpm;
                 Data.BPS = bps;
                 Data.SPB = spb;
 
-                if (scroller.CheckGameOver() && !gameOverTriggered)
+                // 게임 종료 시 처리
+                // Type 1: 게이지가 0이 되었을 때
+                if(hpController.isHpMin())
+                {
+                    if (GameOverCheck())
+                    {
+                        Const.SetClear(0);
+                        isGameOver = true;
+                    }
+                }
+                // Type 2: 노트가 다 사용되었을 때
+                if (scroller.GetProcessedNotes() > 0 &&
+                    GameObject.FindGameObjectsWithTag("Note").Length == 0)
+                {
+                    Const.SetClear(1);
+                    bool isPlaying = soundController.CheckSoundPlaying();
+
+                    if (!isPlaying)
+                    {
+                        isGameOver = true;
+                    }
+                }
+                // 게임오버 처리
+                if (isGameOver && !gameOverTriggered)
                 {
                     // 게임오버로 가기 전에 페이드
                     StartCoroutine("GameOver");
                 }
-                else
+                else if (isGameOver && gameOverTriggered)
                 {
-                    if (GameObject.FindGameObjectsWithTag("Note").Length == 0)
-                    {
-                        Const.SetClear(1);
-                        bool isPlaying = soundController.CheckSoundPlaying();
+                    Debug.Log("GAMEOVER");
+                    // 재생중인 모든 음악 종료
+                    //soundController.StopAll();
 
-                        if (!isPlaying)
-                            scroller.SetGameOver();
-                    }
+                    // 결과 데이터 수집 후 result로 넘기기
+                    scroller.GetResultData(totalNotes);
+
+                    // 결과창으로 이동
+                    //Loading.StartLoading("Result");
                 }
             }
             else if(firstrun && isPaused)
@@ -316,18 +234,13 @@ namespace BMSPlayer {
                 timePrevFrame = musicStartTime;
             }
 
-            if (scroller.CheckGameOver() && gameOverTriggered)
-            {
-                Loading.StartLoading("Result");
-            }
-
+            // 일시정지 메뉴 소환
             if(Input.GetKeyDown(KeyCode.Escape))
             {
                 isPaused = !isPaused;
 
                 if(isPaused)
                 {
-                    // 메뉴 보여주기
                     UI.ShowPauseMenu();
                 }
                 else
@@ -339,23 +252,24 @@ namespace BMSPlayer {
 
         IEnumerator GameOver()
         {
-            if (switchResult)
-            {
-                Debug.Log("GAMEOVER");
-                // 재생중인 모든 음악 종료
-                //channelGroup.stop();
-                soundController.StopAll();
+            UI.SetFade();
+            gameOverTriggered = true;
+            yield return null;
+        }
 
-                // 결과 데이터 수집 후 result로 넘기기
-                scroller.GetResultData(totalNotes);
-
-                UI.SetFade();
-                gameOverTriggered = true;
-            }
-            else
+        private bool GameOverCheck()
+        {
+            switch (Const.GetJudgeType())
             {
-                yield return new WaitForSeconds(0.0f);
-                switchResult = true;
+                case JudgeType.ASSISTED:
+                case JudgeType.EASY:
+                case JudgeType.NORMAL:
+                    return false;
+                case JudgeType.HARD:
+                case JudgeType.EXHARD:
+                    return true;
+                default:
+                    return false;
             }
         }
     }

@@ -64,16 +64,12 @@ namespace BMSPlayer
         public Text txtOk;
         public Text txtMiss;
 
-        // Option
-        public Text txtSpeed;
-        public Text txtBPM;
-        public Text txtCalcSpd;
-
         // Gear
         public GameObject playArea;
         public TextMesh gearCombo;
         public TextMesh gearExScore;
         public TextMesh gearSpeed;
+        public TextMesh gearSpeedFluid;
         public TextMesh gearHP;
         public TextMesh gearGuageType;
         public TextMesh gearBPM;
@@ -96,7 +92,6 @@ namespace BMSPlayer
         public SpriteRenderer graphTarget;
         public SpriteRenderer graphBestBase;
         public SpriteRenderer graphTargetBase;
-        private GraphTargetType graphTargetType;
         public TextMesh rankCurrent;
         public TextMesh rankBest;
         public TextMesh rankTarget;
@@ -113,19 +108,6 @@ namespace BMSPlayer
         public Sprite hpBarNormal;
         public Sprite hpBarHard;
         public Sprite hpBarExHard;
-        
-        // Game Object
-        public GameObject startLine; // 노트가 생성되는 위치
-        public GameObject lastLine; // 판정선
-        public GameObject noteWhite;
-        public GameObject noteBlue;
-        public GameObject notePink;
-        public GameObject noteEmpty;
-        public GameObject noteNouse;
-        
-        public GameObject playerPanel;
-        public GameObject btnWhite;
-        public GameObject btnBlue;
 
         // BGA
         public MPMP bgaVideo;
@@ -140,54 +122,32 @@ namespace BMSPlayer
         public Sprite selectBtn;
 
         // Music Info
-        public TextMesh infoGerne;
         public TextMesh infoTtile;
-        public TextMesh infoArtist;
+
+        // Display Note
+        private NoteGenerator generator;
+        private bool[] lnadd = new bool[8];
 
         public void Awake()
         {
+            // 노트 표시용 설정
+            generator = GetComponent<NoteGenerator>();
+            for (int i = 0; i < 8; i++)
+            {
+                lnadd[i] = false;
+            }
+
             // 판정 패널 표시 설정
             if (Const.GetPJudge() == 0) layerJudgeAll.SetActive(false);
 
             // HP bar 설정
-            switch(Const.GetJudgeType())
-            {
-                case JudgeType.ASSISTED:
-                    hpBarType.text = "ASSISTED";
-                    hpBarType.color = new Color(206f / 255, 159f / 255, 1f);
-                    hpBar.sprite = hpBarAssisted;
-                    break;
-                case JudgeType.EASY:
-                    hpBarType.text = "EASY";
-                    hpBarType.color = new Color(159f / 255, 1f, 180f / 255);
-                    hpBar.sprite = hpBarEasy;
-                    break;
-                case JudgeType.NORMAL:
-                    hpBarType.text = "NORMAL";
-                    hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
-                    hpBar.sprite = hpBarNormal;
-                    break;
-                case JudgeType.HARD:
-                    hpBarType.text = "HARD";
-                    hpBarType.color = new Color(1f, 159f / 255, 159f / 255);
-                    hpBar.sprite = hpBarHard;
-                    break;
-                case JudgeType.EXHARD:
-                    hpBarType.text = "EX-HARD";
-                    hpBarType.color = new Color(246f / 255, 1f, 159f / 255);
-                    hpBar.sprite = hpBarExHard;
-                    break;
-                default:
-                    hpBarType.text = "NORMAL";
-                    hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
-                    hpBar.sprite = hpBarNormal;
-                    break;
-            }
+            SetInitialHPBar();
 
             // HP 기본 수치 설정
             hpController = GetComponent<HPController>();
             UpdateHP(hpController.GetHP());
 
+            // 일시정지 메뉴
             btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
             btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
 
@@ -251,17 +211,51 @@ namespace BMSPlayer
 
         public void SetGearBPM(double bpm, double min, double max)
         {
-            if(min == 0 && max == 0)
+            gearBPM.text = bpm.ToString("0.00");
+            gearBPMmin.text = min.ToString("0.00");
+            gearBPMmax.text = max.ToString("0.00");
+        }
+
+        public void SetGearCurBPM(double bpm)
+        {
+            gearBPM.text = bpm.ToString("0.00");
+            gearSpeedFluid.text = ((int)(bpm * Const.GetSpeedFixed() / 100)).ToString();
+        }
+
+        private void SetInitialHPBar()
+        {
+            switch (Const.GetJudgeType())
             {
-                gearBPM.text = bpm.ToString("0.00");
-                gearBPMmin.text = bpm.ToString("0.00");
-                gearBPMmax.text = bpm.ToString("0.00");
-            }
-            else
-            {
-                gearBPM.text = bpm.ToString("0.00");
-                gearBPMmin.text = min.ToString("0.00");
-                gearBPMmax.text = max.ToString("0.00");
+                case JudgeType.ASSISTED:
+                    hpBarType.text = "ASSISTED";
+                    hpBarType.color = new Color(206f / 255, 159f / 255, 1f);
+                    hpBar.sprite = hpBarAssisted;
+                    break;
+                case JudgeType.EASY:
+                    hpBarType.text = "EASY";
+                    hpBarType.color = new Color(159f / 255, 1f, 180f / 255);
+                    hpBar.sprite = hpBarEasy;
+                    break;
+                case JudgeType.NORMAL:
+                    hpBarType.text = "NORMAL";
+                    hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
+                    hpBar.sprite = hpBarNormal;
+                    break;
+                case JudgeType.HARD:
+                    hpBarType.text = "HARD";
+                    hpBarType.color = new Color(1f, 159f / 255, 159f / 255);
+                    hpBar.sprite = hpBarHard;
+                    break;
+                case JudgeType.EXHARD:
+                    hpBarType.text = "EX-HARD";
+                    hpBarType.color = new Color(246f / 255, 1f, 159f / 255);
+                    hpBar.sprite = hpBarExHard;
+                    break;
+                default:
+                    hpBarType.text = "NORMAL";
+                    hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
+                    hpBar.sprite = hpBarNormal;
+                    break;
             }
         }
 
@@ -299,22 +293,16 @@ namespace BMSPlayer
             }
         }
 
-        public void SetMusicInfo(string gerne, string name, string artist)
+        public void SetMusicInfo(string name)
         {
             // 곡 정보 설정
-            infoGerne.text = gerne;
             infoTtile.text = name;
-            infoArtist.text = artist;
         }
 
-        public void UpdateSpeed(double bpm)
+        public void UpdateSpeed()
         {
-            int speed = Const.GetSpeedFixed();
-            txtSpeed.text = ((float)speed / 100).ToString("0.00");
-            txtBPM.text = bpm.ToString("0.00");
-            txtCalcSpd.text = ((bpm * speed) / 100).ToString("0.00");
-
-            gearSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
+            gearSpeed.text = ((float)Const.GetSpeedFixed() / 100).ToString("0.00") + "x";
+            gearSpeedFluid.text = Const.GetSpeedFluid().ToString();
         }
 
         public void UpdateHP(int hp)
@@ -344,7 +332,44 @@ namespace BMSPlayer
         public void UpdateGraph(int ex, int procNotes, int totalNotes)
         {
             graphCurrent.material.SetFloat("_Progress", ((float)ex) / (totalNotes * 2));
-            switch(Const.GetGraphTarget())
+
+            // 현재 자기 랭크 글자 변경
+            float currentRankState = (float)ex / (procNotes * 2);
+            if(currentRankState >= 8f / 9)
+            {
+                rankCurrent.text = "AAA";
+            }
+            else if (currentRankState >= 7f / 9)
+            {
+                rankCurrent.text = "AA";
+            }
+            else if (currentRankState >= 6f / 9)
+            {
+                rankCurrent.text = "A";
+            }
+            else if (currentRankState >= 5f / 9)
+            {
+                rankCurrent.text = "B";
+            }
+            else if (currentRankState >= 4f / 9)
+            {
+                rankCurrent.text = "C";
+            }
+            else if (currentRankState >= 3f / 9)
+            {
+                rankCurrent.text = "D";
+            }
+            else if (currentRankState >= 2f / 9)
+            {
+                rankCurrent.text = "E";
+            }
+            else
+            {
+                rankCurrent.text = "F";
+            }
+
+            // 타겟 그래프 상승
+            switch (Const.GetGraphTarget())
             {
                 case GraphTargetType.A:
                     graphTarget.material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 6 / 9);
@@ -649,6 +674,122 @@ namespace BMSPlayer
         public void HidePauseMenu()
         {
             layerPauseMenu.SetActive(false);
+        }
+
+        public void displayNote(ref Note note, ref List<Longnote> lnlist)
+        {
+            if (!note.isLong())
+            {
+                if (note.getNotetype() == Note.NOTETYPE.PLAYABLE)
+                {
+                    //if(n.getLane() <= Const.GetPlayline())
+                    //{
+                    GameObject noteObj = generator.AddNewNote(note.getLane(), note.getPosition(), playArea.transform);
+                    noteObj.transform.SetParent(playArea.transform, false);
+                    note.setNote(noteObj);
+                    note.setReleased(true);
+                    //}
+                    //else
+                    //{
+                    // 플레이 라인을 벗어나는 경우 MUSIC 타입으로 변경
+                    //    n.changeToMusic();
+                    //}
+                }
+            }
+            else
+            {
+                // 롱노트 중에 일단 라인을 벗어나는지 검사
+                /*if (n.getLane() > Const.GetPlayline())
+                {
+                    // 라인을 벗어나면 롱노트로 추가하지 않고
+                    // 시작 노트를 MUSIC 타입으로 변경 후 종료
+                    int cline = n.getLane();
+
+                    if (lnadd[cline])
+                    {
+                        remove.Add(n);
+                        lnadd[cline] = false;
+                    }
+                    else
+                    {
+                        n.changeToMusic();
+                        lnadd[cline] = true;
+                    }
+                }
+                else
+                {*/
+                // 롱노트 처리
+                //int cline = note.getLane();
+                /*if (lnadd[cline])
+                {
+                    // 이미 롱노트가 추가중인 상태이면 현재 라인의 lnlist를 갱신하고 노트 표시 추가
+                    for (int i = 0; i < lnlist.Count; i++)
+                    {
+                        if (lnlist[i].getLane() == cline && lnlist[i].getEnd() == null)
+                        {
+                            GameObject noteObj = generator.AddNewNote(note.getLane(), note.getPosition(), playArea.transform);
+                            noteObj.transform.parent = playArea.transform;
+                            note.setNote(noteObj); // 끝노트
+                            note.setReleased(true);
+
+                            lnlist[i].setEnd(note);
+                            lnlist[i].setEndPos(note.getPosition());
+                            lnlist[i].getMiddle().setPosition(
+                                (lnlist[i].getStart().getPosition() + note.getPosition()) / 2
+                            );
+                            lnadd[cline] = false;
+                        }
+                    }
+                }
+                else
+                {*/
+                    // 아직 롱노트가 없으면 일반 노트를 하나 추가하고
+                    // 롱노트를 이 노트의 위치와 시작 위치 사이에 추가할 수 있도록 함
+                    // 이 동작은 Scroller.moveNotes()에서 isLong()을 확인해서 표기한다
+
+                    // 시작노트
+                    GameObject noteObj = generator.AddNewNote(note.getLane(), note.getPosition(), playArea.transform);
+                    noteObj.transform.SetParent(playArea.transform, false);
+                    note.setNote(noteObj);
+                    note.setReleased(true);
+
+                    // 끝노트도 같이 추가한다
+                    for (int i = 0; i < lnlist.Count; i++)
+                    {
+                        if (lnlist[i].getStart() == note)
+                        {
+                        // 가운데노트
+                            Note lnNote = lnlist[i].getMiddle();
+                            GameObject lnObj = generator.AddNewNote(lnNote.getLane(), lnNote.getPosition(), playArea.transform);
+                            lnObj.transform.SetParent(playArea.transform, false);
+                            lnNote.setNote(lnObj);
+                            lnNote.setReleased(true);
+
+                            // 끝노트
+                            Note endNote = lnlist[i].getEnd();
+                            GameObject endObj = generator.AddNewNote(endNote.getLane(), endNote.getPosition(), playArea.transform);
+                            endObj.transform.SetParent(playArea.transform, false);
+                            endNote.setNote(endObj); // 끝노트
+                            endNote.setReleased(true);
+
+                            lnlist[i].setEnd(endNote);
+                            lnlist[i].setEndPos(endNote.getPosition());
+                            lnlist[i].getMiddle().setPosition(
+                                (lnlist[i].getStart().getPosition() + endNote.getPosition()) / 2
+                            );
+                            //lnadd[cline] = false;
+                        }
+                    }
+
+                    
+
+                    //lnlist.Add(new Longnote(cline, note, note.getPosition(), lnNote));
+                    // 롱노트 길이 표기용 노트는 L# 이라는 WAV 명을 표기하고 노트 타입도 LONGNOTE
+                    // (단 롱노트의 시작과 끝은 일반 Note이다)
+                    //lnadd[cline] = true;
+                //}
+                //}
+            }
         }
 
         public void PauseMenuMove()

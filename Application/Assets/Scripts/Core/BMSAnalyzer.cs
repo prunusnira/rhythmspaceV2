@@ -47,6 +47,8 @@ namespace BMSCore
                             left += etc;
                         }
 
+                        string chkWav = tag.Substring(0, 4);
+
                         // For BPM Check
                         int parsedTag = 0;
 
@@ -100,6 +102,13 @@ namespace BMSCore
                         else if (tag == "#STAGEFILE")
                         {
                             bms.setStageFile(left);
+                        }
+                        else if (tag != "#BPM" && chkWav == "#BPM")
+                        {
+                            // 16진수로 표현 불가능 한 BPM 표현
+                            double bpmC = 0d;
+                            bool trial = double.TryParse(left, out bpmC);
+                            GetBPMInfoNum(bpmC, ref bms);
                         }
 
                         // BPM CHECK
@@ -205,6 +214,8 @@ namespace BMSCore
                             float bpm;
                             float.TryParse(left, out bpm);
                             bms.setBPMStart(bpm);
+                            bms.setBPMMin(bpm);
+                            bms.setBPMMax(bpm);
                         }
                         else if (tag == "#PLAYLEVEL")
                         {
@@ -292,6 +303,16 @@ namespace BMSCore
                                 bms.mBGAImages.Add(tag.Substring(4, 2), UnityTools.createSpriteFromFile(bms.getFolderPath() + filenameCheck));
                             }
                         }
+                        else if (tag != "#BPM" && chkWav == "#BPM")
+                        {
+                            // 16진수로 표현 불가능 한 BPM 표현
+                            double bpmC = 0d;
+                            bool trial = double.TryParse(left, out bpmC);
+                            GetBPMInfoNum(bpmC, ref bms);
+
+                            // 등록 필요
+                            bms.mBPMNum.Add(tag.Substring(4, 2), bpmC);
+                        }
 
                         // 문자인 경우는 제외해야 함
                         else if (int.TryParse(tag.Substring(1, 1), out parsedTag))
@@ -335,7 +356,8 @@ namespace BMSCore
                             }
                             else if (ch == 3 && leftNote != "00")
                             {   // BPM
-                                bms.mBPMSet.Add(bar, leftNote);
+                                bms.mBPMNote.Add(bar, leftNote);
+                                GetBPMInfo(leftNote, ref bms);
                             }
                             else if (ch == 4)
                             {
@@ -349,6 +371,11 @@ namespace BMSCore
                             else if (ch == 7)
                             {
                                 // POOR IMG
+                            }
+                            else if(ch == 8)
+                            {
+                                // BPM
+                                bms.mBPMNoteType2.Add(bar, leftNote);
                             }
                             else
                             {
@@ -426,6 +453,18 @@ namespace BMSCore
                         bms.setBPMMax(bpm);
                     }
                 }
+            }
+        }
+
+        public void GetBPMInfoNum(double bpm, ref BMS bms)
+        {
+            if (bpm < bms.getBPMMin())
+            {
+                bms.setBPMMin(bpm);
+            }
+            if (bpm > bms.getBPMMax())
+            {
+                bms.setBPMMax(bpm);
             }
         }
     }

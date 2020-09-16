@@ -44,8 +44,6 @@ public class Loading : MonoBehaviour {
             if(nextScene.progress >= 0.9f)
             {
                 progressBar.fillAmount = Mathf.Lerp(progressBar.fillAmount, 1f, timer);
-
-                Debug.Log("Loading :" + progressBar.fillAmount);
                 
                 if (progressBar.fillAmount == 1f)
                 {

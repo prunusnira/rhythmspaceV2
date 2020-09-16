@@ -114,36 +114,36 @@ namespace BMSPlayer
                     switch (name)
                     {
                         case "c51":
-                            Keys.btn1c = key;
-                            Keys.dpad1 = dp;
+                            Keys.btnct[0] = key;
+                            Keys.dpad[0] = dp;
                             break;
                         case "c52":
-                            Keys.btn2c = key;
-                            Keys.dpad2 = dp;
+                            Keys.btnct[1] = key;
+                            Keys.dpad[1] = dp;
                             break;
                         case "c53":
-                            Keys.btn3c = key;
-                            Keys.dpad3 = dp;
+                            Keys.btnct[2] = key;
+                            Keys.dpad[2] = dp;
                             break;
                         case "c54":
-                            Keys.btn4c = key;
-                            Keys.dpad4 = dp;
+                            Keys.btnct[3] = key;
+                            Keys.dpad[3] = dp;
                             break;
                         case "c55":
-                            Keys.btn5c = key;
-                            Keys.dpad5 = dp;
+                            Keys.btnct[4] = key;
+                            Keys.dpad[4] = dp;
                             break;
                         case "c56":
-                            Keys.btn6c = key;
-                            Keys.dpad6 = dp;
+                            Keys.btnct[5] = key;
+                            Keys.dpad[5] = dp;
                             break;
                         case "c87":
-                            Keys.btn7c = key;
-                            Keys.dpad7 = dp;
+                            Keys.btnct[6] = key;
+                            Keys.dpad[6] = dp;
                             break;
                         case "c88":
-                            Keys.btn8c = key;
-                            Keys.dpad8 = dp;
+                            Keys.btnct[7] = key;
+                            Keys.dpad[7] = dp;
                             break;
                     }
 

@@ -4,10 +4,11 @@ using UnityEngine;
 
 public enum GraphTargetType
 {
-    A = 0,
-    AA = 1,
-    AAA = 2,
-    MAX = 3,
-    IRTOP = 4,
-    IRAVG = 5
+    OFF = 0,
+    A = 1,
+    AA = 2,
+    AAA = 3,
+    MAX = 4,
+    IRTOP = 5,
+    IRAVG = 6
 }

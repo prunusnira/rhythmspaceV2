@@ -104,7 +104,7 @@ namespace BMSPlayer
                             setupButtons();
                             break;
                         case "defaultp4":
-                            Keys.setP4Default();
+                            Keys.setDS4Default();
                             setupButtons();
                             break;
                         case "closeSetting":
@@ -175,7 +175,7 @@ namespace BMSPlayer
                     }
                     else if (col == 1)
                     {
-                        Keys.setP4Default();
+                        Keys.setDS4Default();
                         setupButtons();
                     }
                     else if (col == 2)
@@ -238,7 +238,7 @@ namespace BMSPlayer
 
         public void loadDefaultP4()
         {
-            Keys.setP4Default();
+            Keys.setDS4Default();
             PlayerPrefs.SetString("keypreset", "defaultp4");
         }
 
@@ -263,23 +263,23 @@ namespace BMSPlayer
 
         public void setupButtons()
         {
-            ChangeButton(key1k, Keys.btn1k);
-            ChangeButton(key2k, Keys.btn2k);
-            ChangeButton(key3k, Keys.btn3k);
-            ChangeButton(key4k, Keys.btn4k);
-            ChangeButton(key5k, Keys.btn5k);
-            ChangeButton(key6k, Keys.btn6k);
-            ChangeButton(key7k, Keys.btn7k);
-            ChangeButton(key8k, Keys.btn8k);
+            ChangeButton(key1k, Keys.btnkb[0]);
+            ChangeButton(key2k, Keys.btnkb[1]);
+            ChangeButton(key3k, Keys.btnkb[2]);
+            ChangeButton(key4k, Keys.btnkb[3]);
+            ChangeButton(key5k, Keys.btnkb[4]);
+            ChangeButton(key6k, Keys.btnkb[5]);
+            ChangeButton(key7k, Keys.btnkb[6]);
+            ChangeButton(key8k, Keys.btnkb[7]);
 
-            ChangeButton(key1c, Keys.btn1c);
-            ChangeButton(key2c, Keys.btn2c);
-            ChangeButton(key3c, Keys.btn3c);
-            ChangeButton(key4c, Keys.btn4c);
-            ChangeButton(key5c, Keys.btn5c);
-            ChangeButton(key6c, Keys.btn6c);
-            ChangeButton(key7c, Keys.btn7c);
-            ChangeButton(key8c, Keys.btn8c);
+            ChangeButton(key1c, Keys.btnct[0]);
+            ChangeButton(key2c, Keys.btnct[1]);
+            ChangeButton(key3c, Keys.btnct[2]);
+            ChangeButton(key4c, Keys.btnct[3]);
+            ChangeButton(key5c, Keys.btnct[4]);
+            ChangeButton(key6c, Keys.btnct[5]);
+            ChangeButton(key7c, Keys.btnct[6]);
+            ChangeButton(key8c, Keys.btnct[7]);
         }
 
         public void ChangeButton(Button btn, string key)

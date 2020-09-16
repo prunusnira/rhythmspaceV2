@@ -37,11 +37,20 @@ namespace BMSPlayer
         public Sprite GNormal;
         public Sprite GHard;
         public Sprite GExHard;
-        private JudgeType currentJudge;
+
+        // Target Graph Type
+        public Image spTarget;
+        public Sprite TOff;
+        public Sprite TA;
+        public Sprite TAA;
+        public Sprite TAAA;
+        public Sprite TMax;
 
         public void Awake()
         {
             // 현재 값 가져오기
+
+            // 오토 설정
             if(Const.GetAuto() == 0)
             {
                 spAutoOnOff.sprite = AutoOff;
@@ -51,6 +60,7 @@ namespace BMSPlayer
                 spAutoOnOff.sprite = AutoOn;
             }
 
+            // 판정 표시 설정
             if(Const.GetPJudge() == 0)
             {
                 spJudgeOnOff.sprite = JudgeOff;
@@ -60,6 +70,7 @@ namespace BMSPlayer
                 spJudgeOnOff.sprite = JudgeOn;
             }
 
+            // 속도
             if(Const.GetSpdType() == SpdType.FIXED)
             {
                 speed = Const.GetSpeedFixed();
@@ -73,8 +84,8 @@ namespace BMSPlayer
                 txtSpeed.text = speedfl.ToString();
             }
 
-            currentJudge = Const.GetJudgeType();
-            switch(currentJudge)
+            // 게이지 타입
+            switch(Const.GetJudgeType())
             {
                 case JudgeType.ASSISTED:
                     spGauge.sprite = GAssisted;
@@ -90,6 +101,29 @@ namespace BMSPlayer
                     break;
                 case JudgeType.EXHARD:
                     spGauge.sprite = GExHard;
+                    break;
+            }
+
+            // 그래프
+            switch(Const.GetGraphTarget())
+            {
+                case GraphTargetType.OFF:
+                    spTarget.sprite = TOff;
+                    break;
+                case GraphTargetType.A:
+                    spTarget.sprite = TA;
+                    break;
+                case GraphTargetType.AA:
+                    spTarget.sprite = TAA;
+                    break;
+                case GraphTargetType.AAA:
+                    spTarget.sprite = TAAA;
+                    break;
+                case GraphTargetType.MAX:
+                    spTarget.sprite = TMax;
+                    break;
+                default:
+                    spTarget.sprite = TOff;
                     break;
             }
         }
@@ -139,6 +173,10 @@ namespace BMSPlayer
             else if (Input.GetKeyDown(KeyCode.F6))
             {
                 JudgeTypeChange();
+            }
+            else if (Input.GetKeyDown(KeyCode.F7))
+            {
+                GraphTargetChange();
             }
         }
 
@@ -216,30 +254,29 @@ namespace BMSPlayer
 
         private void JudgeTypeChange()
         {
-            switch (currentJudge)
+            switch (Const.GetJudgeType())
             {
                 case JudgeType.ASSISTED:
                     spGauge.sprite = GEasy;
-                    currentJudge = JudgeType.EASY;
+                    Const.SetJudgeType(JudgeType.EASY);
                     break;
                 case JudgeType.EASY:
                     spGauge.sprite = GNormal;
-                    currentJudge = JudgeType.NORMAL;
+                    Const.SetJudgeType(JudgeType.NORMAL);
                     break;
                 case JudgeType.NORMAL:
                     spGauge.sprite = GHard;
-                    currentJudge = JudgeType.HARD;
+                    Const.SetJudgeType(JudgeType.HARD);
                     break;
                 case JudgeType.HARD:
                     spGauge.sprite = GExHard;
-                    currentJudge = JudgeType.EXHARD;
+                    Const.SetJudgeType(JudgeType.EXHARD);
                     break;
                 case JudgeType.EXHARD:
                     spGauge.sprite = GAssisted;
-                    currentJudge = JudgeType.ASSISTED;
+                    Const.SetJudgeType(JudgeType.ASSISTED);
                     break;
             }
-            Const.SetJudgeType(currentJudge);
         }
 
         private void SpeedTypeChange()
@@ -257,6 +294,36 @@ namespace BMSPlayer
                 Const.SetSpdType(SpdType.FIXED);
                 txtSpeed.text = ((float)speed/100).ToString("0.00");
                 txtSpdAnother.text = "FLUID " + speedfl.ToString();
+            }
+        }
+
+        private void GraphTargetChange()
+        {
+            switch (Const.GetGraphTarget())
+            {
+                case GraphTargetType.OFF:
+                    spTarget.sprite = TA;
+                    Const.SetGraphTarget(GraphTargetType.A);
+                    break;
+                case GraphTargetType.A:
+                    spTarget.sprite = TAA;
+                    Const.SetGraphTarget(GraphTargetType.AA);
+                    break;
+                case GraphTargetType.AA:
+                    spTarget.sprite = TAAA;
+                    Const.SetGraphTarget(GraphTargetType.AAA);
+                    break;
+                case GraphTargetType.AAA:
+                    spTarget.sprite = TMax;
+                    Const.SetGraphTarget(GraphTargetType.MAX);
+                    break;
+                case GraphTargetType.MAX:
+                    spTarget.sprite = TOff;
+                    Const.SetGraphTarget(GraphTargetType.OFF);
+                    break;
+                default:
+                    spTarget.sprite = TOff;
+                    break;
             }
         }
     }
