@@ -67,7 +67,7 @@ namespace BMSPlayer
             miss.text = vmiss.ToString();
             combobreak.text = vcb.ToString();
             avgrate.text = (rate * 100).ToString("0.00") + "%";
-            exscore.text = Const.GetResultExScore().ToString();
+            exscore.text = Const.GetResultScore().ToString();
             combo.text = Const.GetResultMaxCombo().ToString();
             timediff.text = vdiff.ToString("0.00") + "ms";
 

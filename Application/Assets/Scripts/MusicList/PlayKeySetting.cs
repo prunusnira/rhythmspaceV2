@@ -185,26 +185,24 @@ namespace BMSPlayer
                     }
                     break;
                 case 1:
-                    if (col == 0) changeKey("7k");
-                    else if (col == 1) changeKey("7c");
-                    else if (col == 2) changeKey("8k");
-                    else if (col == 3) changeKey("8c");
-                    break;
-                case 2:
                     if (col == 0) changeKey("1k");
                     else if (col == 1) changeKey("2k");
                     else if (col == 2) changeKey("3k");
                     else if (col == 3) changeKey("4k");
                     else if (col == 4) changeKey("5k");
                     else if (col == 5) changeKey("6k");
+                    else if (col == 6) changeKey("7k");
+                    else if (col == 7) changeKey("8k");
                     break;
-                case 3:
+                case 2:
                     if (col == 0) changeKey("1c");
                     else if (col == 1) changeKey("2c");
                     else if (col == 2) changeKey("3c");
                     else if (col == 3) changeKey("4c");
                     else if (col == 4) changeKey("5c");
                     else if (col == 5) changeKey("6c");
+                    else if (col == 6) changeKey("7c");
+                    else if (col == 7) changeKey("8c");
                     break;
             }
         }

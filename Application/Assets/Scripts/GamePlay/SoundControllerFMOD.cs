@@ -1,6 +1,6 @@
 ﻿using BMSCore;
-using BMSPlayer;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BMSPlayer
@@ -8,21 +8,11 @@ namespace BMSPlayer
     public class SoundControllerFMOD : MonoBehaviour, ISoundController
     {
         private FMOD.ChannelGroup channelGroup;
-        private FMOD.Channel[] channel;
+        private List<FMOD.Channel> channels;
 
         public void Initialize()
         {
-            /*FMOD.RESULT result;
-            
-            result = FMODUnity.RuntimeManager.CoreSystem.init(
-                Const.CHANNEL,
-                FMOD.INITFLAGS.NORMAL,
-                (IntPtr)FMOD.OUTPUTTYPE.AUTODETECT
-            );
-
-            FMODErrorCheck(result);*/
-
-            channel = new FMOD.Channel[Const.CHANNEL];
+            channels = new List<FMOD.Channel>();
             channelGroup = new FMOD.ChannelGroup();
         }
 
@@ -62,6 +52,7 @@ namespace BMSPlayer
                     out channel
                 );
                 channel.setLoopCount(0);
+                channels.Add(channel);
             }
             catch(Exception e)
             {
@@ -73,10 +64,13 @@ namespace BMSPlayer
         public bool CheckSoundPlaying()
         {
             bool isPlaying = false;
-            for (int i = 0; i < Const.CHANNEL; i++)
+            foreach(FMOD.Channel c in channels)
             {
-                channel[i].isPlaying(out isPlaying);
-                if (isPlaying) break;
+                c.isPlaying(out isPlaying);
+                if(isPlaying)
+                {
+                    break;
+                }
             }
             return isPlaying;
         }
@@ -84,7 +78,6 @@ namespace BMSPlayer
         public void StopAll()
         {
             channelGroup.stop();
-            FMODUnity.RuntimeManager.CoreSystem.close();
         }
 
         public void FMODErrorCheck(FMOD.RESULT result)

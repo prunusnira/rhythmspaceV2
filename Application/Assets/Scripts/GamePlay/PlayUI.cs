@@ -650,6 +650,11 @@ namespace BMSPlayer
             bgaVideo.Play();
         }
 
+        public bool isBGAPlaying()
+        {
+            return bgaVideo.IsPlaying();
+        }
+
         public void BGAImageSetting(Sprite img)
         {
             bgaImage.sprite = img;

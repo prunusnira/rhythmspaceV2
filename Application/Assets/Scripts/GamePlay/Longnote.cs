@@ -14,7 +14,7 @@ namespace BMSPlayer
         private Note middle;
         private bool used = false;
         // 처리중일때의 value (Scroller.userGamePlay의 롱노트 처리 참고)
-        private bool processed = false;
+        private bool inProgress = false;
         private double processTime = 0;
 
         public Longnote(int lane, Note start, double startpos, Note middle, double endpos = -1, Note end = null)
@@ -40,14 +40,14 @@ namespace BMSPlayer
         public Note getMiddle() { return middle; }
         public Note getEnd() { return end; }
         public bool isUsed() { return used; }
-        public bool isProcessed() { return processed; }
+        public bool isInProgress() { return inProgress; }
         public double getProcTime() { return processTime; }
 
         public void setStartPos(double pos) { this.startpos = pos; }
         public void setEnd(Note end) { this.end = end; }
         public void setEndPos(double endpos) { this.endpos = endpos; }
         public void setUsed(bool used) { this.used = used; }
-        public void setProcessed(bool processed) { this.processed = processed; }
+        public void setInProgress(bool inProgress) { this.inProgress = inProgress; }
         public void setProcTime(double processTime) { this.processTime = processTime; }
     }
 }

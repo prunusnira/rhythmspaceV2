@@ -33,6 +33,7 @@ namespace BMSPlayer {
         private double totalLen = 0; // Bar만 따진것이 아닌 가변 마디를 고려한 이전 마디까지의 길이
         private bool isPaused = false;
         private bool isGameOver = false;
+        private bool isBGAMovieExist = false;
 
         // Audio Management
         private ISoundController soundController;
@@ -92,6 +93,7 @@ namespace BMSPlayer {
 
             if(analyzer.IsVideoExist())
             {
+                isBGAMovieExist = true;
                 UI.BGAVideoActivate();
                 UI.BGAVideoSetting(Data.BMS.bgaVideoFile);
             }
@@ -100,21 +102,24 @@ namespace BMSPlayer {
             generator = GetComponent<NoteGenerator>();
 
             // 사운드 컨트롤러 정의
-            if(Const.GetAudio() == 0)
+            /*if(Const.GetAudio() == 0)
             {
                 soundController = GetComponent<SoundControllerUnity>();
             }
             else
-            {
+            {*/
                 soundController = GetComponent<SoundControllerFMOD>();
-            }
+            //}
 
             // 사운드 정의
             soundController.Initialize();
             soundController.InitSoundChannels();
             soundController.PreloadSound(Data.BMS);
 
-			generator.AnalyzeNotes(Data.BMS, Data.Notes, Data.LongNotes,
+			generator.AnalyzeNotes(
+                Data.BMS,
+                Data.NotePlay, Data.NoteBGA, Data.NoteBGM, Data.NoteBPM,
+                Data.LongNotes,
                 Data.BMS.lastBar, Data.SPB,
                 ref totalLen, ref noteCount, ref totalNotes, ref totalTime);
 
@@ -158,17 +163,27 @@ namespace BMSPlayer {
                 double bps = Data.BPS;
                 double spb = Data.SPB;
 
+                // 1틱 동안 노트가 움직이는 거리 (시간 * 속도)
+                double noteMove = deltaTime * bps;
+
                 // 변속곡 때문에 총 플레이 시간과 bps만으로 계산하는 것은 불가능함
-                scroller.moveNotes(deltaTime, Data.BPS, Data.LongNotes, Data.Notes);
+                scroller.MoveNotes(Data.NotePlay, Data.LongNotes, noteMove, ref bps);
+                scroller.SpeedChangeAndBeam(bpm);
 
                 if(isPlayAuto)
                 {
-                    scroller.autoPlay(Data.Notes, Data.LongNotes, Data.BMS,
+                    scroller.AutoPlay(Data.NotePlay, Data.LongNotes, Data.BMS,
                         ref bps, totalNotes);
                 }
+                else
+                {
+                    scroller.Play(Data.NotePlay, Data.LongNotes, Data.BMS,
+                        ref bpm, ref bps, ref spb, totalNotes);
+                }
 
-                scroller.play(Data.Notes, Data.LongNotes, Data.BMS,
-                        ref bpm, ref bps, ref spb, totalNotes, isPlayAuto);
+                scroller.PlayBGA(Data.NoteBGA, Data.BMS, noteMove);
+                scroller.PlayBGM(Data.NoteBGM, Data.BMS, noteMove);
+                scroller.PlayBPM(Data.NoteBPM, Data.BMS, noteMove, ref bpm, ref bps, ref spb);
 
                 Data.CurrentBPM = bpm;
                 Data.BPS = bps;
@@ -185,13 +200,18 @@ namespace BMSPlayer {
                     }
                 }
                 // Type 2: 노트가 다 사용되었을 때
-                if (scroller.GetProcessedNotes() > 0 &&
-                    GameObject.FindGameObjectsWithTag("Note").Length == 0)
+                if (scroller.GetProcessedNotes() >= totalNotes)
                 {
                     Const.SetClear(1);
-                    bool isPlaying = soundController.CheckSoundPlaying();
+                    bool isPlayingMusic = soundController.CheckSoundPlaying();
+                    bool isPlayingBGA = false;
 
-                    if (!isPlaying)
+                    if(isBGAMovieExist)
+                    {
+                        isPlayingBGA = UI.isBGAPlaying();
+                    }
+
+                    if (!isPlayingMusic && !isPlayingBGA)
                     {
                         isGameOver = true;
                     }
@@ -206,13 +226,13 @@ namespace BMSPlayer {
                 {
                     Debug.Log("GAMEOVER");
                     // 재생중인 모든 음악 종료
-                    //soundController.StopAll();
+                    soundController.StopAll();
 
                     // 결과 데이터 수집 후 result로 넘기기
                     scroller.GetResultData(totalNotes);
 
                     // 결과창으로 이동
-                    //Loading.StartLoading("Result");
+                    Loading.StartLoading("Result");
                 }
             }
             else if(firstrun && isPaused)

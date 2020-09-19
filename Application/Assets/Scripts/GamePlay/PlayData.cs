@@ -19,8 +19,17 @@ namespace BMSPlayer
                 bms = new BMS(bmsPath);
 
             // 데이터 초기화
-            notes = new List<Note>();
+            notePlay = new List<Note>[8];
             longnotes = new List<Longnote>();
+
+            for(int i = 0; i < 8; i++)
+            {
+                notePlay[i] = new List<Note>();
+            }
+
+            noteBGM = new List<Note>();
+            noteBGA = new List<Note>();
+            noteBPM = new List<Note>();
         }
 
 		// BMS 관련 데이터
@@ -38,14 +47,44 @@ namespace BMSPlayer
 			set { playline = value; }
 		}
 
-		private List<Note> notes;
+        private List<Note>[] notePlay;
+        public List<Note>[] NotePlay
+        {
+            get { return notePlay; }
+            set { notePlay = value; }
+        }
+
+
+        private List<Note> noteBGA;
+        public List<Note> NoteBGA
+        {
+            get { return noteBGA; }
+            set { noteBGA = value; }
+        }
+
+        private List<Note> noteBPM;
+        public List<Note> NoteBPM
+        {
+            get { return noteBPM; }
+            set { noteBPM = value; }
+        }
+
+        private List<Note> noteBGM;
+        public List<Note> NoteBGM
+        {
+            get { return noteBGM; }
+            set { noteBGM = value; }
+        }
+
+
+        /*private List<Note> notes;
 		public List<Note> Notes
         {
 			get { return notes; }
 			set { notes = value; }
-		}
+		}*/
 
-		private List<Longnote> longnotes;
+        private List<Longnote> longnotes;
 		public List<Longnote> LongNotes
         {
 			get { return longnotes; }

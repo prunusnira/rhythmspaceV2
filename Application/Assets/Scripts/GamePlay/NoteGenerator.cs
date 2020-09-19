@@ -64,7 +64,10 @@ namespace BMSPlayer
             }
         }
 
-        public void AnalyzeNotes(BMS bms, List<Note> notes, List<Longnote> lnlist,
+        public void AnalyzeNotes(
+            BMS bms,
+            List<Note>[] notePlay, List<Note> noteBGA, List<Note> noteBGM, List<Note> noteBPM,
+            List<Longnote> lnlist,
             int bars, double spb, ref double totalLen, ref int noteCount,
             ref int totalNotes, ref double totalTime) {
             int lines = Const.GetPlayline();
@@ -75,32 +78,32 @@ namespace BMSPlayer
                 if (bms.mNote.ContainsKey(cbar))
                 {
                     Dictionary<int, string> lane = LaneMapGenerator(bms.mNote[cbar]);
-                    NoteAdder(notes, lane, bms.mBarLength, cbar, lines, ref totalLen, ref totalNotes, ref noteCount);
+                    NoteAdder(notePlay, lane, bms.mBarLength, cbar, lines, ref totalLen, ref totalNotes, ref noteCount);
                 }
 
                 // BPM 변경: 보이지 않는 bpm 노트 오브젝트를 만들고 이 노트가 판정선 100%가 되면 bpm 값을 변경
                 if (bms.mBPMNote.ContainsKey(cbar)) // Type1
                 {
-                    NoteAdderBPM(notes, bms.mBPMNote[cbar], bms.mBarLength,
+                    NoteAdderBPM(noteBPM, bms.mBPMNote[cbar], bms.mBarLength,
                         BPMNoteType.Type1, cbar, ref totalLen, ref noteCount);
                 }
 
                 if(bms.mBPMNoteType2.ContainsKey(cbar)) // Type2
                 {
-                    NoteAdderBPM(notes, bms.mBPMNoteType2[cbar], bms.mBarLength,
+                    NoteAdderBPM(noteBPM, bms.mBPMNoteType2[cbar], bms.mBarLength,
                         BPMNoteType.Type2, cbar, ref totalLen, ref noteCount);
                 }
 
                 // 배경음: 보이지 않는 music 노트 오브젝트를 만들고 이 노트가 판정선 100%가 되면 할당된 소리를 재생
                 if (bms.mMusic.ContainsKey(cbar))
                 {
-                    NoteAdderMusic(notes, bms.mMusic[cbar], bms.mBarLength, cbar, ref totalLen, ref noteCount);
+                    NoteAdderMusic(noteBGM, bms.mMusic[cbar], bms.mBarLength, cbar, ref totalLen, ref noteCount);
                 }
 
                 // BGA 노트 처리
                 if (bms.mBGANote.ContainsKey(cbar))
                 {
-                    NoteAdderBGA(notes, bms.mBGANote[cbar], bms.mBarLength, cbar, ref totalLen, ref noteCount);
+                    NoteAdderBGA(noteBGA, bms.mBGANote[cbar], bms.mBarLength, cbar, ref totalLen, ref noteCount);
                 }
 
                 if (bms.mBarLength.ContainsKey(cbar))
@@ -114,7 +117,12 @@ namespace BMSPlayer
                     totalTime += spb;
                 }
             }
-            LongnoteSetup(notes, lnlist);
+            LongnoteSetup(notePlay, lnlist);
+
+            // 노트 오브젝트 등록 후 각 라인별로 position에 따라 정렬 수행
+            // (롱노트 순서 정렬을 위해서)
+            SortNote(notePlay);
+
         }
 
         // 각 라인 별 노트 데이터 저장 (Bar 1개 내)
@@ -157,7 +165,7 @@ namespace BMSPlayer
             return lane;
         }
 
-        public void NoteAdder(List<Note> notes, Dictionary<int, string> lane,
+        public void NoteAdder(List<Note>[] notes, Dictionary<int, string> lane,
             Dictionary<int, double> barLength, int cbar, int lines,
             ref double totalLen, ref int totalNotes, ref int noteCount) {
 
@@ -189,75 +197,75 @@ namespace BMSPlayer
                                 switch (cline)
                                 {
                                     case 0:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 0));
+                                        notes[0].Add(new Note(realpos, noteStr, cbar, 0));
                                         totalNotes++;
                                         noteCount++;
                                         break;
                                     case 1:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 1));
+                                        notes[1].Add(new Note(realpos, noteStr, cbar, 1));
                                         totalNotes++;
                                         noteCount++;
                                         break;
                                     case 2:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 2));
+                                        notes[2].Add(new Note(realpos, noteStr, cbar, 2));
                                         totalNotes++;
                                         noteCount++;
                                         break;
                                     case 3:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 3));
+                                        notes[3].Add(new Note(realpos, noteStr, cbar, 3));
                                         totalNotes++;
                                         noteCount++;
                                         break;
                                     case 4:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 4));
+                                        notes[4].Add(new Note(realpos, noteStr, cbar, 4));
                                         totalNotes++;
                                         noteCount++;
                                         break;
                                     case 5:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 5));
+                                        notes[5].Add(new Note(realpos, noteStr, cbar, 5));
                                         totalNotes++;
                                         noteCount++;
                                         break;
                                     case 6:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 6));
+                                        notes[6].Add(new Note(realpos, noteStr, cbar, 6));
                                         totalNotes++;
                                         noteCount++;
                                         break;
                                     case 7:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 7));
+                                        notes[7].Add(new Note(realpos, noteStr, cbar, 7));
                                         totalNotes++;
                                         noteCount++;
                                         break;
                                     case 10:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 0, Note.NOTETYPE.PLAYABLE, true));
+                                        notes[0].Add(new Note(realpos, noteStr, cbar, 0, Note.NOTETYPE.PLAYABLE, true));
                                         longcnt++;
                                         break;
                                     case 11:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 1, Note.NOTETYPE.PLAYABLE, true));
+                                        notes[1].Add(new Note(realpos, noteStr, cbar, 1, Note.NOTETYPE.PLAYABLE, true));
                                         longcnt++;
                                         break;
                                     case 12:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 2, Note.NOTETYPE.PLAYABLE, true));
+                                        notes[2].Add(new Note(realpos, noteStr, cbar, 2, Note.NOTETYPE.PLAYABLE, true));
                                         longcnt++;
                                         break;
                                     case 13:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 3, Note.NOTETYPE.PLAYABLE, true));
+                                        notes[3].Add(new Note(realpos, noteStr, cbar, 3, Note.NOTETYPE.PLAYABLE, true));
                                         longcnt++;
                                         break;
                                     case 14:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 4, Note.NOTETYPE.PLAYABLE, true));
+                                        notes[4].Add(new Note(realpos, noteStr, cbar, 4, Note.NOTETYPE.PLAYABLE, true));
                                         longcnt++;
                                         break;
                                     case 15:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 5, Note.NOTETYPE.PLAYABLE, true));
+                                        notes[5].Add(new Note(realpos, noteStr, cbar, 5, Note.NOTETYPE.PLAYABLE, true));
                                         longcnt++;
                                         break;
                                     case 16:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 6, Note.NOTETYPE.PLAYABLE, true));
+                                        notes[6].Add(new Note(realpos, noteStr, cbar, 6, Note.NOTETYPE.PLAYABLE, true));
                                         longcnt++;
                                         break;
                                     case 17:
-                                        notes.Add(new Note(realpos, noteStr, cbar, 7, Note.NOTETYPE.PLAYABLE, true));
+                                        notes[7].Add(new Note(realpos, noteStr, cbar, 7, Note.NOTETYPE.PLAYABLE, true));
                                         longcnt++;
                                         break;
                                 }
@@ -270,7 +278,7 @@ namespace BMSPlayer
             totalNotes += longcnt / 2;
         }
 
-        public void LongnoteSetup(List<Note> notes, List<Longnote> lnlist)
+        public void LongnoteSetup(List<Note>[] notePlay, List<Longnote> lnlist)
         {
             bool[] lnadd = new bool[8];
             for (int i = 0; i < 8; i++)
@@ -278,37 +286,40 @@ namespace BMSPlayer
                 lnadd[i] = false;
             }
 
-            foreach (Note n in notes)
+            foreach (List<Note> notes in notePlay)
             {
-                if(n.isLong())
+                foreach (Note n in notes)
                 {
-                    int cline = n.getLane();
-                    if (lnadd[cline])
+                    if(n.isLong())
                     {
-                        // 이미 롱노트가 추가중인 상태이면 현재 라인의 lnlist를 갱신하고 노트 표시 추가
-                        for (int i = 0; i < lnlist.Count; i++)
+                        int cline = n.getLane();
+                        if (lnadd[cline])
                         {
-                            if (lnlist[i].getLane() == cline && lnlist[i].getEnd() == null)
+                            // 이미 롱노트가 추가중인 상태이면 현재 라인의 lnlist를 갱신하고 노트 표시 추가
+                            for (int i = 0; i < lnlist.Count; i++)
                             {
-                                n.setLnEnd(true);
-                                n.setLnNum(i);
-                                lnlist[i].setEnd(n);
-                                lnlist[i].setEndPos(n.getPosition());
-                                lnlist[i].getMiddle().setPosition(
-                                    (lnlist[i].getStart().getPosition() + n.getPosition()) / 2
-                                );
-                                lnadd[cline] = false;
+                                if (lnlist[i].getLane() == cline && lnlist[i].getEnd() == null)
+                                {
+                                    n.setLnEnd(true);
+                                    n.setLnNum(i);
+                                    lnlist[i].setEnd(n);
+                                    lnlist[i].setEndPos(n.getPosition());
+                                    lnlist[i].getMiddle().setPosition(
+                                        (lnlist[i].getStart().getPosition() + n.getPosition()) / 2
+                                    );
+                                    lnadd[cline] = false;
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        n.setLnStart(true);
-                        n.setLnNum(lnlist.Count);
-                        Note lnNote = new Note(n.getPosition() + 1, "L#", n.getBar(), n.getLane(), Note.NOTETYPE.PLAYABLE, true);
-                        lnNote.setLnMid(true);
-                        lnlist.Add(new Longnote(cline, n, n.getPosition(), lnNote));
-                        lnadd[cline] = true;
+                        else
+                        {
+                            n.setLnStart(true);
+                            n.setLnNum(lnlist.Count);
+                            Note lnNote = new Note(n.getPosition() + 1, "L#", n.getBar(), n.getLane(), Note.NOTETYPE.PLAYABLE, true);
+                            lnNote.setLnMid(true);
+                            lnlist.Add(new Longnote(cline, n, n.getPosition(), lnNote));
+                            lnadd[cline] = true;
+                        }
                     }
                 }
             }
@@ -410,6 +421,14 @@ namespace BMSPlayer
                 else length += 1;
             }
             return length;
+        }
+
+        private void SortNote(List<Note>[] notePlay)
+        {
+            foreach(List<Note> nl in notePlay)
+            {
+                nl.Sort((x1, x2) => x1.getPosition().CompareTo(x2.getPosition()));
+            }
         }
     }
 }

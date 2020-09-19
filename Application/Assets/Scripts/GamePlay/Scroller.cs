@@ -39,6 +39,9 @@ namespace BMSPlayer
         private double sumRate = 0;
         private double avgRate = 0;
 
+        // 공푸어 처리용
+        private int notesInTimingWindow = 0; // 개수가 0보다 크면 노트가 있음
+
         private int speed = 200;
         private int speedfl = 200;
         private SpdType spdType;
@@ -55,6 +58,7 @@ namespace BMSPlayer
         // 노트 스크롤
         private double noteTiming;
         private bool[] btnPushState; // 라인별 처리중 상태 on/off
+        private bool[] btnPushSound; // 라인 눌렀을 때 소리를 재생했는지 여부 확인
         private int syncControl = 0;
 
         // 롱노트 처리 변수
@@ -77,7 +81,8 @@ namespace BMSPlayer
             spdType = Const.GetSpdType();
 
             isAxisPushed = new bool[8] { false, false, false, false, false, false, false, false };
-            btnPushState = new bool[8];
+            btnPushState = new bool[8] { false, false, false, false, false, false, false, false };
+            btnPushSound = new bool[8] { false, false, false, false, false, false, false, false };
             isLnWorking = new bool[42];
             lnTiming = new double[8];
             lnInProcess = new Longnote[8];
@@ -98,218 +103,401 @@ namespace BMSPlayer
             hpController.SetHPJudgeType(judgeType, noteCount);
 
             // 사운드 컨트롤러 정의
-            if (Const.GetAudio() == 0)
+            /*if (Const.GetAudio() == 0)
             {
                 soundController = GetComponent<SoundControllerUnity>();
             }
             else
-            {
+            {*/
                 soundController = GetComponent<SoundControllerFMOD>();
-            }
+            //}
         }
 
-        public void moveNotes(double frametime, double bps,
-            List<Longnote> lnlist, List<Note> notes)
+        public void MoveNotes(List<Note>[] notePlay, List<Longnote> lnlist,
+            double noteMove, ref double bps)
         {
-            /**
-             * 1틱에 노트가 이동한 거리 (noteTimimg) = frametime * bps
-             * (배속이 적용되지 않은 실제 노트의 위치임 = 이전 노트위치 - noteTiming)
-             * 
-             * 배속이 적용된 노트 위치 = (노트위치 - noteTiming) * 배속
-             * 
-             * 순간속도 = noteTiming * 배속
-             * 
-             * ==========================================
-             * 노트 위치에 대해 판정선까지의 시간계산하기
-             * 시간 = (노트의 처음위치 - 노트의 현재위치) / 시간당 비트(bps)
-             */
-            noteTiming = frametime * bps;
-
             double linepos = lastLine.transform.localPosition.z;
 
-            List<Note> removeCandidate = new List<Note>();
-
             // 기본적으로 롱노트든 뭐든 모든 노트를 내림
-            for (int i = 0; i < notes.Count; i++)
+            foreach(List<Note> notes in notePlay)
             {
-                Note n = notes[i];
-                double posz = n.getPosition() - noteTiming;
-                float scrpos = (float)posz * speed / 100;
-                n.setPosition(posz);
-                n.setScrPos(scrpos);
+                List<Note> removeCandidate = new List<Note>();
 
-                // 노트가 화면에 표시되지 않은 상태라면 노트를 화면에 뿌림
-                if(!n.isReleased() && scrpos < 3000)
+                for (int i = 0; i < notes.Count; i++)
                 {
-                    ui.displayNote(ref n, ref lnlist);
-                }
+                    Note current = notes[i];
+                    float scrpos = MoveActualNotePosition(ref current, noteMove);
 
-                // 실제 오브젝트가 존재할 때 위치를 이동시킴
-                if(n.noteobj != null)
+                    // 노트가 화면에 표시되지 않은 상태라면 노트를 화면에 뿌림
+                    if (!current.isReleased() && current.getScrPos() < 3000)
+                    {
+                        ui.displayNote(ref current, ref lnlist);
+                    }
+
+                    // 실제 오브젝트가 존재할 때 위치를 이동시킴
+                    if (current.noteobj != null)
+                    {
+                        GameObject noteobj = current.noteobj;
+                        noteobj.transform.localPosition = new Vector3(
+                            noteobj.transform.localPosition.x,
+                            noteobj.transform.localPosition.y,
+                            scrpos);
+                    }
+
+                    // 롱노트 가운데 노트의 위치와 넓이 설정
+                    if (current.isLnEnd() && current.isReleased() &&
+                        !current.isUsed())
+                    {
+                        // isSpeedChanged는 모든 롱노트를 변경한 후에
+                        // false로 바꾸어야하므로 for문 아래에 둠
+                        Longnote ln = lnlist[current.getLnNum()];
+                        double startRealPos = ln.getStart().getScrPos();
+                        double endRealPos = ln.getEnd().getScrPos();
+
+                        Note middle = ln.getMiddle();
+
+                        // 스케일 변경
+                        Vector3 middleScale = middle.noteobj.transform.localScale;
+                        middle.noteobj.transform.localScale = new Vector3(
+                            middleScale.x, middleScale.y, (float)(endRealPos - startRealPos));
+
+                        // 위치 변경
+                        Vector3 middlePos = middle.noteobj.transform.localPosition;
+                        middle.noteobj.transform.localPosition = new Vector3(
+                            middlePos.x, middlePos.y, (float)((startRealPos + endRealPos) / 2));
+                    }
+
+                    
+                    double time = GetJudgeTiming(current.getScrPos(), linepos, bps);
+
+                    // 노트가 타이밍윈도우 내에 진입하면 공푸어 계산을 위해 값을 추가
+                    if(time < TIMING)
+                    {
+                        notesInTimingWindow++;
+                    }
+
+                    // 노트가 판정선 이하로 내려가면 사라짐
+                    // 노트의 위치는 판정선과 노트 사이의 도달 시간으로 계산
+                    /*
+                     * 노트 위치에 대해 판정선까지의 시간계산하기
+                     * 시간 = (노트의 처음위치 - 노트의 현재위치) / 시간당 비트(bps)
+                     */
+                    if (time < TIMING * -1 &&
+                        current.getNotetype() == Note.NOTETYPE.PLAYABLE &&
+                        current.isReleased())
+                    {
+                        if (!current.isLong() && !current.isUsed())
+                        {
+                            // 데이터 처리
+                            miss++;
+                            combo = 0;
+                            cb++;
+                            processedNotes++;
+                            hpController.hpChangeMiss();
+                            UpdateTiming(time, true);
+                            current.setUsed(true);
+                            ui.UpdateHP(hpController.GetHP());
+
+                            // 노트 삭제
+                            Destroy(current.noteobj);
+                            removeCandidate.Add(current);
+                        }
+                        else if (current.isLnStart() && !current.isUsed() &&
+                            !lnlist[current.getLnNum()].isInProgress())
+                        {
+                            // 시작 위치에서는 롱노트 전체 형태를 유지해야 하므로 없애지 않음
+                            miss++;
+                            combo = 0;
+                            cb++;
+                            hpController.hpChangeMiss();
+                            UpdateTiming(time, true);
+                        }
+                        else if (current.isLnMid() && !current.isUsed())
+                        {
+                            current.setUsed(true);
+                        }
+                        else if (current.isLnEnd() && !current.isUsed())
+                        {
+                            // 롱노트 관련 데이터 처리
+                            int lnNum = current.getLnNum();
+                            isLnWorking[current.getLane()] = false;
+                            lnlist[lnNum].getStart().setUsed(true);
+                            lnlist[lnNum].setUsed(true);
+                            current.setUsed(true);
+                            processedNotes++;
+
+                            // 롱노트 구성요소를 모두 삭제처리
+                            Destroy(lnlist[lnNum].getStart().noteobj);
+                            Destroy(lnlist[lnNum].getMiddle().noteobj);
+                            Destroy(current.noteobj);
+                            removeCandidate.Add(current);
+                            removeCandidate.Add(lnlist[lnNum].getStart());
+                            removeCandidate.Add(lnlist[lnNum].getMiddle());
+                        }
+                    }
+                }
+                
+                // 삭제
+                foreach (Note n in removeCandidate)
                 {
-                    GameObject noteobj = n.noteobj;
-                    noteobj.transform.localPosition = new Vector3(
-                        noteobj.transform.localPosition.x,
-                        noteobj.transform.localPosition.y,
-                        (float)posz * speed / 100);
+                    notes.Remove(n);
                 }
-
-                // 롱노트 가운데 노트의 초기 위치와 넓이 설정
-                if(n.isLnEnd() && n.isReleased())
-                {
-                    // isSpeedChanged는 모든 롱노트를 변경한 후에
-                    // false로 바꾸어야하므로 for문 아래에 둠
-                    Longnote ln = lnlist[n.getLnNum()];
-                    double startRealPos = ln.getStart().getScrPos();
-                    double endRealPos = ln.getEnd().getScrPos();
-
-                    Note middle = ln.getMiddle();
-
-                    // 스케일 변경
-                    Vector3 middleScale = middle.noteobj.transform.localScale;
-                    middle.noteobj.transform.localScale = new Vector3(
-                        middleScale.x, middleScale.y, (float)(endRealPos - startRealPos));
-
-                    // 위치 변경
-                    Vector3 middlePos = middle.noteobj.transform.localPosition;
-                    middle.noteobj.transform.localPosition = new Vector3(
-                        middlePos.x, middlePos.y, (float)((startRealPos + endRealPos) / 2));
-                }
-
-                // 노트가 판정선 이하로 내려가면 사라짐
-                // 노트의 위치는 판정선과 노트 사이의 도달 시간으로 계산
-                /*
-                 * 노트 위치에 대해 판정선까지의 시간계산하기
-                 * 시간 = (노트의 처음위치 - 노트의 현재위치) / 시간당 비트(bps)
-                 */
-                double time = GetJudgeTiming(n.getScrPos(), linepos, bps);
-                if (time < TIMING * -1 &&
-                    n.getNotetype() == Note.NOTETYPE.PLAYABLE)
-                {
-                    if(!n.isLong() && !n.isUsed())
-                    {
-                        miss++;
-                        combo = 0;
-                        cb++;
-                        processedNotes++;
-                        hpController.hpChangeMiss();
-                        UpdateTiming(time, true);
-                        if (n.isReleased()) Destroy(n.noteobj);
-                        n.setUsed(true);
-                        removeCandidate.Add(n);
-                        ui.UpdateHP(hpController.GetHP());
-                    }
-                    else if(n.isLnStart() && !n.isUsed())
-                    {
-                        // 시작 위치에서는 롱노트 전체 형태를 유지해야 하므로 없애지 않음
-                        miss++;
-                        combo = 0;
-                        cb++;
-                        hpController.hpChangeMiss();
-                        UpdateTiming(time, true);
-                        n.setUsed(true);
-                    }
-                    else if(n.isLnMid() && !n.isUsed())
-                    {
-                        n.setUsed(true);
-                    }
-                    else if(n.isLnEnd())
-                    {
-                        // 롱노트 구성요소를 모두 삭제처리 하는 과정
-                        processedNotes++;
-                        int lnNum = n.getLnNum();
-                        lnlist[lnNum].setUsed(true);
-                        Destroy(lnlist[lnNum].getStart().noteobj);
-                        Destroy(lnlist[lnNum].getMiddle().noteobj);
-                        Destroy(n.noteobj);
-                        lnlist[lnNum].getStart().setUsed(true);
-                        n.setUsed(true);
-                        removeCandidate.Add(n);
-                        removeCandidate.Add(lnlist[lnNum].getStart());
-                        removeCandidate.Add(lnlist[lnNum].getMiddle());
-                        isLnWorking[n.getLane()] = false;
-                        btnPushState[n.getLane()] = false;
-                    }
-                }
-
-            }
-
-            // 삭제
-            foreach (Note n in removeCandidate)
-            {
-                notes.Remove(n);
             }
         }
 
-        public void autoPlay(List<Note> notes, List<Longnote> lnlist,
+        private float MoveActualNotePosition(ref Note n, double noteMove)
+        {
+            double posz = n.getPosition() - noteMove;
+            float scrpos = (float)posz * speed / 100;
+            n.setPosition(posz);
+            n.setScrPos(scrpos);
+            return scrpos;
+        }
+
+        public void PlayBGA(List<Note> noteBGA, BMS bms, double noteMove)
+        {
+            double linepos = lastLine.transform.localPosition.z;
+            List<Note> removeCandidate = new List<Note>();
+
+            for (int i = 0; i < noteBGA.Count; i++)
+            {
+                Note current = noteBGA[i];
+                MoveActualNotePosition(ref current, noteMove);
+
+                if (current.getScrPos() <= linepos)
+                {
+                    string notestr = current.getWav();
+                    if (bms.mBGAImages.Count > 0)
+                    {
+                        if (bms.mBGAImages.ContainsKey(notestr))
+                        {
+                            if (!BGAOnChecked) bgaImage.SetActive(true);
+                            ui.BGAImageSetting(bms.mBGAImages[notestr]);
+                        }
+                    }
+                    else if (bms.bgaVideoFile != null)
+                    {
+                        if (!BGAOnChecked) bgaVideo.SetActive(true);
+                        ui.BGAVideoPlay();
+                    }
+                    current.setUsed(true);
+                    removeCandidate.Add(current);
+                }
+            }
+
+            foreach (Note n in removeCandidate)
+            {
+                noteBGA.Remove(n);
+            }
+        }
+
+        public void PlayBGM(List<Note> noteBGM, BMS bms, double noteMove)
+        {
+            double linepos = lastLine.transform.localPosition.z;
+            List<Note> removeCandidate = new List<Note>();
+
+            for (int i = 0; i < noteBGM.Count; i++)
+            {
+                Note current = noteBGM[i];
+                MoveActualNotePosition(ref current, noteMove);
+
+                if (current.getScrPos() <= linepos)
+                {
+                    soundController.PlayKeySound(current.getLane(), current.getWav(), ref bms);
+                    current.setUsed(true);
+                    removeCandidate.Add(current);
+                }
+            }
+
+            foreach (Note n in removeCandidate)
+            {
+                noteBGM.Remove(n);
+            }
+        }
+
+        public void PlayBPM(List<Note> noteBPM, BMS bms, double noteMove,
+            ref double bpm, ref double bps, ref double spb)
+        {
+            double linepos = lastLine.transform.localPosition.z;
+            List<Note> removeCandidate = new List<Note>();
+
+            for (int i = 0; i < noteBPM.Count; i++)
+            {
+                Note current = noteBPM[i];
+                MoveActualNotePosition(ref current, noteMove);
+
+                if (current.getScrPos() <= linepos)
+                {
+                    switch (current.getNotetype())
+                    {
+                        case Note.NOTETYPE.BPM:
+                            bpm = Convert.ToInt32(current.getWav(), 16);
+                            bps = bpm / 240;
+                            spb = (double)(240 * 1000) / bpm;
+                            current.setUsed(true);
+                            removeCandidate.Add(current);
+                            ui.SetGearCurBPM(bpm);
+                            break;
+                        case Note.NOTETYPE.BPMT2:
+                            bpm = bms.mBPMNum[current.getWav()];
+                            bps = bpm / 240;
+                            spb = (double)(240 * 1000) / bpm;
+                            current.setUsed(true);
+                            removeCandidate.Add(current);
+                            ui.SetGearCurBPM(bpm);
+                            break;
+                    }
+                }
+            }
+
+            foreach (Note n in removeCandidate)
+            {
+                noteBPM.Remove(n);
+            }
+        }
+
+        public void AutoPlay(List<Note>[] notePlay, List<Longnote> lnlist,
             BMS bms, ref double bps, int totalNotes)
         {
             double linepos = lastLine.transform.localPosition.z;
+            double additionalPos = bps * PERFECT;
             List<Note> removeCandidate = new List<Note>();
 
-            for (int i = 0; i < notes.Count; i++)
+            // 각 라인에 대해 검사
+            for (int i = 0; i < Const.LINE; i++)
             {
-                Note current = notes[i];
-                Note.NOTETYPE type = current.getNotetype();
+                // 1. 현재 라인을 가져옴
+                List<Note> currentLine = notePlay[i];
 
-                if(type == Note.NOTETYPE.PLAYABLE)
+                // 2. 현재 라인의 첫 노트를 가져옴
+                if (currentLine.Count == 0) continue;
+
+                Note cnote = currentLine[0];
+
+                if (cnote.isLnStart() && lnlist[cnote.getLnNum()].isInProgress())
                 {
-                    int line = current.getLane();
-                    double additionalPos = bps * PERFECT;
+                    cnote = currentLine[1];
+                }
 
-                    /**
-                     * 롱노트를 처리중이 아니면서
-                     * 판정선에 노트가 닿고
-                     * 현재 노트가 미사용상태일 경우
-                     * (일반노트 혹은 롱노트의 시작)
-                     */
-                    if (!isLnWorking[line] &&
-                        current.getScrPos() <= linepos + additionalPos &&
-                        !current.isUsed())
+                // 3. 해당 노트의 위치가 판정선 아래인지 확인
+                if (cnote.getScrPos() <= linepos + additionalPos)
+                {
+                    // 롱노트 진행중이 아닐 때의 처리
+                    // (일반노트 & 롱노트 시작)
+                    if (!isLnWorking[i])
                     {
-                        //ShowBeam(line, true);
-                        btnPushState[line] = true;
-                        double time = GetJudgeTiming(notes[i].getScrPos(), linepos, bps);
-                        ProcessSingleNote(line, time, totalNotes, ref bms, ref current, ref removeCandidate, ref lnlist);
+                        // 눌림 상태 처리
+                        btnPushState[i] = true;
 
-                        if (!current.isLong())
+                        // 소리 내기
+                        if (!btnPushSound[i])
                         {
-                            StartCoroutine(AutoTurnoffBeam(line));
+                            soundController.PlayKeySound(cnote.getLane(), cnote.getWav(), ref bms);
+                            btnPushSound[i] = true;
                         }
-                    }
-                    /**
-                     * 롱노트가 처리중이며
-                     * 판정선에 노트가 닿고
-                     * 현재 노트가 미사용상태일 경우
-                     * (롱노트가 끝날때의 처리)
-                     */
-                    else if (isLnWorking[line] &&
-                        current.getScrPos() <= linepos + additionalPos &&
-                        !current.isUsed())
-                    {
-                        if(current.isLnEnd())
+
+                        double time = GetJudgeTiming(cnote.getScrPos(), linepos, bps);
+                        
+                        if (cnote.isLnStart())
                         {
-                            //double time = GetJudgeTiming(current.getScrPos(), linepos, bps);
-                            double time = lnTiming[current.getLane()];
+                            ProcessLNStartNote(ref cnote, ref lnlist, time, i);
+                            lnlist[cnote.getLnNum()].setInProgress(true);
+                        }
+                        else if(!cnote.isLong())
+                        {
+                            ProcessSingleNote(i, time, totalNotes, ref bms, ref cnote, ref removeCandidate, ref lnlist);
+                            StartCoroutine(AutoTurnoffBeam(i));
+                        }
+
+                        btnPushSound[i] = false;
+                    }
+                    // 롱노트의 끝노트일 때 처리
+                    else
+                    {
+                        if (cnote.isLnEnd())
+                        {
+                            double time = lnTiming[cnote.getLane()];
                             AfterTouchLongEnd(time, totalNotes);
 
-                            //ShowBeam(line, false);
-                            isLnWorking[line] = false;
-                            btnPushState[line] = false;
-                            current.setUsed(true);
+                            btnPushState[i] = false;
+                            isLnWorking[i] = false;
+                            btnPushSound[i] = false;
+                            cnote.setUsed(true);
+
+                            removeCandidate.Add(lnlist[cnote.getLnNum()].getStart());
+                            removeCandidate.Add(lnlist[cnote.getLnNum()].getMiddle());
+                            removeCandidate.Add(cnote);
                         }
                     }
                 }
+
+                foreach (Note n in removeCandidate)
+                {
+                    Destroy(n.noteobj);
+                    notePlay[i].Remove(n);
+                }
             }
+
+            /*foreach (List<Note> notes in notePlay)
+            {
+                for (int i = 0; i < notes.Count; i++)
+                {
+                    Note current = notes[i];
+                    Note.NOTETYPE type = current.getNotetype();
+
+                    if (type == Note.NOTETYPE.PLAYABLE)
+                    {
+                        int line = current.getLane();
+
+                        // (일반노트 혹은 롱노트의 시작)
+                        if (!isLnWorking[line] &&
+                            current.getScrPos() <= linepos + additionalPos &&
+                            !current.isUsed())
+                        {
+                            btnPushState[line] = true;
+
+                            if (!btnPushSound[line])
+                            {
+                                soundController.PlayKeySound(current.getLane(), current.getWav(), ref bms);
+                                btnPushSound[line] = true;
+                            }
+
+                            double time = GetJudgeTiming(notes[i].getScrPos(), linepos, bps);
+                            ProcessSingleNote(line, time, totalNotes, ref bms, ref current, ref removeCandidate, ref lnlist);
+
+                            if (!current.isLong())
+                            {
+                                StartCoroutine(AutoTurnoffBeam(line));
+                                btnPushSound[line] = false;
+                                notes.Remove(current);
+                            }
+                        }
+                        // (롱노트가 끝날때의 처리)
+                        else if (isLnWorking[line] &&
+                            current.getScrPos() <= linepos + additionalPos &&
+                            !current.isUsed())
+                        {
+                            if (current.isLnEnd())
+                            {
+                                //double time = GetJudgeTiming(current.getScrPos(), linepos, bps);
+                                double time = lnTiming[current.getLane()];
+                                AfterTouchLongEnd(time, totalNotes);
+
+                                //ShowBeam(line, false);
+                                isLnWorking[line] = false;
+                                btnPushState[line] = false;
+                                btnPushSound[line] = false;
+                                current.setUsed(true);
+                                notes.Remove(current);
+                            }
+                        }
+                    }
+                }
+            }*/
         }
 
-        public void play(List<Note> notes, List<Longnote> lnlist, BMS bms,
-            ref double bpm, ref double bps, ref double spb, int totalNotes, bool isAuto)
+        public void SpeedChangeAndBeam(double bpm)
         {
-            double linepos = lastLine.transform.localPosition.z;
-
-            List<Note> removeCandidate = new List<Note>();
-
             if (Input.GetButtonDown("spdup"))
             {
                 if (spdType == SpdType.FIXED)
@@ -324,7 +512,7 @@ namespace BMSPlayer
                     SpeedDownFixed(bpm);
                 }
             }
-            if(Input.GetButton("spdup"))
+            if (Input.GetButton("spdup"))
             {
                 if (spdType == SpdType.FLUID)
                 {
@@ -342,7 +530,7 @@ namespace BMSPlayer
             // 버튼 푸시 상태에 따라 빔 표시 상태 변경
             for (int i = 0; i < btnPushState.Length; i++)
             {
-                if(btnPushState[i])
+                if (btnPushState[i])
                 {
                     ShowBeam(i, true);
                 }
@@ -351,122 +539,120 @@ namespace BMSPlayer
                     ShowBeam(i, false);
                 }
             }
+        }
 
-            for (int i = 0; i < notes.Count; i++)
+        public void Play(List<Note>[] notePlay, List<Longnote> lnlist, BMS bms,
+            ref double bpm, ref double bps, ref double spb, int totalNotes)
+        {
+            double linepos = lastLine.transform.localPosition.z;
+
+            /**
+             * 노트 처리하기
+             * 
+             * Step 1.
+             * 노트를 일단 누른다 (ProcessBeamOnTouch())
+             * 
+             * Step 2.
+             * 눌려진 노트 라인을 확인하여 그 리스트의 제일 첫 노트를 확인한다
+             * 
+             * Step 3.
+             * 해당 노트의 소리를 낸다
+             * 
+             * Step 4.
+             * Timing 계산 후 판정 처리
+             */
+
+            // 각 라인에 대해 검사
+            for (int i = 0; i < Const.LINE; i++)
             {
-                Note current = notes[i];
-                Note.NOTETYPE type = current.getNotetype();
-
-                if(type == Note.NOTETYPE.PLAYABLE && !isAuto)
+                // 현재 라인이 눌려진 상태이면
+                if (btnPushState[i])
                 {
-                    int line = current.getLane();
-                    // 라인 벗어나는 노트는 Controller에서 생성할 때 미리 MUSIC으로 바꿔둠
+                    // 1. 현재 라인을 가져옴
+                    List<Note> currentLine = notePlay[i];
 
-                    double additionalPos = bps * PERFECT;
-                    
-                    // 라인에 버튼 눌렸는지 확인
-                    if (btnPushState[line])
+                    // 2. 현재 라인의 첫 노트를 가져옴
+                    Note cnote = currentLine[0];
+
+                    // 3. 노트 존재 유무와 상관없이 소리를 냄
+                    if (!btnPushSound[i])
                     {
-                        // 일반노트 or 롱노트 시작
-                        if (!isLnWorking[line])
-                        {
-                            double time = GetJudgeTiming(current.getScrPos(), linepos, bps);
-
-                            if (time > TIMING) continue;
-
-                            // 노트 처리
-                            ProcessSingleNote(line, time, totalNotes, ref bms, ref current, ref removeCandidate, ref lnlist);
-                        }
+                        soundController.PlayKeySound(cnote.getLane(), cnote.getWav(), ref bms);
+                        btnPushSound[i] = true;
                     }
-                    else
+
+                    // 4. 판정 처리하기
+                }
+            }
+
+            /*foreach (List<Note> notes in notePlay)
+            {
+                List<Note> removeCandidate = new List<Note>();
+                for (int i = 0; i < notes.Count; i++)
+                {
+                    Note current = notes[i];
+                    Note.NOTETYPE type = current.getNotetype();
+
+                    if (type == Note.NOTETYPE.PLAYABLE && !isAuto)
                     {
-                        // 라인에 버튼이 눌리지 않았는데 롱노트가 처리중이었던 경우
-                        if (isLnWorking[line])
+                        int line = current.getLane();
+                        double additionalPos = bps * PERFECT;
+
+                        // 라인에 버튼 눌렸는지 확인
+                        if (btnPushState[line])
                         {
-                            // 롱노트 끝 노트의 위치를 확인하여
-                            // 거리에 따라 판정 적용
-                            foreach (Longnote n in lnlist)
+                            // 일반노트 or 롱노트 시작
+                            if (!isLnWorking[line] && !current.isUsed())
                             {
-                                if (n.getEnd() == current)
-                                {
-                                    // 이미 처리된 경우는 break
-                                    if (current.isUsed()) break;
+                                double time = GetJudgeTiming(current.getScrPos(), linepos, bps);
+                                if (time > TIMING) continue;
 
-                                    // 거리를 계산하여 판정처리
-                                    // 너무 일찍 떼는 경우를 생각해야 함
 
-                                    double time = GetJudgeTiming(current.getScrPos(), linepos, bps);
-
-                                    // 롱노트 처리
-                                    AfterTouchLongEnd(time, totalNotes);
-
-                                    // 끝 노트이므로 음은 재생하지 않음
-                                    isLnWorking[line] = false;
-                                    lnInProcess[line].getEnd().setUsed(true);
-                                    //lnstartproc[line - 1].getStart().setPlayed(true);
-                                    lnInProcess[line].setProcessed(true);
-                                }
+                                // 노트 처리
+                                ProcessSingleNote(line, time, totalNotes, ref bms, ref current, ref removeCandidate, ref lnlist);
                             }
                         }
-                        // 아니면 하는 동작 없음 (미스처리는 moveNote에서 수행)
-                    }
-                }
-                else
-                {
-                    if(current.getScrPos() <= linepos + syncControl)
-                    {
-                        switch (current.getNotetype())
+                        else
                         {
-                            case Note.NOTETYPE.MUSIC:
-                                //PlayKeySound(current.getWav(), current.getLane(), ref bms, ref unityAudio, ref channelGroup, ref fmodChannel);
-                                soundController.PlayKeySound(current.getLane(), current.getWav(), ref bms);
-                                current.setUsed(true);
-                                removeCandidate.Add(current);
-                                break;
-                            case Note.NOTETYPE.BGA:
-                                string notestr = current.getWav();
-                                if (bms.mBGAImages.Count > 0)
+                            // 라인에 버튼이 눌리지 않았는데 롱노트가 처리중이었던 경우
+                            if (isLnWorking[line])
+                            {
+                                // 롱노트 끝 노트의 위치를 확인하여
+                                // 거리에 따라 판정 적용
+                                foreach (Longnote n in lnlist)
                                 {
-                                    if (bms.mBGAImages.ContainsKey(notestr))
+                                    if (n.getEnd() == current)
                                     {
-                                        if (!BGAOnChecked) bgaImage.SetActive(true);
-                                        ui.BGAImageSetting(bms.mBGAImages[notestr]);
+                                        // 이미 처리된 경우는 break
+                                        if (current.isUsed()) break;
+
+                                        // 거리를 계산하여 판정처리
+                                        // 너무 일찍 떼는 경우를 생각해야 함
+
+                                        double time = GetJudgeTiming(current.getScrPos(), linepos, bps);
+
+                                        // 롱노트 처리
+                                        AfterTouchLongEnd(time, totalNotes);
+
+                                        // 끝 노트이므로 음은 재생하지 않음
+                                        isLnWorking[line] = false;
+                                        lnInProcess[line].getEnd().setUsed(true);
+                                        //lnstartproc[line - 1].getStart().setPlayed(true);
+                                        lnInProcess[line].setProcessed(true);
                                     }
                                 }
-                                else if (bms.bgaVideoFile != null)
-                                {
-                                    if (!BGAOnChecked) bgaVideo.SetActive(true);
-                                    ui.BGAVideoPlay();
-                                }
-                                current.setUsed(true);
-                                removeCandidate.Add(current);
-                                break;
-                            case Note.NOTETYPE.BPM:
-                                bpm = Convert.ToInt32(current.getWav(), 16);
-                                bps = bpm / 240;
-                                spb = (double)(240 * 1000) / bpm;
-                                current.setUsed(true);
-                                removeCandidate.Add(current);
-                                ui.SetGearCurBPM(bpm);
-                                break;
-                            case Note.NOTETYPE.BPMT2:
-                                bpm = bms.mBPMNum[current.getWav()];
-                                bps = bpm / 240;
-                                spb = (double)(240 * 1000) / bpm;
-                                current.setUsed(true);
-                                removeCandidate.Add(current);
-                                ui.SetGearCurBPM(bpm);
-                                break;
+                            }
+                            // 아니면 하는 동작 없음 (미스처리는 moveNote에서 수행)
                         }
                     }
                 }
-            }
-
-            // 삭제
-            foreach (Note n in removeCandidate)
-            {
-                notes.Remove(n);
-            }
+                
+                // 삭제
+                foreach (Note n in removeCandidate)
+                {
+                    notes.Remove(n);
+                }
+            }*/
 
             if (Const.DEBUG)
             {
@@ -538,66 +724,62 @@ namespace BMSPlayer
                 if (Keys.GetKeyAxisUp(Keys.btnkb[i]))
                 {
                     btnPushState[i] = false;
+                    btnPushSound[i] = false;
                 }
                 if (Keys.GetKeyAxisUp(Keys.btnct[i]))
                 {
                     if (Keys.dpad[i] && isAxisPushed[i])
                     {
                         btnPushState[i] = false;
+                        btnPushSound[i] = false;
                         isAxisPushed[i] = false;
                     }
                 }
             }
         }
 
+        public void ProcessLNStartNote(ref Note note, ref List<Longnote> lnlist,
+            double time, int line)
+        {
+            Longnote n = lnlist[note.getLnNum()];
+            lnInProcess[line] = n;
+            lnInProcess[line].setProcTime(time);
+            isLnWorking[line] = true;
+            lnTiming[line] = time;
+        }
+
         public void ProcessSingleNote(int line, double time, int totalNotes,
             ref BMS bms, ref Note note, ref List<Note> removeCandidate,
             ref List<Longnote> lnlist)
         {
-            // 일단 소리는 내고 시작
-            soundController.PlayKeySound(note.getLane(), note.getWav(), ref bms);
-            
-            // 해당 노트가 롱노트의 시작노트라면
-            if(note.isLong() && note.isLnStart()) {
-                Longnote n = lnlist[note.getLnNum()];
-                lnInProcess[line] = n;
-                lnInProcess[line].setProcTime(time);
-                isLnWorking[line] = true;
-                lnTiming[line] = time;
-                note.setUsed(true);
-                AfterTouchLongStart(time);
+            TimingType timingType = GetTimingType(time, false);
+            switch (timingType)
+            {
+                case TimingType.PERFECT:
+                    perfect++;
+                    hpController.hpChangePerfect();
+                    exscore += 2;
+                    AfterTouchSingle(line, time, totalNotes, ref note, ref removeCandidate);
+                    break;
+                case TimingType.GREAT:
+                    great++;
+                    hpController.hpChangeGreat();
+                    exscore += 1;
+                    AfterTouchSingle(line, time, totalNotes, ref note, ref removeCandidate);
+                    break;
+                case TimingType.GOOD:
+                    good++;
+                    hpController.hpChangeGood();
+                    AfterTouchSingle(line, time, totalNotes, ref note, ref removeCandidate);
+                    break;
+                case TimingType.BAD:
+                    ok++;
+                    hpController.hpChangeBad();
+                    AfterTouchSingle(line, time, totalNotes, ref note, ref removeCandidate);
+                    break;
             }
-            // 롱노트가 아닌 일반 단노트 처리
-            else if(!note.isLong()) {
-                TimingType timingType = GetTimingType(time, false);
-                switch (timingType)
-                {
-                    case TimingType.PERFECT:
-                        perfect++;
-                        hpController.hpChangePerfect();
-                        exscore += 2;
-                        AfterTouchSingle(line, time, totalNotes, ref note, ref removeCandidate);
-                        break;
-                    case TimingType.GREAT:
-                        great++;
-                        hpController.hpChangeGreat();
-                        exscore += 1;
-                        AfterTouchSingle(line, time, totalNotes, ref note, ref removeCandidate);
-                        break;
-                    case TimingType.GOOD:
-                        good++;
-                        hpController.hpChangeGood();
-                        AfterTouchSingle(line, time, totalNotes, ref note, ref removeCandidate);
-                        break;
-                    case TimingType.BAD:
-                        ok++;
-                        hpController.hpChangeBad();
-                        AfterTouchSingle(line, time, totalNotes, ref note, ref removeCandidate);
-                        break;
-                }
 
-                ui.UpdateHP(hpController.GetHP());
-            }
+            ui.UpdateHP(hpController.GetHP());
         }
 
         // 롱노트의 끝 노트 타이밍을 처리하는 메소드
@@ -646,12 +828,7 @@ namespace BMSPlayer
             Destroy(note.noteobj);
             note.setUsed(true);
             removeCandidate.Add(note);
-            //btnPushState[line] = false;
-        }
-
-        public void AfterTouchLongStart(double time)
-        {
-            UpdateTiming(time, false);
+            notesInTimingWindow--;
         }
 
         private bool CheckAutoNearNotes()
@@ -702,7 +879,6 @@ namespace BMSPlayer
         IEnumerator AutoTurnoffBeam(int i)
         {
             yield return new WaitForSeconds(0.05f);
-            //ShowBeam(i, false);
             btnPushState[i] = false;
         }
 
@@ -738,12 +914,6 @@ namespace BMSPlayer
         private void ShowBeam(int lane, bool onoff)
         {
             ui.ShowAndHideBeam(lane, onoff);
-            /*if (onoff) {
-                btnPushState[lane] = true;
-            }
-            else {
-                btnPushState[lane] = false;
-            }*/
         }
 
         public void GetResultData(int totalNotes)
@@ -756,7 +926,7 @@ namespace BMSPlayer
             Const.SetResultComboBreak(cb);
             Const.SetResultAvgRate((float)avgRate);
             Const.SetResultTimeDiff((float)avgTimeDiff);
-            Const.SetResultExScore(exscore);
+            Const.SetResultScore(exscore);
             Const.SetResultMaxCombo(maxcombo);
         }
 

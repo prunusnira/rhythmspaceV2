@@ -15,10 +15,9 @@ namespace BMSPlayer
             DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db1.sqlite";
 #endif
         }
-        public static string FMOD_CHANNEL_GROUP = "bmsChnGroup";
         public static int CHANNEL = 320;
-
         public static int frameMultiplier = 1000;
+        public static int LINE = 8;
 
         public static bool DEBUG = true;
         public static bool isKeyChanged = false;
@@ -66,9 +65,9 @@ namespace BMSPlayer
 
         public static string[] settingSyncDesc = new string[3]
         {
-        "1 변동시 마다 3px씩 판정 위치가 변경됩니다",
-        "１変更について３pxの判定変化があります",
-        "Judge timing changes by 3px per 1"
+        "1 변동시 마다 1ms씩 판정 위치가 변경됩니다.",
+        "１変更について1msの判定変化があります",
+        "Judge timing changes by 1ms per 1"
         };
 
         public static string[] settingChangeWarning = new string[3]
@@ -123,7 +122,7 @@ namespace BMSPlayer
             return PlayerPrefs.GetInt("encoding", 932);
         }
 
-        public static void SetAudio(int audio)
+        /*public static void SetAudio(int audio)
         {
             PlayerPrefs.SetInt("audio", audio);
         }
@@ -131,7 +130,7 @@ namespace BMSPlayer
         public static int GetAudio()
         {
             return PlayerPrefs.GetInt("audio", 0);
-        }
+        }*/
 
         public static void SetLang(int lang)
         {
@@ -141,6 +140,16 @@ namespace BMSPlayer
         public static int GetLang()
         {
             return PlayerPrefs.GetInt("lang", 2);
+        }
+
+        public static void SetAutoSync(AutoSyncType autosync)
+        {
+            PlayerPrefs.SetInt("autosync", (int)autosync);
+        }
+
+        public static AutoSyncType GetAutoSync()
+        {
+            return (AutoSyncType)PlayerPrefs.GetInt("autosync", (int)AutoSyncType.OFF);
         }
 
         public static void SetSync(int sync)
@@ -329,14 +338,14 @@ namespace BMSPlayer
             return PlayerPrefs.GetInt("rst_cb", 0);
         }
 
-        public static void SetResultExScore(int score)
+        public static void SetResultScore(int score)
         {
-            PlayerPrefs.SetInt("rst_exscore", score);
+            PlayerPrefs.SetInt("rst_score", score);
         }
 
-        public static int GetResultExScore()
+        public static int GetResultScore()
         {
-            return PlayerPrefs.GetInt("rst_exscore", 0);
+            return PlayerPrefs.GetInt("rst_score", 0);
         }
 
         public static void SetResultAvgRate(float rate)

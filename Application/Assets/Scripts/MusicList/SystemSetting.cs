@@ -31,13 +31,8 @@ namespace BMSPlayer
         public Button btnEng;
         public Text curLang;
 
-        // Audio
-        public Button btnUnitySound;
-        public Button btnFmod;
-        public Text curSound;
-        public Text soundDesc;
-
         // Sync changer
+        public Button btnAutoSync;
         public Button btnSyncUp;
         public Button btnSyncDown;
         public Text syncval;
@@ -73,7 +68,6 @@ namespace BMSPlayer
         {
             int lang = Const.GetLang();
             int enc = Const.GetEncoding();
-            int sound = Const.GetAudio();
             int sync = Const.GetSync();
 
             switch(lang)
@@ -97,16 +91,6 @@ namespace BMSPlayer
                     break;
                 case 949:
                     curEncoding.text = "KR-Based";
-                    break;
-            }
-
-            switch(sound)
-            {
-                case 0:
-                    curSound.text = "UNITY Audio";
-                    break;
-                case 1:
-                    curSound.text = "FMOD Audio";
                     break;
             }
 
@@ -146,19 +130,19 @@ namespace BMSPlayer
                     else if (col == 2) ChangeSprite(btnEng);
                     break;
                 case 2:
-                    if (col == 0) ChangeSprite(btnSyncDown);
-                    else if (col == 1) ChangeSprite(btnSyncUp);
+                    if (col == 0) ChangeSprite(btnAutoSync);
+                    else if (col == 1) ChangeSprite(btnSyncDown);
+                    else if (col == 2) ChangeSprite(btnSyncUp);
                     break;
                 case 3:
                     if (col == 0) ChangeSprite(btn932);
                     else if (col == 1) ChangeSprite(btn949);
                     break;
                 case 4:
-                    if (col == 0) ChangeSprite(btnUnitySound);
-                    else if (col == 1) ChangeSprite(btnFmod);
+                    ChangeSprite(btnKeySetting);
                     break;
                 case 5:
-                    ChangeSprite(btnKeySetting);
+                    // Resolution
                     break;
             }
         }
@@ -181,11 +165,15 @@ namespace BMSPlayer
                     changeLang(col);
                     break;
                 case 2:
-                    if (col == 0)
+                    if(col == 0)
+                    {
+                        SetAutoSync();
+                    }
+                    else if (col == 1)
                     {
                         changeSync(false);
                     }
-                    else if (col == 1)
+                    else if (col == 2)
                     {
                         changeSync(true);
                     }
@@ -201,17 +189,10 @@ namespace BMSPlayer
                     }
                     break;
                 case 4:
-                    if (col == 0)
-                    {
-                        changeAudio(false);
-                    }
-                    else if (col == 1)
-                    {
-                        changeAudio(true);
-                    }
+                    ShowKeySetting();
                     break;
                 case 5:
-                    ShowKeySetting();
+                    // Resoultion
                     break;
             }
         }
@@ -224,7 +205,6 @@ namespace BMSPlayer
             showSync();
             changeEncoding(Const.GetEncoding());
             syncdesc.text = Const.settingSyncDesc[lang];
-            encodingWarn.text = Const.settingChangeWarning[lang];
         }
 
         public void changePath()
@@ -296,6 +276,20 @@ namespace BMSPlayer
             }
         }
 
+        public void SetAutoSync()
+        {
+            if (Const.GetAutoSync() == AutoSyncType.OFF)
+            {
+                Const.SetAutoSync(AutoSyncType.ON);
+                btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync ON";
+            }
+            else if (Const.GetAutoSync() == AutoSyncType.ON)
+            {
+                Const.SetAutoSync(AutoSyncType.OFF);
+                btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync OFF";
+            }
+        }
+
         public void changeSync(bool up)
         {
             int sync = Const.GetSync();
@@ -353,20 +347,6 @@ namespace BMSPlayer
                 case 949:
                     curEncoding.text = "KR-Based";
                     break;
-            }
-        }
-
-        public void changeAudio(bool fmod)
-        {
-            if(fmod)
-            {
-                Const.SetAudio(1);
-                curSound.text = "FMOD Audio";
-            }
-            else
-            {
-                Const.SetAudio(0);
-                curSound.text = "UNITY Audio";
             }
         }
 
