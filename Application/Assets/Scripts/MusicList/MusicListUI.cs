@@ -15,6 +15,7 @@ namespace BMSPlayer
     {
         // Data store
         private List<MusicListData> bmslist;
+        private MusicListManager mlm;
 
         private EventSystem evtsystem;
         private PointerEventData eventdata;
@@ -44,7 +45,6 @@ namespace BMSPlayer
         public Sprite empty;
 
         // data
-        private SQLiteExecutor sqlexecutor;
         public Text debugText;
 
         public AudioSource sfxChange;
@@ -66,19 +66,17 @@ namespace BMSPlayer
         {
             // Initialize
             bmslist = new List<MusicListData>();
+            mlm = new MusicListManager();
 
-            // Load SQLite
-            sqlexecutor = SQLiteExecutor.getInstance();
-
-            // Load bms list from SQL
-            // 일단 리셋 후 다시 로딩
-            sqlexecutor.select(SQLiteExecutor.TABLETYPE.LIST);
+            mlm.LoadBMSFromDBOverall();
 
             // Const의 리스트 데이터 확인
             foreach (MusicListData d in Const.list)
             {
                 bmslist.Add(d);
             }
+
+            mlm.close();
 
             //isFading = true;
         }
@@ -151,11 +149,13 @@ namespace BMSPlayer
             {
                 Const.isRefreshDone = false;
                 // 목록을 리셋하고 새로 리프레시
-                musicRect.content.transform.DetachChildren();
                 Const.list.Clear();
+                musicRect.Clear();
                 bmslist.Clear();
 
-                sqlexecutor.select(SQLiteExecutor.TABLETYPE.LIST);
+                mlm = new MusicListManager();
+                mlm.LoadBMSFromDBOverall();
+                mlm.close();
 
                 // Const의 리스트 데이터 확인
                 foreach (MusicListData d in Const.list)
@@ -175,7 +175,7 @@ namespace BMSPlayer
 
             if (File.Exists(Const.selectedMusic.Path + Const.selectedMusic.Jacket))
             {
-                infoJacket.texture = UnityTools.LoadTexture(Const.selectedMusic.Path + Const.selectedMusic.Jacket);
+                infoJacket.texture = Tools.LoadTexture(Const.selectedMusic.Path + Const.selectedMusic.Jacket);
             }
             else
             {
@@ -197,16 +197,16 @@ namespace BMSPlayer
                     " (" + Const.selectedMusic.BPMstart + " start)";
             }
 
-            if(Const.GetSpdType() == SpdType.FIXED)
+            if(Const.SpdType == SpdType.FIXED)
             {
-                int spdfl = (int)(Const.selectedMusic.BPMstart * Const.GetSpeedFixed() / 100);
-                Const.SetSpeedFluid(spdfl);
+                int spdfl = (int)(Const.selectedMusic.BPMstart * Const.SpeedFixed / 100);
+                Const.SpeedFluid = spdfl;
                 optSpdAppend.text = "FLUID " + spdfl.ToString("0");
             }
             else
             {
-                int spd = (int)(Const.GetSpeedFluid() / Const.selectedMusic.BPMstart * 100);
-                Const.SetSpeedFixed(spd);
+                int spd = (int)(Const.SpeedFluid / Const.selectedMusic.BPMstart * 100);
+                Const.SpeedFixed = spd;
                 optSpdAppend.text = "FIXED " + ((float)spd/100).ToString("0.00")+"x";
             }
         }
@@ -231,7 +231,7 @@ namespace BMSPlayer
                 // 선택한 패턴의 정보를 표시하고 플레이 시작이 가능
                 Debug.Log(Const.selectedMusic.Name + " " + Const.selectedMusic.Artist);
 
-                Const.SetPlayingBMSPath(Const.selectedMusic.Path + Const.selectedMusic.FileName);
+                Const.PlayingBMSPath = Const.selectedMusic.Path + Const.selectedMusic.FileName;
 
                 Debug.Log("READY TO RUN");
                 Loading.StartLoading("PlayScreen");

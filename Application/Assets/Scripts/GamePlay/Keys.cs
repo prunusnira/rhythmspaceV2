@@ -264,7 +264,7 @@ namespace BMSPlayer
         {
             for(int i = 0; i < btnkb.Length; i++)
             {
-                btnkb[0] = PlayerPrefs.GetString(
+                btnkb[i] = PlayerPrefs.GetString(
                     "btn"+(i+1).ToString() +"k", DEFAULT_KB[i]
                 );
             }
@@ -276,14 +276,14 @@ namespace BMSPlayer
         {
             for (int i = 0; i < btnct.Length; i++)
             {
-                btnct[0] = PlayerPrefs.GetString(
+                btnct[i] = PlayerPrefs.GetString(
                     "btn" + (i + 1).ToString() + "c", DEFAULT_DS4[i]
                 );
             }
 
             for (int i = 0; i < dpad.Length; i++)
             {
-                dpad[0] = bool.Parse(PlayerPrefs.GetString(
+                dpad[i] = bool.Parse(PlayerPrefs.GetString(
                     "dpad" + (i + 1).ToString(), DEFAULT_DPAD[i].ToString())
                 );
             }

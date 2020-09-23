@@ -31,16 +31,19 @@ namespace BMSPlayer
         public Image rank;
         public Image cleared;
 
-        public Sprite ranks;
+        public Sprite rankaaa;
+        public Sprite rankaa;
         public Sprite ranka;
         public Sprite rankb;
         public Sprite rankc;
+        public Sprite rankd;
+        public Sprite ranke;
         public Sprite rankf;
         public Sprite pfmark;
         public Sprite fcmark;
 
         public Sprite failed;
-        private int isClear = 0;
+        private ClearType isClear;
 
         void Awake()
         {
@@ -48,45 +51,64 @@ namespace BMSPlayer
             PlayData Data = new PlayData();
             BMSAnalyzer analyzer = new BMSAnalyzer();
             analyzer.HeaderAnalyzer(Data.BMS);
-            gerne.text = Data.BMS.getGerne();
-            title.text = Data.BMS.getTitle();
-            artist.text = Data.BMS.getArtist();
+            gerne.text = Data.BMS.Gerne;
+            title.text = Data.BMS.Title;
+            artist.text = Data.BMS.Artist;
 
             // 판정
-            int vgd = Const.GetResultGood();
-            int vok = Const.GetResultOk();
-            int vmiss = Const.GetResultMiss();
-            int vcb = Const.GetResultComboBreak();
-            float rate = Const.GetResultAvgRate() / 100;
-            float vdiff = Const.GetResultTimeDiff();
+            int vgd = Const.ResultGood;
+            int vok = Const.ResultOk;
+            int vmiss = Const.ResultMiss;
+            int vcb = Const.ResultComboBreak;
+            float rate = Const.ResultAvgRate / 100;
+            float vdiff = Const.ResultTimeDiff;
+            string rankstr = Const.ResultRank;
 
-            perfect.text = Const.GetResultPerfect().ToString();
-            great.text = Const.GetResultGreat().ToString();
+            perfect.text = Const.ResultPerfect.ToString();
+            great.text = Const.ResultGreat.ToString();
             good.text = vgd.ToString();
             ok.text = vok.ToString();
             miss.text = vmiss.ToString();
             combobreak.text = vcb.ToString();
             avgrate.text = (rate * 100).ToString("0.00") + "%";
-            exscore.text = Const.GetResultScore().ToString();
-            combo.text = Const.GetResultMaxCombo().ToString();
+            exscore.text = Const.ResultScore.ToString();
+            combo.text = Const.ResultMaxCombo.ToString();
             timediff.text = vdiff.ToString("0.00") + "ms";
 
-            isClear = Const.GetClear();
+            isClear = Const.Clear;
 
-            if (rate > 98)
-                rank.sprite = ranks;
-            else if (rate > 93)
-                rank.sprite = ranka;
-            else if (rate > 85)
-                rank.sprite = rankb;
-            else
-                rank.sprite = rankc;
+            switch(rankstr)
+            {
+                case "aaa":
+                    rank.sprite = rankaaa;
+                    break;
+                case "aa":
+                    rank.sprite = rankaa;
+                    break;
+                case "a":
+                    rank.sprite = ranka;
+                    break;
+                case "b":
+                    rank.sprite = rankb;
+                    break;
+                case "c":
+                    rank.sprite = rankc;
+                    break;
+                case "d":
+                    rank.sprite = rankd;
+                    break;
+                case "e":
+                    rank.sprite = ranke;
+                    break;
+                case "f":
+                    rank.sprite = rankf;
+                    break;
+            }
 
-            if (isClear != 1)
+            if (isClear != ClearType.FAIL)
             {
                 rank.sprite = rankf;
                 cleared.sprite = failed;
-                //loop.GetComponent<Renderer>().material = failMaterial;
             }
 
             if (vmiss == 0)

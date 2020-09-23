@@ -6,7 +6,7 @@ using B83.Image.BMP;
 
 namespace BMSCore
 {
-    public class UnityTools
+    public class Tools
     {
         public static Sprite createSpriteFromFile(string FilePath, float PixelsPerUnit = 100.0f)
         {

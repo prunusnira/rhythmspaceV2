@@ -1,4 +1,5 @@
-﻿using monoflow;
+﻿using BMSCore;
+using monoflow;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -63,6 +64,7 @@ namespace BMSPlayer
         public Text txtGood;
         public Text txtOk;
         public Text txtMiss;
+        public Text txtComboBreak;
 
         // Gear
         public GameObject playArea;
@@ -75,16 +77,16 @@ namespace BMSPlayer
         public TextMesh gearBPM;
         public TextMesh gearBPMmin;
         public TextMesh gearBPMmax;
+        public TextMesh txtAutoPlay;
 
         // Beam
-        public GameObject beam1;
-        public GameObject beam2;
-        public GameObject beam3;
-        public GameObject beam4;
-        public GameObject beam5;
-        public GameObject beam6;
-        public GameObject beam7;
-        public GameObject beam8;
+        public GameObject[] beam;
+
+        // Note Effect
+        private Coroutine[] effectCoroutine;
+        public SpriteRenderer[] noteEffects;
+        public GameObject[] touches;
+        private float[] effectRotation = new float[8];
 
         // Play Graph
         public SpriteRenderer graphCurrent;
@@ -92,12 +94,20 @@ namespace BMSPlayer
         public SpriteRenderer graphTarget;
         public SpriteRenderer graphBestBase;
         public SpriteRenderer graphTargetBase;
-        public TextMesh rankCurrent;
-        public TextMesh rankBest;
-        public TextMesh rankTarget;
+        public SpriteRenderer rankCurrent;
+        public SpriteRenderer rankBest;
+        public SpriteRenderer rankTarget;
         public TextMesh scoreCurrent;
         public TextMesh scoreBest;
         public TextMesh scoreTarget;
+        public Sprite rankAAA;
+        public Sprite rankAA;
+        public Sprite rankA;
+        public Sprite rankB;
+        public Sprite rankC;
+        public Sprite rankD;
+        public Sprite rankE;
+        public Sprite rankF;
 
         // HPBar
         private HPController hpController;
@@ -112,7 +122,6 @@ namespace BMSPlayer
         // BGA
         public MPMP bgaVideo;
         public SpriteRenderer bgaImage;
-        public GameObject[] touches;
 
         public GameObject fadeCube;
         private bool isFading = false;
@@ -135,30 +144,38 @@ namespace BMSPlayer
             for (int i = 0; i < 8; i++)
             {
                 lnadd[i] = false;
+                effectCoroutine = new Coroutine[8];
+                effectRotation[i] = 0f;
             }
 
             // 판정 패널 표시 설정
-            if (Const.GetPJudge() == 0) layerJudgeAll.SetActive(false);
+            if (Const.DisplayJudge == 0) layerJudgeAll.SetActive(false);
 
             // HP bar 설정
             SetInitialHPBar();
 
             // HP 기본 수치 설정
             hpController = GetComponent<HPController>();
-            UpdateHP(hpController.GetHP());
+            UpdateHP(hpController.CurrentHP);
 
             // 일시정지 메뉴
             btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
             btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
 
             // 판정 표시 타입 변경
-            if(Const.GetJudgeUIType() == JudgeUIType.BM)
+            if(Const.JudgeUIType == JudgeUIType.BM)
             {
                 judgeTypeED.SetActive(false);
             }
             else
             {
                 judgeTypeBM.SetActive(false);
+            }
+
+            // 오토 플레이 표기
+            if(Const.Auto == AutoPlayType.ON)
+            {
+                txtAutoPlay.gameObject.SetActive(true);
             }
 
             // 그래프 초기화
@@ -170,7 +187,7 @@ namespace BMSPlayer
             FPSCounter.text = "FPS " + ((int)(1f / Time.unscaledDeltaTime)).ToString();
             if (DateTime.Now.Ticks / 10000 - timeLastComboPopup > 1000)
             {
-                if(Const.GetJudgeUIType() == JudgeUIType.ED)
+                if(Const.JudgeUIType == JudgeUIType.ED)
                 {
                     comboLayerED.SetActive(false);
                     judgeSpriteED.gameObject.SetActive(false);
@@ -219,12 +236,12 @@ namespace BMSPlayer
         public void SetGearCurBPM(double bpm)
         {
             gearBPM.text = bpm.ToString("0.00");
-            gearSpeedFluid.text = ((int)(bpm * Const.GetSpeedFixed() / 100)).ToString();
+            gearSpeedFluid.text = ((int)(bpm * Const.SpeedFixed / 100)).ToString();
         }
 
         private void SetInitialHPBar()
         {
-            switch (Const.GetJudgeType())
+            switch (Const.JudgeType)
             {
                 case JudgeType.ASSISTED:
                     hpBarType.text = "ASSISTED";
@@ -266,29 +283,29 @@ namespace BMSPlayer
             graphTarget.material.SetFloat("_Progress", 0f);
 
             graphBestBase.material.SetFloat("_Progress", 0f);
-            rankBest.text = "F";
+            rankBest.sprite = rankF;
 
-            switch(Const.GetGraphTarget())
+            switch(Const.GraphTarget)
             {
                 case GraphTargetType.A:
                     graphTargetBase.material.SetFloat("_Progress", 6f/9);
-                    rankTarget.text = "A";
+                    rankTarget.sprite = rankA;
                     break;
                 case GraphTargetType.AA:
                     graphTargetBase.material.SetFloat("_Progress", 7f/9);
-                    rankTarget.text = "AA";
+                    rankTarget.sprite = rankAA;
                     break;
                 case GraphTargetType.AAA:
                     graphTargetBase.material.SetFloat("_Progress", 8f/9);
-                    rankTarget.text = "AAA";
+                    rankTarget.sprite = rankAAA;
                     break;
                 case GraphTargetType.MAX:
                     graphTargetBase.material.SetFloat("_Progress", 1f);
-                    rankTarget.text = "AAA";
+                    rankTarget.sprite = rankAAA;
                     break;
                 default:
                     graphTargetBase.material.SetFloat("_Progress", 0f);
-                    rankTarget.text = "F";
+                    rankTarget.sprite = rankF;
                     break;
             }
         }
@@ -301,13 +318,13 @@ namespace BMSPlayer
 
         public void UpdateSpeed()
         {
-            gearSpeed.text = ((float)Const.GetSpeedFixed() / 100).ToString("0.00") + "x";
-            gearSpeedFluid.text = Const.GetSpeedFluid().ToString();
+            gearSpeed.text = ((float)Const.SpeedFixed / 100).ToString("0.00") + "x";
+            gearSpeedFluid.text = Const.SpeedFluid.ToString();
         }
 
         public void UpdateHP(int hp)
         {
-            float chp = (float)hp / hpController.GetHPMax();
+            float chp = (float)hp / hpController.HPMax;
             hpBar.material.SetFloat("_Progress", chp);
             gearHP.text = (chp * 100).ToString("0.00") + "%";
         }
@@ -334,42 +351,37 @@ namespace BMSPlayer
             graphCurrent.material.SetFloat("_Progress", ((float)ex) / (totalNotes * 2));
 
             // 현재 자기 랭크 글자 변경
-            float currentRankState = (float)ex / (procNotes * 2);
-            if(currentRankState >= 8f / 9)
+            string rank = GetRank(ex, procNotes);
+            switch(rank)
             {
-                rankCurrent.text = "AAA";
-            }
-            else if (currentRankState >= 7f / 9)
-            {
-                rankCurrent.text = "AA";
-            }
-            else if (currentRankState >= 6f / 9)
-            {
-                rankCurrent.text = "A";
-            }
-            else if (currentRankState >= 5f / 9)
-            {
-                rankCurrent.text = "B";
-            }
-            else if (currentRankState >= 4f / 9)
-            {
-                rankCurrent.text = "C";
-            }
-            else if (currentRankState >= 3f / 9)
-            {
-                rankCurrent.text = "D";
-            }
-            else if (currentRankState >= 2f / 9)
-            {
-                rankCurrent.text = "E";
-            }
-            else
-            {
-                rankCurrent.text = "F";
+                case "aaa":
+                    rankCurrent.sprite = rankAAA;
+                    break;
+                case "aa":
+                    rankCurrent.sprite = rankAA;
+                    break;
+                case "a":
+                    rankCurrent.sprite = rankA;
+                    break;
+                case "b":
+                    rankCurrent.sprite = rankB;
+                    break;
+                case "c":
+                    rankCurrent.sprite = rankC;
+                    break;
+                case "d":
+                    rankCurrent.sprite = rankD;
+                    break;
+                case "e":
+                    rankCurrent.sprite = rankE;
+                    break;
+                case "f":
+                    rankCurrent.sprite = rankF;
+                    break;
             }
 
             // 타겟 그래프 상승
-            switch (Const.GetGraphTarget())
+            switch (Const.GraphTarget)
             {
                 case GraphTargetType.A:
                     graphTarget.material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 6 / 9);
@@ -390,6 +402,47 @@ namespace BMSPlayer
             }
         }
 
+        public string GetRank(int ex, int proc)
+        {
+            string rank = "f";
+            float currentRankState = (float)ex / (proc * 2);
+
+            if (currentRankState >= 8f / 9)
+            {
+                rank = "aaa";
+            }
+            else if (currentRankState >= 7f / 9)
+            {
+                rank = "aa";
+            }
+            else if (currentRankState >= 6f / 9)
+            {
+                rank = "a";
+            }
+            else if (currentRankState >= 5f / 9)
+            {
+                rank = "b";
+            }
+            else if (currentRankState >= 4f / 9)
+            {
+                rank = "c";
+            }
+            else if (currentRankState >= 3f / 9)
+            {
+                rank = "d";
+            }
+            else if (currentRankState >= 2f / 9)
+            {
+                rank = "e";
+            }
+            else
+            {
+                rank = "f";
+            }
+
+            return rank;
+        }
+
         public void UpdateMaxCombo(int combo)
         {
             gearCombo.text = combo.ToString();
@@ -403,7 +456,7 @@ namespace BMSPlayer
             {
                 case TimingType.PERFECT:
                     judgeSpriteED.sprite = spPerfect;
-                    judgeStr = "PERFECT";
+                    judgeStr = "GREAT";
                     break;
                 case TimingType.GREAT:
                     judgeSpriteED.sprite = spGreat;
@@ -418,6 +471,7 @@ namespace BMSPlayer
                     judgeStr = "BAD";
                     break;
                 case TimingType.POOR:
+                case TimingType.EPOOR:
                     judgeSpriteED.sprite = spMiss;
                     judgeStr = "POOR";
                     break;
@@ -425,7 +479,7 @@ namespace BMSPlayer
 
             // Combo update
 
-            if (Const.GetJudgeUIType() == JudgeUIType.ED)
+            if (Const.JudgeUIType == JudgeUIType.ED)
             {
                 foreach (Transform t in comboLayerED.transform)
                 {
@@ -533,19 +587,24 @@ namespace BMSPlayer
                 txtTimingPercentBM.gameObject.SetActive(true);
                 txtJudgeBM.gameObject.SetActive(true);
                 txtTimingMsBM.gameObject.SetActive(true);
+
+                // 판정별 색상 변경 처리
             }
 
             timeLastComboPopup = DateTime.Now.Ticks / 10000;
             timeLastTimingPopup = DateTime.Now.Ticks / 10000;
         }
 
-        public void UpdateSideJudge(int p, int gr, int gd, int o, int m, string a, string d)
+        public void UpdateSideJudge(
+            int p, int gr, int gd, int o, int m, int cb,
+            string a, string d)
         {
             txtPerfect.text = p.ToString();
             txtGreat.text = gr.ToString();
             txtGood.text = gd.ToString();
             txtOk.text = o.ToString();
             txtMiss.text = m.ToString();
+            txtComboBreak.text = cb.ToString();
             txtAvgRate.text = a;
             txtAvgDiff.text = d;
         }
@@ -553,41 +612,57 @@ namespace BMSPlayer
         // Beam 보이기
         public void ShowAndHideBeam(int line, bool onoff)
         {
-            switch(line)
+            if (onoff) beam[line].SetActive(true);
+            else beam[line].SetActive(false);
+        }
+
+        public void TurnOnNoteEffect(int pos)
+        {
+            if (effectCoroutine[pos] != null) StopCoroutine(effectCoroutine[pos]);
+            noteEffects[pos].gameObject.SetActive(true);
+            effectCoroutine[pos] = StartCoroutine("noteEffect", noteEffects[pos]);
+            
+        }
+
+        public void TurnOnNoteEffectLN(int pos, bool onoff)
+        {
+            if (effectCoroutine[pos] != null) StopCoroutine(effectCoroutine[pos]);
+            noteEffects[pos].gameObject.SetActive(true);
+            if (onoff)
             {
-                case 0:
-                    if(onoff) beam1.SetActive(true);
-                    else beam1.SetActive(false);
-                    break;
-                case 1:
-                    if (onoff) beam2.SetActive(true);
-                    else beam2.SetActive(false);
-                    break;
-                case 2:
-                    if (onoff) beam3.SetActive(true);
-                    else beam3.SetActive(false);
-                    break;
-                case 3:
-                    if (onoff) beam4.SetActive(true);
-                    else beam4.SetActive(false);
-                    break;
-                case 4:
-                    if (onoff) beam5.SetActive(true);
-                    else beam5.SetActive(false);
-                    break;
-                case 5:
-                    if (onoff) beam6.SetActive(true);
-                    else beam6.SetActive(false);
-                    break;
-                case 6:
-                    if (onoff) beam7.SetActive(true);
-                    else beam7.SetActive(false);
-                    break;
-                case 7:
-                    if (onoff) beam8.SetActive(true);
-                    else beam8.SetActive(false);
-                    break;
+                noteEffects[pos].transform.localScale = new Vector3(1f, 1f, 1f);
+                StartCoroutine(noteEffectLN(noteEffects[pos], pos));
             }
+            else
+            {
+                StartCoroutine("noteEffect", noteEffects[pos]);
+            }
+        }
+
+        // Note Effect Coroutine
+        IEnumerator noteEffect(SpriteRenderer sprite)
+        {
+            float x = 1f;
+            float y = 1f;
+            sprite.transform.localScale = new Vector3(x, y, 1f);
+            for(int i = 0; i < 12; i++)
+            {
+                yield return new WaitForSeconds(0.02f);
+                sprite.transform.rotation = Quaternion.Euler(new Vector3(90f, 15f * i, 0f));
+                sprite.transform.localScale = new Vector3(x * 0.8f, y * 0.8f, 1f);
+                x *= 0.8f;
+                y *= 0.8f;
+            }
+            yield return new WaitForSeconds(0.02f);
+            sprite.gameObject.SetActive(false);
+        }
+
+        IEnumerator noteEffectLN(SpriteRenderer sprite, int pos)
+        {
+            yield return new WaitForSeconds(0.02f);
+            effectRotation[pos] += 15f;
+            if (effectRotation[pos] % 360 == 0) effectRotation[pos] = 0f;
+            sprite.transform.rotation = Quaternion.Euler(new Vector3(90f, effectRotation[pos], 0f));
         }
 
         // Animation Effect Coroutine
@@ -683,117 +758,52 @@ namespace BMSPlayer
 
         public void displayNote(ref Note note, ref List<Longnote> lnlist)
         {
-            if (!note.isLong())
+            if (!note.IsLongnote)
             {
-                if (note.getNotetype() == Note.NOTETYPE.PLAYABLE)
+                if (note.Notetype == ObjectType.PLAYABLE)
                 {
-                    //if(n.getLane() <= Const.GetPlayline())
-                    //{
-                    GameObject noteObj = generator.AddNewNote(note.getLane(), note.getPosition(), playArea.transform);
+                    GameObject noteObj = generator.AddNewNote(note.Line, note.Position, playArea.transform);
                     noteObj.transform.SetParent(playArea.transform, false);
-                    note.setNote(noteObj);
-                    note.setReleased(true);
-                    //}
-                    //else
-                    //{
-                    // 플레이 라인을 벗어나는 경우 MUSIC 타입으로 변경
-                    //    n.changeToMusic();
-                    //}
+                    note.Noteobj = noteObj;
+                    note.Released = true;
                 }
             }
             else
             {
-                // 롱노트 중에 일단 라인을 벗어나는지 검사
-                /*if (n.getLane() > Const.GetPlayline())
-                {
-                    // 라인을 벗어나면 롱노트로 추가하지 않고
-                    // 시작 노트를 MUSIC 타입으로 변경 후 종료
-                    int cline = n.getLane();
+                // 아직 롱노트가 없으면 일반 노트를 하나 추가하고
+                // 롱노트를 이 노트의 위치와 시작 위치 사이에 추가할 수 있도록 함
+                // 이 동작은 Scroller.moveNotes()에서 isLong()을 확인해서 표기한다
 
-                    if (lnadd[cline])
+                // 시작노트
+                GameObject noteObj = generator.AddNewNote(note.Line, note.Position, playArea.transform);
+                noteObj.transform.SetParent(playArea.transform, false);
+                note.Noteobj = noteObj;
+                note.Released = true;
+
+                // 끝노트도 같이 추가한다
+                for (int i = 0; i < lnlist.Count; i++)
+                {
+                    if (lnlist[i].StartNote == note)
                     {
-                        remove.Add(n);
-                        lnadd[cline] = false;
-                    }
-                    else
-                    {
-                        n.changeToMusic();
-                        lnadd[cline] = true;
+                    // 가운데노트
+                        Note lnNote = lnlist[i].MidNote;
+                        GameObject lnObj = generator.AddNewNote(lnNote.Line, lnNote.Position, playArea.transform);
+                        lnObj.transform.SetParent(playArea.transform, false);
+                        lnNote.Noteobj = lnObj;
+                        lnNote.Released = true;
+
+                        // 끝노트
+                        Note endNote = lnlist[i].EndNote;
+                        GameObject endObj = generator.AddNewNote(endNote.Line, endNote.Position, playArea.transform);
+                        endObj.transform.SetParent(playArea.transform, false);
+                        endNote.Noteobj = endObj; // 끝노트
+                        endNote.Released = true;
+
+                        lnlist[i].EndNote = endNote;
+                        lnlist[i].MidNote.Position =
+                            (lnlist[i].StartNote.Position + endNote.Position) / 2;
                     }
                 }
-                else
-                {*/
-                // 롱노트 처리
-                //int cline = note.getLane();
-                /*if (lnadd[cline])
-                {
-                    // 이미 롱노트가 추가중인 상태이면 현재 라인의 lnlist를 갱신하고 노트 표시 추가
-                    for (int i = 0; i < lnlist.Count; i++)
-                    {
-                        if (lnlist[i].getLane() == cline && lnlist[i].getEnd() == null)
-                        {
-                            GameObject noteObj = generator.AddNewNote(note.getLane(), note.getPosition(), playArea.transform);
-                            noteObj.transform.parent = playArea.transform;
-                            note.setNote(noteObj); // 끝노트
-                            note.setReleased(true);
-
-                            lnlist[i].setEnd(note);
-                            lnlist[i].setEndPos(note.getPosition());
-                            lnlist[i].getMiddle().setPosition(
-                                (lnlist[i].getStart().getPosition() + note.getPosition()) / 2
-                            );
-                            lnadd[cline] = false;
-                        }
-                    }
-                }
-                else
-                {*/
-                    // 아직 롱노트가 없으면 일반 노트를 하나 추가하고
-                    // 롱노트를 이 노트의 위치와 시작 위치 사이에 추가할 수 있도록 함
-                    // 이 동작은 Scroller.moveNotes()에서 isLong()을 확인해서 표기한다
-
-                    // 시작노트
-                    GameObject noteObj = generator.AddNewNote(note.getLane(), note.getPosition(), playArea.transform);
-                    noteObj.transform.SetParent(playArea.transform, false);
-                    note.setNote(noteObj);
-                    note.setReleased(true);
-
-                    // 끝노트도 같이 추가한다
-                    for (int i = 0; i < lnlist.Count; i++)
-                    {
-                        if (lnlist[i].getStart() == note)
-                        {
-                        // 가운데노트
-                            Note lnNote = lnlist[i].getMiddle();
-                            GameObject lnObj = generator.AddNewNote(lnNote.getLane(), lnNote.getPosition(), playArea.transform);
-                            lnObj.transform.SetParent(playArea.transform, false);
-                            lnNote.setNote(lnObj);
-                            lnNote.setReleased(true);
-
-                            // 끝노트
-                            Note endNote = lnlist[i].getEnd();
-                            GameObject endObj = generator.AddNewNote(endNote.getLane(), endNote.getPosition(), playArea.transform);
-                            endObj.transform.SetParent(playArea.transform, false);
-                            endNote.setNote(endObj); // 끝노트
-                            endNote.setReleased(true);
-
-                            lnlist[i].setEnd(endNote);
-                            lnlist[i].setEndPos(endNote.getPosition());
-                            lnlist[i].getMiddle().setPosition(
-                                (lnlist[i].getStart().getPosition() + endNote.getPosition()) / 2
-                            );
-                            //lnadd[cline] = false;
-                        }
-                    }
-
-                    
-
-                    //lnlist.Add(new Longnote(cline, note, note.getPosition(), lnNote));
-                    // 롱노트 길이 표기용 노트는 L# 이라는 WAV 명을 표기하고 노트 타입도 LONGNOTE
-                    // (단 롱노트의 시작과 끝은 일반 Note이다)
-                    //lnadd[cline] = true;
-                //}
-                //}
             }
         }
 

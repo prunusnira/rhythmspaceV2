@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using BMSCore;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,70 +7,44 @@ namespace BMSPlayer
 {
     public class Note
     {
-        public enum NOTETYPE { PLAYABLE, MUSIC, BPM, BPMT2, BGA };
-
-        private double position { get; set; }
-        private double startPos { get; set; }
-        private double scrpos { get; set; }
-        private string wav { get; set; }
-        private NOTETYPE notetype;
-        private int bar { get; set; }
-        private int lane { get; set; }
+        public double Position { get; set; }
+        public double ScrPos { get; set; }
+        public string Wav { get; set; }
+        public ObjectType Notetype;
+        public int Bar { get; set; }
+        public int Line { get; set; }
         // 0: 턴테이블, 1~7 각버튼 대응
-        private bool released { get; set; } // 노트가 표시되었는지 유무
-        private bool used { get; set; } // 노트 처리 유무
-        public GameObject noteobj { get; set; }
+        public bool Released { get; set; } // 노트가 표시되었는지 유무
+        public bool Used { get; set; } // 노트 처리 유무
+        public GameObject Noteobj { get; set; }
 
         // 롱노트 관련 처리
-        private bool longnote { get; set; }
-        private int lnnum { get; set; }
-        private bool lnStart { get; set; }
-        private bool lnMid { get; set; }
-        private bool lnEnd { get; set; }
+        public bool IsLongnote { get; set; }
+        public int LNNum { get; set; }
+        public bool LNStart { get; set; }
+        public bool LNMid { get; set; }
+        public bool LNEnd { get; set; }
 
-        public Note(double pos, string wav, int bar, int lane, NOTETYPE notetype = NOTETYPE.PLAYABLE, bool longnote = false)
+        // 타이밍 윈도우 체크
+        public bool TimingWindowChk { get; set; }
+
+        public Note(double pos, string wav, int bar, int lane, ObjectType notetype = ObjectType.PLAYABLE, bool longnote = false)
         {
-            position = pos;
-            startPos = pos;
-            this.wav = wav;
-            this.notetype = notetype;
-            this.bar = bar;
-            this.lane = lane;
-            released = false;
-            used = false;
-            noteobj = null;
-            this.longnote = longnote;
-            scrpos = 4000;
-            lnnum = -1;
-            lnStart = false;
-            lnMid = false;
-            lnEnd = false;
+            Position = pos;
+            this.Wav = wav;
+            this.Notetype = notetype;
+            this.Bar = bar;
+            this.Line = lane;
+            Released = false;
+            Used = false;
+            Noteobj = null;
+            this.IsLongnote = longnote;
+            ScrPos = 4000;
+            LNNum = -1;
+            LNStart = false;
+            LNMid = false;
+            LNEnd = false;
+            TimingWindowChk = false;
         }
-
-        public double getPosition() { return position; }
-        public double getStartPosition() { return startPos; }
-        public double getScrPos() { return scrpos; }
-        public NOTETYPE getNotetype() { return notetype; }
-        public string getWav() { return wav; }
-        public int getBar() { return bar; }
-        public int getLane() { return lane; }
-        public bool isUsed() { return used; }
-        public bool isReleased() { return released; }
-        public bool isLong() { return longnote; }
-        public int getLnNum() { return lnnum; }
-        public bool isLnStart() { return lnStart; }
-        public bool isLnMid() { return lnMid; }
-        public bool isLnEnd() { return lnEnd; }
-
-        public void setUsed(bool used) { this.used = used; }
-        public void setReleased(bool released) { this.released = released; }
-        public void setNote(GameObject obj) { this.noteobj = obj; released = true; }
-        public void setPosition(double position) { this.position = position; }
-        public void setScrPos(double scrpos) { this.scrpos = scrpos; }
-        public void changeToMusic() { notetype = NOTETYPE.MUSIC; longnote = false; }
-        public void setLnNum(int lnnum) { this.lnnum = lnnum; }
-        public void setLnStart(bool lnStart) { this.lnStart = lnStart; }
-        public void setLnMid(bool lnMid) { this.lnMid = lnMid; }
-        public void setLnEnd(bool lnEnd) { this.lnEnd = lnEnd; }
     }
 }

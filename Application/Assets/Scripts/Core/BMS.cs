@@ -52,66 +52,73 @@ namespace BMSCore
 {
     public class BMS
     {
-        private string mFilePath = "";
-        private string mFileName = "";
-        private string mFolderPath = "";
-        private int mPlayer = 0;
-        private string mGerne = "";
-        private string mTitle = "";
-        private string mArtist = "";
-        private double mBPMStart = 0f;
-        private double mBPMMin = 0f;
-        private double mBPMMax = 0f;
-        private int mLevel = 0;
-        private int mRank = 0;
-        private int mTotalNotes = 0;
-        private string mStageFile = "";
-        private LNType mLNType = LNType.Type1; // default = LNType1
-        private string mLNObj = ""; // Only used for LNOBJ
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
+        public string FolderPath { get; set; }
+        public int Player { get; set; }
+        public string Gerne { get; set; }
+        public string Title { get; set; }
+        public string SubTitle { get; set; }
+        public string Artist { get; set; }
+        public string SubArtist { get; set; }
+        public double BPMStart { get; set; }
+        public double BPMMin { get; set; }
+        public double BPMMax { get; set; }
+        public int Level { get; set; }
+        public int Rank { get; set; }
+        public int TotalNotes { get; set; }
+        public int Difficulty { get; set; }
+        public string StageFile { get; set; }
+        public LNType LNType { get; set; } // default = LNType1
+        public string LNObj { get; set; } // Only used for LNOBJ
+        public int LastBar { get; set; } // last number of bar
+        public string BGAVideoFile { get; set; }
 
         // <Bar#, <Ch#, note>> : map structure - int = Ch#
-        public Dictionary<string, string> mWavList = new Dictionary<string, string>();
-        public Dictionary<string, AudioClip> mWavFilesAC = new Dictionary<string, AudioClip>();
-        public Dictionary<string, FMOD.Sound> mWavFilesFM = new Dictionary<string, FMOD.Sound>();
-        public Dictionary<int, List<string>> mMusic = new Dictionary<int, List<string>>();
-        public Dictionary<int, string> mBPMNote = new Dictionary<int, string>();
-        public Dictionary<int, string> mBPMNoteType2 = new Dictionary<int, string>();
-        public Dictionary<string, double> mBPMNum = new Dictionary<string, double>();
-        public Dictionary<int, Dictionary<int, string>> mNote = new Dictionary<int, Dictionary<int, string>>();
-        public Dictionary<int, double> mBarLength = new Dictionary<int, double>();
-        public Dictionary<string, Sprite> mBGAImages = new Dictionary<string, Sprite>();
-        public Dictionary<int, string> mBGANote = new Dictionary<int, string>();
-        public int lastBar = 0; // last number of bar
-        public string bgaVideoFile = null;
-
-        /// Methods
-
+        public Dictionary<string, string> WavList = new Dictionary<string, string>();
+        public Dictionary<string, AudioClip> WavFilesAC = new Dictionary<string, AudioClip>();
+        public Dictionary<string, FMOD.Sound> WavFilesFM = new Dictionary<string, FMOD.Sound>();
+        public Dictionary<int, List<string>> Music = new Dictionary<int, List<string>>();
+        public Dictionary<int, string> BPMNote = new Dictionary<int, string>();
+        public Dictionary<int, string> BPMNoteType2 = new Dictionary<int, string>();
+        public Dictionary<string, double> BPMNum = new Dictionary<string, double>();
+        public Dictionary<int, Dictionary<string, string>> Note = new Dictionary<int, Dictionary<string, string>>();
+        public Dictionary<int, double> BarLength = new Dictionary<int, double>();
+        public Dictionary<string, Sprite> BGAImages = new Dictionary<string, Sprite>();
+        public Dictionary<int, string> BGANote = new Dictionary<int, string>();
+        public Dictionary<string, int> StopList = new Dictionary<string, int>();
+        public Dictionary<int, string> StopNote = new Dictionary<int, string>();
+        
         // Constructor
         public BMS(string path)
         {
-            setFilePath(path);
+            FilePath = path;
+            FolderPath = SetFolderPath(FilePath);
+            FileName = SetFileName(FilePath);
+            Player = 1;
+            Gerne = "";
+            Title = "";
+            SubTitle = "";
+            Artist = "";
+            SubArtist = "";
+            BPMStart = 0;
+            BPMMin = 0;
+            BPMMax = 0;
+            Level = 0;
+            Rank = 0;
+            TotalNotes = 0;
+            Difficulty = 0;
+            StageFile = "";
+            LNType = LNType.Type1;
+            LNObj = "";
+            LastBar = 0;
+            BGAVideoFile = "";
         }
 
-        // Setter
-        public void setFilePath(string path) { mFilePath = path; mFolderPath = setFolderPath(mFilePath); mFileName = setFileName(mFilePath); }
-        public void setPlayer(int player) { mPlayer = player; }
-        public void setGerne(string gerne) { mGerne = gerne; }
-        public void setTitle(string title) { mTitle = title; }
-        public void setArtist(string artist) { mArtist = artist; }
-        public void setBPMStart(double bpm) { mBPMStart = bpm; }
-        public void setBPMMin(double bpm) { mBPMMin = bpm; }
-        public void setBPMMax(double bpm) { mBPMMax = bpm; }
-        public void setLevel(int level) { mLevel = level; }
-        public void setRank(int rank) { mRank = rank; }
-        public void setTotalNotes(int notes) { mTotalNotes = notes; }
-        public void setStageFile(string path) { mStageFile = path; }
-        public void setLNType(LNType type) { mLNType = type; }
-        public void setLNObj(string obj) { mLNObj = obj; }
-
-        public string setFolderPath(string path)
+        private string SetFolderPath(string path)
         {
             int count = 0;
-            mFolderPath = "";
+            FolderPath = "";
             List<string> vc = new List<string>();
 
             char[] seperator = { '/', '\\' };
@@ -125,35 +132,17 @@ namespace BMSCore
 
             for (int i = 0; i < count - 1; i++)
             {
-                if (i != 0) mFolderPath += "/";
-                mFolderPath += vc[i];
+                if (i != 0) FolderPath += "/";
+                FolderPath += vc[i];
             }
-            return mFolderPath + "/";
+            return FolderPath + "/";
         }
 
-        public string setFileName(string path)
+        private string SetFileName(string path)
         {
             char[] seperator = { '/', '\\' };
             string[] pathDiv = path.Split(seperator);
             return pathDiv[pathDiv.Length-1];
         }
-
-        // Getter
-        public string getFilePath() { return mFilePath; }
-        public string getFileName() { return mFileName; }
-        public string getFolderPath() { return mFolderPath; }
-        public int getPlayer() { return mPlayer; }
-        public string getGerne() { return mGerne; }
-        public string getTitle() { return mTitle; }
-        public string getArtist() { return mArtist; }
-        public double getBPMStart() { return mBPMStart; }
-        public double getBPMMin() { return mBPMMin; }
-        public double getBPMMax() { return mBPMMax; }
-        public int getLevel() { return mLevel; }
-        public int getRank() { return mRank; }
-        public int getTotalNotes() { return mTotalNotes; }
-        public string getStageFile() { return mStageFile; }
-        public LNType getLNType() { return mLNType; }
-        public string getLNObj() { return mLNObj; }
     }
 }

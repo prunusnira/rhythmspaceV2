@@ -5,61 +5,91 @@ namespace BMSPlayer
 {
     public class HPController : MonoBehaviour
     {
-        private int currentHP;
-        private int hpMin = 0;
-        private int hpMax = 10000;
-        private int hpPerfect;
-        private int hpGreat;
-        private int hpGood;
-        private int hpBad;
-        private int hpMiss;
+        public int HPMin
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        public int HPMax
+        {
+            get
+            {
+                return 10000;
+            }
+        }
+
+        public int CurrentHP { get; set; }
+        public int HPPerfect { get; set; }
+        public int HPGreat { get; set; }
+        public int HPGood { get; set; }
+        public int HPBad { get; set; }
+        public int HPMiss { get; set; }
+        public int HPEPoor { get; set; }
 
         public void hpChangePerfect()
         {
-            currentHP += hpPerfect;
-            if (currentHP > hpMax) { currentHP = hpMax; }
+            CurrentHP += HPPerfect;
+            if (CurrentHP > HPMax) { CurrentHP = HPMax; }
         }
 
         public void hpChangeGreat()
         {
-            currentHP += hpGreat;
-            if (currentHP > hpMax) { currentHP = hpMax; }
+            CurrentHP += HPGreat;
+            if (CurrentHP > HPMax) { CurrentHP = HPMax; }
         }
 
         public void hpChangeGood()
         {
-            currentHP += hpGood;
-            if (currentHP > hpMax) { currentHP = hpMax; }
+            CurrentHP += HPGood;
+            if (CurrentHP > HPMax) { CurrentHP = HPMax; }
         }
 
         public void hpChangeBad()
         {
             // 하드는 30퍼 이하에서 감소량 반값
-            JudgeType type = Const.GetJudgeType();
-            if (type == JudgeType.HARD && currentHP <= hpMax * 0.3)
+            JudgeType type = Const.JudgeType;
+            if (type == JudgeType.HARD && CurrentHP <= HPMax * 0.3)
             {
-                currentHP += hpBad / 2;
+                CurrentHP += HPBad / 2;
             }
             else
             {
-                currentHP += hpBad;
+                CurrentHP += HPBad;
             }
-            if (currentHP < hpMin) { currentHP = hpMin; }
+            if (CurrentHP < HPMin) { CurrentHP = HPMin; }
         }
 
         public void hpChangeMiss()
         {
             // 하드는 30퍼 이하에서 감소량 반값
-            JudgeType type = Const.GetJudgeType();
-            if (type == JudgeType.HARD && currentHP <= hpMax * 0.3)
+            JudgeType type = Const.JudgeType;
+            if (type == JudgeType.HARD && CurrentHP <= HPMax * 0.3)
             {
-                currentHP += hpMiss / 2;
+                CurrentHP += HPMiss / 2;
             }
             else
             {
-                currentHP += hpMiss;
+                CurrentHP += HPMiss;
             }
-            if (currentHP < hpMin) { currentHP = hpMin; }
+            if (CurrentHP < HPMin) { CurrentHP = HPMin; }
+        }
+
+        public void hpChangeEPoor()
+        {
+            // 하드는 30퍼 이하에서 감소량 반값
+            JudgeType type = Const.JudgeType;
+            if (type == JudgeType.HARD && CurrentHP <= HPMax * 0.3)
+            {
+                CurrentHP += HPEPoor / 2;
+            }
+            else
+            {
+                CurrentHP += HPEPoor;
+            }
+            if (CurrentHP < HPMin) { CurrentHP = HPMin; }
         }
 
         public void SetHPJudgeType(JudgeType type, int notecount)
@@ -69,44 +99,49 @@ namespace BMSPlayer
             {
                 case JudgeType.ASSISTED:
                 case JudgeType.EASY:
-                    currentHP = (int)(hpMax * 0.2);
-                    hpPerfect = changeEN;
-                    hpGreat = changeEN;
-                    hpGood = changeEN / 2;
-                    hpBad = -160;
-                    hpMiss = -480;
+                    CurrentHP = (int)(HPMax * 0.2);
+                    HPPerfect = changeEN;
+                    HPGreat = changeEN;
+                    HPGood = changeEN / 2;
+                    HPBad = -160;
+                    HPMiss = -480;
+                    HPEPoor = -160;
                     break;
                 case JudgeType.NORMAL:
-                    currentHP = (int)(hpMax * 0.2);
-                    hpPerfect = changeEN;
-                    hpGreat = changeEN;
-                    hpGood = changeEN / 2;
-                    hpBad = -160;
-                    hpMiss = -600;
+                    CurrentHP = (int)(HPMax * 0.2);
+                    HPPerfect = changeEN;
+                    HPGreat = changeEN;
+                    HPGood = changeEN / 2;
+                    HPBad = -160;
+                    HPMiss = -600;
+                    HPEPoor = -200;
                     break;
                 case JudgeType.HARD:
-                    currentHP = hpMax;
-                    hpPerfect = 16;
-                    hpGreat = 16;
-                    hpGood = 0;
-                    hpBad = -500;
-                    hpMiss = -960;
+                    CurrentHP = HPMax;
+                    HPPerfect = 16;
+                    HPGreat = 16;
+                    HPGood = 0;
+                    HPBad = -500;
+                    HPMiss = -960;
+                    HPEPoor = -500;
                     break;
                 case JudgeType.EXHARD:
-                    currentHP = hpMax;
-                    hpPerfect = 16;
-                    hpGreat = 16;
-                    hpGood = 0;
-                    hpBad = -1000;
-                    hpMiss = -1920;
+                    CurrentHP = HPMax;
+                    HPPerfect = 16;
+                    HPGreat = 16;
+                    HPGood = 0;
+                    HPBad = -1000;
+                    HPMiss = -1920;
+                    HPEPoor = -1000;
                     break;
                 default:
-                    currentHP = (int)(hpMax * 0.2);
-                    hpPerfect = 1;
-                    hpGreat = 1;
-                    hpGood = 1;
-                    hpBad = -160;
-                    hpMiss = -500;
+                    CurrentHP = (int)(HPMax * 0.2);
+                    HPPerfect = 1;
+                    HPGreat = 1;
+                    HPGood = 1;
+                    HPBad = -160;
+                    HPMiss = -500;
+                    HPEPoor = -160;
                     break;
             }
         }
@@ -116,28 +151,12 @@ namespace BMSPlayer
         // Perfect, Great은 똑같고 Good은 반값
         private int CalculateHPChange(int notecount)
         {
-            return (int)Mathf.Round(760.5f / (0.01f * notecount + 6.5f));
+            return (int)Mathf.Round(((0.01f * notecount + 6.5f) / 7.605f / notecount) * 10000);
         }
 
-        // Getter
-        public int GetHPMax()
+        public bool IsHpMin()
         {
-            return hpMax;
-        }
-
-        public int GetHPMin()
-        {
-            return hpMin;
-        }
-
-        public int GetHP()
-        {
-            return currentHP;
-        }
-
-        public bool isHpMin()
-        {
-            return currentHP <= hpMin ? true : false;
+            return CurrentHP <= HPMin ? true : false;
         }
     }
 }

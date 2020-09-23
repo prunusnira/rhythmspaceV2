@@ -9,10 +9,10 @@ namespace BMSCore
         // LNObj를 LNType1 형식으로 변환하는 메소드
         public void FixLongNoteLNOBJ(BMS bms)
         {
-            int[] nrLane = { 11, 12, 13, 14, 15, 16, 18, 19 };
-            int[] lnLane = { 51, 52, 53, 54, 55, 56, 58, 59 };
-            string LNObj = bms.getLNObj();
-            int maxbar = bms.lastBar;
+            string[] nrLane = { "11", "12", "13", "14", "15", "16", "18", "19" };
+            string[] lnLane = { "51", "52", "53", "54", "55", "56", "58", "59" };
+            string LNObj = bms.LNObj;
+            int maxbar = bms.LastBar;
 
             /**
              * 최초 정의 - LINE / BAR
@@ -46,13 +46,13 @@ namespace BMSCore
              * 
              * 11 12 13 14 15 16 18 19
              */
-            for (int i = 0; i < bms.lastBar; i++) // bar
+            for (int i = 0; i < bms.LastBar; i++) // bar
             {
                 for (int j = 0; j < 8; j++) // line
                 {
-                    if (!bms.mNote.ContainsKey(i)) continue;
+                    if (!bms.Note.ContainsKey(i)) continue;
 
-                    string noteStr = bms.mNote[i][nrLane[j]];
+                    string noteStr = bms.Note[i][nrLane[j]];
                     List<string> currentList = GetNoteListFromString(noteStr);
                     List<int> lnPosList = new List<int>();
                     bool isLNObjExist = false;
@@ -133,20 +133,20 @@ namespace BMSCore
                         List<int> idxlist = new List<int>();
                         idxlist.Add(lastidx);
 
-                        string lnPrevStr = bms.mNote[tempBar[j]][lnLane[j]];
+                        string lnPrevStr = bms.Note[tempBar[j]][lnLane[j]];
                         List<string> lnPrevList = GetNoteListFromString(lnPrevStr);
 
                         string nrListReplace = GetNewNormalString(prevstr, idxlist);
                         string lnListReplace = GetNewLongNoteString(lnPrevList, prevstr, idxlist);
-                        bms.mNote[bar][nrLane[j]] = nrListReplace;
-                        bms.mNote[bar][lnLane[j]] = lnListReplace;
+                        bms.Note[bar][nrLane[j]] = nrListReplace;
+                        bms.Note[bar][lnLane[j]] = lnListReplace;
                     }
 
                     // 현재 노트 리스트에서 롱노트로 쓸 값들만 옮기기
                     string newNrStr = GetNewNormalString(currentList, lnPosList);
                     string newLnStr = GetNewLongNoteString(null, currentList, lnPosList);
-                    bms.mNote[i][nrLane[j]] = newNrStr;
-                    bms.mNote[i][lnLane[j]] = newLnStr;
+                    bms.Note[i][nrLane[j]] = newNrStr;
+                    bms.Note[i][lnLane[j]] = newLnStr;
 
                     // 롱노트를 옮긴 다음에도 단노트가 남아있으면 temp로 등록함
                     List<string> afterNoteChk = GetNoteListFromString(newNrStr);

@@ -287,13 +287,13 @@ namespace BMSPlayer
 
         public void changeKey(string name)
         {
-            Const.SetKeyChange(name);
+            Const.KeyChange = name;
             keyPopup.SetActive(true);
         }
 
         public void changeCtrl(string name)
         {
-            Const.SetKeyChange(name);
+            Const.KeyChange = name;
             ctrlPopup.SetActive(true);
         }
 

@@ -12,12 +12,12 @@ namespace BMSPlayer
 
         void Update()
         {
-            string name = Const.GetKeyChange();
+            string name = Const.KeyChange;
             changeKeyName(name);
             StartCoroutine(KeyInputChecker(name));
             if (Const.isKeyChanged)
             {
-                Const.SetKeyChange("");
+                Const.KeyChange = "";
                 self.SetActive(false);
             }
 

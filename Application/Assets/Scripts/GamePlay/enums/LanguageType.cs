@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace BMSPlayer
 {
-    public enum BPMNoteType
+    public enum LanguageType
     {
-        Type1 = 0,
-        Type2 = 1
+        KO = 0,
+        JA = 1,
+        EN = 2
     }
 }

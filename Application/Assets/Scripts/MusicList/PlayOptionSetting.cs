@@ -51,7 +51,7 @@ namespace BMSPlayer
             // 현재 값 가져오기
 
             // 오토 설정
-            if(Const.GetAuto() == 0)
+            if(Const.Auto == AutoPlayType.OFF)
             {
                 spAutoOnOff.sprite = AutoOff;
             }
@@ -61,7 +61,7 @@ namespace BMSPlayer
             }
 
             // 판정 표시 설정
-            if(Const.GetPJudge() == 0)
+            if(Const.DisplayJudge == 0)
             {
                 spJudgeOnOff.sprite = JudgeOff;
             }
@@ -71,21 +71,21 @@ namespace BMSPlayer
             }
 
             // 속도
-            if(Const.GetSpdType() == SpdType.FIXED)
+            if(Const.SpdType == SpdType.FIXED)
             {
-                speed = Const.GetSpeedFixed();
+                speed = Const.SpeedFixed;
                 spSpdType.sprite = spdFixed;
                 txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
             }
             else
             {
-                speedfl = Const.GetSpeedFluid();
+                speedfl = Const.SpeedFluid;
                 spSpdType.sprite = spdFluid;
                 txtSpeed.text = speedfl.ToString();
             }
 
             // 게이지 타입
-            switch(Const.GetJudgeType())
+            switch(Const.JudgeType)
             {
                 case JudgeType.ASSISTED:
                     spGauge.sprite = GAssisted;
@@ -105,7 +105,7 @@ namespace BMSPlayer
             }
 
             // 그래프
-            switch(Const.GetGraphTarget())
+            switch(Const.GraphTarget)
             {
                 case GraphTargetType.OFF:
                     spTarget.sprite = TOff;
@@ -132,28 +132,28 @@ namespace BMSPlayer
         {
             if(Input.GetKeyDown(KeyCode.F1))
             {
-                if(Const.GetSpdType() == SpdType.FIXED)
+                if(Const.SpdType == SpdType.FIXED)
                 {
                     SpeedDownFixed();
                 }
             }
             else if(Input.GetKeyDown(KeyCode.F2))
             {
-                if (Const.GetSpdType() == SpdType.FIXED)
+                if (Const.SpdType == SpdType.FIXED)
                 {
                     SpeedUpFixed();
                 }
             }
             else if(Input.GetKey(KeyCode.F1))
             {
-                if (Const.GetSpdType() == SpdType.FLUID)
+                if (Const.SpdType == SpdType.FLUID)
                 {
                     SpeedDownFluid();
                 }
             }
             else if (Input.GetKey(KeyCode.F2))
             {
-                if (Const.GetSpdType() == SpdType.FLUID)
+                if (Const.SpdType == SpdType.FLUID)
                 {
                     SpeedUpFluid();
                 }
@@ -183,9 +183,9 @@ namespace BMSPlayer
         private void SpeedUpFixed()
         {
             if(speed < 1000) speed += 25;
-            Const.SetSpeedFixed(speed);
+            Const.SpeedFixed = speed;
             speedfl = (int)(Const.selectedMusic.BPMstart * speed / 100);
-            Const.SetSpeedFluid(speedfl);
+            Const.SpeedFluid = speedfl;
 
             txtSpeed.text = ((float)speed/100).ToString("0.00") + "x";
             txtSpdAnother.text = "FLUID " + speedfl.ToString();
@@ -194,9 +194,9 @@ namespace BMSPlayer
         private void SpeedDownFixed()
         {
             if (speed > 50) speed -= 25;
-            Const.SetSpeedFixed(speed);
+            Const.SpeedFixed = speed;
             speedfl = (int)(Const.selectedMusic.BPMstart * speed / 100);
-            Const.SetSpeedFluid(speedfl);
+            Const.SpeedFluid = speedfl;
 
             txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
             txtSpdAnother.text = "FLUID " + speedfl.ToString();
@@ -205,9 +205,9 @@ namespace BMSPlayer
         private void SpeedUpFluid()
         {
             if (speedfl < 1000) speedfl++;
-            Const.SetSpeedFluid(speedfl);
+            Const.SpeedFluid = speedfl;
             speed = (int)((double)speedfl / Const.selectedMusic.BPMstart * 100);
-            Const.SetSpeedFixed(speed);
+            Const.SpeedFixed = speed;
 
             txtSpeed.text = speedfl.ToString();
             txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
@@ -216,9 +216,9 @@ namespace BMSPlayer
         private void SpeedDownFluid()
         {
             if (speedfl > 100) speedfl--;
-            Const.SetSpeedFluid(speedfl);
+            Const.SpeedFluid = speedfl;
             speed = (int)((double)speedfl / Const.selectedMusic.BPMstart * 100);
-            Const.SetSpeedFixed(speed);
+            Const.SpeedFixed = speed;
 
             txtSpeed.text = speedfl.ToString();
             txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
@@ -226,72 +226,72 @@ namespace BMSPlayer
 
         private void JudgeOnOff()
         {
-            if(Const.GetPJudge() == 0)
+            if(Const.DisplayJudge == 0)
             {
-                Const.SetPJudge(1);
+                Const.DisplayJudge = 1;
                 spJudgeOnOff.sprite = JudgeOn;
             }
             else
             {
-                Const.SetPJudge(0);
+                Const.DisplayJudge = 0;
                 spJudgeOnOff.sprite = JudgeOff;
             }
         }
 
         private void AutoOnOff()
         {
-            if(Const.GetAuto() == 0)
+            if(Const.Auto == AutoPlayType.OFF)
             {
-                Const.SetAuto(1);
+                Const.Auto = AutoPlayType.ON;
                 spAutoOnOff.sprite = AutoOn;
             }
             else
             {
-                Const.SetAuto(0);
+                Const.Auto = AutoPlayType.OFF;
                 spAutoOnOff.sprite = AutoOff;
             }
         }
 
         private void JudgeTypeChange()
         {
-            switch (Const.GetJudgeType())
+            switch (Const.JudgeType)
             {
                 case JudgeType.ASSISTED:
                     spGauge.sprite = GEasy;
-                    Const.SetJudgeType(JudgeType.EASY);
+                    Const.JudgeType = JudgeType.EASY;
                     break;
                 case JudgeType.EASY:
                     spGauge.sprite = GNormal;
-                    Const.SetJudgeType(JudgeType.NORMAL);
+                    Const.JudgeType = JudgeType.NORMAL;
                     break;
                 case JudgeType.NORMAL:
                     spGauge.sprite = GHard;
-                    Const.SetJudgeType(JudgeType.HARD);
+                    Const.JudgeType = JudgeType.HARD;
                     break;
                 case JudgeType.HARD:
                     spGauge.sprite = GExHard;
-                    Const.SetJudgeType(JudgeType.EXHARD);
+                    Const.JudgeType = JudgeType.EXHARD;
                     break;
                 case JudgeType.EXHARD:
                     spGauge.sprite = GAssisted;
-                    Const.SetJudgeType(JudgeType.ASSISTED);
+                    Const.JudgeType = JudgeType.ASSISTED;
                     break;
             }
         }
 
         private void SpeedTypeChange()
         {
-            if (Const.GetSpdType() == SpdType.FIXED)
+            if (Const.SpdType == SpdType.FIXED)
             {
                 spSpdType.sprite = spdFluid;
-                Const.SetSpdType(SpdType.FLUID);
+                Const.SpdType = SpdType.FLUID;
                 txtSpeed.text = speedfl.ToString();
                 txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
             }
             else
             {
                 spSpdType.sprite = spdFixed;
-                Const.SetSpdType(SpdType.FIXED);
+                Const.SpdType = SpdType.FIXED;
                 txtSpeed.text = ((float)speed/100).ToString("0.00");
                 txtSpdAnother.text = "FLUID " + speedfl.ToString();
             }
@@ -299,27 +299,27 @@ namespace BMSPlayer
 
         private void GraphTargetChange()
         {
-            switch (Const.GetGraphTarget())
+            switch (Const.GraphTarget)
             {
                 case GraphTargetType.OFF:
                     spTarget.sprite = TA;
-                    Const.SetGraphTarget(GraphTargetType.A);
+                    Const.GraphTarget = GraphTargetType.A;
                     break;
                 case GraphTargetType.A:
                     spTarget.sprite = TAA;
-                    Const.SetGraphTarget(GraphTargetType.AA);
+                    Const.GraphTarget = GraphTargetType.AA;
                     break;
                 case GraphTargetType.AA:
                     spTarget.sprite = TAAA;
-                    Const.SetGraphTarget(GraphTargetType.AAA);
+                    Const.GraphTarget = GraphTargetType.AAA;
                     break;
                 case GraphTargetType.AAA:
                     spTarget.sprite = TMax;
-                    Const.SetGraphTarget(GraphTargetType.MAX);
+                    Const.GraphTarget = GraphTargetType.MAX;
                     break;
                 case GraphTargetType.MAX:
                     spTarget.sprite = TOff;
-                    Const.SetGraphTarget(GraphTargetType.OFF);
+                    Const.GraphTarget = GraphTargetType.OFF;
                     break;
                 default:
                     spTarget.sprite = TOff;

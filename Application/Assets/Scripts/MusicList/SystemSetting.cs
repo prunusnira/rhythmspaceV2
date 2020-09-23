@@ -7,12 +7,17 @@ using System.IO;
 using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
+using BMSCore;
 
 namespace BMSPlayer
 {
     public class SystemSetting : Setting
     {
         // Path changer
+        private MusicListManager mlm;
+        private LoadBMSList bmsLoader;
+        private List<MusicListData> musicList;
+
         public Text txtPathTitle;
         public Text txtPathVar;
         public GameObject objBrowser;
@@ -22,8 +27,7 @@ namespace BMSPlayer
         public Button btnChange;
         public Button btnRefresh;
         public GameObject layerLoading;
-        private bool isRefresh;
-        private bool isRefreshRun;
+        public TextMesh txtLoadingPath;
 
         // Lang changer
         public Button btnKor;
@@ -54,9 +58,9 @@ namespace BMSPlayer
         {
             base.Awake();
 
-            isRefresh = false;
-
-            isRefreshRun = false;
+            mlm = new MusicListManager();
+            musicList = new List<MusicListData>();
+            bmsLoader = new LoadBMSList();
             
             rows = 6;
             btn = new int[] { 2, 3, 2, 2, 2, 1 };
@@ -66,19 +70,19 @@ namespace BMSPlayer
 
         public override void Start()
         {
-            int lang = Const.GetLang();
-            int enc = Const.GetEncoding();
-            int sync = Const.GetSync();
+            LanguageType lang = Const.Language;
+            int enc = Const.Encoding;
+            int sync = Const.Sync;
 
             switch(lang)
             {
-                case 0:
+                case LanguageType.KO:
                     curLang.text = "Korean";
                     break;
-                case 1:
+                case LanguageType.JA:
                     curLang.text = "Japanese";
                     break;
-                case 2:
+                case LanguageType.EN:
                     curLang.text = "English";
                     break;
             }
@@ -100,12 +104,6 @@ namespace BMSPlayer
         public override void Update()
         {
             base.Update();
-
-            // refresh
-            if(isRefresh)
-            {
-                StartCoroutine("refresh");
-            }
         }
 
         public override void EncolorBtn(int row, int col)
@@ -158,11 +156,11 @@ namespace BMSPlayer
                     }
                     else if (col == 1)
                     {
-                        setRefresh();
+                        pathRefresh();
                     }
                     break;
                 case 1:
-                    changeLang(col);
+                    changeLang((LanguageType)col);
                     break;
                 case 2:
                     if(col == 0)
@@ -199,18 +197,18 @@ namespace BMSPlayer
 
         public void UpdateOption()
         {
-            int lang = Const.GetLang();
-            txtPathVar.text = Const.GetBMSFolderPath();
-            settingDesc.text = Const.settingDesc[lang];
+            LanguageType lang = Const.Language;
+            txtPathVar.text = Const.BMSFolderPath;
+            settingDesc.text = Const.settingDesc[(int)lang];
             showSync();
-            changeEncoding(Const.GetEncoding());
-            syncdesc.text = Const.settingSyncDesc[lang];
+            changeEncoding(Const.Encoding);
+            syncdesc.text = Const.settingSyncDesc[(int)lang];
         }
 
         public void changePath()
         {
             browserBg.SetActive(true);
-            txtBrowserDesc.text = Const.browserDesc[Const.GetLang()];
+            txtBrowserDesc.text = Const.browserDesc[(int)Const.Language];
             /* https://github.com/GracesGames/SimpleFileBrowser */
             GameObject browser = Instantiate(objBrowser, browserBg.transform);
             browser.name = "BMS Top Path Select";
@@ -222,22 +220,22 @@ namespace BMSPlayer
             browserScr.OnFileBrowserClose += pathCancelCallback;
         }
 
-        public void setRefresh()
+        public void pathRefresh()
         {
             layerLoading.SetActive(true);
-            isRefresh = true;
+            StartCoroutine("refresh");
         }
 
         public void pathCallback(string path)
         {
-            Const.SetBMSFolderPath(path);
+            Const.BMSFolderPath = path;
             browserBg.SetActive(false);
             BinaryFormatter formatter = new BinaryFormatter();
             string directory = Directory.GetDirectoryRoot(path);
             txtPathVar.text = path;
 
             layerLoading.SetActive(true);
-            isRefresh = true;
+            StartCoroutine("refresh");
         }
 
         public void pathCancelCallback()
@@ -247,66 +245,72 @@ namespace BMSPlayer
 
         IEnumerator refresh()
         {
-            if(!isRefreshRun)
+            musicList.RemoveRange(0, musicList.Count);
+
+            // Directory List
+            txtLoadingPath.text = "Loading folder list";
+            yield return new WaitForSeconds(0.00001f);
+            List<string> dirlist = bmsLoader.GetDirectories(Const.BMSFolderPath);
+
+            // File List
+            txtLoadingPath.text = "Loading file list";
+            yield return new WaitForSeconds(0.00001f);
+            List<string> filelist = bmsLoader.GetFiles(dirlist);
+
+            // Load each file
+            int index = 0;
+            foreach(string file in filelist)
             {
-                isRefreshRun = true;
-                Debug.Log("Refresh Start");
-                yield return new WaitForSeconds(0.5f);
+                // 각 파일별로 돌면서 파일을 등록함
+                txtLoadingPath.text = "Loading " + file;
+                yield return new WaitForSeconds(0.00001f);
+                MusicListData bmsdata = mlm.LoadBMSFromFolder(file, index);
+                if(bmsdata != null) musicList.Add(bmsdata);
+                index++;
             }
-            else
-            {
-                isRefreshRun = false;
-                isRefresh = false;
-                Debug.Log("Refreshing...");
-                int rtn = MusicDataRegister.AddBMSFromPath();
-                switch(rtn)
-                {
-                    case 0:
-                        Debug.Log("Refresh Complete");
-                        break;
-                    case 1:
-                        Debug.Log("No bms on path");
-                        break;
-                    case 2:
-                        Debug.Log("path is empty");
-                        break;
-                }
-                layerLoading.SetActive(false);
-                Const.isRefreshDone = true;
-            }
+            yield return new WaitForSeconds(0.00001f);
+
+            // 수집한 BMS 데이터를 DB에 등록
+            txtLoadingPath.text = "Registering into database";
+            yield return new WaitForSeconds(0.00001f);
+            mlm.AddDataToDB(musicList);
+            mlm.close();
+
+            layerLoading.SetActive(false);
+            Const.isRefreshDone = true;
         }
 
         public void SetAutoSync()
         {
-            if (Const.GetAutoSync() == AutoSyncType.OFF)
+            if (Const.AutoSync == AutoSyncType.OFF)
             {
-                Const.SetAutoSync(AutoSyncType.ON);
+                Const.AutoSync = AutoSyncType.ON;
                 btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync ON";
             }
-            else if (Const.GetAutoSync() == AutoSyncType.ON)
+            else
             {
-                Const.SetAutoSync(AutoSyncType.OFF);
+                Const.AutoSync = AutoSyncType.OFF;
                 btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync OFF";
             }
         }
 
         public void changeSync(bool up)
         {
-            int sync = Const.GetSync();
+            int sync = Const.Sync;
             if (up)
             {
-                Const.SetSync(sync + 1);
+                Const.Sync = sync + 1;
             }
             else
             {
-                Const.SetSync(sync - 1);
+                Const.Sync = sync - 1;
             }
             showSync();
         }
 
         public void showSync()
         {
-            int sync = Const.GetSync();
+            int sync = Const.Sync;
             if (sync < 0)
             {
                 syncval.text = sync.ToString();
@@ -317,28 +321,28 @@ namespace BMSPlayer
             }
         }
 
-        public void changeLang(int lang)
+        public void changeLang(LanguageType lang)
         {
-            Const.SetLang(lang);
+            Const.Language = lang;
             switch (lang)
             {
-                case 0:
+                case LanguageType.KO:
                     curLang.text = "Korean";
                     break;
-                case 1:
+                case LanguageType.JA:
                     curLang.text = "Japanese";
                     break;
-                case 2:
+                case LanguageType.EN:
                     curLang.text = "English";
                     break;
             }
-            Const.SetLang(lang);
+            Const.Language = lang;
             UpdateOption();
         }
 
         public void changeEncoding(int enc)
         {
-            Const.SetEncoding(enc);
+            Const.Encoding = enc;
             switch (enc)
             {
                 case 932:
@@ -356,6 +360,12 @@ namespace BMSPlayer
             MusicListUI.SetNotOnTop();
             layerKeySetting.SetActive(true);
             GetComponent<PlayKeySetting>().EnableWindow();
+        }
+
+        IEnumerator LoadFile()
+        {
+
+            yield return null;
         }
     }
 }

@@ -18,10 +18,10 @@ namespace BMSCore
         public void HeaderAnalyzer(BMS bms)
         {
             // input stream 열기 // 기본 Default, 일본어 932, 한국어 949
-            int encoding = Const.GetEncoding();
+            int encoding = Const.Encoding;
 
             StreamReader bmsReader = new StreamReader(
-                bms.getFilePath(), System.Text.Encoding.GetEncoding(encoding)
+                bms.FilePath, System.Text.Encoding.GetEncoding(encoding)
             );
 
             // 한 줄 씩 읽으면서 분석
@@ -34,7 +34,7 @@ namespace BMSCore
                     if (line.Length != 0 && line[0].StartsWith("#"))
                     {
                         // divide tag and other info
-                        string tag = line[0];
+                        string tag = line[0].ToUpper();
                         string left = "";
                         string etc;
                         for (int i = 1; i < line.Length; i++)
@@ -47,7 +47,7 @@ namespace BMSCore
                             left += etc;
                         }
 
-                        string chkWav = tag.Substring(0, 4);
+                        string chkWav = tag.Substring(0, 4).ToUpper();
 
                         // For BPM Check
                         int parsedTag = 0;
@@ -61,47 +61,59 @@ namespace BMSCore
                         }
                         else if (tag == "#PLAYER")
                         {
-                            bms.setPlayer(int.Parse(left));
+                            bms.Player = int.Parse(left);
                         }
                         else if (tag == "#GENRE")
                         {
-                            bms.setGerne(left);
+                            bms.Gerne = left;
                         }
                         else if (tag == "#TITLE")
                         {
-                            bms.setTitle(left);
+                            bms.Title = left;
+                        }
+                        else if (tag == "#SUBTITLE")
+                        {
+                            bms.SubTitle = left;
                         }
                         else if (tag == "#ARTIST")
                         {
-                            bms.setArtist(left);
+                            bms.Artist = left;
+                        }
+                        else if (tag == "#SUBARTIST")
+                        {
+                            bms.SubArtist = left;
+                        }
+                        else if(tag == "#DIFFICULTY")
+                        {
+                            bms.Difficulty = int.Parse(left);
                         }
                         else if (tag == "#BPM")
                         {
                             float bpm;
                             float.TryParse(left, out bpm);
-                            bms.setBPMStart(bpm);
-                            bms.setBPMMin(bpm);
-                            bms.setBPMMax(bpm);
+                            bms.BPMStart = bpm;
+                            bms.BPMMin = bpm;
+                            bms.BPMMax = bpm;
                         }
                         else if (tag == "#PLAYLEVEL")
                         {
                             int level;
                             int.TryParse(left, out level);
-                            bms.setLevel(level);
+                            bms.Level = level;
                         }
                         else if (tag == "#RANK")
                         {
-                            bms.setRank(int.Parse(left));
+                            bms.Rank = int.Parse(left);
                         }
                         else if (tag == "#TOTAL")
                         {
                             int note;
                             int.TryParse(left, out note);
-                            bms.setTotalNotes(note);
+                            bms.TotalNotes = note;
                         }
                         else if (tag == "#STAGEFILE")
                         {
-                            bms.setStageFile(left);
+                            bms.StageFile = left;
                         }
                         else if (tag != "#BPM" && chkWav == "#BPM")
                         {
@@ -137,7 +149,7 @@ namespace BMSCore
                 {
                     ErrorHandler.LogError("===File Error===");
                     ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
-                    ErrorHandler.LogError("from: " + bms.getFilePath());
+                    ErrorHandler.LogError("from: " + bms.FilePath);
                     continue;
                 }
             }
@@ -148,8 +160,8 @@ namespace BMSCore
         public void FullAnalyzer(BMS bms)
         {
             // wav ogg 체크
-            string[] wavfiles = Directory.GetFiles(bms.getFolderPath(), "*.wav");
-            string[] oggfiles = Directory.GetFiles(bms.getFolderPath(), "*.ogg");
+            string[] wavfiles = Directory.GetFiles(bms.FolderPath, "*.wav");
+            string[] oggfiles = Directory.GetFiles(bms.FolderPath, "*.ogg");
 
             if (wavfiles.Length > 0)
                 isWavExist = true;
@@ -157,8 +169,8 @@ namespace BMSCore
                 isOggExist = true;
 
             // input stream 열기 // 기본 Default, 일본어 932, 한국어 949
-            int encoding = Const.GetEncoding();
-            StreamReader bmsReader = new StreamReader(bms.getFilePath(), System.Text.Encoding.GetEncoding(encoding));
+            int encoding = Const.Encoding;
+            StreamReader bmsReader = new StreamReader(bms.FilePath, System.Text.Encoding.GetEncoding(encoding));
 
             // 한 줄 씩 읽으면서 분석
             string buf = null;
@@ -170,7 +182,7 @@ namespace BMSCore
                     if (line.Length != 0 && line[0].StartsWith("#"))
                     {
                         // divide tag and other info
-                        string tag = line[0];
+                        string tag = line[0].ToUpper();
                         string left = "";
                         string etc;
                         for (int i = 1; i < line.Length; i++)
@@ -183,7 +195,7 @@ namespace BMSCore
                             left += etc;
                         }
 
-                        string chkWav = tag.Substring(0, 4);
+                        string chkWav = tag.Substring(0, 4).ToUpper();
                         int parsedTag = 0;
 
                         // process each tag
@@ -195,66 +207,73 @@ namespace BMSCore
                         }
                         if (tag == "#PLAYER")
                         {
-                            bms.setPlayer(int.Parse(left));
+                            bms.Player = int.Parse(left);
                         }
                         else if (tag == "#GENRE")
                         {
-                            bms.setGerne(left);
+                            bms.Gerne = left;
                         }
                         else if (tag == "#TITLE")
                         {
-                            bms.setTitle(left);
+                            bms.Title = left;
+                        }
+                        else if (tag == "#SUBTITLE")
+                        {
+                            bms.SubTitle = left;
                         }
                         else if (tag == "#ARTIST")
                         {
-                            bms.setArtist(left);
+                            bms.Artist = left;
+                        }
+                        else if (tag == "#SUBARTIST")
+                        {
+                            bms.SubArtist = left;
+                        }
+                        else if (tag == "#DIFFICULTY")
+                        {
+                            bms.Difficulty = int.Parse(left);
                         }
                         else if (tag == "#BPM")
                         {
                             float bpm;
                             float.TryParse(left, out bpm);
-                            bms.setBPMStart(bpm);
-                            bms.setBPMMin(bpm);
-                            bms.setBPMMax(bpm);
+                            bms.BPMStart = bpm;
+                            bms.BPMMin = bpm;
+                            bms.BPMMax = bpm;
                         }
                         else if (tag == "#PLAYLEVEL")
                         {
                             int level;
                             int.TryParse(left, out level);
-                            bms.setLevel(level);
+                            bms.Level = level;
                         }
                         else if (tag == "#RANK")
                         {
-                            bms.setRank(int.Parse(left));
+                            bms.Rank = int.Parse(left);
                         }
                         else if (tag == "#TOTAL")
                         {
                             int note;
                             int.TryParse(left, out note);
-                            bms.setTotalNotes(note);
+                            bms.TotalNotes = note;
                         }
                         else if (tag == "#STAGEFILE")
                         {
-                            bms.setStageFile(left);
+                            bms.StageFile = left;
                         }
-
-                        else if (tag == "#STOP")
-                        {
-                        }
-
                         // Long Note Type Check
                         else if (tag == "#LNTYPE")
                         {
                             switch (int.Parse(left))
                             {
-                                case 1: bms.setLNType(LNType.Type1); break;
-                                case 2: bms.setLNType(LNType.Type2); break;
+                                case 1: bms.LNType = LNType.Type1; break;
+                                case 2: bms.LNType = LNType.Type2; break;
                             }
                         }
                         else if (tag == "#LNOBJ")
                         {
-                            bms.setLNType(LNType.Obj);
-                            bms.setLNObj(left);
+                            bms.LNType = LNType.Obj;
+                            bms.LNObj = left;
                         }
 
                         else if (chkWav == "#WAV")
@@ -274,14 +293,14 @@ namespace BMSCore
                                 // 혼돈의 카오스...
                             }
 
-                            bms.mWavList.Add(tag.Substring(4, 2), filename);
+                            bms.WavList.Add(tag.Substring(4, 2), filename);
                         }
 
                         else if (chkWav == "#BMP")
                         {
                             if (left.EndsWith(".mpg") || left.EndsWith(".mp4"))
                             {
-                                bms.bgaVideoFile = bms.getFolderPath() + left;
+                                bms.BGAVideoFile = bms.FolderPath + left;
                                 isVideoExist = true;
                             }
                             else if (left.EndsWith(".bmp") || left.EndsWith(".jpg")
@@ -295,12 +314,12 @@ namespace BMSCore
                                     filenameCheck += filename[i] + ".";
                                 }
 
-                                if (File.Exists(bms.getFolderPath() + filenameCheck + "bmp")) filenameCheck += "bmp";
-                                else if (File.Exists(bms.getFolderPath() + filenameCheck + "jpg")) filenameCheck += "jpg";
-                                else if (File.Exists(bms.getFolderPath() + filenameCheck + "jpeg")) filenameCheck += "jpeg";
-                                else if (File.Exists(bms.getFolderPath() + filenameCheck + "png")) filenameCheck += "png";
+                                if (File.Exists(bms.FolderPath + filenameCheck + "bmp")) filenameCheck += "bmp";
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "jpg")) filenameCheck += "jpg";
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "jpeg")) filenameCheck += "jpeg";
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "png")) filenameCheck += "png";
 
-                                bms.mBGAImages.Add(tag.Substring(4, 2), UnityTools.createSpriteFromFile(bms.getFolderPath() + filenameCheck));
+                                bms.BGAImages.Add(tag.Substring(4, 2), Tools.createSpriteFromFile(bms.FolderPath + filenameCheck));
                             }
                         }
                         else if (tag != "#BPM" && chkWav == "#BPM")
@@ -311,9 +330,14 @@ namespace BMSCore
                             GetBPMInfoNum(bpmC, ref bms);
 
                             // 등록 필요
-                            bms.mBPMNum.Add(tag.Substring(4, 2), bpmC);
+                            bms.BPMNum.Add(tag.Substring(4, 2), bpmC);
                         }
-
+                        else if (chkWav == "#STO")
+                        {
+                            int stime = 0;
+                            int.TryParse(left, out stime);
+                            bms.StopList.Add(tag.Substring(5, 2), stime);
+                        }
                         // 문자인 경우는 제외해야 함
                         else if (int.TryParse(tag.Substring(1, 1), out parsedTag))
                         {
@@ -327,18 +351,18 @@ namespace BMSCore
                             leftNote += noteTok[1];
 
                             int bar = int.Parse(noteBuf.Substring(1, 3));
-                            int ch = int.Parse(noteBuf.Substring(4, 2));
+                            string ch = noteBuf.Substring(4, 2);
 
-                            if (ch == 1)
+                            if (ch == "01")
                             {
                                 if (leftNote != "00")
                                 {
                                     // 베이스 음악 (MUSIC)
                                     List<string> mlist;
-                                    if (bms.mMusic.ContainsKey(bar))
+                                    if (bms.Music.ContainsKey(bar))
                                     {
-                                        mlist = bms.mMusic[bar];
-                                        bms.mMusic.Remove(bar);
+                                        mlist = bms.Music[bar];
+                                        bms.Music.Remove(bar);
                                     }
                                     else
                                     {
@@ -347,72 +371,77 @@ namespace BMSCore
 
                                     mlist.Add(leftNote);
 
-                                    bms.mMusic.Add(bar, mlist);
+                                    bms.Music.Add(bar, mlist);
                                 }
                             }
-                            else if (ch == 2)
+                            else if (ch == "02")
                             {
-                                bms.mBarLength.Add(bar, double.Parse(leftNote));
+                                bms.BarLength.Add(bar, double.Parse(leftNote));
                             }
-                            else if (ch == 3 && leftNote != "00")
+                            else if (ch == "03" && leftNote != "00")
                             {   // BPM
-                                bms.mBPMNote.Add(bar, leftNote);
+                                bms.BPMNote.Add(bar, leftNote);
                                 GetBPMInfo(leftNote, ref bms);
                             }
-                            else if (ch == 4)
+                            else if (ch == "04")
                             {
                                 // BGA
-                                bms.mBGANote.Add(bar, leftNote);
+                                bms.BGANote.Add(bar, leftNote);
                             }
-                            else if (ch == 6)
+                            else if (ch == "06")
                             {
                                 // LAYER IMG
                             }
-                            else if (ch == 7)
+                            else if (ch == "07")
                             {
                                 // POOR IMG
                             }
-                            else if(ch == 8)
+                            else if(ch == "08" && leftNote != "00")
                             {
                                 // BPM
-                                bms.mBPMNoteType2.Add(bar, leftNote);
+                                bms.BPMNoteType2.Add(bar, leftNote);
+                            }
+                            else if(ch == "09" && leftNote != "00")
+                            {
+                                // Stop
+                                bms.StopNote.Add(bar, leftNote);
                             }
                             else
                             {
-                                if (bms.lastBar < bar) bms.lastBar = bar;
+                                if (bms.LastBar < bar) bms.LastBar = bar;
 
                                 // bar 데이터 유무 체크
-                                if (!bms.mNote.ContainsKey(bar))
-                                    bms.mNote[bar] = new Dictionary<int, string>();
+                                if (!bms.Note.ContainsKey(bar))
+                                    bms.Note[bar] = new Dictionary<string, string>();
 
                                 // bar에 키값 있는지 여부 확인
-                                if (bms.mNote[bar].ContainsKey(ch) && bms.mNote[bar][ch] == null)
+                                if (bms.Note[bar].ContainsKey(ch) && bms.Note[bar][ch] == null)
                                 {
-                                    bms.mNote[bar].Remove(ch);
-                                    bms.mNote[bar].Add(ch, leftNote);
+                                    bms.Note[bar].Remove(ch);
+                                    bms.Note[bar].Add(ch, leftNote);
                                 }
                                 else
                                 {
-                                    bms.mNote[bar].Add(ch, leftNote);
+                                    bms.Note[bar].Add(ch, leftNote);
                                 }
 
                                 // 비어있는 노트 파트에 빈 공간을 추가해서 채움
-                                if (!bms.mNote[bar].ContainsKey(11)) bms.mNote[bar].Add(11, null);
-                                if (!bms.mNote[bar].ContainsKey(12)) bms.mNote[bar].Add(12, null);
-                                if (!bms.mNote[bar].ContainsKey(13)) bms.mNote[bar].Add(13, null);
-                                if (!bms.mNote[bar].ContainsKey(14)) bms.mNote[bar].Add(14, null);
-                                if (!bms.mNote[bar].ContainsKey(15)) bms.mNote[bar].Add(15, null);
-                                if (!bms.mNote[bar].ContainsKey(16)) bms.mNote[bar].Add(16, null);
-                                if (!bms.mNote[bar].ContainsKey(18)) bms.mNote[bar].Add(18, null);
-                                if (!bms.mNote[bar].ContainsKey(19)) bms.mNote[bar].Add(19, null);
-                                if (!bms.mNote[bar].ContainsKey(51)) bms.mNote[bar].Add(51, null);
-                                if (!bms.mNote[bar].ContainsKey(52)) bms.mNote[bar].Add(52, null);
-                                if (!bms.mNote[bar].ContainsKey(53)) bms.mNote[bar].Add(53, null);
-                                if (!bms.mNote[bar].ContainsKey(54)) bms.mNote[bar].Add(54, null);
-                                if (!bms.mNote[bar].ContainsKey(55)) bms.mNote[bar].Add(55, null);
-                                if (!bms.mNote[bar].ContainsKey(56)) bms.mNote[bar].Add(56, null);
-                                if (!bms.mNote[bar].ContainsKey(58)) bms.mNote[bar].Add(58, null);
-                                if (!bms.mNote[bar].ContainsKey(59)) bms.mNote[bar].Add(59, null);
+                                if (!bms.Note[bar].ContainsKey("11")) bms.Note[bar].Add("11", null);
+                                if (!bms.Note[bar].ContainsKey("12")) bms.Note[bar].Add("12", null);
+                                if (!bms.Note[bar].ContainsKey("13")) bms.Note[bar].Add("13", null);
+                                if (!bms.Note[bar].ContainsKey("14")) bms.Note[bar].Add("14", null);
+                                if (!bms.Note[bar].ContainsKey("15")) bms.Note[bar].Add("15", null);
+                                if (!bms.Note[bar].ContainsKey("16")) bms.Note[bar].Add("16", null);
+                                if (!bms.Note[bar].ContainsKey("18")) bms.Note[bar].Add("18", null);
+                                if (!bms.Note[bar].ContainsKey("19")) bms.Note[bar].Add("19", null);
+                                if (!bms.Note[bar].ContainsKey("51")) bms.Note[bar].Add("51", null);
+                                if (!bms.Note[bar].ContainsKey("52")) bms.Note[bar].Add("52", null);
+                                if (!bms.Note[bar].ContainsKey("53")) bms.Note[bar].Add("53", null);
+                                if (!bms.Note[bar].ContainsKey("54")) bms.Note[bar].Add("54", null);
+                                if (!bms.Note[bar].ContainsKey("55")) bms.Note[bar].Add("55", null);
+                                if (!bms.Note[bar].ContainsKey("56")) bms.Note[bar].Add("56", null);
+                                if (!bms.Note[bar].ContainsKey("58")) bms.Note[bar].Add("58", null);
+                                if (!bms.Note[bar].ContainsKey("59")) bms.Note[bar].Add("59", null);
                             }
 
                             //bms->mNote.insert(std::pair<int, Bar>(bar, mbar));
@@ -423,7 +452,7 @@ namespace BMSCore
                 {
                     ErrorHandler.LogError("===File Error===");
                     ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
-                    ErrorHandler.LogError("from: " + bms.getFilePath());
+                    ErrorHandler.LogError("from: " + bms.FilePath);
                     continue;
                 }
             }
@@ -444,13 +473,13 @@ namespace BMSCore
                 if (str != "00")
                 {
                     double bpm = Convert.ToInt32(str, 16);
-                    if(bpm < bms.getBPMMin())
+                    if(bpm < bms.BPMMin)
                     {
-                        bms.setBPMMin(bpm);
+                        bms.BPMMin = bpm;
                     }
-                    if(bpm > bms.getBPMMax())
+                    if(bpm > bms.BPMMax)
                     {
-                        bms.setBPMMax(bpm);
+                        bms.BPMMax = bpm;
                     }
                 }
             }
@@ -458,13 +487,13 @@ namespace BMSCore
 
         public void GetBPMInfoNum(double bpm, ref BMS bms)
         {
-            if (bpm < bms.getBPMMin())
+            if (bpm < bms.BPMMin)
             {
-                bms.setBPMMin(bpm);
+                bms.BPMMin = bpm;
             }
-            if (bpm > bms.getBPMMax())
+            if (bpm > bms.BPMMax)
             {
-                bms.setBPMMax(bpm);
+                bms.BPMMax = bpm;
             }
         }
     }

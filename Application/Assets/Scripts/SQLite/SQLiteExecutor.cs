@@ -28,6 +28,10 @@ namespace DatabaseManager
             }
             else
             {
+                if(!Instance.checkDBConn())
+                {
+                    Instance = new SQLiteExecutor();
+                }
                 Debug.Log("DB instance exist");
             }
             return Instance;
@@ -49,6 +53,12 @@ namespace DatabaseManager
             dbconn = (IDbConnection)new SqliteConnection("Data Source="+dbfile);
             dbcommand = (IDbCommand)new SqliteCommand();
             dbconn.Open();
+        }
+
+        public bool checkDBConn()
+        {
+            if (dbconn == null) return false;
+            else return true;
         }
 
         public void closeDB()

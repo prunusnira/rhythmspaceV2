@@ -30,12 +30,12 @@ namespace BMSPlayer
         public void PreloadSound(BMS bms)
         {
 
-            foreach (string val in bms.mWavList.Keys)
+            foreach (string val in bms.WavList.Keys)
             {
-                string filepath = bms.getFolderPath() + bms.mWavList[val];
+                string filepath = bms.FolderPath + bms.WavList[val];
                 FMOD.Sound snd;
                 FMODUnity.RuntimeManager.CoreSystem.createSound(filepath, FMOD.MODE.CREATESAMPLE, out snd);
-                bms.mWavFilesFM.Add(val, snd);
+                bms.WavFilesFM.Add(val, snd);
             }
         }
 
@@ -46,7 +46,7 @@ namespace BMSPlayer
             {
                 FMOD.Channel channel;
                 result = FMODUnity.RuntimeManager.CoreSystem.playSound(
-                    bms.mWavFilesFM[wavFile],
+                    bms.WavFilesFM[wavFile],
                     channelGroup,
                     false,
                     out channel

@@ -66,14 +66,14 @@ namespace BMSPlayer {
             analyzer.FullAnalyzer(Data.BMS);
 
             // LNOBJ 타입이면 추가로 이식하는 작업을 수행함
-            if(Data.BMS.getLNType() == LNType.Obj)
+            if(Data.BMS.LNType == LNType.Obj)
             {
                 LNConverter = new LNObjConverter();
                 LNConverter.FixLongNoteLNOBJ(Data.BMS);
             }
 
             // 파일 분석 이후 기본 정보 분석
-            Data.CurrentBPM = Data.BMS.getBPMStart();
+            Data.CurrentBPM = Data.BMS.BPMStart;
             Data.PrevBPM = Data.CurrentBPM;
             Data.BPS = Data.CurrentBPM / 240;
             Data.SPB = (double)(240 * 1000) / Data.CurrentBPM;
@@ -82,20 +82,20 @@ namespace BMSPlayer {
             // 모든 시간은 ms 단위로 한다
 
             // 곡 정보 출력
-            UI.SetMusicInfo(Data.BMS.getTitle());
+            UI.SetMusicInfo(Data.BMS.Title);
 
             // 기어 BPM 표시
             UI.SetGearBPM(
-                Data.BMS.getBPMStart(),
-                Data.BMS.getBPMMin(),
-                Data.BMS.getBPMMax()
+                Data.BMS.BPMStart,
+                Data.BMS.BPMMin,
+                Data.BMS.BPMMax
             );
 
             if(analyzer.IsVideoExist())
             {
                 isBGAMovieExist = true;
                 UI.BGAVideoActivate();
-                UI.BGAVideoSetting(Data.BMS.bgaVideoFile);
+                UI.BGAVideoSetting(Data.BMS.BGAVideoFile);
             }
 
             // 분석된 데이터를 바탕으로 노트를 생성
@@ -119,14 +119,14 @@ namespace BMSPlayer {
 			generator.AnalyzeNotes(
                 Data.BMS,
                 Data.NotePlay, Data.NoteBGA, Data.NoteBGM, Data.NoteBPM,
-                Data.LongNotes,
-                Data.BMS.lastBar, Data.SPB,
+                Data.LongNotes, Data.NoteStop,
+                Data.BMS.LastBar, Data.SPB,
                 ref totalLen, ref noteCount, ref totalNotes, ref totalTime);
 
-            Debug.Log("File Loaded: " + Data.BMS.getFilePath());
-            Debug.Log("Music: " + Data.BMS.getTitle());
-            Debug.Log("Artist: " + Data.BMS.getArtist());
-            Debug.Log("BPM: " + Data.BMS.getBPMStart());
+            Debug.Log("File Loaded: " + Data.BMS.FilePath);
+            Debug.Log("Music: " + Data.BMS.Title);
+            Debug.Log("Artist: " + Data.BMS.Artist);
+            Debug.Log("BPM: " + Data.BMS.BPMStart);
             Debug.Log("Total: " + totalNotes.ToString());
 
             UI.UpdateSpeed();
@@ -135,7 +135,7 @@ namespace BMSPlayer {
             scroller = GetComponent<Scroller>();
             scroller.Init(noteCount);
 
-            if (Const.GetAuto() == 1)
+            if (Const.Auto == AutoPlayType.ON)
                 isPlayAuto = true;
             else
                 isPlayAuto = false;
@@ -149,7 +149,12 @@ namespace BMSPlayer {
             }
         }
 
-        void Update ()
+        private void FixedUpdate()
+        {
+            
+        }
+
+        private void Update ()
         {
             // 플레이 키 (최 우선 체크)
             scroller.ProcessBeamOnTouch();
@@ -165,6 +170,8 @@ namespace BMSPlayer {
 
                 // 1틱 동안 노트가 움직이는 거리 (시간 * 속도)
                 double noteMove = deltaTime * bps;
+
+                scroller.PlayBPM(Data.NoteBPM, Data.BMS, noteMove, ref bpm, ref bps, ref spb);
 
                 // 변속곡 때문에 총 플레이 시간과 bps만으로 계산하는 것은 불가능함
                 scroller.MoveNotes(Data.NotePlay, Data.LongNotes, noteMove, ref bps);
@@ -183,7 +190,7 @@ namespace BMSPlayer {
 
                 scroller.PlayBGA(Data.NoteBGA, Data.BMS, noteMove);
                 scroller.PlayBGM(Data.NoteBGM, Data.BMS, noteMove);
-                scroller.PlayBPM(Data.NoteBPM, Data.BMS, noteMove, ref bpm, ref bps, ref spb);
+                scroller.PlayStop(Data.NoteStop, Data.BMS, noteMove, bps);
 
                 Data.CurrentBPM = bpm;
                 Data.BPS = bps;
@@ -191,18 +198,18 @@ namespace BMSPlayer {
 
                 // 게임 종료 시 처리
                 // Type 1: 게이지가 0이 되었을 때
-                if(hpController.isHpMin())
+                if(hpController.IsHpMin())
                 {
                     if (GameOverCheck())
                     {
-                        Const.SetClear(0);
+                        Const.Clear = ClearType.FAIL;
                         isGameOver = true;
                     }
                 }
                 // Type 2: 노트가 다 사용되었을 때
                 if (scroller.GetProcessedNotes() >= totalNotes)
                 {
-                    Const.SetClear(1);
+                    Const.Clear = ClearType.CLEAR;
                     bool isPlayingMusic = soundController.CheckSoundPlaying();
                     bool isPlayingBGA = false;
 
@@ -279,7 +286,7 @@ namespace BMSPlayer {
 
         private bool GameOverCheck()
         {
-            switch (Const.GetJudgeType())
+            switch (Const.JudgeType)
             {
                 case JudgeType.ASSISTED:
                 case JudgeType.EASY:

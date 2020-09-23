@@ -23,16 +23,16 @@ namespace BMSPlayer
         // Execute after BMSAnalyzer.FullAnalyzer worked
         public void PreloadSound(BMS bms)
         {
-            foreach (string val in bms.mWavList.Keys)
+            foreach (string val in bms.WavList.Keys)
             {
-                string filepath = bms.getFolderPath() + bms.mWavList[val];
+                string filepath = bms.FolderPath + bms.WavList[val];
                 string encoded = filepath.Replace("#", "%23");
                 WWW path = new WWW("file://" + encoded);
                 AudioClip clip = path.GetAudioClip();
                 clip.name = val;
                 clip.LoadAudioData();
                 while (clip.loadState != AudioDataLoadState.Loaded) { }
-                bms.mWavFilesAC.Add(val, clip);
+                bms.WavFilesAC.Add(val, clip);
             }
         }
 
@@ -40,7 +40,7 @@ namespace BMSPlayer
         {
             try
             {
-                audioSource[lane].PlayOneShot(bms.mWavFilesAC[wavFile]);
+                audioSource[lane].PlayOneShot(bms.WavFilesAC[wavFile]);
 
             }
             catch (System.Exception e)

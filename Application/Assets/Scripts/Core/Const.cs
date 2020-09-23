@@ -16,7 +16,8 @@ namespace BMSPlayer
 #endif
         }
         public static int CHANNEL = 320;
-        public static int frameMultiplier = 1000;
+        public static int FRAMEMULTIPLIER = 1000;
+        public static int FIXEDSTARTHEIGHT = 3000;
         public static int LINE = 8;
 
         public static bool DEBUG = true;
@@ -92,290 +93,346 @@ namespace BMSPlayer
 
         // System Setting Values
         #region System Setting
-        public static void SetBMSFolderPath(string path)
+        public static string BMSFolderPath
         {
-            PlayerPrefs.SetString("bmspath", path);
+            get
+            {
+                return PlayerPrefs.GetString("bmspath", settingNoPathFound[(int)Language]);
+            }
+            set
+            {
+                PlayerPrefs.SetString("bmspath", value);
+            }
         }
 
-        public static string GetBMSFolderPath()
+        public static string PlayingBMSPath
         {
-            return PlayerPrefs.GetString("bmspath", settingNoPathFound[GetLang()]);
+            get
+            {
+                return PlayerPrefs.GetString("playbms", "");
+            }
+            set
+            {
+                PlayerPrefs.SetString("playbms", value);
+            }
         }
 
-        public static void SetPlayingBMSPath(string path)
+        public static int Encoding
         {
-            PlayerPrefs.SetString("playbms", path);
+            get
+            {
+                return PlayerPrefs.GetInt("encoding", 932);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("encoding", value);
+            }
         }
 
-        public static string GetPlayingBMSPath()
+        public static LanguageType Language
         {
-            return PlayerPrefs.GetString("playbms", "");
+            get
+            {
+                return (LanguageType)PlayerPrefs.GetInt("lang", (int)LanguageType.EN);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("lang", (int)value);
+            }
         }
 
-        public static void SetEncoding(int enc)
+        public static AutoSyncType AutoSync
         {
-            PlayerPrefs.SetInt("encoding", enc);
+            get
+            {
+                return (AutoSyncType)PlayerPrefs.GetInt("autosync", (int)AutoSyncType.OFF);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("autosync", (int)value);
+            }
         }
 
-        public static int GetEncoding()
+        public static int Sync
         {
-            return PlayerPrefs.GetInt("encoding", 932);
+            get
+            {
+                return PlayerPrefs.GetInt("sync", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("sync", value);
+            }
         }
 
-        /*public static void SetAudio(int audio)
+        public static string KeyChange
         {
-            PlayerPrefs.SetInt("audio", audio);
-        }
-
-        public static int GetAudio()
-        {
-            return PlayerPrefs.GetInt("audio", 0);
-        }*/
-
-        public static void SetLang(int lang)
-        {
-            PlayerPrefs.SetInt("lang", lang);
-        }
-
-        public static int GetLang()
-        {
-            return PlayerPrefs.GetInt("lang", 2);
-        }
-
-        public static void SetAutoSync(AutoSyncType autosync)
-        {
-            PlayerPrefs.SetInt("autosync", (int)autosync);
-        }
-
-        public static AutoSyncType GetAutoSync()
-        {
-            return (AutoSyncType)PlayerPrefs.GetInt("autosync", (int)AutoSyncType.OFF);
-        }
-
-        public static void SetSync(int sync)
-        {
-            PlayerPrefs.SetInt("sync", sync);
-        }
-
-        public static int GetSync()
-        {
-            return PlayerPrefs.GetInt("sync", 0);
-        }
-
-        public static void SetKeyChange(string key)
-        {
-            PlayerPrefs.SetString("keyToChange", key);
-        }
-
-        public static string GetKeyChange()
-        {
-            return PlayerPrefs.GetString("keyToChange", "");
+            get
+            {
+                return PlayerPrefs.GetString("keyToChange", "");
+            }
+            set
+            {
+                PlayerPrefs.SetString("keyToChange", value);
+            }
         }
         #endregion
 
         // Play Setting
         #region Play Setting
-        public static void SetSpeedFixed(int speed)
+        public static int SpeedFixed
         {
-            PlayerPrefs.SetInt("speed", speed);
+            get
+            {
+                return PlayerPrefs.GetInt("speed", 200);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("speed", value);
+            }
         }
 
-        public static int GetSpeedFixed()
+        public static int SpeedFluid
         {
-            return PlayerPrefs.GetInt("speed", 200);
+            get
+            {
+                return PlayerPrefs.GetInt("speedfl", 200);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("speedfl", value);
+            }
         }
 
-        public static void SetSpeedFluid(int speed)
+        public static SpdType SpdType
         {
-            PlayerPrefs.SetInt("speedfl", speed);
+            get
+            {
+                return (SpdType)PlayerPrefs.GetInt("spdtype", (int)SpdType.FIXED);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("spdtype", (int)value);
+            }
         }
 
-        public static int GetSpeedFluid()
+        public static int Playline
         {
-            return PlayerPrefs.GetInt("speedfl", 200);
+            get
+            {
+                return PlayerPrefs.GetInt("playline", 8);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("playline", value);
+            }
         }
 
-        public static void SetSpdType(SpdType type)
+        public static AutoPlayType Auto
         {
-            PlayerPrefs.SetInt("spdtype", (int)type);
+            get
+            {
+                return (AutoPlayType)PlayerPrefs.GetInt("auto", (int)AutoPlayType.OFF);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("auto", (int)value);
+            }
         }
 
-        public static SpdType GetSpdType()
+        public static int DisplayJudge
         {
-            return (SpdType)PlayerPrefs.GetInt("spdtype", (int)SpdType.FIXED);
+            get
+            {
+                return PlayerPrefs.GetInt("pjudge", 1);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("pjudge", value);
+            }
         }
 
-        public static void SetPlayline(int line)
+        public static JudgeType JudgeType
         {
-            PlayerPrefs.SetInt("playline", line);
+            get
+            {
+                return (JudgeType)PlayerPrefs.GetInt("judgeType", (int)JudgeType.NORMAL);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("judgeType", (int)value);
+            }
         }
 
-        public static int GetPlayline()
+        public static JudgeUIType JudgeUIType
         {
-            return PlayerPrefs.GetInt("playline", 8);
+            get
+            {
+                return (JudgeUIType)PlayerPrefs.GetInt("judgeUIType", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("judgeUIType", (int)value);
+            }
         }
 
-        public static void SetAuto(int auto)
+        public static GraphTargetType GraphTarget
         {
-            PlayerPrefs.SetInt("auto", auto);
-        }
-
-        public static int GetAuto()
-        {
-            return PlayerPrefs.GetInt("auto", 0);
-        }
-
-        public static void SetPJudge(int pjudge)
-        {
-            PlayerPrefs.SetInt("pjudge", pjudge);
-        }
-
-        public static int GetPJudge()
-        {
-            return PlayerPrefs.GetInt("pjudge", 1);
-        }
-
-        public static void SetJudgeType(JudgeType type)
-        {
-            PlayerPrefs.SetInt("judgeType", (int)type);
-        }
-
-        public static JudgeType GetJudgeType()
-        {
-            return (JudgeType)PlayerPrefs.GetInt("judgeType", (int)JudgeType.NORMAL);
-        }
-
-        public static void SetJudgeUIType(JudgeUIType type)
-        {
-            PlayerPrefs.SetInt("judgeUIType", (int)type);
-        }
-
-        public static JudgeUIType GetJudgeUIType()
-        {
-            return (JudgeUIType)PlayerPrefs.GetInt("judgeUIType", 0);
-        }
-
-        public static void SetGraphTarget(GraphTargetType type)
-        {
-            PlayerPrefs.SetInt("graphTargetType", (int)type);
-        }
-
-        public static GraphTargetType GetGraphTarget()
-        {
-            return (GraphTargetType)PlayerPrefs.GetInt("graphTargetType", (int)GraphTargetType.OFF);
+            get
+            {
+                return (GraphTargetType)PlayerPrefs.GetInt("graphTargetType", (int)GraphTargetType.OFF);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("graphTargetType", (int)value);
+            }
         }
         #endregion
 
         // Play Status
         #region Play Status
-        public static void SetClear(int clear)
+        public static ClearType Clear
         {
-            PlayerPrefs.SetInt("clear", clear);
+            get
+            {
+                return (ClearType)PlayerPrefs.GetInt("clear", (int)ClearType.FAIL);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("clear", (int)value);
+            }
         }
 
-        public static int GetClear()
+        public static int ResultPerfect
         {
-            return PlayerPrefs.GetInt("clear", 0);
+            get
+            {
+                return PlayerPrefs.GetInt("rst_p", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_p", value);
+            }
         }
 
-        public static void SetResultPerfect(int pfc)
+        public static int ResultGreat
         {
-            PlayerPrefs.SetInt("rst_p", pfc);
+            get
+            {
+                return PlayerPrefs.GetInt("rst_gr", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_gr", value);
+            }
         }
 
-        public static int GetResultPerfect()
+        public static int ResultGood
         {
-            return PlayerPrefs.GetInt("rst_p", 0);
+            get
+            {
+                return PlayerPrefs.GetInt("rst_gd", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_gd", value);
+            }
         }
 
-        public static void SetResultGreat(int gr)
+        public static int ResultOk
         {
-            PlayerPrefs.SetInt("rst_gr", gr);
+            get
+            {
+                return PlayerPrefs.GetInt("rst_o", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_o", value);
+            }
         }
 
-        public static int GetResultGreat()
+        public static int ResultMiss
         {
-            return PlayerPrefs.GetInt("rst_gr", 0);
+            get
+            {
+                return PlayerPrefs.GetInt("rst_m", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_m", value);
+            }
         }
 
-        public static void SetResultGood(int gd)
+        public static int ResultComboBreak
         {
-            PlayerPrefs.SetInt("rst_gd", gd);
+            get
+            {
+                return PlayerPrefs.GetInt("rst_cb", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_cb", value);
+            }
         }
 
-        public static int GetResultGood()
+        public static int ResultScore
         {
-            return PlayerPrefs.GetInt("rst_gd", 0);
+            get
+            {
+                return PlayerPrefs.GetInt("rst_score", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_score", value);
+            }
         }
 
-        public static void SetResultOk(int ok)
+        public static float ResultAvgRate
         {
-            PlayerPrefs.SetInt("rst_o", ok);
+            get
+            {
+                return PlayerPrefs.GetFloat("rst_rate", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetFloat("rst_rate", value);
+            }
         }
 
-        public static int GetResultOk()
+        public static int ResultMaxCombo
         {
-            return PlayerPrefs.GetInt("rst_o", 0);
+            get
+            {
+                return PlayerPrefs.GetInt("rst_combo", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_combo", value);
+            }
         }
 
-        public static void SetResultMiss(int m)
+        public static float ResultTimeDiff
         {
-            PlayerPrefs.SetInt("rst_m", m);
+            get
+            {
+                return PlayerPrefs.GetFloat("rst_timediff", 0f);
+            }
+            set
+            {
+                PlayerPrefs.SetFloat("rst_timediff", value);
+            }
         }
 
-        public static int GetResultMiss()
+        public static string ResultRank
         {
-            return PlayerPrefs.GetInt("rst_m", 0);
-        }
-
-        public static void SetResultComboBreak(int v)
-        {
-            PlayerPrefs.SetInt("rst_cb", v);
-        }
-
-        public static int GetResultComboBreak()
-        {
-            return PlayerPrefs.GetInt("rst_cb", 0);
-        }
-
-        public static void SetResultScore(int score)
-        {
-            PlayerPrefs.SetInt("rst_score", score);
-        }
-
-        public static int GetResultScore()
-        {
-            return PlayerPrefs.GetInt("rst_score", 0);
-        }
-
-        public static void SetResultAvgRate(float rate)
-        {
-            PlayerPrefs.SetFloat("rst_rate", rate);
-        }
-
-        public static float GetResultAvgRate()
-        {
-            return PlayerPrefs.GetFloat("rst_rate", 0);
-        }
-
-        public static void SetResultMaxCombo(int combo)
-        {
-            PlayerPrefs.SetInt("rst_combo", combo);
-        }
-
-        public static int GetResultMaxCombo()
-        {
-            return PlayerPrefs.GetInt("rst_combo", 0);
-        }
-
-        public static void SetResultTimeDiff(float timediff)
-        {
-            PlayerPrefs.SetFloat("rst_timediff", timediff);
-        }
-
-        public static float GetResultTimeDiff()
-        {
-            return PlayerPrefs.GetFloat("rst_timediff", 0f);
+            get
+            {
+                return PlayerPrefs.GetString("rst_rank", "f");
+            }
+            set
+            {
+                PlayerPrefs.SetString("rst_rank", value);
+            }
         }
         #endregion
     }

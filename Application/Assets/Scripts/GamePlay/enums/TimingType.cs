@@ -7,6 +7,7 @@
         GOOD = 2,
         BAD = 3,
         POOR = 4,
-        NONE = 5
+        EPOOR = 5,
+        NONE = 6
     }
 }

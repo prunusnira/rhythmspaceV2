@@ -123,6 +123,8 @@ public class ScrollRectInfinite : ScrollRect {
     {
         itemList.Clear();
         content.transform.DetachChildren();
+        currentIdx = 0;
+        height = 0f;
     }
 
     // Getter/Setter
