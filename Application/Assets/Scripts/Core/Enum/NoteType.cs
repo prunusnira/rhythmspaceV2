@@ -1,13 +1,15 @@
-﻿namespace BMSCore
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace BMSCore
 {
-    public enum ObjectType
+    // 플레이 노트에 한정된 속성
+    public enum NoteType
     {
-        PLAYABLE,
-        MUSIC,
-        BPM,
-        BPMT2,
-        BGA,
-        STOP,
-        MINE
+        SINGLE,
+        LNSTART,
+        LNMID,
+        LNEND
     }
 }

@@ -95,6 +95,7 @@
     <Compile Include="Assets\Scripts\Core\Enum\BPMNoteType.cs" />
     <Compile Include="Assets\Scripts\Core\Enum\LNType.cs" />
     <Compile Include="Assets\Scripts\Core\Enum\NoteType.cs" />
+    <Compile Include="Assets\Scripts\Core\Enum\ObjectType.cs" />
     <Compile Include="Assets\Scripts\Core\ErrorHandler.cs" />
     <Compile Include="Assets\Scripts\Core\LNObjConverter.cs" />
     <Compile Include="Assets\Scripts\Core\Tools.cs" />

@@ -4,8 +4,11 @@
     {
         public int Bar { get; set; }
         public double Position { get; set; }
-        public ObjectType type { get; set; }
+        public ObjectType ObjType { get; set; }
         public bool Used { get; set; }
+
+        // Position on screen - deprecated
+        public double ScrPos { get; set; }
     }
 
     public class PlayNote : NoteObject
@@ -13,6 +16,7 @@
         public int Line { get; set; }
         public string Wav { get; set; }
         public int LNNum { get; set; }
+        public NoteType PlayNoteType { get; set; }
     }
 
     public class LongNote : NoteObject

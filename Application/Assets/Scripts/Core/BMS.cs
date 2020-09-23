@@ -74,21 +74,45 @@ namespace BMSCore
         public int LastBar { get; set; } // last number of bar
         public string BGAVideoFile { get; set; }
 
-        // <Bar#, <Ch#, note>> : map structure - int = Ch#
+        // <WAV##, WavFileName>
         public Dictionary<string, string> WavList = new Dictionary<string, string>();
-        public Dictionary<string, AudioClip> WavFilesAC = new Dictionary<string, AudioClip>();
+
+        // <WAV##, FMOD Sound>
         public Dictionary<string, FMOD.Sound> WavFilesFM = new Dictionary<string, FMOD.Sound>();
-        public Dictionary<int, List<string>> Music = new Dictionary<int, List<string>>();
+
+        // <BAR#, Channel 03>
         public Dictionary<int, string> BPMNote = new Dictionary<int, string>();
+
+        // <BAR#, Channel 08>
         public Dictionary<int, string> BPMNoteType2 = new Dictionary<int, string>();
+
+        // <BPM##, double로 표현된 bpm> - Channel 08에서 사용하는 BPM 데이터
         public Dictionary<string, double> BPMNum = new Dictionary<string, double>();
+
+        // <BAR#, Channel 01> - Channel 01은 한 bar에 여러개가 들어갈 수 있음
+        public Dictionary<int, List<string>> Music = new Dictionary<int, List<string>>();
+
+        // <BAR#, <Channel #, Note String>> - 각 채널별 노트 등록 -> 리팩토링 가능
         public Dictionary<int, Dictionary<string, string>> Note = new Dictionary<int, Dictionary<string, string>>();
+
+        // <BAR#, Channel 02> - 4/4박자를 1로 하여 double로 bar의 길이를 결정
         public Dictionary<int, double> BarLength = new Dictionary<int, double>();
+
+        // <BMP##, FileName>
         public Dictionary<string, Sprite> BGAImages = new Dictionary<string, Sprite>();
+
+        // <BAR#, Channel 04>
         public Dictionary<int, string> BGANote = new Dictionary<int, string>();
+
+        // <STOP##, Time> - 192 노트를 1박 기준으로 보고 멈추는 시간을 설정
         public Dictionary<string, int> StopList = new Dictionary<string, int>();
+
+        // <BAR#, Channel 09>
         public Dictionary<int, string> StopNote = new Dictionary<int, string>();
-        
+
+        // 호환성을 위해 임시로 남겨둠
+        public Dictionary<string, AudioClip> WavFilesAC = new Dictionary<string, AudioClip>();
+
         // Constructor
         public BMS(string path)
         {
