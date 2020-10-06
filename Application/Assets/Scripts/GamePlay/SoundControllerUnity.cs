@@ -36,11 +36,11 @@ namespace BMSPlayer
             }
         }
 
-        public void PlayKeySound(int lane, string wavFile, ref BMS bms)
+        public void PlayKeySound(string wavFile, BMS bms, int line)
         {
             try
             {
-                audioSource[lane].PlayOneShot(bms.WavFilesAC[wavFile]);
+                audioSource[line].PlayOneShot(bms.WavFilesAC[wavFile]);
 
             }
             catch (System.Exception e)

@@ -11,8 +11,9 @@ namespace BMSPlayer
         public GameObject noteWhite;
         public GameObject noteBlue;
         public GameObject notePink;
+        public GameObject noteMine;
 
-        public GameObject AddNewNote(int clane, double zpos, Transform parent)
+        public GameObject AddNewNote(int clane, double timing, Transform parent)
         {
             /**
              * lanes 중 clane에 노트 오브젝트르 생성함
@@ -22,7 +23,7 @@ namespace BMSPlayer
              */
             GameObject noteObject = null;
 
-            Vector3 pos = new Vector3(GetXPos(clane), 1, (float)zpos);
+            Vector3 pos = new Vector3(GetXPos(clane), 1, (float)timing);
 
             switch (clane)
             {
@@ -48,6 +49,24 @@ namespace BMSPlayer
             return noteObject;
         }
 
+        public GameObject AddNewMineNote(int clane, double timing, Transform parent)
+        {
+            /**
+             * lanes 중 clane에 노트 오브젝트르 생성함
+             * 노트 배치: 흰파흰흰파흰
+             * 
+             * 노트를 추가하는 과정에서는 bpm을 전혀 고려하지 않고 있는 그대로 노트를 배치해야 변속 시 스크롤 속도를 조절할 수 있다.
+             */
+            GameObject noteObject = null;
+
+            Vector3 pos = new Vector3(GetXPos(clane), 1, (float)timing);
+
+            noteObject = Instantiate(noteMine, pos, Quaternion.identity, parent);
+            noteObject.transform.localPosition = pos;
+
+            return noteObject;
+        }
+
         public int GetXPos(int line)
         {
             switch(line)
@@ -64,275 +83,347 @@ namespace BMSPlayer
             }
         }
 
-        public void AnalyzeNotes(
-            BMS bms,
-            List<Note>[] notePlay, List<Note> noteBGA, List<Note> noteBGM,
-            List<Note> noteBPM, List<Longnote> lnlist, List<Note> noteStop,
-            int bars, double spb, ref double totalLen, ref int noteCount,
-            ref int totalNotes, ref double totalTime) {
-            int lines = Const.Playline;
-            //int longcnt = 0;
-            for (int cbar = 0; cbar <= bars; cbar++)
+        public void AnalyzeNotes(PlayData data)
+        {
+            // BPM 계산을 위해 최초 위치 (Position 0)에 BPM 노트를 추가
+            /*BPMNote initBPMNote = new BPMNote
             {
+                Position = 0,
+                Bar = 0,
+                ObjType = ObjectType.BPM,
+                BPMValue = data.BMS.BPMStart,
+                Timing = 0
+            };
+            data.NoteBPM.Add(initBPMNote);
+            data.BPMPositionFix.Add(0);*/
+
+            for (int cbar = 0; cbar <= data.BMS.LastBar; cbar++)
+            {
+
                 // 노트 분석 및 배치
-                if (bms.Note.ContainsKey(cbar))
+                if (data.BMS.PlayNote.ContainsKey(cbar))
                 {
-                    Dictionary<int, string> lane = LaneMapGenerator(bms.Note[cbar]);
-                    NoteAdder(notePlay, lane, bms.BarLength, cbar, lines, ref totalLen, ref totalNotes, ref noteCount);
+                    Dictionary<int, string> PlayNotesInLine = PlayNotesByBar(data.BMS.PlayNote[cbar]);
+                    NoteAdderPlay(data, PlayNotesInLine, cbar);
+                }
+
+                // 지뢰노트 처리
+                if (data.BMS.MineNote.ContainsKey(cbar))
+                {
+                    Dictionary<int, string> MineNotesInLine = MineNotesByBar(data.BMS.MineNote[cbar]);
+                    NoteAdderMine(data, MineNotesInLine, cbar);
                 }
 
                 // BPM 변경: 보이지 않는 bpm 노트 오브젝트를 만들고 이 노트가 판정선 100%가 되면 bpm 값을 변경
-                if (bms.BPMNote.ContainsKey(cbar)) // Type1
+                if (data.BMS.BPMNote.ContainsKey(cbar)) // Type1
                 {
-                    NoteAdderBPM(noteBPM, bms.BPMNote[cbar], bms.BarLength,
-                        BPMNoteType.Type1, cbar, ref totalLen, ref noteCount);
+                    NoteAdderBPM(BPMNoteType.Type1, data, cbar);
                 }
 
-                if(bms.BPMNoteType2.ContainsKey(cbar)) // Type2
+                if(data.BMS.BPMNoteType2.ContainsKey(cbar)) // Type2
                 {
-                    NoteAdderBPM(noteBPM, bms.BPMNoteType2[cbar], bms.BarLength,
-                        BPMNoteType.Type2, cbar, ref totalLen, ref noteCount);
+                    NoteAdderBPM(BPMNoteType.Type2, data, cbar);
                 }
 
                 // 배경음: 보이지 않는 music 노트 오브젝트를 만들고 이 노트가 판정선 100%가 되면 할당된 소리를 재생
-                if (bms.Music.ContainsKey(cbar))
+                if (data.BMS.Music.ContainsKey(cbar))
                 {
-                    NoteAdderMusic(noteBGM, bms.Music[cbar], bms.BarLength, cbar, ref totalLen, ref noteCount);
+                    NoteAdderMusic(data, cbar);
                 }
 
                 // 멈춤 처리
-                if (bms.StopNote.ContainsKey(cbar))
+                if (data.BMS.StopNote.ContainsKey(cbar))
                 {
-                    NoteAdderStop(noteStop, bms.StopNote[cbar], bms.BarLength,
-                        cbar, ref totalLen, ref noteCount);
+                    NoteAdderStop(data, cbar);
                 }
 
                 // BGA 노트 처리
-                if (bms.BGANote.ContainsKey(cbar))
+                if (data.BMS.BGANote.ContainsKey(cbar))
                 {
-                    NoteAdderBGA(noteBGA, bms.BGANote[cbar], bms.BarLength, cbar, ref totalLen, ref noteCount);
+                    NoteAdderBGA(data, cbar);
                 }
 
-                if (bms.BarLength.ContainsKey(cbar))
+                if (data.BMS.BarLength.ContainsKey(cbar))
                 {
-                    totalLen += bms.BarLength[cbar];
-                    totalTime += spb * bms.BarLength[cbar];
+                    data.TotalLength += data.BMS.BarLength[cbar];
+                    //totalTime += spb * bms.BarLength[cbar];
                 }
                 else
                 {
-                    totalLen += 1;
-                    totalTime += spb;
+                    data.TotalLength += 1;
+                    //totalTime += spb;
                 }
             }
-            LongnoteSetup(notePlay, lnlist);
+            LongnoteSetup(data.NotePlay, data.NoteLong);
 
             // 노트 오브젝트 등록 후 각 라인별로 position에 따라 정렬 수행
             // (롱노트 순서 정렬을 위해서)
-            SortNote(notePlay);
-
+            SortNote(data.NotePlay);
         }
 
         // 각 라인 별 노트 데이터 저장 (Bar 1개 내)
-        public Dictionary<int, string> LaneMapGenerator(Dictionary<string, string> bar) {
-            Dictionary<int, string> lane = new Dictionary<int, string>(16);
+        public Dictionary<int, string> PlayNotesByBar(Dictionary<string, string> NotesInBar) {
+            Dictionary<int, string> NotesPerLine = new Dictionary<int, string>(16);
 
-            if (bar.ContainsKey("11"))
-                lane.Add(1, bar["11"]);
-            if (bar.ContainsKey("12"))
-                lane.Add(2, bar["12"]);
-            if (bar.ContainsKey("13"))
-                lane.Add(3, bar["13"]);
-            if (bar.ContainsKey("14"))
-                lane.Add(4, bar["14"]);
-            if (bar.ContainsKey("15"))
-                lane.Add(5, bar["15"]);
-            if (bar.ContainsKey("16"))
-                lane.Add(0, bar["16"]);
-            if (bar.ContainsKey("18"))
-                lane.Add(6, bar["18"]);
-            if (bar.ContainsKey("19"))
-                lane.Add(7, bar["19"]);
-            if (bar.ContainsKey("51"))
-                lane.Add(11, bar["51"]);
-            if (bar.ContainsKey("52"))
-                lane.Add(12, bar["52"]);
-            if (bar.ContainsKey("53"))
-                lane.Add(13, bar["53"]);
-            if (bar.ContainsKey("54"))
-                lane.Add(14, bar["54"]);
-            if (bar.ContainsKey("55"))
-                lane.Add(15, bar["55"]);
-            if (bar.ContainsKey("56"))
-                lane.Add(10, bar["56"]);
-            if (bar.ContainsKey("58"))
-                lane.Add(16, bar["58"]);
-            if (bar.ContainsKey("59"))
-                lane.Add(17, bar["59"]);
+            if (NotesInBar.ContainsKey("11"))
+                NotesPerLine.Add(1, NotesInBar["11"]);
+            if (NotesInBar.ContainsKey("12"))
+                NotesPerLine.Add(2, NotesInBar["12"]);
+            if (NotesInBar.ContainsKey("13"))
+                NotesPerLine.Add(3, NotesInBar["13"]);
+            if (NotesInBar.ContainsKey("14"))
+                NotesPerLine.Add(4, NotesInBar["14"]);
+            if (NotesInBar.ContainsKey("15"))
+                NotesPerLine.Add(5, NotesInBar["15"]);
+            if (NotesInBar.ContainsKey("16"))
+                NotesPerLine.Add(0, NotesInBar["16"]);
+            if (NotesInBar.ContainsKey("18"))
+                NotesPerLine.Add(6, NotesInBar["18"]);
+            if (NotesInBar.ContainsKey("19"))
+                NotesPerLine.Add(7, NotesInBar["19"]);
+            if (NotesInBar.ContainsKey("51"))
+                NotesPerLine.Add(11, NotesInBar["51"]);
+            if (NotesInBar.ContainsKey("52"))
+                NotesPerLine.Add(12, NotesInBar["52"]);
+            if (NotesInBar.ContainsKey("53"))
+                NotesPerLine.Add(13, NotesInBar["53"]);
+            if (NotesInBar.ContainsKey("54"))
+                NotesPerLine.Add(14, NotesInBar["54"]);
+            if (NotesInBar.ContainsKey("55"))
+                NotesPerLine.Add(15, NotesInBar["55"]);
+            if (NotesInBar.ContainsKey("56"))
+                NotesPerLine.Add(10, NotesInBar["56"]);
+            if (NotesInBar.ContainsKey("58"))
+                NotesPerLine.Add(16, NotesInBar["58"]);
+            if (NotesInBar.ContainsKey("59"))
+                NotesPerLine.Add(17, NotesInBar["59"]);
 
-            return lane;
+            return NotesPerLine;
         }
 
-        public void NoteAdder(List<Note>[] notes, Dictionary<int, string> lane,
-            Dictionary<int, double> barLength, int cbar, int lines,
-            ref double totalLen, ref int totalNotes, ref int noteCount) {
+        public Dictionary<int, string> MineNotesByBar(Dictionary<string, string> NotesInBar)
+        {
+            Dictionary<int, string> NotesPerLine = new Dictionary<int, string>(16);
 
+            if (NotesInBar.ContainsKey("D1"))
+                NotesPerLine.Add(1, NotesInBar["D1"]);
+            if (NotesInBar.ContainsKey("D2"))
+                NotesPerLine.Add(2, NotesInBar["D2"]);
+            if (NotesInBar.ContainsKey("D3"))
+                NotesPerLine.Add(3, NotesInBar["D3"]);
+            if (NotesInBar.ContainsKey("D4"))
+                NotesPerLine.Add(4, NotesInBar["D4"]);
+            if (NotesInBar.ContainsKey("D5"))
+                NotesPerLine.Add(5, NotesInBar["D5"]);
+            if (NotesInBar.ContainsKey("D6"))
+                NotesPerLine.Add(0, NotesInBar["D6"]);
+            if (NotesInBar.ContainsKey("D8"))
+                NotesPerLine.Add(6, NotesInBar["D8"]);
+            if (NotesInBar.ContainsKey("D9"))
+                NotesPerLine.Add(7, NotesInBar["D9"]);
+
+            return NotesPerLine;
+        }
+
+        public void NoteAdderPlay(PlayData data, Dictionary<int, string> line, int cbar)
+        {
             int longcnt = 0;
 
             // 라인별 노트 추가
             for (int cline = 0; cline < 18; cline++)
             {
-                if (lane.ContainsKey(cline))
+                if (line.ContainsKey(cline))
                 {
-                    if (lane[cline] != null)
+                    if (line[cline] != null)
                     {
-                        int size = lane[cline].Length / 2;
+                        int size = line[cline].Length / 2;
 
                         for (int n = 0; n < size; n++)
                         {
-                            string noteStr = lane[cline].Substring(n * 2, 2);
+                            string noteStr = line[cline].Substring(n * 2, 2);
                             if (noteStr != "00")
                             {
                                 double position = (double)n / size;
 
-                                if (barLength.ContainsKey(cbar))
+                                if (data.BMS.BarLength.ContainsKey(cbar))
                                 {
-                                    position *= barLength[cbar];
+                                    position *= data.BMS.BarLength[cbar];
                                 }
 
-                                double realpos = (totalLen + position) * Const.FRAMEMULTIPLIER + Const.FIXEDSTARTHEIGHT;
-                                
+                                double realpos = (data.TotalLength + position);
+
+                                PlayNote note = new PlayNote
+                                {
+                                    Position = realpos,
+                                    OnScrPos = realpos,
+                                    Wav = noteStr,
+                                    Bar = cbar,
+                                    ObjType = ObjectType.PLAYABLE
+                                };
                                 switch (cline)
                                 {
                                     case 0:
-                                        notes[0].Add(new Note(realpos, noteStr, cbar, 0));
-                                        totalNotes++;
-                                        noteCount++;
-                                        break;
                                     case 1:
-                                        notes[1].Add(new Note(realpos, noteStr, cbar, 1));
-                                        totalNotes++;
-                                        noteCount++;
-                                        break;
                                     case 2:
-                                        notes[2].Add(new Note(realpos, noteStr, cbar, 2));
-                                        totalNotes++;
-                                        noteCount++;
-                                        break;
                                     case 3:
-                                        notes[3].Add(new Note(realpos, noteStr, cbar, 3));
-                                        totalNotes++;
-                                        noteCount++;
-                                        break;
                                     case 4:
-                                        notes[4].Add(new Note(realpos, noteStr, cbar, 4));
-                                        totalNotes++;
-                                        noteCount++;
-                                        break;
                                     case 5:
-                                        notes[5].Add(new Note(realpos, noteStr, cbar, 5));
-                                        totalNotes++;
-                                        noteCount++;
-                                        break;
                                     case 6:
-                                        notes[6].Add(new Note(realpos, noteStr, cbar, 6));
-                                        totalNotes++;
-                                        noteCount++;
-                                        break;
                                     case 7:
-                                        notes[7].Add(new Note(realpos, noteStr, cbar, 7));
-                                        totalNotes++;
-                                        noteCount++;
+                                        note.Line = cline;
+                                        note.PlayNoteType = NoteType.SINGLE;
+                                        data.TotalNotes++;
+                                        data.NoteCount++;
                                         break;
                                     case 10:
-                                        notes[0].Add(new Note(realpos, noteStr, cbar, 0, ObjectType.PLAYABLE, true));
-                                        longcnt++;
-                                        break;
                                     case 11:
-                                        notes[1].Add(new Note(realpos, noteStr, cbar, 1, ObjectType.PLAYABLE, true));
-                                        longcnt++;
-                                        break;
                                     case 12:
-                                        notes[2].Add(new Note(realpos, noteStr, cbar, 2, ObjectType.PLAYABLE, true));
-                                        longcnt++;
-                                        break;
                                     case 13:
-                                        notes[3].Add(new Note(realpos, noteStr, cbar, 3, ObjectType.PLAYABLE, true));
-                                        longcnt++;
-                                        break;
                                     case 14:
-                                        notes[4].Add(new Note(realpos, noteStr, cbar, 4, ObjectType.PLAYABLE, true));
-                                        longcnt++;
-                                        break;
                                     case 15:
-                                        notes[5].Add(new Note(realpos, noteStr, cbar, 5, ObjectType.PLAYABLE, true));
-                                        longcnt++;
-                                        break;
                                     case 16:
-                                        notes[6].Add(new Note(realpos, noteStr, cbar, 6, ObjectType.PLAYABLE, true));
-                                        longcnt++;
-                                        break;
                                     case 17:
-                                        notes[7].Add(new Note(realpos, noteStr, cbar, 7, ObjectType.PLAYABLE, true));
+                                        note.Line = cline - 10;
+                                        note.PlayNoteType = NoteType.LNTEMP;
                                         longcnt++;
                                         break;
                                 }
+                                data.NotePlay[note.Line].Add(note);
                             }
                         }
                     }
                 }
             }
-            noteCount += longcnt / 2;
-            totalNotes += longcnt / 2;
+            data.NoteCount += longcnt / 2;
+            data.TotalNotes += longcnt / 2;
         }
 
-        public void LongnoteSetup(List<Note>[] notePlay, List<Longnote> lnlist)
+        public void LongnoteSetup(List<PlayNote>[] notePlay, List<LongNote> lnlist)
         {
-            bool[] lnadd = new bool[8];
+            bool[] LNAdding = new bool[8];
             for (int i = 0; i < 8; i++)
             {
-                lnadd[i] = false;
+                LNAdding[i] = false;
             }
 
-            foreach (List<Note> notes in notePlay)
+            foreach (List<PlayNote> notes in notePlay)
             {
-                foreach (Note n in notes)
+                foreach (PlayNote n in notes)
                 {
-                    if(n.IsLongnote)
+                    if(n.PlayNoteType == NoteType.LNTEMP)
                     {
                         int cline = n.Line;
-                        if (lnadd[cline])
+                        if (LNAdding[cline])
                         {
                             // 이미 롱노트가 추가중인 상태이면 현재 라인의 lnlist를 갱신하고 노트 표시 추가
                             for (int i = 0; i < lnlist.Count; i++)
                             {
-                                if (lnlist[i].Line == cline && lnlist[i].EndNote == null)
+                                if (lnlist[i].Line == cline && lnlist[i].End == null)
                                 {
-                                    n.LNEnd = true;
+                                    n.PlayNoteType = NoteType.LNEND;
                                     n.LNNum = i;
-                                    lnlist[i].EndNote = n;
-                                    lnlist[i].MidNote.Position = 
-                                        (lnlist[i].StartNote.Position + n.Position) / 2;
-                                    lnadd[cline] = false;
+                                    lnlist[i].End = n;
+                                    lnlist[i].Mid.Position = 
+                                        (lnlist[i].Start.Position + n.Position) / 2;
+                                    LNAdding[cline] = false;
                                 }
                             }
                         }
                         else
                         {
-                            n.LNStart = true;
+                            // 시작노트 처리
+                            n.PlayNoteType = NoteType.LNSTART;
                             n.LNNum = lnlist.Count;
-                            Note lnNote = new Note(n.Position + 1, "L#", n.Bar, n.Line, ObjectType.PLAYABLE, true);
-                            lnNote.LNMid = true;
-                            lnlist.Add(new Longnote(cline, n, lnNote));
-                            lnadd[cline] = true;
+
+                            // 가운데 노트 처리
+                            PlayNote MidNote = new PlayNote
+                            {
+                                Position = n.Position,
+                                Wav = "L#",
+                                Bar = n.Bar,
+                                Line = n.Line,
+                                LNNum = lnlist.Count,
+                                PlayNoteType = NoteType.LNMID,
+                                ObjType = ObjectType.PLAYABLE
+                            };
+
+                            // 롱노트 오브젝트 생성
+                            LongNote ln = new LongNote
+                            {
+                                Line = cline,
+                                Start = n,
+                                Mid = MidNote
+                            };
+
+                            // 롱노트 등록
+                            lnlist.Add(ln);
+                            LNAdding[cline] = true;
                         }
                     }
                 }
             }
         }
 
-        public void NoteAdderBPM(List<Note> notes, string bpmline,
-            Dictionary<int, double> barLength, BPMNoteType type,
-            int cbar, ref double totalLen, ref int noteCount) {
+        public void NoteAdderMine(PlayData data, Dictionary<int, string> line, int cbar)
+        {
+            int longcnt = 0;
+
+            // 라인별 노트 추가
+            for (int cline = 0; cline < 8; cline++)
+            {
+                if (line.ContainsKey(cline))
+                {
+                    if (line[cline] != null)
+                    {
+                        int size = line[cline].Length / 2;
+
+                        for (int n = 0; n < size; n++)
+                        {
+                            string noteStr = line[cline].Substring(n * 2, 2);
+                            if (noteStr != "00")
+                            {
+                                double position = (double)n / size;
+
+                                if (data.BMS.BarLength.ContainsKey(cbar))
+                                {
+                                    position *= data.BMS.BarLength[cbar];
+                                }
+
+                                double realpos = (data.TotalLength + position);
+
+                                MineNote note = new MineNote
+                                {
+                                    Position = realpos,
+                                    OnScrPos = realpos,
+                                    Bar = cbar,
+                                    ObjType = ObjectType.MINE
+                                };
+
+                                note.Line = cline;
+                                data.NoteCount++;
+                                data.NoteMine[note.Line].Add(note);
+                            }
+                        }
+                    }
+                }
+            }
+            data.NoteCount += longcnt / 2;
+            data.TotalNotes += longcnt / 2;
+        }
+
+        public void NoteAdderBPM(BPMNoteType type, PlayData data, int cbar)
+        {
+            string bpmline;
+
+            if(type == BPMNoteType.Type1)
+            {
+                bpmline = data.BMS.BPMNote[cbar];
+            }
+            else
+            {
+                bpmline = data.BMS.BPMNoteType2[cbar];
+            }
+
             if (bpmline.Length > 0)
             {
                 int bpmsize = bpmline.Length / 2;
@@ -342,109 +433,144 @@ namespace BMSPlayer
                     if (noteStr != "00")
                     {
                         double position = (double)n / bpmsize;
-                        if (barLength.ContainsKey(cbar))
+                        if (data.BMS.BarLength.ContainsKey(cbar))
                         {
-                            position *= barLength[cbar];
+                            position *= data.BMS.BarLength[cbar];
                         }
 
-                        double realpos = (totalLen + position) * Const.FRAMEMULTIPLIER + Const.FIXEDSTARTHEIGHT;
+                        double realpos = (data.TotalLength + position);
 
-                        if(type == BPMNoteType.Type1)
+                        BPMNote note = new BPMNote
                         {
-                            notes.Add(new Note(realpos, noteStr, cbar, 8, ObjectType.BPM));
+                            Position = realpos,
+                            Bar = cbar,
+                            ObjType = ObjectType.BPM
+                        };
+
+                        if (type == BPMNoteType.Type1)
+                        {
+                            note.BPMValue = Convert.ToInt32(noteStr, 16);
                         }   
                         else if(type == BPMNoteType.Type2)
                         {
-                            notes.Add(new Note(realpos, noteStr, cbar, 8, ObjectType.BPMT2));
+                            note.BPMValue = data.BMS.BPMNum[noteStr];
                         }
 
-                        noteCount++;
+                        data.NoteBPM.Add(note);
+                        data.NoteCount++;
+                        data.BPMPositionFix.Add(realpos);
                     }
                 }
             }
         }
 
-        public void NoteAdderMusic(List<Note> notes, List<string> musicnote,
-            Dictionary<int, double> barLength, int cbar,
-            ref double totalLen, ref int noteCount)
+        public void NoteAdderMusic(PlayData data, int cbar)
         {
-            for (int num = 0; num < musicnote.Count; num++)
+            for (int num = 0; num < data.BMS.Music[cbar].Count; num++)
             {
-                string mnote = musicnote[num];
+                string mnote = data.BMS.Music[cbar][num];
                 int size = mnote.Length / 2;
                 for (int n = 0; n < size; n++)
                 {
-                    string noteStr = musicnote[num].Substring(n * 2, 2);
+                    string noteStr = data.BMS.Music[cbar][num].Substring(n * 2, 2);
                     if (noteStr != "00")
                     {
                         double position = (double)n / size;
-                        if (barLength.ContainsKey(cbar))
+                        if (data.BMS.BarLength.ContainsKey(cbar))
                         {
-                            position *= barLength[cbar];
+                            position *= data.BMS.BarLength[cbar];
                         }
 
-                        double realpos = (totalLen + position) * Const.FRAMEMULTIPLIER + Const.FIXEDSTARTHEIGHT;
+                        double realpos = (data.TotalLength + position);
 
-                        notes.Add(new Note(realpos, noteStr, cbar, num + 9, ObjectType.MUSIC));
-                        noteCount++;
+                        BGMNote note = new BGMNote
+                        {
+                            Position = realpos,
+                            Wav = noteStr,
+                            Bar = cbar,
+                            ObjType = ObjectType.MUSIC
+                        };
+
+                        data.NoteBGM.Add(note);
+                        data.NoteCount++;
                     }
                 }
             }
         }
 
-        public void NoteAdderBGA(List<Note> notes, string bgaNotes,
-            Dictionary<int, double> barLength, int cbar,
-            ref double totalLen, ref int noteCount)
+        public void NoteAdderBGA(PlayData data, int cbar)
         {
-            int size = bgaNotes.Length / 2;
+            int size = data.BMS.BGANote[cbar].Length / 2;
 
             for (int n = 0; n < size; n++)
             {
-                string noteStr = bgaNotes.Substring(n * 2, 2);
+                string noteStr = data.BMS.BGANote[cbar].Substring(n * 2, 2);
                 if (noteStr != "00")
                 {
                     double position = (double)n / size;
 
-                    if (barLength.ContainsKey(cbar))
+                    if (data.BMS.BarLength.ContainsKey(cbar))
                     {
-                        position *= barLength[cbar];
+                        position *= data.BMS.BarLength[cbar];
                     }
 
-                    double realpos = (totalLen + position) * Const.FRAMEMULTIPLIER + Const.FIXEDSTARTHEIGHT;
+                    double realpos = (data.TotalLength + position);
 
-                    notes.Add(new Note(realpos, noteStr, cbar, 8, ObjectType.BGA));
-                    noteCount++;
+                    BGANote note = new BGANote
+                    {
+                        Position = realpos,
+                        Bar = cbar,
+                        ObjType = ObjectType.BGA
+                    };
+
+                    if (data.BMS.BGAImages.Count == 0)
+                    {
+                        note.VideoFile = data.BMS.BGAVideoFile;
+                    }
+                    else
+                    {
+                        note.BGASprite = data.BMS.BGAImages[noteStr];
+                    }
+
+                    data.NoteBGA.Add(note);
+                    data.NoteCount++;
                 }
             }
         }
 
-        public void NoteAdderStop(List<Note> notes, string stopNotes,
-            Dictionary<int, double> barLength, int cbar,
-            ref double totalLen, ref int noteCount)
+        public void NoteAdderStop(PlayData data, int cbar)
         {
-            int size = stopNotes.Length / 2;
+            int size = data.BMS.StopNote[cbar].Length / 2;
 
             for (int n = 0; n < size; n++)
             {
-                string noteStr = stopNotes.Substring(n * 2, 2);
+                string noteStr = data.BMS.StopNote[cbar].Substring(n * 2, 2);
                 if (noteStr != "00")
                 {
                     double position = (double)n / size;
 
-                    if (barLength.ContainsKey(cbar))
+                    if (data.BMS.BarLength.ContainsKey(cbar))
                     {
-                        position *= barLength[cbar];
+                        position *= data.BMS.BarLength[cbar];
                     }
 
-                    double realpos = (totalLen + position) * Const.FRAMEMULTIPLIER + Const.FIXEDSTARTHEIGHT;
+                    double realpos = (data.TotalLength + position);
 
-                    notes.Add(new Note(realpos, noteStr, cbar, 8, ObjectType.STOP));
-                    noteCount++;
+                    StopNote note = new StopNote
+                    {
+                        Position = realpos,
+                        Bar = cbar,
+                        ObjType = ObjectType.STOP,
+                        StopDuration = (double)data.BMS.StopList[noteStr] / 192
+                        // 나중에 실시간으로 멈출 때 bps로 나누어야 함
+                    };
+                    data.NoteStop.Add(note);
+                    data.NoteCount++;
                 }
             }
         }
 
-        private double calculateTotalLength(BMS bms)
+        private double CalculateTotalLength(BMS bms)
         {
             double length = 0;
             for (int i = 0; i < bms.LastBar; i++)
@@ -456,11 +582,440 @@ namespace BMSPlayer
             return length;
         }
 
-        private void SortNote(List<Note>[] notePlay)
+        private void SortNote(List<PlayNote>[] notePlay)
         {
-            foreach(List<Note> nl in notePlay)
+            foreach(List<PlayNote> nl in notePlay)
             {
                 nl.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+            }
+        }
+
+        public void PositionToTiming(PlayData data)
+        {
+            /*List<TimingObject> TimingList = new List<TimingObject>();
+
+            foreach(BPMNote n in data.NoteBPM)
+            {
+                TimingList.Add(n);
+            }
+
+            foreach (StopNote n in data.NoteStop)
+            {
+                TimingList.Add(n);
+            }
+
+            TimingList.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+
+            int BPMIdx = 0;
+            foreach (TimingObject n in TimingList)
+            {
+                if(n is BPMNote)
+                {
+                    BPMIdx = TimingList.IndexOf(n);
+
+                    n.Timing =
+                        data.NoteBPM[i - 1].Timing +
+                        (data.NoteBPM[i].Position - data.NoteBPM[i - 1].Position) / (data.NoteBPM[i - 1].BPMValue / 240)
+                        * 10;
+                }
+                else if(n is StopNote)
+                {
+
+                }
+            }
+
+            for (int i = 1; i < data.NoteBPM.Count; i++)
+            {
+                data.NoteBPM[i].Timing =
+                    data.NoteBPM[i - 1].Timing +
+                    (data.NoteBPM[i].Position - data.NoteBPM[i - 1].Position) / (data.NoteBPM[i - 1].BPMValue / 240)
+                    * 10;
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                foreach (PlayNote n in data.NotePlay[i])
+                {
+                    CalculateTiming(data, n);
+                }
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                foreach (MineNote n in data.NoteMine[i])
+                {
+                    CalculateTiming(data, n);
+                }
+            }
+
+            foreach (BGANote n in data.NoteBGA)
+            {
+                CalculateTiming(data, n);
+            }
+
+            foreach (BGMNote n in data.NoteBGM)
+            {
+                CalculateTiming(data, n);
+            }
+
+            foreach (StopNote n in data.NoteStop)
+            {
+                CalculateTiming(data, n);
+            }*/
+            Dictionary<int, List<BPMNote>> BPMChangeCheck =
+                new Dictionary<int, List<BPMNote>>();
+
+            Dictionary<int, List<StopNote>> StopChangeCheck =
+                new Dictionary<int, List<StopNote>>();
+
+            // 작업 진행 전에 bar마다 bpm/stop 체크
+            foreach(BPMNote n in data.NoteBPM)
+            {
+                List<BPMNote> bpmBar;
+                if (BPMChangeCheck.ContainsKey(n.Bar))
+                {
+                    bpmBar = BPMChangeCheck[n.Bar];
+                    bpmBar.Add(n);
+                    BPMChangeCheck[n.Bar] = bpmBar;
+                }
+                else
+                {
+                    bpmBar = new List<BPMNote>();
+                    bpmBar.Add(n);
+                    BPMChangeCheck.Add(n.Bar, bpmBar);
+                }
+            }
+
+            foreach(StopNote n in data.NoteStop)
+            {
+                List<StopNote> stopBar;
+                if (StopChangeCheck.ContainsKey(n.Bar))
+                {
+                    stopBar = StopChangeCheck[n.Bar];
+                    stopBar.Add(n);
+                    StopChangeCheck[n.Bar] = stopBar;
+                }
+                else
+                {
+                    stopBar = new List<StopNote>();
+                    stopBar.Add(n);
+                    StopChangeCheck.Add(n.Bar, stopBar);
+                }
+            }
+
+            double prevTime = 0;
+            double prevBarPos = 0;
+            double prevChangePos = 0;
+            double bps = data.BMS.BPMStart / 240;
+            double nextbps = bps;
+
+            double stopPos = 0;
+            double stopTime = 0;
+            bool isStop = false;
+
+            // Bar는 000부터 시작하므로 시간 계산을 0부터 진행
+            for (int bar = 0; bar < data.BMS.LastBar + 1; bar++)
+            {
+                double barLength = 1;
+                if(data.BMS.BarLength.ContainsKey(bar))
+                {
+                    barLength = data.BMS.BarLength[bar];
+                }
+                
+                // 모든 노트에서 bpm이 변경되거나 시간이 멈추는 부분에 대해
+                // 범위를 나누고 각각 시간 계산을 별도로 진행
+                List<NoteObject> timeChangeInBar = new List<NoteObject>();
+
+                if (BPMChangeCheck.ContainsKey(bar) ||
+                    StopChangeCheck.ContainsKey(bar))
+                {
+
+                    if(BPMChangeCheck.Count > 0 && BPMChangeCheck.ContainsKey(bar))
+                    {
+                        List<BPMNote> bpmChangeInBar = BPMChangeCheck[bar];
+                        bpmChangeInBar.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+
+                        foreach (BPMNote n in BPMChangeCheck[bar])
+                        {
+                            timeChangeInBar.Add(n);
+                        }
+                    }
+
+                    if (StopChangeCheck.Count > 0 && StopChangeCheck.ContainsKey(bar))
+                    {
+                        List<StopNote> stopChangeInBar = StopChangeCheck[bar];
+                        stopChangeInBar.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+
+                        foreach (StopNote n in StopChangeCheck[bar])
+                        {
+                            timeChangeInBar.Add(n);
+                        }
+                    }
+
+                    timeChangeInBar.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+
+                    // 각 Position을 기준으로 같은바의 해당 Position보다 아래에 있으면
+                    // 노트 타임을 설정함
+                    for (int i = 0; i < timeChangeInBar.Count+1; i++)
+                    {
+                        double PosStart = 0;
+                        double PosEnd = 0;
+                        if(bar == 101)
+                        {
+                            int a = 1 + 1;
+                        }
+                        bps = nextbps;
+
+                        // i == 0이면 bar 시작위치에서 bpm 변경 노트까지를 판단
+                        if(i == 0)
+                        {
+                            PosStart = prevBarPos;
+                            PosEnd = timeChangeInBar[i].Position;
+                        }
+                        // i가 마지막 인덱스이면 이전 위치에서 barlength까지
+                        else if (i == timeChangeInBar.Count)
+                        {
+                            PosStart = timeChangeInBar[i - 1].Position;
+                            PosEnd = prevBarPos + barLength;
+                        }
+                        // 나머지는 이전것부터 현재것까지
+                        else
+                        {
+                            PosStart = timeChangeInBar[i - 1].Position;
+                            PosEnd = timeChangeInBar[i].Position;
+                        }
+
+                        // 각 노트에 대해 Position 설정
+                        for (int j = 0; j < 8; j++)
+                        {
+                            foreach (PlayNote n in data.NotePlay[j])
+                            {
+                                // Stop 발생 시 해당위치에 있는 노트들은 처리를 수행함
+                                if(isStop && n.Position == stopPos)
+                                {
+                                    CalculateTiming(n, bps, stopTime, PosStart);
+                                }
+                                // 현재 시간 변경점 이내에 있는 경우
+                                else if (n.Bar == bar &&
+                                        n.Position >= PosStart &&
+                                        n.Position < PosEnd
+                                    )
+                                {
+                                    CalculateTiming(n, bps, prevTime, PosStart);
+                                }
+                            }
+                        }
+
+                        for (int j = 0; j < 8; j++)
+                        {
+                            foreach (MineNote n in data.NoteMine[j])
+                            {
+                                if (isStop && n.Position == stopPos)
+                                {
+                                    CalculateTiming(n, bps, stopTime, PosStart);
+                                }
+                                else if (n.Bar == bar &&
+                                        n.Position >= PosStart &&
+                                        n.Position < PosEnd
+                                    )
+                                {
+                                    CalculateTiming(n, bps, prevTime, PosStart);
+                                }
+                            }
+                        }
+
+                        foreach (BPMNote n in data.NoteBPM)
+                        {
+                            if (isStop && n.Position == stopPos)
+                            {
+                                CalculateTiming(n, bps, stopTime, PosStart);
+                            }
+                            else if (n.Bar == bar &&
+                                    n.Position >= PosStart &&
+                                    n.Position < PosEnd
+                                )
+                            {
+                                CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+
+                            if (!data.BPMPositionFix.Contains(n.Position))
+                                data.BPMPositionFix.Add(n.Position);
+                        }
+
+                        foreach (BGANote n in data.NoteBGA)
+                        {
+                            if (isStop && n.Position == stopPos)
+                            {
+                                CalculateTiming(n, bps, stopTime, PosStart);
+                            }
+                            else if (n.Bar == bar &&
+                                    n.Position >= PosStart &&
+                                    n.Position < PosEnd
+                                )
+                            {
+                                CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+                        }
+
+                        foreach (BGMNote n in data.NoteBGM)
+                        {
+                            if (isStop && n.Position == stopPos)
+                            {
+                                CalculateTiming(n, bps, stopTime, PosStart);
+                            }
+                            else if (n.Bar == bar &&
+                                    n.Position >= PosStart &&
+                                    n.Position < PosEnd
+                                )
+                            {
+                                CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+                        }
+
+                        foreach (StopNote n in data.NoteStop)
+                        {
+                            if (isStop && n.Position == stopPos)
+                            {
+                                CalculateTiming(n, bps, stopTime, PosStart);
+                            }
+                            else if (n.Bar == bar &&
+                                    n.Position >= PosStart &&
+                                    n.Position < PosEnd
+                                )
+                            {
+                                CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+                        }
+
+                        if(isStop)
+                        {
+                            isStop = false;
+                        }
+
+                        if (i != timeChangeInBar.Count)
+                        {
+                            // 현재 선택된 노트가 BPM 노트이면 bps 값을 변경
+                            if (timeChangeInBar[i] is BPMNote)
+                            {
+                                BPMNote bpm = timeChangeInBar[i] as BPMNote;
+                                nextbps = bpm.BPMValue / 240;
+                            }
+
+                            if(timeChangeInBar[i] is StopNote)
+                            {
+                                StopNote stop = timeChangeInBar[i] as StopNote;
+                                stopPos = stop.Position;
+                                stopTime = prevTime + (stopPos - prevChangePos) / bps * 10;
+                                isStop = true;
+                                prevTime += stop.StopDuration / bps * 10;
+                            }
+
+                            prevTime += (timeChangeInBar[i].Position - prevChangePos) / bps * 10;
+                            prevChangePos = timeChangeInBar[i].Position;
+                        }
+                        else
+                        {
+                            prevBarPos += barLength;
+                            prevTime += (prevBarPos - prevChangePos) / bps * 10;
+                            prevChangePos = prevBarPos;
+                        }
+                    }
+                }
+                else
+                {
+                    double PosStart = prevBarPos;
+
+                    // 모든 노트에 대해 타이밍 계산을 진행
+                    for (int i = 0; i < 8; i++)
+                    {
+                        foreach (PlayNote n in data.NotePlay[i])
+                        {
+                            if(n.Bar == bar)
+                            {
+                                CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        foreach (MineNote n in data.NoteMine[i])
+                        {
+                            if (n.Bar == bar)
+                            {
+                                CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+                        }
+                    }
+
+                    foreach(BGANote n in data.NoteBGA)
+                    {
+                        if (n.Bar == bar)
+                        {
+                            CalculateTiming(n, bps, prevTime, PosStart);
+                        }
+                    }
+
+                    foreach(BGMNote n in data.NoteBGM)
+                    {
+                        if (n.Bar == bar)
+                        {
+                            CalculateTiming(n, bps, prevTime, PosStart);
+                        }
+                    }
+
+                    if (bar == 48)
+                    {
+                        int a = 1 + 1;
+                    }
+
+                    prevBarPos += barLength;
+                    prevChangePos = prevBarPos;
+                    prevTime += barLength / bps * 10;
+                }
+            }
+        }
+
+        private void CalculateTiming(NoteObject n, double bps, double prevTime, double prevPos)
+        {
+            double time = (n.Position - prevPos) / bps * 10;
+            n.Timing = prevTime + time;
+        }
+
+        private void CalculateTiming(PlayData data, NoteObject n)
+        {
+            double time = 0;
+            int idx = 0;
+            bool broken = false;
+            for (idx = 1; idx < data.NoteBPM.Count - 1; idx++)
+            {
+                if (n.Position > data.NoteBPM[idx].Position)
+                {
+                    time += (data.NoteBPM[idx].Position - data.NoteBPM[idx - 1].Position) / (data.NoteBPM[idx - 1].BPMValue / 240) * 10;
+                }
+                else
+                {
+                    broken = true;
+                    break;
+                }
+            }
+            if(broken)
+                time += (n.Position - data.NoteBPM[idx - 1].Position) / (data.NoteBPM[idx - 1].BPMValue / 240) * 10;
+            else
+                time += (n.Position - data.NoteBPM[idx].Position) / (data.NoteBPM[idx].BPMValue / 240) * 10;
+            n.Timing = time;
+        }
+
+        public void SortAllNotes(PlayData data)
+        {
+            data.NoteBGA.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+            data.NoteBGM.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+            data.NoteBPM.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+            data.NoteStop.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+            for(int i = 0; i < 8; i++)
+            {
+                data.NoteMine[i].Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+                data.NotePlay[i].Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
             }
         }
     }

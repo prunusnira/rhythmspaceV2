@@ -98,7 +98,7 @@ namespace BMSPlayer
                 // 키보드를 움직였을 때 메뉴가 움직이도록 설정
                 if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    pressedTime = DateTime.Now.Ticks;
+                    pressedTime = DateTime.Now.Ticks / 1000;
                     musicRect.AddItemBottom(ObjectSetup);
                     showInfo(musicRect.GetCurrent());
                     sfxChange.PlayOneShot(sfxChangeClip);
@@ -106,7 +106,7 @@ namespace BMSPlayer
 
                 if(Input.GetKey(KeyCode.DownArrow))
                 {
-                    if(DateTime.Now.Ticks - pressedTime > 2000000)
+                    if(DateTime.Now.Ticks / 1000 - pressedTime > 2000)
                     {
                         musicRect.AddItemBottom(ObjectSetup);
                         showInfo(musicRect.GetCurrent());
@@ -116,7 +116,7 @@ namespace BMSPlayer
 
                 if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
-                    pressedTime = DateTime.Now.Ticks;
+                    pressedTime = DateTime.Now.Ticks / 1000;
                     musicRect.AddItemTop(ObjectSetup);
                     showInfo(musicRect.GetCurrent());
                     sfxChange.PlayOneShot(sfxChangeClip);
@@ -124,7 +124,7 @@ namespace BMSPlayer
 
                 if (Input.GetKey(KeyCode.UpArrow))
                 {
-                    if (DateTime.Now.Ticks - pressedTime > 2000000)
+                    if (DateTime.Now.Ticks / 1000 - pressedTime > 2000)
                     {
                         musicRect.AddItemTop(ObjectSetup);
                         showInfo(musicRect.GetCurrent());

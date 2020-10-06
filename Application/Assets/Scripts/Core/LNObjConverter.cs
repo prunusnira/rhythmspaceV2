@@ -50,9 +50,9 @@ namespace BMSCore
             {
                 for (int j = 0; j < 8; j++) // line
                 {
-                    if (!bms.Note.ContainsKey(i)) continue;
+                    if (!bms.PlayNote.ContainsKey(i)) continue;
 
-                    string noteStr = bms.Note[i][nrLane[j]];
+                    string noteStr = bms.PlayNote[i][nrLane[j]];
                     List<string> currentList = GetNoteListFromString(noteStr);
                     List<int> lnPosList = new List<int>();
                     bool isLNObjExist = false;
@@ -133,20 +133,20 @@ namespace BMSCore
                         List<int> idxlist = new List<int>();
                         idxlist.Add(lastidx);
 
-                        string lnPrevStr = bms.Note[tempBar[j]][lnLane[j]];
+                        string lnPrevStr = bms.PlayNote[tempBar[j]][lnLane[j]];
                         List<string> lnPrevList = GetNoteListFromString(lnPrevStr);
 
                         string nrListReplace = GetNewNormalString(prevstr, idxlist);
                         string lnListReplace = GetNewLongNoteString(lnPrevList, prevstr, idxlist);
-                        bms.Note[bar][nrLane[j]] = nrListReplace;
-                        bms.Note[bar][lnLane[j]] = lnListReplace;
+                        bms.PlayNote[bar][nrLane[j]] = nrListReplace;
+                        bms.PlayNote[bar][lnLane[j]] = lnListReplace;
                     }
 
                     // 현재 노트 리스트에서 롱노트로 쓸 값들만 옮기기
                     string newNrStr = GetNewNormalString(currentList, lnPosList);
                     string newLnStr = GetNewLongNoteString(null, currentList, lnPosList);
-                    bms.Note[i][nrLane[j]] = newNrStr;
-                    bms.Note[i][lnLane[j]] = newLnStr;
+                    bms.PlayNote[i][nrLane[j]] = newNrStr;
+                    bms.PlayNote[i][lnLane[j]] = newLnStr;
 
                     // 롱노트를 옮긴 다음에도 단노트가 남아있으면 temp로 등록함
                     List<string> afterNoteChk = GetNoteListFromString(newNrStr);

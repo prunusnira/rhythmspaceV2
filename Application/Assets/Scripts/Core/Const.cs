@@ -16,8 +16,8 @@ namespace BMSPlayer
 #endif
         }
         public static int CHANNEL = 320;
-        public static int FRAMEMULTIPLIER = 1000;
-        public static int FIXEDSTARTHEIGHT = 3000;
+        public static int SPEEDMULTIPLIER = 10;
+        public static int DEFAULTPOS = 0;
         public static int LINE = 8;
 
         public static bool DEBUG = true;

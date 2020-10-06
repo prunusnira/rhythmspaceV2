@@ -13,6 +13,7 @@ namespace BMSPlayer
 	// 플레이 화면의 모든 UI 요소 컨트롤
 	public class PlayUI : MonoBehaviour {
         // UI Object
+        private List<GameObject> NoteOnScreen;
         public GameObject layerJudgeAll;
         public GameObject layerPauseMenu;
         public Text FPSCounter;
@@ -180,12 +181,14 @@ namespace BMSPlayer
 
             // 그래프 초기화
             SetInitialGraph();
+
+            NoteOnScreen = new List<GameObject>();
         }
 
         private void Update()
         {
             FPSCounter.text = "FPS " + ((int)(1f / Time.unscaledDeltaTime)).ToString();
-            if (DateTime.Now.Ticks / 10000 - timeLastComboPopup > 1000)
+            if (DateTime.Now.Ticks / 1000 - timeLastComboPopup > 1000)
             {
                 if(Const.JudgeUIType == JudgeUIType.ED)
                 {
@@ -591,8 +594,8 @@ namespace BMSPlayer
                 // 판정별 색상 변경 처리
             }
 
-            timeLastComboPopup = DateTime.Now.Ticks / 10000;
-            timeLastTimingPopup = DateTime.Now.Ticks / 10000;
+            timeLastComboPopup = DateTime.Now.Ticks / 1000;
+            timeLastTimingPopup = DateTime.Now.Ticks / 1000;
         }
 
         public void UpdateSideJudge(
@@ -756,17 +759,22 @@ namespace BMSPlayer
             layerPauseMenu.SetActive(false);
         }
 
-        public void displayNote(ref Note note, ref List<Longnote> lnlist)
+        public void DisplayMineNote(MineNote note)
         {
-            if (!note.IsLongnote)
+            GameObject noteObj = generator.AddNewMineNote(note.Line, note.Timing, playArea.transform);
+            noteObj.transform.SetParent(playArea.transform, false);
+            note.OnScreen = true;
+            note.NoteObject = noteObj;
+        }
+
+        public void DisplayPlayNote(PlayNote note, List<LongNote> lnlist)
+        {
+            if (note.PlayNoteType == NoteType.SINGLE)
             {
-                if (note.Notetype == ObjectType.PLAYABLE)
-                {
-                    GameObject noteObj = generator.AddNewNote(note.Line, note.Position, playArea.transform);
-                    noteObj.transform.SetParent(playArea.transform, false);
-                    note.Noteobj = noteObj;
-                    note.Released = true;
-                }
+                GameObject noteObj = generator.AddNewNote(note.Line, note.Timing, playArea.transform);
+                noteObj.transform.SetParent(playArea.transform, false);
+                note.OnScreen = true;
+                note.NoteObject = noteObj;
             }
             else
             {
@@ -775,34 +783,60 @@ namespace BMSPlayer
                 // 이 동작은 Scroller.moveNotes()에서 isLong()을 확인해서 표기한다
 
                 // 시작노트
-                GameObject noteObj = generator.AddNewNote(note.Line, note.Position, playArea.transform);
-                noteObj.transform.SetParent(playArea.transform, false);
-                note.Noteobj = noteObj;
-                note.Released = true;
-
-                // 끝노트도 같이 추가한다
-                for (int i = 0; i < lnlist.Count; i++)
+                if(note.PlayNoteType == NoteType.LNSTART)
                 {
-                    if (lnlist[i].StartNote == note)
+                    GameObject noteObj = generator.AddNewNote(note.Line, note.Timing, playArea.transform);
+                    noteObj.transform.SetParent(playArea.transform, false);
+                    note.OnScreen = true;
+                    note.NoteObject = noteObj;
+
+                    //NoteOnScreen.Add(noteObj);
+
+                    // 끝노트도 같이 추가한다
+                    for (int i = 0; i < lnlist.Count; i++)
                     {
-                    // 가운데노트
-                        Note lnNote = lnlist[i].MidNote;
-                        GameObject lnObj = generator.AddNewNote(lnNote.Line, lnNote.Position, playArea.transform);
-                        lnObj.transform.SetParent(playArea.transform, false);
-                        lnNote.Noteobj = lnObj;
-                        lnNote.Released = true;
+                        if (lnlist[i].Start == note)
+                        {
+                        // 가운데노트
+                            PlayNote lnNote = lnlist[i].Mid;
+                            GameObject lnObj = generator.AddNewNote(lnNote.Line, lnNote.Timing, playArea.transform);
+                            lnObj.transform.SetParent(playArea.transform, false);
+                            lnNote.OnScreen = true;
+                            lnNote.NoteObject = lnObj;
 
-                        // 끝노트
-                        Note endNote = lnlist[i].EndNote;
-                        GameObject endObj = generator.AddNewNote(endNote.Line, endNote.Position, playArea.transform);
-                        endObj.transform.SetParent(playArea.transform, false);
-                        endNote.Noteobj = endObj; // 끝노트
-                        endNote.Released = true;
+                            //NoteOnScreen.Add(lnObj);
 
-                        lnlist[i].EndNote = endNote;
-                        lnlist[i].MidNote.Position =
-                            (lnlist[i].StartNote.Position + endNote.Position) / 2;
+                            // 끝노트
+                            PlayNote endNote = lnlist[i].End;
+                            GameObject endObj = generator.AddNewNote(endNote.Line, endNote.Timing, playArea.transform);
+                            endObj.transform.SetParent(playArea.transform, false);
+                            endNote.OnScreen = true;
+                            endNote.NoteObject = endObj;
+
+                            //NoteOnScreen.Add(endObj); // 끝노트
+
+                            lnlist[i].Mid.Position = (note.Position + endNote.Position) / 2;
+                        }
                     }
+                }
+            }
+        }
+
+        public void FixAllNotePositionOnScreen(PlayData data, int idx)
+        {
+            foreach(List<PlayNote> pnotes in data.NotePlay)
+            {
+                foreach(PlayNote n in pnotes)
+                {
+                    n.OnScrPos = n.Position - data.BPMPositionFix[idx];
+                }
+            }
+
+            foreach (List<MineNote> mnotes in data.NoteMine)
+            {
+                foreach (MineNote n in mnotes)
+                {
+                    n.OnScrPos = n.Position - data.BPMPositionFix[idx];
                 }
             }
         }

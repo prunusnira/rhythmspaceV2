@@ -11,7 +11,7 @@ namespace BMSPlayer
         // Execute after BMSAnalyzer.FullAnalyzer worked
         void PreloadSound(BMS bms);
 
-        void PlayKeySound(int lane, string wavFile, ref BMS bms);
+        void PlayKeySound(string wavFile, BMS bms, int line);
 
         bool CheckSoundPlaying();
 

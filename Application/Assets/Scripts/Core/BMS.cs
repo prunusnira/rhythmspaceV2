@@ -92,8 +92,11 @@ namespace BMSCore
         // <BAR#, Channel 01> - Channel 01은 한 bar에 여러개가 들어갈 수 있음
         public Dictionary<int, List<string>> Music = new Dictionary<int, List<string>>();
 
-        // <BAR#, <Channel #, Note String>> - 각 채널별 노트 등록 -> 리팩토링 가능
-        public Dictionary<int, Dictionary<string, string>> Note = new Dictionary<int, Dictionary<string, string>>();
+        // <BAR#, <Channel #, Note String>> - 각 채널별 노트 등록 (플레이노트)
+        public Dictionary<int, Dictionary<string, string>> PlayNote = new Dictionary<int, Dictionary<string, string>>();
+
+        // <BAR#, <Channel #, Note String>> - 각 채널별 노트 등록 (지뢰노트)
+        public Dictionary<int, Dictionary<string, string>> MineNote = new Dictionary<int, Dictionary<string, string>>();
 
         // <BAR#, Channel 02> - 4/4박자를 1로 하여 double로 bar의 길이를 결정
         public Dictionary<int, double> BarLength = new Dictionary<int, double>();

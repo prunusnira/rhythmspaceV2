@@ -39,7 +39,7 @@ namespace BMSPlayer
             }
         }
 
-        public void PlayKeySound(int lane, string wavFile, ref BMS bms)
+        public void PlayKeySound(string wavFile, BMS bms, int line)
         {
             FMOD.RESULT result = FMOD.RESULT.OK;
             try

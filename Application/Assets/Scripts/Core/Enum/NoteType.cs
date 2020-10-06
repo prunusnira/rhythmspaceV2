@@ -10,6 +10,7 @@ namespace BMSCore
         SINGLE,
         LNSTART,
         LNMID,
-        LNEND
+        LNEND,
+        LNTEMP
     }
 }

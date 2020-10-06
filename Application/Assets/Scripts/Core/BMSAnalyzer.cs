@@ -406,42 +406,70 @@ namespace BMSCore
                                 // Stop
                                 bms.StopNote.Add(bar, leftNote);
                             }
+                            else if(ch.StartsWith("D"))
+                            {
+                                if (bms.LastBar < bar) bms.LastBar = bar;
+
+                                // bar 데이터 유무 체크
+                                if (!bms.MineNote.ContainsKey(bar))
+                                    bms.MineNote[bar] = new Dictionary<string, string>();
+
+                                // bar에 키값 있는지 여부 확인
+                                if (bms.MineNote[bar].ContainsKey(ch) && bms.MineNote[bar][ch] == null)
+                                {
+                                    bms.MineNote[bar].Remove(ch);
+                                    bms.MineNote[bar].Add(ch, leftNote);
+                                }
+                                else
+                                {
+                                    bms.MineNote[bar].Add(ch, leftNote);
+                                }
+
+                                if (!bms.MineNote[bar].ContainsKey("D1")) bms.MineNote[bar].Add("D1", null);
+                                if (!bms.MineNote[bar].ContainsKey("D2")) bms.MineNote[bar].Add("D2", null);
+                                if (!bms.MineNote[bar].ContainsKey("D3")) bms.MineNote[bar].Add("D3", null);
+                                if (!bms.MineNote[bar].ContainsKey("D4")) bms.MineNote[bar].Add("D4", null);
+                                if (!bms.MineNote[bar].ContainsKey("D5")) bms.MineNote[bar].Add("D5", null);
+                                if (!bms.MineNote[bar].ContainsKey("D6")) bms.MineNote[bar].Add("D6", null);
+                                if (!bms.MineNote[bar].ContainsKey("D8")) bms.MineNote[bar].Add("D8", null);
+                                if (!bms.MineNote[bar].ContainsKey("D9")) bms.MineNote[bar].Add("D9", null);
+                            }
                             else
                             {
                                 if (bms.LastBar < bar) bms.LastBar = bar;
 
                                 // bar 데이터 유무 체크
-                                if (!bms.Note.ContainsKey(bar))
-                                    bms.Note[bar] = new Dictionary<string, string>();
+                                if (!bms.PlayNote.ContainsKey(bar))
+                                    bms.PlayNote[bar] = new Dictionary<string, string>();
 
                                 // bar에 키값 있는지 여부 확인
-                                if (bms.Note[bar].ContainsKey(ch) && bms.Note[bar][ch] == null)
+                                if (bms.PlayNote[bar].ContainsKey(ch) && bms.PlayNote[bar][ch] == null)
                                 {
-                                    bms.Note[bar].Remove(ch);
-                                    bms.Note[bar].Add(ch, leftNote);
+                                    bms.PlayNote[bar].Remove(ch);
+                                    bms.PlayNote[bar].Add(ch, leftNote);
                                 }
                                 else
                                 {
-                                    bms.Note[bar].Add(ch, leftNote);
+                                    bms.PlayNote[bar].Add(ch, leftNote);
                                 }
 
                                 // 비어있는 노트 파트에 빈 공간을 추가해서 채움
-                                if (!bms.Note[bar].ContainsKey("11")) bms.Note[bar].Add("11", null);
-                                if (!bms.Note[bar].ContainsKey("12")) bms.Note[bar].Add("12", null);
-                                if (!bms.Note[bar].ContainsKey("13")) bms.Note[bar].Add("13", null);
-                                if (!bms.Note[bar].ContainsKey("14")) bms.Note[bar].Add("14", null);
-                                if (!bms.Note[bar].ContainsKey("15")) bms.Note[bar].Add("15", null);
-                                if (!bms.Note[bar].ContainsKey("16")) bms.Note[bar].Add("16", null);
-                                if (!bms.Note[bar].ContainsKey("18")) bms.Note[bar].Add("18", null);
-                                if (!bms.Note[bar].ContainsKey("19")) bms.Note[bar].Add("19", null);
-                                if (!bms.Note[bar].ContainsKey("51")) bms.Note[bar].Add("51", null);
-                                if (!bms.Note[bar].ContainsKey("52")) bms.Note[bar].Add("52", null);
-                                if (!bms.Note[bar].ContainsKey("53")) bms.Note[bar].Add("53", null);
-                                if (!bms.Note[bar].ContainsKey("54")) bms.Note[bar].Add("54", null);
-                                if (!bms.Note[bar].ContainsKey("55")) bms.Note[bar].Add("55", null);
-                                if (!bms.Note[bar].ContainsKey("56")) bms.Note[bar].Add("56", null);
-                                if (!bms.Note[bar].ContainsKey("58")) bms.Note[bar].Add("58", null);
-                                if (!bms.Note[bar].ContainsKey("59")) bms.Note[bar].Add("59", null);
+                                if (!bms.PlayNote[bar].ContainsKey("11")) bms.PlayNote[bar].Add("11", null);
+                                if (!bms.PlayNote[bar].ContainsKey("12")) bms.PlayNote[bar].Add("12", null);
+                                if (!bms.PlayNote[bar].ContainsKey("13")) bms.PlayNote[bar].Add("13", null);
+                                if (!bms.PlayNote[bar].ContainsKey("14")) bms.PlayNote[bar].Add("14", null);
+                                if (!bms.PlayNote[bar].ContainsKey("15")) bms.PlayNote[bar].Add("15", null);
+                                if (!bms.PlayNote[bar].ContainsKey("16")) bms.PlayNote[bar].Add("16", null);
+                                if (!bms.PlayNote[bar].ContainsKey("18")) bms.PlayNote[bar].Add("18", null);
+                                if (!bms.PlayNote[bar].ContainsKey("19")) bms.PlayNote[bar].Add("19", null);
+                                if (!bms.PlayNote[bar].ContainsKey("51")) bms.PlayNote[bar].Add("51", null);
+                                if (!bms.PlayNote[bar].ContainsKey("52")) bms.PlayNote[bar].Add("52", null);
+                                if (!bms.PlayNote[bar].ContainsKey("53")) bms.PlayNote[bar].Add("53", null);
+                                if (!bms.PlayNote[bar].ContainsKey("54")) bms.PlayNote[bar].Add("54", null);
+                                if (!bms.PlayNote[bar].ContainsKey("55")) bms.PlayNote[bar].Add("55", null);
+                                if (!bms.PlayNote[bar].ContainsKey("56")) bms.PlayNote[bar].Add("56", null);
+                                if (!bms.PlayNote[bar].ContainsKey("58")) bms.PlayNote[bar].Add("58", null);
+                                if (!bms.PlayNote[bar].ContainsKey("59")) bms.PlayNote[bar].Add("59", null);
                             }
 
                             //bms->mNote.insert(std::pair<int, Bar>(bar, mbar));
