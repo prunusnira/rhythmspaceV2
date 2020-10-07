@@ -21,7 +21,6 @@ namespace BMSPlayer
 
         // Unity objects
         public GameObject lastLine; // 판정선
-        public GameObject bgaVideo;
         public GameObject bgaImage;
 
         // user play info
@@ -55,8 +54,6 @@ namespace BMSPlayer
 
         // 패드용 눌림 체크
         private bool[] isAxisPushed;
-
-        private bool BGAOnChecked = false;
 
         // 노트 스크롤
         private double noteTiming;
@@ -339,15 +336,11 @@ namespace BMSPlayer
                     // 비디오 파일이 아닐 경우
                     if(current.VideoFile == null)
                     {
-                        if (!BGAOnChecked) bgaImage.SetActive(true);
                         ui.BGAImageSetting(current.BGASprite);
-                        BGAOnChecked = true;
                     }
                     else
                     {
-                        if (!BGAOnChecked) bgaVideo.SetActive(true);
-                        ui.BGAVideoPlay();
-                        BGAOnChecked = true;
+                        ui.BGAVideoPlay(current.VideoFile);
                     }
                     current.Used = true;
                     removeCandidate.Add(current);
@@ -961,7 +954,7 @@ namespace BMSPlayer
                     ui.UpdateMaxCombo(maxcombo);
                 }
 
-                ui.UpdateJudge(timingType, combo, ((1 - abstime / BAD) * 100).ToString("0.00") + "%", (int)Math.Round(time));
+                ui.UpdateJudge(timingType, combo, ((1 - abstime / BAD) * 100).ToString("0.00") + "%", (int)Math.Round(time*10));
             }
 
             avgRate = Math.Round(sumRate * 100 / processedNotes) / 100;

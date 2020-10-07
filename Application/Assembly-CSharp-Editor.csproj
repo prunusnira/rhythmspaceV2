@@ -62,14 +62,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\MPMP\Examples\Scripts\Editor\MPMP_VR_SetupEditor.cs" />
-    <Compile Include="Assets\MPMP\Scripts\Editor\EnableOpenGLES2.cs" />
-    <Compile Include="Assets\MPMP\Scripts\Editor\MPMPEditor.cs" />
-    <Compile Include="Assets\MPMP\Scripts\Editor\MPMP_Editor_Utils.cs" />
-    <Compile Include="Assets\MPMP\Scripts\Editor\MPMP_VLC_Utils.cs" />
-    <Compile Include="Assets\MPMP\Scripts\Editor\OSXBuiltCheck.cs" />
-    <Compile Include="Assets\MPMP\Scripts\Editor\ScriptOrderManager.cs" />
-    <Compile Include="Assets\MPMP\Scripts\GUI\Editor\MPMP_ugui_Element_Editor.cs" />
     <Compile Include="Assets\ResonanceAudio\Editor\FmodResonanceAudioRoomEditor.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Unity2019.4.9f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>

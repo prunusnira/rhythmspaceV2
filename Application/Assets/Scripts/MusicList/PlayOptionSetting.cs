@@ -16,35 +16,26 @@ namespace BMSPlayer
         private int speedfl;
 
         // Speed Type
-        public Image spSpdType;
-        public Sprite spdFixed;
-        public Sprite spdFluid;
+        public Text txtSpdType;
 
         // Auto
-        public Image spAutoOnOff;
-        public Sprite AutoOn;
-        public Sprite AutoOff;
+        public Text txtAuto;
 
         // Judge
-        public Image spJudgeOnOff;
-        public Sprite JudgeOn;
-        public Sprite JudgeOff;
+        public Text txtJudge;
 
         // Gauge Type
-        public Image spGauge;
-        public Sprite GAssisted;
-        public Sprite GEasy;
-        public Sprite GNormal;
-        public Sprite GHard;
-        public Sprite GExHard;
+        public Text txtGauge;
 
         // Target Graph Type
-        public Image spTarget;
-        public Sprite TOff;
-        public Sprite TA;
-        public Sprite TAA;
-        public Sprite TAAA;
-        public Sprite TMax;
+        public Text txtTarget;
+
+        // Play Area Type
+        public Text txtPlayArea;
+
+        // Note Layout
+        public Text txtNoteLayout;
+        public Text txtNoteDesc;
 
         public void Awake()
         {
@@ -53,34 +44,40 @@ namespace BMSPlayer
             // 오토 설정
             if(Const.Auto == AutoPlayType.OFF)
             {
-                spAutoOnOff.sprite = AutoOff;
+                txtAuto.text = "OFF";
+                txtAuto.color = Color.white;
             }
             else
             {
-                spAutoOnOff.sprite = AutoOn;
+                txtAuto.text = "ON";
+                txtAuto.color = Color.red;
             }
 
             // 판정 표시 설정
             if(Const.DisplayJudge == 0)
             {
-                spJudgeOnOff.sprite = JudgeOff;
+                txtJudge.text = "OFF";
+                txtJudge.color = Color.white;
             }
             else
             {
-                spJudgeOnOff.sprite = JudgeOn;
+                txtJudge.text = "ON";
+                txtJudge.color = new Color(1f, 120f / 255, 0f);
             }
 
             // 속도
             if(Const.SpdType == SpdType.FIXED)
             {
                 speed = Const.SpeedFixed;
-                spSpdType.sprite = spdFixed;
+                txtSpdType.text = "FIXED";
+                txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
                 txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
             }
             else
             {
                 speedfl = Const.SpeedFluid;
-                spSpdType.sprite = spdFluid;
+                txtSpdType.text = "FLUID";
+                txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
                 txtSpeed.text = speedfl.ToString();
             }
 
@@ -88,42 +85,109 @@ namespace BMSPlayer
             switch(Const.JudgeType)
             {
                 case JudgeType.ASSISTED:
-                    spGauge.sprite = GAssisted;
+                    txtGauge.text = "ASSISTED";
+                    txtGauge.color = new Color(206f / 255, 159f / 255, 1f);
                     break;
                 case JudgeType.EASY:
-                    spGauge.sprite = GEasy;
+                    txtGauge.text = "EASY";
+                    txtGauge.color = new Color(159f / 255, 1f, 180f / 255);
                     break;
                 case JudgeType.NORMAL:
-                    spGauge.sprite = GNormal;
+                    txtGauge.text = "NORMAL";
+                    txtGauge.color = new Color(159f / 255, 215f / 255, 1f);
                     break;
                 case JudgeType.HARD:
-                    spGauge.sprite = GHard;
+                    txtGauge.text = "HARD";
+                    txtGauge.color = new Color(1f, 159f / 255, 159f / 255);
                     break;
                 case JudgeType.EXHARD:
-                    spGauge.sprite = GExHard;
+                    txtGauge.text = "EX-HARD";
+                    txtGauge.color = new Color(1f, 207f / 255, 79f / 255);
                     break;
             }
 
             // 그래프
             switch(Const.GraphTarget)
             {
-                case GraphTargetType.OFF:
-                    spTarget.sprite = TOff;
-                    break;
                 case GraphTargetType.A:
-                    spTarget.sprite = TA;
+                    txtTarget.text = "A";
+                    txtTarget.color = new Color(196f / 255, 52f / 255, 174f / 255);
                     break;
                 case GraphTargetType.AA:
-                    spTarget.sprite = TAA;
+                    txtTarget.text = "AA";
+                    txtTarget.color = new Color(1f, 133f / 255, 45f / 255);
                     break;
                 case GraphTargetType.AAA:
-                    spTarget.sprite = TAAA;
+                    txtTarget.text = "AAA";
+                    txtTarget.color = new Color(1f, 64f / 255, 64f / 255);
                     break;
                 case GraphTargetType.MAX:
-                    spTarget.sprite = TMax;
+                    txtTarget.text = "MAX";
+                    txtTarget.color = new Color(164f / 255, 71f / 255, 117f / 255);
                     break;
+                case GraphTargetType.OFF:
                 default:
-                    spTarget.sprite = TOff;
+                    txtTarget.text = "OFF";
+                    txtTarget.color = Color.white;
+                    break;
+            }
+
+            // 플레이 공간 설정
+            switch(Const.AreaCover)
+            {
+                case CoverType.SUD:
+                    txtPlayArea.text = "SUDDEN";
+                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                    break;
+                case CoverType.HID:
+                    txtPlayArea.text = "HIDDEN";
+                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                    break;
+                case CoverType.LIFT:
+                    txtPlayArea.text = "LIFT";
+                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                    break;
+                case CoverType.SUDLIFT:
+                    txtPlayArea.text = "SUD+LIFT";
+                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                    break;
+                case CoverType.SUDHID:
+                    txtPlayArea.text = "SUD+HID";
+                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                    break;
+                case CoverType.OFF:
+                default:
+                    txtPlayArea.text = "OFF";
+                    txtTarget.color = Color.white;
+                    break;
+            }
+
+            // 배치
+            switch(Const.NoteLayout)
+            {
+                case NoteLayout.NORMAL:
+                    txtNoteLayout.text = "NORMAL";
+                    txtNoteDesc.text = Const.RandomDescNR[(int)Const.Language];
+                    break;
+                case NoteLayout.RANDOM:
+                    txtNoteLayout.text = "RANDOM";
+                    txtNoteDesc.text = Const.RandomDescRD[(int)Const.Language];
+                    break;
+                case NoteLayout.MIRROR:
+                    txtNoteLayout.text = "MIRROR";
+                    txtNoteDesc.text = Const.RandomDescMR[(int)Const.Language];
+                    break;
+                case NoteLayout.SRAN:
+                    txtNoteLayout.text = "S-RAN";
+                    txtNoteDesc.text = Const.RandomDescSR[(int)Const.Language];
+                    break;
+                case NoteLayout.CRAN:
+                    txtNoteLayout.text = "C-RAN";
+                    txtNoteDesc.text = Const.RandomDescCR[(int)Const.Language];
+                    break;
+                case NoteLayout.CUSTOM:
+                    txtNoteLayout.text = "CUSTOM";
+                    txtNoteDesc.text = Const.RandomDescCU[(int)Const.Language];
                     break;
             }
         }
@@ -178,6 +242,14 @@ namespace BMSPlayer
             {
                 GraphTargetChange();
             }
+            else if (Input.GetKeyDown(KeyCode.F8))
+            {
+                AreaCoverChange();
+            }
+            else if(Input.GetKeyDown(KeyCode.F9))
+            {
+                NoteLayoutChange();
+            }
         }
 
         private void SpeedUpFixed()
@@ -229,12 +301,14 @@ namespace BMSPlayer
             if(Const.DisplayJudge == 0)
             {
                 Const.DisplayJudge = 1;
-                spJudgeOnOff.sprite = JudgeOn;
+                txtJudge.text = "ON";
+                txtJudge.color = new Color(1f, 120f / 255, 0f);
             }
             else
             {
                 Const.DisplayJudge = 0;
-                spJudgeOnOff.sprite = JudgeOff;
+                txtJudge.text = "OFF";
+                txtJudge.color = Color.white;
             }
         }
 
@@ -243,12 +317,14 @@ namespace BMSPlayer
             if(Const.Auto == AutoPlayType.OFF)
             {
                 Const.Auto = AutoPlayType.ON;
-                spAutoOnOff.sprite = AutoOn;
+                txtAuto.text = "ON";
+                txtAuto.color = Color.red;
             }
             else
             {
                 Const.Auto = AutoPlayType.OFF;
-                spAutoOnOff.sprite = AutoOff;
+                txtAuto.text = "OFF";
+                txtAuto.color = Color.white;
             }
         }
 
@@ -257,23 +333,28 @@ namespace BMSPlayer
             switch (Const.JudgeType)
             {
                 case JudgeType.ASSISTED:
-                    spGauge.sprite = GEasy;
+                    txtGauge.text = "EASY";
+                    txtGauge.color = new Color(159f / 255, 1f, 180f / 255);
                     Const.JudgeType = JudgeType.EASY;
                     break;
                 case JudgeType.EASY:
-                    spGauge.sprite = GNormal;
+                    txtGauge.text = "NORMAL";
+                    txtGauge.color = new Color(159f / 255, 215f / 255, 1f);
                     Const.JudgeType = JudgeType.NORMAL;
                     break;
                 case JudgeType.NORMAL:
-                    spGauge.sprite = GHard;
+                    txtGauge.text = "HARD";
+                    txtGauge.color = new Color(1f, 159f / 255, 159f / 255);
                     Const.JudgeType = JudgeType.HARD;
                     break;
                 case JudgeType.HARD:
-                    spGauge.sprite = GExHard;
+                    txtGauge.text = "EX-HARD";
+                    txtGauge.color = new Color(1f, 207f / 255, 79f / 255);
                     Const.JudgeType = JudgeType.EXHARD;
                     break;
                 case JudgeType.EXHARD:
-                    spGauge.sprite = GAssisted;
+                    txtGauge.text = "ASSISTED";
+                    txtGauge.color = new Color(206f / 255, 159f / 255, 1f);
                     Const.JudgeType = JudgeType.ASSISTED;
                     break;
             }
@@ -283,14 +364,16 @@ namespace BMSPlayer
         {
             if (Const.SpdType == SpdType.FIXED)
             {
-                spSpdType.sprite = spdFluid;
+                txtSpdType.text = "FLUID";
+                txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
                 Const.SpdType = SpdType.FLUID;
                 txtSpeed.text = speedfl.ToString();
                 txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
             }
             else
             {
-                spSpdType.sprite = spdFixed;
+                txtSpdType.text = "FIXED";
+                txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
                 Const.SpdType = SpdType.FIXED;
                 txtSpeed.text = ((float)speed/100).ToString("0.00");
                 txtSpdAnother.text = "FLUID " + speedfl.ToString();
@@ -302,27 +385,105 @@ namespace BMSPlayer
             switch (Const.GraphTarget)
             {
                 case GraphTargetType.OFF:
-                    spTarget.sprite = TA;
+                    txtTarget.text = "A";
+                    txtTarget.color = new Color(196f / 255, 52f / 255, 174f / 255);
                     Const.GraphTarget = GraphTargetType.A;
                     break;
                 case GraphTargetType.A:
-                    spTarget.sprite = TAA;
+                    txtTarget.text = "AA";
+                    txtTarget.color = new Color(1f, 133f / 255, 45f / 255);
                     Const.GraphTarget = GraphTargetType.AA;
                     break;
                 case GraphTargetType.AA:
-                    spTarget.sprite = TAAA;
+                    txtTarget.text = "AAA";
+                    txtTarget.color = new Color(1f, 64f / 255, 64f / 255);
                     Const.GraphTarget = GraphTargetType.AAA;
                     break;
                 case GraphTargetType.AAA:
-                    spTarget.sprite = TMax;
+                    txtTarget.text = "MAX";
+                    txtTarget.color = new Color(164f / 255, 71f / 255, 117f / 255);
                     Const.GraphTarget = GraphTargetType.MAX;
                     break;
                 case GraphTargetType.MAX:
-                    spTarget.sprite = TOff;
+                default:
+                    txtTarget.text = "OFF";
+                    txtTarget.color = Color.white;
                     Const.GraphTarget = GraphTargetType.OFF;
                     break;
+            }
+        }
+
+        private void AreaCoverChange()
+        {
+            switch (Const.AreaCover)
+            {
+                case CoverType.SUD:
+                    txtPlayArea.text = "HIDDEN";
+                    Const.AreaCover = CoverType.HID;
+                    break;
+                case CoverType.HID:
+                    txtPlayArea.text = "LIFT";
+                    Const.AreaCover = CoverType.LIFT;
+
+                    break;
+                case CoverType.LIFT:
+                    txtPlayArea.text = "SUD+LIFT";
+                    Const.AreaCover = CoverType.SUDLIFT;
+
+                    break;
+                case CoverType.SUDLIFT:
+                    txtPlayArea.text = "SUD+HID";
+                    Const.AreaCover = CoverType.SUDHID;
+                    break;
+                case CoverType.SUDHID:
+                    txtPlayArea.text = "OFF";
+                    txtPlayArea.color = Color.white;
+                    Const.AreaCover = CoverType.OFF;
+                    break;
+                case CoverType.OFF:
                 default:
-                    spTarget.sprite = TOff;
+                    txtPlayArea.text = "SUDDEN";
+                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                    Const.AreaCover = CoverType.SUD;
+                    break;
+            }
+        }
+
+        private void NoteLayoutChange()
+        {
+            switch (Const.NoteLayout)
+            {
+                case NoteLayout.NORMAL:
+                    txtNoteLayout.text = "RANDOM";
+                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
+                    txtNoteDesc.text = Const.RandomDescRD[(int)Const.Language];
+                    Const.NoteLayout = NoteLayout.RANDOM;
+                    break;
+                case NoteLayout.RANDOM:
+                    txtNoteLayout.text = "MIRROR";
+                    txtNoteDesc.text = Const.RandomDescMR[(int)Const.Language];
+                    Const.NoteLayout = NoteLayout.MIRROR;
+                    break;
+                case NoteLayout.MIRROR:
+                    txtNoteLayout.text = "S-RAN";
+                    txtNoteDesc.text = Const.RandomDescSR[(int)Const.Language];
+                    Const.NoteLayout = NoteLayout.SRAN;
+                    break;
+                case NoteLayout.SRAN:
+                    txtNoteLayout.text = "C-RAN";
+                    txtNoteDesc.text = Const.RandomDescCR[(int)Const.Language];
+                    Const.NoteLayout = NoteLayout.CRAN;
+                    break;
+                case NoteLayout.CRAN:
+                    txtNoteLayout.text = "CUSTOM";
+                    txtNoteDesc.text = Const.RandomDescCU[(int)Const.Language];
+                    Const.NoteLayout = NoteLayout.CUSTOM;
+                    break;
+                case NoteLayout.CUSTOM:
+                    txtNoteLayout.text = "NORMAL";
+                    txtNoteLayout.color = Color.white;
+                    txtNoteDesc.text = Const.RandomDescNR[(int)Const.Language];
+                    Const.NoteLayout = NoteLayout.NORMAL;
                     break;
             }
         }

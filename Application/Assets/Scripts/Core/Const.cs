@@ -29,6 +29,17 @@ namespace BMSPlayer
         public static MusicListData selectedMusic = null;
         public static int musiclistIdx = 0;
 
+        public static int[] CustomRandom =
+        {
+            PlayerPrefs.GetInt("custom_r1", 1),
+            PlayerPrefs.GetInt("custom_r2", 2),
+            PlayerPrefs.GetInt("custom_r3", 3),
+            PlayerPrefs.GetInt("custom_r4", 4),
+            PlayerPrefs.GetInt("custom_r5", 5),
+            PlayerPrefs.GetInt("custom_r6", 6),
+            PlayerPrefs.GetInt("custom_r7", 7)
+        };
+
         public static string[] settingDesc = new string[3]
         {
         "게임 설정을 변경합니다",
@@ -89,6 +100,55 @@ namespace BMSPlayer
             "1) Search path with explorer\n" +
             "2) Check Path on the top\n" +
             "3) Click the button on bottom-right"
+        };
+
+        public static string[] videoCodecMsg = new string[3]
+        {
+            "Microsoft Store에서 MPEG-2 Video Extension을 설치해주세요",
+            "Microsoft StoreからMPEG-2 Video Extensionをインストールしてください",
+            "Please install MPEG-2 Video Extension from Microsoft Store"
+        };
+
+        public static string[] RandomDescNR = new string[3]
+        {
+            "정규 채보입니다",
+            "正規譜面です",
+            "Normal Layout"
+        };
+
+        public static string[] RandomDescRD = new string[3]
+        {
+            "오브젝트가 출현하는 라인이 무작위로 섞입니다",
+            "オブジェクトの出現するラインが変わります",
+            "Line for notes will be mixed"
+        };
+
+        public static string[] RandomDescMR = new string[3]
+        {
+            "오브젝트가 출현하는 라인의 순서가 반대로 됩니다",
+            "オブジェクトの出現するラインの順番が逆になります",
+            "Line for notes will be reversed"
+        };
+
+        public static string[] RandomDescSR = new string[3]
+        {
+            "각각의 오브젝트가 무작위 라인에 출현합니다",
+            "各オブジェクトの出現ラインがランダムになります",
+            "Each note will be placed on randomized"
+        };
+
+        public static string[] RandomDescCR = new string[3]
+        {
+            "오브젝트가 출현하는 라인이 색상별로 섞입니다",
+            "オブジェクトの出現するラインがカラーによって変わります",
+            "Line for notes will be mixed by its color"
+        };
+
+        public static string[] RandomDescCU = new string[3]
+        {
+            "사용자가 지정한대로 라인이 변경됩니다\n(F10으로 라인 변경)",
+            "ユーザーが指定のラインになります\n(F10を押して変更)",
+            "Notes will be shown as user setting\n(Press F10 to change line)"
         };
 
         // System Setting Values
@@ -285,6 +345,30 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("graphTargetType", (int)value);
+            }
+        }
+
+        public static CoverType AreaCover
+        {
+            get
+            {
+                return (CoverType)PlayerPrefs.GetInt("areaCover", (int)CoverType.OFF);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("areaCover", (int)value);
+            }
+        }
+
+        public static NoteLayout NoteLayout
+        {
+            get
+            {
+                return (NoteLayout)PlayerPrefs.GetInt("noteLayout", (int)NoteLayout.NORMAL);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("noteLayout", (int)value);
             }
         }
         #endregion

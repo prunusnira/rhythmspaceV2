@@ -21,6 +21,8 @@ namespace BMSPlayer {
         private LNObjConverter LNConverter;
         private HPController hpController;
         private BMSAnalyzer analyzer;
+        private Randomizer randomizer;
+
         public GameObject startLine; // 노트가 생성되는 위치
 
         // Scene 관리
@@ -57,6 +59,9 @@ namespace BMSPlayer {
             // 배속, 라인 수, BMS 로드 등의 기본 데이터 가져오기를 생성자에서 수행
             Data = new PlayData();
 
+            // 배치 변경 관련 작업
+            randomizer = new Randomizer();
+
             // BMS 파일 분석
             analyzer = new BMSAnalyzer();
 
@@ -68,13 +73,6 @@ namespace BMSPlayer {
 
             // 사운드 컨트롤러 초기화
             soundController = GetComponent<SoundControllerFMOD>();
-
-            // LNOBJ 타입이면 추가로 이식하는 작업을 수행함
-            if (Data.BMS.LNType == LNType.Obj)
-            {
-                LNConverter = new LNObjConverter();
-                LNConverter.FixLongNoteLNOBJ(Data.BMS);
-            }
 
             soundController.Initialize();
             soundController.InitSoundChannels();
@@ -268,6 +266,14 @@ namespace BMSPlayer {
             analyzer.FullAnalyzer(Data.BMS);
             yield return null;
 
+            // LNOBJ 타입이면 추가로 이식하는 작업을 수행함
+            if (Data.BMS.LNType == LNType.Obj)
+            {
+                LNConverter = new LNObjConverter();
+                LNConverter.FixLongNoteLNOBJ(Data.BMS);
+            }
+            yield return null;
+
             // 파일 분석 이후 기본 정보 분석
             Data.CurrentBPM = Data.BMS.BPMStart;
             Data.BPS = Data.CurrentBPM / 240;
@@ -293,7 +299,10 @@ namespace BMSPlayer {
             {
                 isBGAMovieExist = true;
                 UI.BGAVideoActivate();
-                UI.BGAVideoSetting(Data.BMS.BGAVideoFile);
+            }
+            else
+            {
+                UI.BGAImageActivate();
             }
             yield return null;
 
@@ -301,7 +310,9 @@ namespace BMSPlayer {
             soundController.PreloadSound(Data.BMS);
             yield return null;
 
-            generator.AnalyzeNotes(Data);
+            // 노트 오브젝트(물리x) 생성
+            // GetNoteLayout == null이면 SRAN
+            generator.AnalyzeNotes(Data, randomizer.GetNoteLayout());
             yield return null;
             generator.PositionToTiming(Data);
             yield return null;

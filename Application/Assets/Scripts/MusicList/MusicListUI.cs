@@ -135,7 +135,7 @@ namespace BMSPlayer
                     }
                 }
 
-                if (Input.GetKeyDown(KeyCode.F10))
+                if (Input.GetKeyDown(KeyCode.F12))
                 {
                     layerSysOpt.SetActive(true);
                     SetNotOnTop();
@@ -245,7 +245,7 @@ namespace BMSPlayer
                     level.color = new Color(172f / 255, 46f / 255, 178f / 255);
                     break;
                 default:
-                    level.color = new Color(125f / 255, 125f / 255, 125f / 255);
+                    level.color = new Color(1f, 1f, 1f);
                     break;
             }
 
@@ -263,7 +263,6 @@ namespace BMSPlayer
 
                 Debug.Log("READY TO RUN");
                 SceneManager.LoadScene("Loading");
-                //Loading.StartLoading("PlayScreen");
             }
         }
 

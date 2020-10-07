@@ -1,5 +1,4 @@
 ﻿using BMSCore;
-using monoflow;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -81,6 +80,7 @@ namespace BMSPlayer
         public TextMesh gearBPMmin;
         public TextMesh gearBPMmax;
         public TextMesh txtAutoPlay;
+        public GameObject[] gearBtnPress;
 
         // Beam
         public GameObject[] beam;
@@ -123,9 +123,11 @@ namespace BMSPlayer
         public Sprite hpBarExHard;
 
         // BGA
-        public MPMP bgaVideo;
         public SpriteRenderer bgaImage;
         public RectTransform bgaRect;
+        public VideoPlayer bgaVideo;
+        public GameObject bgaVideoLayer;
+        public GameObject bgaErrorLayer;
 
         public GameObject fadeCube;
         private bool isFading = false;
@@ -208,7 +210,6 @@ namespace BMSPlayer
                 }
             }
 
-            //Debug.Log(timing + " " + (timing % 1.5));
             if (txtJudgeBM.gameObject.activeSelf && timing % 1.5 < 0.1)
             {
                 // 판정별 색상 변경 처리
@@ -586,13 +587,13 @@ namespace BMSPlayer
 
                 if(ms > 0)
                 {
-                    txtTimingMsBM.color = Color.red;
-                    txtTimingMsBM.text = "+" + ms.ToString() + "ms";
+                    txtTimingMsBM.color = new Color(135f / 255, 206f / 255, 235f / 255);
+                    txtTimingMsBM.text = "FAST" + ms.ToString() + "ms";
                 }
                 else if(ms < 0)
                 {
-                    txtTimingMsBM.color = new Color(135f/255, 206f/255, 235f/255);
-                    txtTimingMsBM.text = ms.ToString() + "ms";
+                    txtTimingMsBM.color = Color.red;
+                    txtTimingMsBM.text = "SLOW " + Math.Abs(ms).ToString() + "ms";
                 }
                 else
                 {
@@ -625,8 +626,16 @@ namespace BMSPlayer
         // Beam 보이기
         public void ShowAndHideBeam(int line, bool onoff)
         {
-            if (onoff) beam[line].SetActive(true);
-            else beam[line].SetActive(false);
+            if (onoff)
+            {
+                beam[line].SetActive(true);
+                gearBtnPress[line].SetActive(true);
+            }
+            else
+            {
+                beam[line].SetActive(false);
+                gearBtnPress[line].SetActive(false);
+            }
         }
 
         public void TurnOnNoteEffect(int pos)
@@ -699,8 +708,8 @@ namespace BMSPlayer
                 txtJudgeBM.colorGradient = new VertexGradient(
                     new Color(56f / 255, 122f / 255, 208f / 255),
                     new Color(56f / 255, 122f / 255, 208f / 255),
-                    new Color(158f / 255, 191f / 255, 125f / 255),
-                    new Color(158f / 255, 191f / 255, 125f / 255)
+                    new Color(183f / 255, 196f / 255, 255f / 255),
+                    new Color(183f / 255, 196f / 255, 255f / 255)
                     );
                 yield return new WaitForSeconds(0.05f);
                 txtJudgeBM.colorGradient = new VertexGradient(
@@ -717,80 +726,70 @@ namespace BMSPlayer
             }
             else
             {
-                txtJudgeBM.gameObject.SetActive(true);
+                txtJudgeBM.colorGradient = new VertexGradient(
+                    new Color(217f / 255, 150f / 255, 0f),
+                    new Color(217f / 255, 150f / 255, 0f),
+                    new Color(255f / 255, 225f / 255, 196f / 255),
+                    new Color(255f / 255, 225f / 255, 196f / 255)
+                    );
                 yield return new WaitForSeconds(0.1f);
-                txtJudgeBM.gameObject.SetActive(false);
+                txtJudgeBM.colorGradient = new VertexGradient(
+                    new Color(0f, 0f, 0f, 0f)
+                    );
                 yield return new WaitForSeconds(0.05f);
             }
         }
 
         public void BGAVideoActivate()
         {
-            bgaVideo.gameObject.SetActive(true);
+            bgaVideoLayer.SetActive(true);
+        }
+
+        public void BGAImageActivate()
+        {
+            bgaImage.gameObject.SetActive(true);
         }
 
         // BGA Control
-        public void BGAVideoSetting(string videoFile)
+        public void BGAVideoPlay(string file)
         {
-            bgaVideo.OnInit = (mpmp) =>
-            {
-                mpmp.volume = 0f;
-                mpmp.preventFlicker = true;
-                mpmp.autoPlay = false;
-                mpmp.Load(videoFile);
-
-                mpmp.OnLoaded = (mp) =>
-                {
-                    mp.Play();
-
-                    // 여기에 Callback을 넣으면 다시 재생시켜도 콜백으로 인해
-                    // 항상 일시정지가 되므로 코루틴으로 멈춤
-                    // 애초에 로딩이 안되면 Callback 자체를 부르지 못하니 상관없음
-                    StartCoroutine(CheckMovieStart());
-                };
-            };
-        }
-
-        IEnumerator CheckMovieStart()
-        {
-            while(!bgaVideo.IsPlaying())
-            {
-                yield return null;
-            }
-
-            bgaVideo.Pause();
-            bgaVideo.SeekTo(0f);
-
-            // 스스로 코루틴을 멈출 때 쓰는 구문
-            yield break;
-        }
-
-        public void BGAVideoPlay()
-        {
+            bgaVideo.url = "file://"+file;
+            bgaVideo.errorReceived += BGAErrorLayer;
             bgaVideo.Play();
         }
 
         public bool isBGAPlaying()
         {
-            return bgaVideo.IsPlaying();
+            return bgaVideo.isPlaying;
+        }
+
+        public void BGAErrorLayer(VideoPlayer source, string msg)
+        {
+            // 메모리 릭 방지
+            bgaVideo.errorReceived -= BGAErrorLayer;
+
+            // 레이어 띄우기
+            bgaErrorLayer.SetActive(true);
         }
 
         public void BGAImageSetting(Sprite img)
         {
-            bgaImage.sprite = img;
+            if(img != null)
+            {
+                bgaImage.sprite = img;
 
-            float width = bgaImage.sprite.bounds.size.x;
-            float height = bgaImage.sprite.bounds.size.y;
+                float width = bgaImage.sprite.bounds.size.x;
+                float height = bgaImage.sprite.bounds.size.y;
 
-            float rectWidth = bgaRect.sizeDelta.x;
-            float rectHeight = bgaRect.sizeDelta.y;
+                float rectWidth = bgaRect.sizeDelta.x;
+                float rectHeight = bgaRect.sizeDelta.y;
 
-            bgaImage.gameObject.transform.localScale =
-                new Vector3(
-                    rectWidth / width,
-                    rectHeight / height
-                );
-                    
+                bgaImage.gameObject.transform.localScale =
+                    new Vector3(
+                        rectWidth / width,
+                        rectHeight / height
+                    );
+            }       
         }
 
         public void ShowPauseMenu()
@@ -834,8 +833,6 @@ namespace BMSPlayer
                     note.OnScreen = true;
                     note.NoteObject = noteObj;
 
-                    //NoteOnScreen.Add(noteObj);
-
                     // 끝노트도 같이 추가한다
                     for (int i = 0; i < lnlist.Count; i++)
                     {
@@ -848,16 +845,12 @@ namespace BMSPlayer
                             lnNote.OnScreen = true;
                             lnNote.NoteObject = lnObj;
 
-                            //NoteOnScreen.Add(lnObj);
-
                             // 끝노트
                             PlayNote endNote = lnlist[i].End;
                             GameObject endObj = generator.AddNewNote(endNote.Line, endNote.Timing, playArea.transform);
                             endObj.transform.SetParent(playArea.transform, false);
                             endNote.OnScreen = true;
                             endNote.NoteObject = endObj;
-
-                            //NoteOnScreen.Add(endObj); // 끝노트
 
                             lnlist[i].Mid.Position = (note.Position + endNote.Position) / 2;
                         }
@@ -917,13 +910,11 @@ namespace BMSPlayer
         {
             Scene scene = SceneManager.GetActiveScene();
             SceneManager.LoadScene("PlayScreen");
-            //Loading.StartLoading("PlayScreen");
         }
 
         public void ExitGame()
         {
             SceneManager.LoadScene("MusicSelect");
-            //Loading.StartLoading("MusicSelect");
         }
     }
 }

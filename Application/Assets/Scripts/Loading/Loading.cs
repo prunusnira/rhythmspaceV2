@@ -69,6 +69,14 @@ public class Loading : MonoBehaviour {
                 break;
         }
 
+        StartCoroutine(LoadAnim(gerne, 0));
+        StartCoroutine(LoadAnim(title, 1));
+        StartCoroutine(LoadAnim(subtitle, 2));
+        StartCoroutine(LoadAnim(artist, 3));
+        StartCoroutine(LoadAnim(subartist, 4));
+        StartCoroutine(LoadAnim(difficulty, 5));
+        StartCoroutine(LoadAnim(level, 6));
+        StartCoroutine(LoadAnim(bpm, 7));
     }
 
     public void Update()
@@ -81,6 +89,13 @@ public class Loading : MonoBehaviour {
         yield return new WaitForSeconds(5f);
 
         SceneManager.LoadScene("PlayScreen");
+    }
+
+    IEnumerator LoadAnim(TextMeshPro mesh, int idx)
+    {
+        yield return new WaitForSeconds(0.05f * idx);
+        Animator anim = mesh.GetComponent<Animator>();
+        anim.Play("SlideRtoL");
     }
 
     /*public void Update()

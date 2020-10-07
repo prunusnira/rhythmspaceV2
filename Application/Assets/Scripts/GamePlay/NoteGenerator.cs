@@ -83,23 +83,22 @@ namespace BMSPlayer
             }
         }
 
-        public void AnalyzeNotes(PlayData data)
+        public void AnalyzeNotes(PlayData data, int[] Layout)
         {
             for (int cbar = 0; cbar <= data.BMS.LastBar; cbar++)
             {
-
                 // 노트 분석 및 배치
                 if (data.BMS.PlayNote.ContainsKey(cbar))
                 {
                     Dictionary<int, string> PlayNotesInLine = PlayNotesByBar(data.BMS.PlayNote[cbar]);
-                    NoteAdderPlay(data, PlayNotesInLine, cbar);
+                    NoteAdderPlay(data, PlayNotesInLine, cbar, Layout);
                 }
 
                 // 지뢰노트 처리
                 if (data.BMS.MineNote.ContainsKey(cbar))
                 {
                     Dictionary<int, string> MineNotesInLine = MineNotesByBar(data.BMS.MineNote[cbar]);
-                    NoteAdderMine(data, MineNotesInLine, cbar);
+                    NoteAdderMine(data, MineNotesInLine, cbar, Layout);
                 }
 
                 // BPM 변경: 보이지 않는 bpm 노트 오브젝트를 만들고 이 노트가 판정선 100%가 되면 bpm 값을 변경
@@ -211,9 +210,14 @@ namespace BMSPlayer
             return NotesPerLine;
         }
 
-        public void NoteAdderPlay(PlayData data, Dictionary<int, string> line, int cbar)
+        public void NoteAdderPlay(
+            PlayData data,
+            Dictionary<int, string> line,
+            int cbar,
+            int[] Layout)
         {
             int longcnt = 0;
+            System.Random rand = new System.Random();
 
             // 라인별 노트 추가
             for (int cline = 0; cline < 18; cline++)
@@ -256,7 +260,6 @@ namespace BMSPlayer
                                     case 5:
                                     case 6:
                                     case 7:
-                                        note.Line = cline;
                                         note.PlayNoteType = NoteType.SINGLE;
                                         data.TotalNotes++;
                                         data.NoteCount++;
@@ -269,9 +272,47 @@ namespace BMSPlayer
                                     case 15:
                                     case 16:
                                     case 17:
-                                        note.Line = cline - 10;
                                         note.PlayNoteType = NoteType.LNTEMP;
                                         longcnt++;
+                                        break;
+                                }
+
+                                // 라인 설정
+                                switch (cline)
+                                {
+                                    case 1:
+                                    case 2:
+                                    case 3:
+                                    case 4:
+                                    case 5:
+                                    case 6:
+                                    case 7:
+                                        // SRAN이 아니라면
+                                        if(Layout != null)
+                                        {
+                                            note.Line = Layout[cline - 1];
+                                        }
+                                        else
+                                        {
+                                            note.Line = rand.Next(1, 8);
+                                        }
+                                        break;
+                                    case 11:
+                                    case 12:
+                                    case 13:
+                                    case 14:
+                                    case 15:
+                                    case 16:
+                                    case 17:
+                                        // SRAN이 아니라면
+                                        if (Layout != null)
+                                        {
+                                            note.Line = Layout[cline - 11];
+                                        }
+                                        else
+                                        {
+                                            note.Line = rand.Next(1, 8);
+                                        }
                                         break;
                                 }
                                 data.NotePlay[note.Line].Add(note);
@@ -350,7 +391,11 @@ namespace BMSPlayer
             }
         }
 
-        public void NoteAdderMine(PlayData data, Dictionary<int, string> line, int cbar)
+        public void NoteAdderMine(
+            PlayData data,
+            Dictionary<int, string> line,
+            int cbar,
+            int[] Layout)
         {
             int longcnt = 0;
 
@@ -515,7 +560,10 @@ namespace BMSPlayer
                     }
                     else
                     {
-                        note.BGASprite = data.BMS.BGAImages[noteStr];
+                        if(data.BMS.BGAImages.ContainsKey(noteStr))
+                        {
+                            note.BGASprite = data.BMS.BGAImages[noteStr];
+                        }
                     }
 
                     data.NoteBGA.Add(note);
