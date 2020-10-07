@@ -74,8 +74,10 @@ namespace DatabaseManager
             dbcommand = dbconn.CreateCommand();
             string list = "create table list (" +
                 "id integer primary key autoincrement," +
-                "name varchar(100) not null," +
+                "title varchar(100) not null," +
+                "subtitle varchar(100) not null," +
                 "artist varchar (100) not null," +
+                "subartist varchar (100) not null," +
                 "gerne varchar (100)," +
                 "bpmstart float not null," +
                 "bpmmin float not null," +
@@ -83,6 +85,7 @@ namespace DatabaseManager
                 "path varchar(1000) not null," +
                 "md5hash varchar(1000) not null," +
                 "level integer not null," +
+                "diff integer default 2," +
                 "fname varchar (100) not null," +
                 "jacket varchar (100))";
             string record = "create table record (" +
@@ -126,16 +129,16 @@ namespace DatabaseManager
                 case TABLETYPE.LIST:
                     // 리스트를 새로 만들땐 리셋을 시키고 해야 됨
                     query = "insert into list " +
-                        "(name, artist, gerne," +
+                        "(title, subtitle, artist, subartist, gerne," +
                         " bpmstart, bpmmin, bpmmax," +
-                        " path, md5hash, level," +
+                        " path, md5hash, level, diff," +
                         " fname, jacket)" +
                         "values" +
                         "('" +
-                            param[0] +"','" + param[1] +"','" + param[2] +"'," +
-                            param[3] + "," + param[4] + "," + param[5] + ",'" +
-                            param[6] + "', '" + param[7] + "','" +param[8] + "','" +
-                            param[9] + "','" + param[10] + "')";
+                            param[0] +"','" + param[1] +"','" + param[2] + "','" + param[3] + "','" + param[4] +"'," +
+                            param[5] + "," + param[6] + "," + param[7] + ",'" +
+                            param[8] + "', '" + param[9] + "','" + param[10] + "','" + param[11] + "','" +
+                            param[12] + "','" + param[13] + "')";
                     break;
                 case TABLETYPE.RECORD:
                     query = "insert into record " +
@@ -203,21 +206,25 @@ namespace DatabaseManager
                 else
                 {
                     int lid = dbreader.GetInt32(0);
-                    string lname = dbreader.GetString(1);
-                    string lartist = dbreader.GetString(2);
-                    string lgerne = dbreader.GetString(3);
-                    float lbpmstart = dbreader.GetFloat(4);
-                    float lbpmmin = dbreader.GetFloat(5);
-                    float lbpmmax = dbreader.GetFloat(6);
-                    string lpath = dbreader.GetString(7);
-                    string lmd5 = dbreader.GetString(8);
-                    int llv = dbreader.GetInt32(9);
-                    string lfname = dbreader.GetString(10);
-                    string ljacket = dbreader.GetString(11);
+                    string ltitle = dbreader.GetString(1);
+                    string lsubtitle = dbreader.GetString(2);
+                    string lartist = dbreader.GetString(3);
+                    string lsubartist = dbreader.GetString(4);
+                    string lgerne = dbreader.GetString(5);
+                    float lbpmstart = dbreader.GetFloat(6);
+                    float lbpmmin = dbreader.GetFloat(7);
+                    float lbpmmax = dbreader.GetFloat(8);
+                    string lpath = dbreader.GetString(9);
+                    string lmd5 = dbreader.GetString(10);
+                    int llv = dbreader.GetInt32(11);
+                    int ldiff = dbreader.GetInt32(12);
+                    string lfname = dbreader.GetString(13);
+                    string ljacket = dbreader.GetString(14);
 
                     MusicListData data = new MusicListData(
-                        lid, lname, lartist, lgerne, lbpmstart, lbpmmin, lbpmmax,
-                        lpath, lmd5, llv, lfname, ljacket);
+                        lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
+                        lbpmstart, lbpmmin, lbpmmax,
+                        lpath, lmd5, llv, ldiff, lfname, ljacket);
 
                     Const.list.Add(data);
                 }

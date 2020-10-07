@@ -3,6 +3,7 @@ using monoflow;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -47,15 +48,16 @@ namespace BMSPlayer
         public Sprite spGood;
         public Sprite spOk;
         public Sprite spMiss;
+        private TimingType currentJudge = TimingType.NONE;
 
         // Judge type BM
         public GameObject judgeTypeBM;
         public TextMesh txtTimingPercentBM;
         public TextMesh txtTimingMsBM;
-        public TextMesh txtJudgeBM;
+        public TextMeshPro txtJudgeBM;
 
-        private long timeLastComboPopup;
-        private long timeLastTimingPopup;
+        private double timeLastComboPopup;
+        private double timeLastTimingPopup;
 
         // Side judge
         public Text txtAvgDiff;
@@ -123,6 +125,7 @@ namespace BMSPlayer
         // BGA
         public MPMP bgaVideo;
         public SpriteRenderer bgaImage;
+        public RectTransform bgaRect;
 
         public GameObject fadeCube;
         private bool isFading = false;
@@ -132,7 +135,7 @@ namespace BMSPlayer
         public Sprite selectBtn;
 
         // Music Info
-        public TextMesh infoTtile;
+        public TextMeshPro infoTtile;
 
         // Display Note
         private NoteGenerator generator;
@@ -188,7 +191,8 @@ namespace BMSPlayer
         private void Update()
         {
             FPSCounter.text = "FPS " + ((int)(1f / Time.unscaledDeltaTime)).ToString();
-            if (DateTime.Now.Ticks / 1000 - timeLastComboPopup > 1000)
+            double timing = (double)DateTime.Now.Ticks / 1000000 - timeLastComboPopup;
+            if (timing > 10)
             {
                 if(Const.JudgeUIType == JudgeUIType.ED)
                 {
@@ -202,6 +206,13 @@ namespace BMSPlayer
                     txtTimingPercentBM.gameObject.SetActive(false);
                     txtTimingMsBM.gameObject.SetActive(false);
                 }
+            }
+
+            //Debug.Log(timing + " " + (timing % 1.5));
+            if (txtJudgeBM.gameObject.activeSelf && timing % 1.5 < 0.1)
+            {
+                // 판정별 색상 변경 처리
+                StartCoroutine(comboChangeBM(currentJudge));
             }
         }
 
@@ -454,6 +465,7 @@ namespace BMSPlayer
         public void UpdateJudge(TimingType judgetype, int combo, string accuracy, int ms)
         {
             string judgeStr = "";
+            currentJudge = judgetype;
             // Judge update
             switch(judgetype)
             {
@@ -590,12 +602,10 @@ namespace BMSPlayer
                 txtTimingPercentBM.gameObject.SetActive(true);
                 txtJudgeBM.gameObject.SetActive(true);
                 txtTimingMsBM.gameObject.SetActive(true);
-
-                // 판정별 색상 변경 처리
             }
 
-            timeLastComboPopup = DateTime.Now.Ticks / 1000;
-            timeLastTimingPopup = DateTime.Now.Ticks / 1000;
+            timeLastComboPopup = (double)DateTime.Now.Ticks / 1000000;
+            timeLastTimingPopup = (double)DateTime.Now.Ticks / 1000000;
         }
 
         public void UpdateSideJudge(
@@ -682,6 +692,38 @@ namespace BMSPlayer
             txtTimingED.transform.localScale = new Vector3(1f, 1f, 1f);
         }
 
+        IEnumerator comboChangeBM(TimingType type)
+        {
+            if(type == TimingType.PERFECT)
+            {
+                txtJudgeBM.colorGradient = new VertexGradient(
+                    new Color(56f / 255, 122f / 255, 208f / 255),
+                    new Color(56f / 255, 122f / 255, 208f / 255),
+                    new Color(158f / 255, 191f / 255, 125f / 255),
+                    new Color(158f / 255, 191f / 255, 125f / 255)
+                    );
+                yield return new WaitForSeconds(0.05f);
+                txtJudgeBM.colorGradient = new VertexGradient(
+                    new Color(232f / 255, 86f / 255, 155f / 255),
+                    new Color(232f / 255, 86f / 255, 155f / 255),
+                    new Color(234f / 255, 164f / 255, 179f / 255),
+                    new Color(234f / 255, 164f / 255, 179f / 255)
+                    );
+                yield return new WaitForSeconds(0.05f);
+                txtJudgeBM.colorGradient = new VertexGradient(
+                    new Color(175f / 255, 232f / 255, 197f / 255)
+                    );
+                yield return new WaitForSeconds(0.05f);
+            }
+            else
+            {
+                txtJudgeBM.gameObject.SetActive(true);
+                yield return new WaitForSeconds(0.1f);
+                txtJudgeBM.gameObject.SetActive(false);
+                yield return new WaitForSeconds(0.05f);
+            }
+        }
+
         public void BGAVideoActivate()
         {
             bgaVideo.gameObject.SetActive(true);
@@ -740,13 +782,15 @@ namespace BMSPlayer
             float width = bgaImage.sprite.bounds.size.x;
             float height = bgaImage.sprite.bounds.size.y;
 
-            float worldScreenHeight = Camera.main.orthographicSize * 2.0f;
-            float worldScreenWidth = worldScreenHeight / Screen.height * Screen.width;
+            float rectWidth = bgaRect.sizeDelta.x;
+            float rectHeight = bgaRect.sizeDelta.y;
 
             bgaImage.gameObject.transform.localScale =
-                new Vector3(640, 360, 1);
-                    //worldScreenWidth / width / 1,
-                    //worldScreenHeight / height / 1);
+                new Vector3(
+                    rectWidth / width,
+                    rectHeight / height
+                );
+                    
         }
 
         public void ShowPauseMenu()
@@ -822,7 +866,7 @@ namespace BMSPlayer
             }
         }
 
-        public void FixAllNotePositionOnScreen(PlayData data, int idx)
+        /*public void FixAllNotePositionOnScreen(PlayData data, int idx)
         {
             foreach(List<PlayNote> pnotes in data.NotePlay)
             {
@@ -839,7 +883,7 @@ namespace BMSPlayer
                     n.OnScrPos = n.Position - data.BPMPositionFix[idx];
                 }
             }
-        }
+        }*/
 
         public void PauseMenuMove()
         {
@@ -872,12 +916,14 @@ namespace BMSPlayer
         public void RestartGame()
         {
             Scene scene = SceneManager.GetActiveScene();
-            Loading.StartLoading("PlayScreen");
+            SceneManager.LoadScene("PlayScreen");
+            //Loading.StartLoading("PlayScreen");
         }
 
         public void ExitGame()
         {
-            Loading.StartLoading("MusicSelect");
+            SceneManager.LoadScene("MusicSelect");
+            //Loading.StartLoading("MusicSelect");
         }
     }
 }

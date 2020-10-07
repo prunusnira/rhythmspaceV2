@@ -120,24 +120,34 @@ namespace BMSPlayer
         }
 
         private void CalculateNotePosition(
-            NoteObject note, double deltaTime, double bps)
+            NoteObject note, PlayData data, double timePassed, double bps)
         {
-            note.OnScrPos = note.OnScrPos - (deltaTime * bps / 10);
+            if (data.BPMNum == 0)
+            {
+                note.OnScrPos =
+                    note.Position - (timePassed * bps / 10);
+            }
+            else
+            {
+                note.OnScrPos =
+                    note.Position - data.BPMPositionFix[data.BPMNum - 1]
+                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10);
+            }
         }
 
         public int currentBar = 0;
         public int currentStop = 0;
 
-        public void MoveMine(List<MineNote>[] noteMine, double deltaTime, double bps)
+        public void MoveMine(PlayData data, double playTime, double bps)
         {
-            foreach (List<MineNote> notes in noteMine)
+            foreach (List<MineNote> notes in data.NoteMine)
             {
                 List<MineNote> removeCandidate = new List<MineNote>();
 
                 foreach (MineNote current in notes)
                 {
                     // 시간에 따라 실제 노트가 표시될 위치 계산
-                    CalculateNotePosition(current, deltaTime, bps);
+                    CalculateNotePosition(current, data, playTime, bps);
 
                     // 노트가 화면에 표시되지 않은 상태라면 노트를 화면에 뿌림
                     if (!current.OnScreen)// && current.OnScrPos * speed * Const.SPEEDMULTIPLIER < 3000)
@@ -158,8 +168,9 @@ namespace BMSPlayer
                     if(current.OnScrPos < 0)
                     {
                         Destroy(current.NoteObject);
-                        removeCandidate.Add(current);
                         current.NoteObject = null;
+                        current.OnScreen = false;
+                        removeCandidate.Add(current);
                     }
                 }
 
@@ -171,11 +182,11 @@ namespace BMSPlayer
             }
         }
 
-        public void MoveNotes(List<PlayNote>[] notePlay, List<LongNote> lnlist,
-            double timePassed, double deltaTime, ref double bps)
+        public void MoveNotes(PlayData data,
+            double timePassed, ref double bps)
         {
             // 기본적으로 롱노트든 뭐든 모든 노트를 내림
-            foreach (List<PlayNote> notes in notePlay)
+            foreach (List<PlayNote> notes in data.NotePlay)
             {
                 List<PlayNote> removeCandidate = new List<PlayNote>();
 
@@ -184,11 +195,11 @@ namespace BMSPlayer
                     // 노트가 화면에 표시되지 않은 상태라면 노트를 화면에 뿌림
                     if (!current.OnScreen)// && current.OnScrPos * speed * Const.SPEEDMULTIPLIER < 3000)
                     {
-                        ui.DisplayPlayNote(current, lnlist);
+                        ui.DisplayPlayNote(current, data.NoteLong);
                     }
 
                     // 시간에 따라 실제 노트가 표시될 위치 계산
-                    CalculateNotePosition(current, deltaTime, bps);
+                    CalculateNotePosition(current, data, timePassed, bps);
 
                     // 실제 오브젝트가 존재할 때 위치를 이동시킴
                     if (current.OnScreen && current.NoteObject != null)
@@ -207,7 +218,7 @@ namespace BMSPlayer
                     {
                         // isSpeedChanged는 모든 롱노트를 변경한 후에
                         // false로 바꾸어야하므로 for문 아래에 둠
-                        LongNote ln = lnlist[current.LNNum];
+                        LongNote ln = data.NoteLong[current.LNNum];
                         double startRealPos = ln.Start.OnScrPos * speed * Const.SPEEDMULTIPLIER;
                         double endRealPos = ln.End.OnScrPos * speed * Const.SPEEDMULTIPLIER;
 
@@ -270,14 +281,14 @@ namespace BMSPlayer
                         }
                         else if (current.PlayNoteType == NoteType.LNSTART &&
                             !current.Used &&
-                            !lnlist[current.LNNum].Processing)
+                            !data.NoteLong[current.LNNum].Processing)
                         {
                             // 시작 위치에서는 롱노트 전체 형태를 유지해야 하므로 없애지 않음
                             miss++;
                             cb++;
                             hpController.hpChangeMiss();
                             UpdateTiming(judgeTiming, true);
-                            lnlist[current.LNNum].Processing = true;
+                            data.NoteLong[current.LNNum].Processing = true;
                         }
                         else if (current.PlayNoteType == NoteType.LNMID &&
                             !current.Used)
@@ -290,19 +301,19 @@ namespace BMSPlayer
                             // 롱노트 관련 데이터 처리
                             int lnNum = current.LNNum;
                             isLnWorking[current.Line] = false;
-                            lnlist[lnNum].Start.Used = true;
-                            lnlist[lnNum].Used = true;
+                            data.NoteLong[lnNum].Start.Used = true;
+                            data.NoteLong[lnNum].Used = true;
                             current.Used = true;
                             processedNotes++;
-                            lnlist[current.LNNum].Processing = false;
+                            data.NoteLong[current.LNNum].Processing = false;
 
                             // 롱노트 구성요소를 모두 삭제처리
                             //Destroy(lnlist[lnNum].StartNote.Noteobj);
                             //Destroy(lnlist[lnNum].MidNote.Noteobj);
                             //Destroy(current.Noteobj);
                             removeCandidate.Add(current);
-                            removeCandidate.Add(lnlist[lnNum].Start);
-                            removeCandidate.Add(lnlist[lnNum].Mid);
+                            removeCandidate.Add(data.NoteLong[lnNum].Start);
+                            removeCandidate.Add(data.NoteLong[lnNum].Mid);
                         }
                     }
                 }
@@ -422,6 +433,7 @@ namespace BMSPlayer
                     double stop = current.StopDuration;
                     Debug.Log("StopDuration:" + current.Bar + " " + (stop / bps * 10));
                     Data.Stop += stop / bps * 10;
+                    Data.IsStopOn = true;
                     current.Used = true;
                     removeCandidate.Add(current);
                 }
@@ -741,7 +753,7 @@ namespace BMSPlayer
 
                 foreach (PlayNote n in removeCandidate)
                 {
-                    //Destroy(n.Noteobj);
+                    Destroy(n.NoteObject);
                     notePlay[i].Remove(n);
                 }
             }

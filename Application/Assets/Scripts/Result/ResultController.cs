@@ -105,7 +105,7 @@ namespace BMSPlayer
                     break;
             }
 
-            if (isClear != ClearType.FAIL)
+            if (isClear == ClearType.FAIL)
             {
                 rank.sprite = rankf;
                 cleared.sprite = failed;

@@ -20,14 +20,16 @@ namespace BMSPlayer {
         private Scroller scroller;
         private LNObjConverter LNConverter;
         private HPController hpController;
+        private BMSAnalyzer analyzer;
         public GameObject startLine; // 노트가 생성되는 위치
 
         // Scene 관리
         private bool gameOverTriggered = false;
-        private double totalLen = 0; // Bar만 따진것이 아닌 가변 마디를 고려한 이전 마디까지의 길이
         private bool isPaused = false;
         private bool isGameOver = false;
         private bool isBGAMovieExist = false;
+        private bool isBMSReady = false;
+        private bool isLoading = false;
 
         // 시간 관리
         private double StartTime = 0;
@@ -38,13 +40,6 @@ namespace BMSPlayer {
 
         // Audio Management
         private ISoundController soundController;
-        /*
-        // Unity Audio
-        private AudioSource[] unityAudio = new AudioSource[Const.CHANNEL];
-
-		// FMOD 관리
-		private FMOD.ChannelGroup channelGroup;
-        private FMOD.Channel[] fmodChannel = new FMOD.Channel[Const.CHANNEL];*/
 
         private bool firstrun = false;
         public bool isPlayAuto;
@@ -63,74 +58,26 @@ namespace BMSPlayer {
             Data = new PlayData();
 
             // BMS 파일 분석
-            BMSAnalyzer analyzer = new BMSAnalyzer();
-            analyzer.FullAnalyzer(Data.BMS);
+            analyzer = new BMSAnalyzer();
+
+            // 분석된 데이터를 기반으로 스크롤러 준비
+            scroller = GetComponent<Scroller>();
+
+            // 분석된 데이터를 바탕으로 노트를 생성
+            generator = GetComponent<NoteGenerator>();
+
+            // 사운드 컨트롤러 초기화
+            soundController = GetComponent<SoundControllerFMOD>();
 
             // LNOBJ 타입이면 추가로 이식하는 작업을 수행함
-            if(Data.BMS.LNType == LNType.Obj)
+            if (Data.BMS.LNType == LNType.Obj)
             {
                 LNConverter = new LNObjConverter();
                 LNConverter.FixLongNoteLNOBJ(Data.BMS);
             }
 
-            // 파일 분석 이후 기본 정보 분석
-            Data.CurrentBPM = Data.BMS.BPMStart;
-            Data.BPS = Data.CurrentBPM / 240;
-            Data.SPB = (double)(240 * 1000) / Data.CurrentBPM;
-            // BPM = 분당 비트수, 1분에 1/4박자(bar 1개)의 개수
-            // beat per second는 bpm/60, 여기에 4 bar = 1박이므로 4로 추가로 나눈다
-            // 모든 시간은 ms 단위로 한다
-
-            // 곡 정보 출력
-            UI.SetMusicInfo(Data.BMS.Title);
-
-            // 기어 BPM 표시
-            UI.SetGearBPM(
-                Data.BMS.BPMStart,
-                Data.BMS.BPMMin,
-                Data.BMS.BPMMax
-            );
-
-            if(analyzer.IsVideoExist())
-            {
-                isBGAMovieExist = true;
-                UI.BGAVideoActivate();
-                UI.BGAVideoSetting(Data.BMS.BGAVideoFile);
-            }
-
-            // 분석된 데이터를 바탕으로 노트를 생성
-            generator = GetComponent<NoteGenerator>();
-
-            // 사운드 컨트롤러 정의
-            /*if(Const.GetAudio() == 0)
-            {
-                soundController = GetComponent<SoundControllerUnity>();
-            }
-            else
-            {*/
-                soundController = GetComponent<SoundControllerFMOD>();
-            //}
-
-            // 사운드 정의
             soundController.Initialize();
             soundController.InitSoundChannels();
-            soundController.PreloadSound(Data.BMS);
-
-			generator.AnalyzeNotes(Data);
-            generator.PositionToTiming(Data);
-            generator.SortAllNotes(Data);
-
-            Debug.Log("File Loaded: " + Data.BMS.FilePath);
-            Debug.Log("Music: " + Data.BMS.Title);
-            Debug.Log("Artist: " + Data.BMS.Artist);
-            Debug.Log("BPM: " + Data.BMS.BPMStart);
-            Debug.Log("Total: " + Data.TotalNotes);
-
-            UI.UpdateSpeed();
-
-            // 분석된 데이터를 기반으로 스크롤러 준비
-            scroller = GetComponent<Scroller>();
-            scroller.Init(Data.TotalNotes);
 
             if (Const.Auto == AutoPlayType.ON)
                 isPlayAuto = true;
@@ -148,6 +95,18 @@ namespace BMSPlayer {
 
         private void Update ()
         {
+            // 데이터 로딩
+            if(!isLoading)
+            {
+                StartCoroutine("LoadBMS");
+                return;
+            }
+
+            if(!isBMSReady)
+            {
+                return;
+            }
+
             // 플레이 키 (최 우선 체크)
             scroller.ProcessBeamOnTouch();
 
@@ -165,7 +124,12 @@ namespace BMSPlayer {
                 // 변속곡 때문에 총 플레이 시간과 bps만으로 계산하는 것은 불가능함
                 if(Data.Stop > 0)
                 {
-                    Debug.Log("TIME: " + PlayTimePassed + " / Stop: " + Data.Stop + " (-" + (DeltaTime)*10+")");
+                    if(Data.IsStopOn)
+                    {
+                        Data.TotalStop += Data.Stop;
+                        Data.IsStopOn = false;
+                    }
+                    Debug.Log("TIME: " + PlayTimePassed + " / Stop: " + Data.Stop + " (-" + DeltaTime + ")");
                     Data.Stop -= DeltaTime;
                     if (Data.Stop <= 0)
                     {
@@ -174,10 +138,14 @@ namespace BMSPlayer {
                 }
 
                 // Stop 시간이 0이 되었을 때에는 이동 가능?
+                // Stop이 아니면 보이는 오브젝트를 모두 이동시킴
                 if(Data.Stop == 0)
                 {
-                    scroller.MoveNotes(Data.NotePlay, Data.NoteLong, PlayTimePassed, DeltaTime, ref bps);
-                    scroller.MoveMine(Data.NoteMine, DeltaTime, bps);
+                    //scroller.MoveNotes(Data.NotePlay, Data.NoteLong, PlayTimePassed, DeltaTime, ref bps);
+                    //scroller.MoveMine(Data.NoteMine, DeltaTime, bps);
+
+                    scroller.MoveNotes(Data, PlayTimePassed - Data.TotalStop, ref bps);
+                    scroller.MoveMine(Data, PlayTimePassed - Data.TotalStop, bps);
                 }
 
                 scroller.SpeedChangeAndBeam(bpm);
@@ -204,7 +172,7 @@ namespace BMSPlayer {
 
                 if(Data.IsBPMChanged)
                 {
-                    UI.FixAllNotePositionOnScreen(Data, Data.BPMNum - 1);
+                    //UI.FixAllNotePositionOnScreen(Data, Data.BPMNum - 1);
                     Data.IsBPMChanged = false;
                 }
 
@@ -251,7 +219,8 @@ namespace BMSPlayer {
                     scroller.GetResultData(Data.TotalNotes);
 
                     // 결과창으로 이동
-                    Loading.StartLoading("Result");
+                    SceneManager.LoadScene("Result");
+                    //Loading.StartLoading("Result");
                 }
 
                 PrevTickTime = PlayTimePassed;
@@ -290,6 +259,64 @@ namespace BMSPlayer {
                 }
             }
 		}
+
+        IEnumerator LoadBMS()
+        {
+            isLoading = true;
+            yield return null;
+
+            analyzer.FullAnalyzer(Data.BMS);
+            yield return null;
+
+            // 파일 분석 이후 기본 정보 분석
+            Data.CurrentBPM = Data.BMS.BPMStart;
+            Data.BPS = Data.CurrentBPM / 240;
+            Data.SPB = (double)(240 * 1000) / Data.CurrentBPM;
+            // BPM = 분당 비트수, 1분에 1/4박자(bar 1개)의 개수
+            // beat per second는 bpm/60, 여기에 4 bar = 1박이므로 4로 추가로 나눈다
+            // 모든 시간은 ms 단위로 한다
+            yield return null;
+
+            // 곡 정보 출력
+            UI.SetMusicInfo(Data.BMS.Title);
+            yield return null;
+
+            // 기어 BPM 표시
+            UI.SetGearBPM(
+                Data.BMS.BPMStart,
+                Data.BMS.BPMMin,
+                Data.BMS.BPMMax
+            );
+            yield return null;
+
+            if (analyzer.IsVideoExist())
+            {
+                isBGAMovieExist = true;
+                UI.BGAVideoActivate();
+                UI.BGAVideoSetting(Data.BMS.BGAVideoFile);
+            }
+            yield return null;
+
+            // 사운드 정의
+            soundController.PreloadSound(Data.BMS);
+            yield return null;
+
+            generator.AnalyzeNotes(Data);
+            yield return null;
+            generator.PositionToTiming(Data);
+            yield return null;
+            generator.SortAllNotes(Data);
+            yield return null;
+
+            UI.UpdateSpeed();
+            yield return null;
+
+            scroller.Init(Data.TotalNotes);
+            yield return null;
+
+            isBMSReady = true;
+            yield return null;
+        }
 
         IEnumerator GameOver()
         {

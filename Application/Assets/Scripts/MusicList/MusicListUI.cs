@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System;
+using TMPro;
 
 namespace BMSPlayer
 {
@@ -33,10 +34,12 @@ namespace BMSPlayer
 
         // Selected info
         public RawImage infoJacket;
-        public Text infoGerne;
-        public Text infoName;
-        public Text infoArtist;
-        public Text infoBpm;
+        public TextMeshProUGUI infoGerne;
+        public TextMeshProUGUI infoTitle;
+        public TextMeshProUGUI infoSubTitle;
+        public TextMeshProUGUI infoArtist;
+        public TextMeshProUGUI infoSubArtist;
+        public TextMeshProUGUI infoBpm;
         public SelectedMusicInfo info;
         public GameObject btnStart;
 
@@ -182,11 +185,13 @@ namespace BMSPlayer
                 infoJacket.texture = empty.texture;
             }
             infoGerne.text = Const.selectedMusic.Gerne;
-            infoName.text = Const.selectedMusic.Name;
+            infoTitle.text = Const.selectedMusic.Title;
+            infoSubTitle.text = Const.selectedMusic.SubTitle;
             infoArtist.text = Const.selectedMusic.Artist;
+            infoSubArtist.text = Const.selectedMusic.SubArtist;
 
             // BPM 표시 설정
-            if(Const.selectedMusic.BPMmin == Const.selectedMusic.BPMmax)
+            if (Const.selectedMusic.BPMmin == Const.selectedMusic.BPMmax)
             {
                 infoBpm.text = "BPM " + Const.selectedMusic.BPMstart;
             }
@@ -215,11 +220,34 @@ namespace BMSPlayer
         {
             GameObject music = Instantiate(patternPrefab) as GameObject;
             Transform c = music.transform;
-            Text levelnum = c.GetChild(0).GetComponent<Text>();
-            Text name = c.GetChild(1).GetComponent<Text>();
+            TextMeshProUGUI level = c.GetChild(0).GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI title = c.GetChild(1).GetComponent<TextMeshProUGUI>();
 
-            levelnum.text = d.Level.ToString();
-            name.text = d.Name;
+            level.text = d.Level.ToString();
+            title.text = d.Title;
+
+            // Difficulty에 따른 색상 변경
+            switch(d.Difficulty)
+            {
+                case 1:
+                    level.color = new Color(119f / 255, 255f / 255, 145f / 255);
+                    break;
+                case 2:
+                    level.color = new Color(92f / 255, 120f / 255, 229f / 255);
+                    break;
+                case 3:
+                    level.color = new Color(255f / 255, 242f / 255, 146f / 255);
+                    break;
+                case 4:
+                    level.color = new Color(212f / 255, 95f / 255, 95f / 255);
+                    break;
+                case 5:
+                    level.color = new Color(172f / 255, 46f / 255, 178f / 255);
+                    break;
+                default:
+                    level.color = new Color(125f / 255, 125f / 255, 125f / 255);
+                    break;
+            }
 
             return music;
         }
@@ -229,12 +257,13 @@ namespace BMSPlayer
             if (Const.selectedMusic != null)
             {
                 // 선택한 패턴의 정보를 표시하고 플레이 시작이 가능
-                Debug.Log(Const.selectedMusic.Name + " " + Const.selectedMusic.Artist);
+                Debug.Log(Const.selectedMusic.Title + " " + Const.selectedMusic.Artist);
 
                 Const.PlayingBMSPath = Const.selectedMusic.Path + Const.selectedMusic.FileName;
 
                 Debug.Log("READY TO RUN");
-                Loading.StartLoading("PlayScreen");
+                SceneManager.LoadScene("Loading");
+                //Loading.StartLoading("PlayScreen");
             }
         }
 

@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using BMSPlayer;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,15 +13,80 @@ public class Loading : MonoBehaviour {
     public Image progressBar;
     private static string next;
 
-	// Use this for initialization
-	void Start () {
+    public TextMeshPro gerne;
+    public TextMeshPro title;
+    public TextMeshPro subtitle;
+    public TextMeshPro artist;
+    public TextMeshPro subartist;
+    public TextMeshPro difficulty;
+    public TextMeshPro level;
+    public TextMeshPro bpm;
+
+    void Start () {
+        gerne.text = Const.selectedMusic.Gerne;
+        title.text = Const.selectedMusic.Title;
+        subtitle.text = Const.selectedMusic.SubTitle;
+        artist.text = Const.selectedMusic.Artist;
+        subartist.text = Const.selectedMusic.SubArtist;
+        level.text = Const.selectedMusic.Level.ToString();
+
+        if (Const.selectedMusic.BPMmin == Const.selectedMusic.BPMmax)
+        {
+            bpm.text = "BPM " + Const.selectedMusic.BPMstart;
+        }
+        else
+        {
+            bpm.text = "BPM " + Const.selectedMusic.BPMmin +
+                "~" + Const.selectedMusic.BPMmax +
+                " (" + Const.selectedMusic.BPMstart + " start)";
+        }
+
+        switch (Const.selectedMusic.Difficulty)
+        {
+            case 1:
+                level.color = new Color(119f / 255, 255f / 255, 145f / 255);
+                difficulty.text = "BEGINNER";
+                break;
+            case 2:
+                level.color = new Color(92f / 255, 120f / 255, 229f / 255);
+                difficulty.text = "NORMAL";
+                break;
+            case 3:
+                level.color = new Color(255f / 255, 242f / 255, 146f / 255);
+                difficulty.text = "HYPER";
+                break;
+            case 4:
+                level.color = new Color(212f / 255, 95f / 255, 95f / 255);
+                difficulty.text = "ANOTHER";
+                break;
+            case 5:
+                level.color = new Color(172f / 255, 46f / 255, 178f / 255);
+                difficulty.text = "INSANE";
+                break;
+            default:
+                level.color = new Color(125f / 255, 125f / 255, 125f / 255);
+                difficulty.text = "UNKNOWN";
+                break;
+        }
+
+    }
+
+    public void Update()
+    {
+        StartCoroutine("LoadPlayScr");
+    }
+
+    IEnumerator LoadPlayScr()
+    {
+        yield return new WaitForSeconds(5f);
+
+        SceneManager.LoadScene("PlayScreen");
+    }
+
+    /*public void Update()
+    {
         StartCoroutine(LoadScene());
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    }
 
     public static void StartLoading(string scene)
     {
@@ -61,5 +128,5 @@ public class Loading : MonoBehaviour {
                     timer = 0f;
             }
         }
-    }
+    }*/
 }

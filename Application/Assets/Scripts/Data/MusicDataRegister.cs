@@ -58,9 +58,9 @@ namespace BMSPlayer
 
                     string[] param =
                     {
-                            d.Name, d.Artist, d.Gerne,
+                            d.Title, d.SubTitle, d.Artist, d.SubArtist, d.Gerne,
                             d.BPMstart.ToString(), d.BPMmin.ToString(), d.BPMmax.ToString(),
-                            d.Path, hash, d.Level.ToString(), d.FileName, d.Jacket
+                            d.Path, hash, d.Level.ToString(), d.Difficulty.ToString(), d.FileName, d.Jacket
                         };
                     executor.insertInto(SQLiteExecutor.TABLETYPE.LIST, param);
                     fstream.Close();

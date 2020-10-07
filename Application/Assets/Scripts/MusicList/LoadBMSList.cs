@@ -46,10 +46,11 @@ namespace BMSCore
             if (bms.Player != 1) return null;
 
             MusicListData data = new MusicListData(
-                    count, bms.Title, bms.Artist, bms.Gerne,
+                    count, bms.Title, bms.SubTitle,
+                    bms.Artist, bms.SubArtist, bms.Gerne,
                     bms.BPMStart, bms.BPMMin, bms.BPMMax,
-                    bms.FolderPath, bms.Level, bms.FileName,
-                    bms.StageFile
+                    bms.FolderPath, bms.Level, bms.Difficulty,
+                    bms.FileName, bms.StageFile
                 );
 
             return data;

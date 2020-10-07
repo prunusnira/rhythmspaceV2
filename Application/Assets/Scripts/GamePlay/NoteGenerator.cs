@@ -85,18 +85,6 @@ namespace BMSPlayer
 
         public void AnalyzeNotes(PlayData data)
         {
-            // BPM 계산을 위해 최초 위치 (Position 0)에 BPM 노트를 추가
-            /*BPMNote initBPMNote = new BPMNote
-            {
-                Position = 0,
-                Bar = 0,
-                ObjType = ObjectType.BPM,
-                BPMValue = data.BMS.BPMStart,
-                Timing = 0
-            };
-            data.NoteBPM.Add(initBPMNote);
-            data.BPMPositionFix.Add(0);*/
-
             for (int cbar = 0; cbar <= data.BMS.LastBar; cbar++)
             {
 
@@ -146,12 +134,10 @@ namespace BMSPlayer
                 if (data.BMS.BarLength.ContainsKey(cbar))
                 {
                     data.TotalLength += data.BMS.BarLength[cbar];
-                    //totalTime += spb * bms.BarLength[cbar];
                 }
                 else
                 {
                     data.TotalLength += 1;
-                    //totalTime += spb;
                 }
             }
             LongnoteSetup(data.NotePlay, data.NoteLong);
@@ -592,76 +578,6 @@ namespace BMSPlayer
 
         public void PositionToTiming(PlayData data)
         {
-            /*List<TimingObject> TimingList = new List<TimingObject>();
-
-            foreach(BPMNote n in data.NoteBPM)
-            {
-                TimingList.Add(n);
-            }
-
-            foreach (StopNote n in data.NoteStop)
-            {
-                TimingList.Add(n);
-            }
-
-            TimingList.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
-
-            int BPMIdx = 0;
-            foreach (TimingObject n in TimingList)
-            {
-                if(n is BPMNote)
-                {
-                    BPMIdx = TimingList.IndexOf(n);
-
-                    n.Timing =
-                        data.NoteBPM[i - 1].Timing +
-                        (data.NoteBPM[i].Position - data.NoteBPM[i - 1].Position) / (data.NoteBPM[i - 1].BPMValue / 240)
-                        * 10;
-                }
-                else if(n is StopNote)
-                {
-
-                }
-            }
-
-            for (int i = 1; i < data.NoteBPM.Count; i++)
-            {
-                data.NoteBPM[i].Timing =
-                    data.NoteBPM[i - 1].Timing +
-                    (data.NoteBPM[i].Position - data.NoteBPM[i - 1].Position) / (data.NoteBPM[i - 1].BPMValue / 240)
-                    * 10;
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                foreach (PlayNote n in data.NotePlay[i])
-                {
-                    CalculateTiming(data, n);
-                }
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                foreach (MineNote n in data.NoteMine[i])
-                {
-                    CalculateTiming(data, n);
-                }
-            }
-
-            foreach (BGANote n in data.NoteBGA)
-            {
-                CalculateTiming(data, n);
-            }
-
-            foreach (BGMNote n in data.NoteBGM)
-            {
-                CalculateTiming(data, n);
-            }
-
-            foreach (StopNote n in data.NoteStop)
-            {
-                CalculateTiming(data, n);
-            }*/
             Dictionary<int, List<BPMNote>> BPMChangeCheck =
                 new Dictionary<int, List<BPMNote>>();
 
@@ -829,6 +745,7 @@ namespace BMSPlayer
                             if (isStop && n.Position == stopPos)
                             {
                                 CalculateTiming(n, bps, stopTime, PosStart);
+                                data.BPMTimingFix.Add(n.Timing);
                             }
                             else if (n.Bar == bar &&
                                     n.Position >= PosStart &&
@@ -836,10 +753,8 @@ namespace BMSPlayer
                                 )
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
+                                data.BPMTimingFix.Add(n.Timing);
                             }
-
-                            if (!data.BPMPositionFix.Contains(n.Position))
-                                data.BPMPositionFix.Add(n.Position);
                         }
 
                         foreach (BGANote n in data.NoteBGA)
@@ -980,30 +895,6 @@ namespace BMSPlayer
         {
             double time = (n.Position - prevPos) / bps * 10;
             n.Timing = prevTime + time;
-        }
-
-        private void CalculateTiming(PlayData data, NoteObject n)
-        {
-            double time = 0;
-            int idx = 0;
-            bool broken = false;
-            for (idx = 1; idx < data.NoteBPM.Count - 1; idx++)
-            {
-                if (n.Position > data.NoteBPM[idx].Position)
-                {
-                    time += (data.NoteBPM[idx].Position - data.NoteBPM[idx - 1].Position) / (data.NoteBPM[idx - 1].BPMValue / 240) * 10;
-                }
-                else
-                {
-                    broken = true;
-                    break;
-                }
-            }
-            if(broken)
-                time += (n.Position - data.NoteBPM[idx - 1].Position) / (data.NoteBPM[idx - 1].BPMValue / 240) * 10;
-            else
-                time += (n.Position - data.NoteBPM[idx].Position) / (data.NoteBPM[idx].BPMValue / 240) * 10;
-            n.Timing = time;
         }
 
         public void SortAllNotes(PlayData data)

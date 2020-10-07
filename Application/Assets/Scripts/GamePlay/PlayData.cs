@@ -14,7 +14,9 @@ namespace BMSPlayer
         public double BPS { get; set; }
         public double SPB { get; set; }
         public double Stop { get; set; }
+        public double TotalStop { get; set; }
         public bool IsBPMChanged { get; set; }
+        public bool IsStopOn { get; set; }
 
         // 전체 게임 길이 (4박 기준, 1 = 4/4)
         // BMS 데이터의 02 채널과 연관
@@ -35,6 +37,7 @@ namespace BMSPlayer
         public List<BGANote> NoteBGA { get; set; }
         public List<BGMNote> NoteBGM { get; set; }
         public List<double> BPMPositionFix { get; set; }
+        public List<double> BPMTimingFix { get; set; }
         public int BPMNum { get; set; }
 
         public PlayData()
@@ -67,33 +70,12 @@ namespace BMSPlayer
             NoteBPM = new List<BPMNote>();
             NoteStop = new List<StopNote>();
             BPMPositionFix = new List<double>();
+            BPMTimingFix = new List<double>();
 
             Stop = 0;
+            TotalStop = 0;
             IsBPMChanged = false;
+            IsStopOn = false;
         }
-
-        /*public PlayData()
-        {
-            // Preference 값 가져오기
-            PlayLine = Const.Playline;
-
-            string bmsPath = Const.PlayingBMSPath;
-            if (!bmsPath.Equals(""))
-                BMS = new BMS(bmsPath);
-
-            // 데이터 초기화
-            NotePlay = new List<Note>[8];
-            LongNotes = new List<Longnote>();
-
-            for(int i = 0; i < 8; i++)
-            {
-                NotePlay[i] = new List<Note>();
-            }
-
-            NoteBGM = new List<Note>();
-            NoteBGA = new List<Note>();
-            NoteBPM = new List<Note>();
-            NoteStop = new List<Note>();
-        }*/
     }
 }
