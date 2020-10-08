@@ -22,6 +22,12 @@ public class Loading : MonoBehaviour {
     public TextMeshPro level;
     public TextMeshPro bpm;
 
+    public Image Fader;
+    private bool FadeDone = false;
+    private bool FadeStart = false;
+    private bool FadeReady = false;
+    private bool FadeReadyStart = false;
+
     void Start () {
         gerne.text = Const.selectedMusic.Gerne;
         title.text = Const.selectedMusic.Title;
@@ -81,14 +87,28 @@ public class Loading : MonoBehaviour {
 
     public void Update()
     {
-        StartCoroutine("LoadPlayScr");
+        if(!FadeReadyStart && !FadeReady)
+        {
+            StartCoroutine("WaitFor5Sec");
+        }
+        else if(FadeReady)
+        {
+            if (!FadeDone && !FadeStart)
+            {
+                StartCoroutine("FadeOut");
+            }
+            else if (FadeDone)
+            {
+                SceneManager.LoadScene("PlayScreen");
+            }
+        }
     }
 
-    IEnumerator LoadPlayScr()
+    IEnumerator WaitFor5Sec()
     {
+        FadeReadyStart = true;
         yield return new WaitForSeconds(5f);
-
-        SceneManager.LoadScene("PlayScreen");
+        FadeReady = true;
     }
 
     IEnumerator LoadAnim(TextMeshPro mesh, int idx)
@@ -98,50 +118,18 @@ public class Loading : MonoBehaviour {
         anim.Play("SlideRtoL");
     }
 
-    /*public void Update()
+    IEnumerator FadeOut()
     {
-        StartCoroutine(LoadScene());
-    }
+        FadeStart = true;
+        Fader.gameObject.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
 
-    public static void StartLoading(string scene)
-    {
-        next = scene;
-        SceneManager.LoadScene("Loading");
-    }
-
-    IEnumerator LoadScene()
-    {
-        yield return null;
-
-        AsyncOperation nextScene = SceneManager.LoadSceneAsync(next);
-        nextScene.allowSceneActivation = false;
-
-        float timer = 0f;
-        while(!nextScene.isDone)
+        for (float time = 0; time <= 1f; time += 1f/6)
         {
-            yield return null;
-
-            timer += Time.deltaTime;
-
-            if(nextScene.progress >= 0.9f)
-            {
-                progressBar.fillAmount = Mathf.Lerp(progressBar.fillAmount, 1f, timer);
-                
-                if (progressBar.fillAmount == 1f)
-                {
-                    nextScene.allowSceneActivation = true;
-                }
-            }
-            else
-            {
-                progressBar.fillAmount = Mathf.Lerp(progressBar.fillAmount,
-                    nextScene.progress, timer);
-
-                Debug.Log("Loading :" + progressBar.fillAmount);
-
-                if (progressBar.fillAmount >= nextScene.progress)
-                    timer = 0f;
-            }
+            Fader.color = new Color(0f, 0f, 0f, time);
+            yield return new WaitForSeconds(0.03f);
         }
-    }*/
+
+        FadeDone = true;
+    }
 }

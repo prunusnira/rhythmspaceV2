@@ -125,7 +125,6 @@
     <Compile Include="Assets\Scripts\Result\ResultController.cs" />
     <Compile Include="Assets\Scripts\SQLite\Record.cs" />
     <Compile Include="Assets\Scripts\SQLite\SQLiteExecutor.cs" />
-    <Compile Include="Assets\Scripts\UI\Fader.cs" />
     <Compile Include="Assets\Scripts\UI\GUILayoutx.cs" />
     <Compile Include="Assets\Scripts\UI\MultiScaleCamera.cs" />
     <Compile Include="Assets\Scripts\UI\ScrollRectEx\ScrollRectInfinite.cs" />

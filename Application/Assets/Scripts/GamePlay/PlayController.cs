@@ -207,7 +207,7 @@ namespace BMSPlayer {
                     // 게임오버로 가기 전에 페이드
                     StartCoroutine("GameOver");
                 }
-                else if (isGameOver && gameOverTriggered)
+                else if (isGameOver && gameOverTriggered && UI.GetFadeDone())
                 {
                     Debug.Log("GAMEOVER");
                     // 재생중인 모든 음악 종료
@@ -218,7 +218,6 @@ namespace BMSPlayer {
 
                     // 결과창으로 이동
                     SceneManager.LoadScene("Result");
-                    //Loading.StartLoading("Result");
                 }
 
                 PrevTickTime = PlayTimePassed;
@@ -326,6 +325,7 @@ namespace BMSPlayer {
             yield return null;
 
             isBMSReady = true;
+            UI.DeactiveLoading();
             yield return null;
         }
 

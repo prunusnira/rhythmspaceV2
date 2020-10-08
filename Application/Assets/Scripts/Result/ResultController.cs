@@ -45,6 +45,10 @@ namespace BMSPlayer
         public Sprite failed;
         private ClearType isClear;
 
+        // BG Sound
+        public AudioSource bgLoop;
+        public AudioClip[] loop;
+
         void Awake()
         {
             // 곡 정보
@@ -127,6 +131,17 @@ namespace BMSPlayer
                     fcpfmark.GetComponent<Image>().sprite = fcmark;
                 }
             }
+        }
+
+        private void Start()
+        {
+            // MusicLoop on
+            System.Random rand = new System.Random();
+            AudioClip loopMusic = loop[rand.Next(0, loop.Length)];
+            bgLoop.clip = loopMusic;
+            bgLoop.loop = true;
+            bgLoop.playOnAwake = true;
+            bgLoop.Play();
         }
 
         void Update()

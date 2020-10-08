@@ -11,7 +11,7 @@ Properties {
 }
  
 SubShader {
-	Tags { "Queue"="Overlay+1" }
+	Tags { "Queue"="Transparent" }
 	ZTest Always
 	Blend SrcAlpha OneMinusSrcAlpha
 	Pass {

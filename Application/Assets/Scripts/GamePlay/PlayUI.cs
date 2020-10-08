@@ -80,6 +80,7 @@ namespace BMSPlayer
         public TextMesh gearBPMmin;
         public TextMesh gearBPMmax;
         public TextMesh txtAutoPlay;
+        public TextMesh txtLoading;
         public GameObject[] gearBtnPress;
 
         // Beam
@@ -129,8 +130,11 @@ namespace BMSPlayer
         public GameObject bgaVideoLayer;
         public GameObject bgaErrorLayer;
 
-        public GameObject fadeCube;
-        private bool isFading = false;
+        // Fader
+        public Image Fader;
+        private bool FadeDone = false;
+        private bool FadeStart = false;
+        private bool FadeReady = false;
 
         private int pauseSel = 0;
         public Sprite normalBtn;
@@ -215,30 +219,36 @@ namespace BMSPlayer
                 // 판정별 색상 변경 처리
                 StartCoroutine(comboChangeBM(currentJudge));
             }
-        }
 
-        private void OnGUI()
-        {
-            if (isFading)
+            if(FadeReady && !FadeStart)
             {
                 StartCoroutine("FadeOut");
             }
         }
 
+        public void SetFade()
+        {
+            FadeReady = true;
+        }
+
+        public bool GetFadeDone()
+        {
+            return FadeDone;
+        }
+
         IEnumerator FadeOut()
         {
-            if (fadeCube.GetComponent<Renderer>().material.color.a < 1.0f)
+            FadeStart = true;
+            Fader.gameObject.SetActive(true);
+            yield return new WaitForSeconds(0.5f);
+
+            for (float time = 0; time <= 1f; time += 1f / 6)
             {
-                Color c = fadeCube.GetComponent<Renderer>().material.color;
-                c.a += 0.05f;
-                fadeCube.GetComponent<Renderer>().material.color = c;
-                yield return new WaitForSeconds(0.2f);
+                Fader.color = new Color(0f, 0f, 0f, time);
+                yield return new WaitForSeconds(0.03f);
             }
-            else
-            {
-                isFading = false;
-                yield return null;
-            }
+
+            FadeDone = true;
         }
 
         public void SetGearBPM(double bpm, double min, double max)
@@ -342,17 +352,6 @@ namespace BMSPlayer
             float chp = (float)hp / hpController.HPMax;
             hpBar.material.SetFloat("_Progress", chp);
             gearHP.text = (chp * 100).ToString("0.00") + "%";
-        }
-
-        public void SetFade()
-        {
-            isFading = true;
-            fadeCube.SetActive(true);
-        }
-
-        public float GetFaderAlpha()
-        {
-            return fadeCube.GetComponent<Renderer>().material.color.a;
         }
 
         public void UpdateExScore(int score)
@@ -915,6 +914,11 @@ namespace BMSPlayer
         public void ExitGame()
         {
             SceneManager.LoadScene("MusicSelect");
+        }
+
+        public void DeactiveLoading()
+        {
+            txtLoading.gameObject.SetActive(false);
         }
     }
 }

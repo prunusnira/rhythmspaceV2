@@ -51,19 +51,9 @@ namespace BMSPlayer
         public Text debugText;
 
         public AudioSource sfxChange;
+        public AudioSource bgLoop;
         public AudioClip sfxChangeClip;
-
-        // Fader
-        /*public GameObject fadeCube;
-        private bool isFading = false;
-
-        private void OnGUI()
-        {
-            if (isFading)
-            {
-                StartCoroutine("FadeOut");
-            }
-        }*/
+        public AudioClip[] loop;
 
         void Awake()
         {
@@ -80,8 +70,6 @@ namespace BMSPlayer
             }
 
             mlm.close();
-
-            //isFading = true;
         }
 
         public void Start()
@@ -91,6 +79,14 @@ namespace BMSPlayer
             
             musicRect.Init(bmslist, ObjectSetup);
             showInfo(musicRect.GetCurrent());
+
+            // MusicLoop on
+            System.Random rand = new System.Random();
+            AudioClip loopMusic = loop[rand.Next(0, loop.Length)];
+            bgLoop.clip = loopMusic;
+            bgLoop.loop = true;
+            bgLoop.playOnAwake = true;
+            bgLoop.Play();
         }
 
         public void Update()
