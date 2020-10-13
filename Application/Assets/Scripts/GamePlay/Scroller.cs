@@ -126,13 +126,13 @@ namespace BMSPlayer
             }
             else
             {
-                /*note.OnScrPos =
-                    note.Position - data.BPMPositionFix[data.BPMNum - 1]
-                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10);*/
                 note.OnScrPos =
+                    note.Position - data.BPMPositionFix[data.BPMNum - 1]
+                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10);
+                /*note.OnScrPos =
                     note.Position
                     - data.BPMPositionFix[data.BPMNum - 1]
-                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1] - data.PartialStop) * bps / 10);
+                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1] - data.PartialStop) * bps / 10);*/
             }
         }
 
@@ -166,7 +166,7 @@ namespace BMSPlayer
                             (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER));
                     }
 
-                    if(current.OnScrPos < 0)
+                    if(current.Timing < playTime)
                     {
                         Destroy(current.NoteObject);
                         current.NoteObject = null;
@@ -432,6 +432,7 @@ namespace BMSPlayer
                     Debug.Log("StopDuration:" + current.Bar + " " + (stop / bps * 10));
                     Data.Stop += stop / bps * 10;
                     Data.IsStopOn = true;
+                    Data.StopStart = current.Timing;
                     current.Used = true;
                     removeCandidate.Add(current);
                 }

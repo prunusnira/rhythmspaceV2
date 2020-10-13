@@ -14,6 +14,7 @@ namespace BMSPlayer
         public double BPS { get; set; }
         public double SPB { get; set; }
         public double Stop { get; set; }
+        public double StopStart { get; set; }
         public double PartialStop { get; set; }
         public bool IsBPMChanged { get; set; }
         public bool IsStopOn { get; set; }
@@ -74,6 +75,7 @@ namespace BMSPlayer
             BPMTimingFix = new List<double>();
 
             Stop = 0;
+            StopStart = 0;
             PartialStop = 0;
             IsBPMChanged = false;
             IsStopOn = false;

@@ -94,8 +94,6 @@
     <Compile Include="Assets\Scripts\GamePlay\HPController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\ISoundController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Keys.cs" />
-    <Compile Include="Assets\Scripts\GamePlay\Longnote.cs" />
-    <Compile Include="Assets\Scripts\GamePlay\Note.cs" />
     <Compile Include="Assets\Scripts\GamePlay\NoteGenerator.cs" />
     <Compile Include="Assets\Scripts\GamePlay\PlayController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\PlayData.cs" />

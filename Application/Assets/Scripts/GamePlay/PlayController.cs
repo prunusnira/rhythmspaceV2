@@ -119,14 +119,6 @@ namespace BMSPlayer {
 
                 // 1틱 동안 노트가 움직이는 거리 (시간 * 속도)
 
-                // Stop과 상관없이 모든 오브젝트를 이동시킴
-                // 단, Stop으로 소모된 시간만큼 노트 위치에 대한 보정이 필요함
-                if (Data.Display)
-                {
-                    scroller.MoveNotes(Data, PlayTimePassed, ref bps);
-                    scroller.MoveMine(Data, PlayTimePassed, bps);
-                }
-
                 // 변속곡 때문에 총 플레이 시간과 bps만으로 계산하는 것은 불가능함
                 if (Data.Stop > 0)
                 {
@@ -135,9 +127,13 @@ namespace BMSPlayer {
                         Data.IsStopOn = false;
                         Data.Display = false;
                     }
-                    Debug.Log("TIME: " + PlayTimePassed + " / Stop: " + Data.Stop + " (-" + DeltaTime + ")");
+                    //Debug.Log("TIME: " + PlayTimePassed + " / Stop: " + Data.Stop + " (-" + DeltaTime + ")");
                     Data.Stop -= DeltaTime;
                     Data.PartialStop += DeltaTime;
+                    Debug.Log("BEFORE:"+ PlayTimePassed);
+                    StartTime += DeltaTime;
+                    PlayTimePassed = currentTick - StartTime;
+                    Debug.Log("AFTER:" + PlayTimePassed);
                     if (Data.Stop <= 0)
                     {
                         Data.Display = true;
@@ -145,6 +141,14 @@ namespace BMSPlayer {
                         Data.Stop = 0;
                     }
                 }
+
+                // Stop과 상관없이 모든 오브젝트를 이동시킴
+                // 단, Stop으로 소모된 시간만큼 노트 위치에 대한 보정이 필요함
+                //if (Data.Display)
+                //{
+                    scroller.MoveNotes(Data, PlayTimePassed, ref bps);
+                    scroller.MoveMine(Data, PlayTimePassed, bps);
+                //}
 
                 scroller.SpeedChangeAndBeam(bpm);
 
