@@ -126,9 +126,13 @@ namespace BMSPlayer
             }
             else
             {
-                note.OnScrPos =
+                /*note.OnScrPos =
                     note.Position - data.BPMPositionFix[data.BPMNum - 1]
-                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10);
+                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10);*/
+                note.OnScrPos =
+                    note.Position
+                    - data.BPMPositionFix[data.BPMNum - 1]
+                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1] - data.PartialStop) * bps / 10);
             }
         }
 
@@ -143,14 +147,14 @@ namespace BMSPlayer
 
                 foreach (MineNote current in notes)
                 {
-                    // 시간에 따라 실제 노트가 표시될 위치 계산
-                    CalculateNotePosition(current, data, playTime, bps);
-
                     // 노트가 화면에 표시되지 않은 상태라면 노트를 화면에 뿌림
                     if (!current.OnScreen)// && current.OnScrPos * speed * Const.SPEEDMULTIPLIER < 3000)
                     {
                         ui.DisplayMineNote(current);
                     }
+
+                    // 시간에 따라 실제 노트가 표시될 위치 계산
+                    CalculateNotePosition(current, data, playTime, bps);
 
                     // 실제 오브젝트가 존재할 때 위치를 이동시킴
                     if (current.OnScreen && current.NoteObject != null)
@@ -392,6 +396,7 @@ namespace BMSPlayer
                     ui.SetGearCurBPM(bpm);
                     Data.IsBPMChanged = true;
                     Data.BPMNum++;
+                    Data.PartialStop = 0;
                 }
             }
 

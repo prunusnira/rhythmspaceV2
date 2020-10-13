@@ -112,6 +112,9 @@ namespace BMSPlayer
                     NoteAdderBPM(BPMNoteType.Type2, data, cbar);
                 }
 
+                // bpm position fix 정렬
+                data.BPMPositionFix.Sort((x1, x2) => x1.CompareTo(x2));
+
                 // 배경음: 보이지 않는 music 노트 오브젝트를 만들고 이 노트가 판정선 100%가 되면 할당된 소리를 재생
                 if (data.BMS.Music.ContainsKey(cbar))
                 {
