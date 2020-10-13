@@ -23,7 +23,7 @@ namespace BMSPlayer
              */
             GameObject noteObject = null;
 
-            Vector3 pos = new Vector3(GetXPos(clane), 1, (float)timing);
+            Vector3 pos = new Vector3(GetXPos(clane), 0, (float)timing);
 
             switch (clane)
             {
@@ -59,7 +59,7 @@ namespace BMSPlayer
              */
             GameObject noteObject = null;
 
-            Vector3 pos = new Vector3(GetXPos(clane), 1, (float)timing);
+            Vector3 pos = new Vector3(GetXPos(clane), 0, (float)timing);
 
             noteObject = Instantiate(noteMine, pos, Quaternion.identity, parent);
             noteObject.transform.localPosition = pos;

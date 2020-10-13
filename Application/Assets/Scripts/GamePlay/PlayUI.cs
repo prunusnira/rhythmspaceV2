@@ -69,7 +69,7 @@ namespace BMSPlayer
         public Text txtComboBreak;
 
         // Gear
-        public GameObject playArea;
+        public GameObject noteParentObj;
         public TextMesh gearCombo;
         public TextMesh gearExScore;
         public TextMesh gearSpeed;
@@ -82,6 +82,14 @@ namespace BMSPlayer
         public TextMesh txtAutoPlay;
         public TextMesh txtLoading;
         public GameObject[] gearBtnPress;
+
+        // Cover
+        public GameObject coverSud;
+        public GameObject coverHid;
+        public GameObject playArea;
+        private int coverSudPos;
+        private int coverHidPos;
+        private int playAreaPos;
 
         // Beam
         public GameObject[] beam;
@@ -190,6 +198,11 @@ namespace BMSPlayer
 
             // 그래프 초기화
             SetInitialGraph();
+
+            // 커버 포지션 변경
+            coverSudPos = Const.CoverSudPos;
+            coverHidPos = Const.CoverHidPos;
+            playAreaPos = Const.AreaLiftPos;
 
             NoteOnScreen = new List<GameObject>();
         }
@@ -769,6 +782,8 @@ namespace BMSPlayer
 
             // 레이어 띄우기
             bgaErrorLayer.SetActive(true);
+            bgaErrorLayer.GetComponentsInChildren<TextMeshPro>()[0].text =
+                Const.videoCodecMsg[(int)Const.Language];
         }
 
         public void BGAImageSetting(Sprite img)
@@ -803,8 +818,8 @@ namespace BMSPlayer
 
         public void DisplayMineNote(MineNote note)
         {
-            GameObject noteObj = generator.AddNewMineNote(note.Line, note.Timing, playArea.transform);
-            noteObj.transform.SetParent(playArea.transform, false);
+            GameObject noteObj = generator.AddNewMineNote(note.Line, note.Timing, noteParentObj.transform);
+            noteObj.transform.SetParent(noteParentObj.transform, false);
             note.OnScreen = true;
             note.NoteObject = noteObj;
         }
@@ -813,8 +828,8 @@ namespace BMSPlayer
         {
             if (note.PlayNoteType == NoteType.SINGLE)
             {
-                GameObject noteObj = generator.AddNewNote(note.Line, note.Timing, playArea.transform);
-                noteObj.transform.SetParent(playArea.transform, false);
+                GameObject noteObj = generator.AddNewNote(note.Line, note.Timing, noteParentObj.transform);
+                noteObj.transform.SetParent(noteParentObj.transform, false);
                 note.OnScreen = true;
                 note.NoteObject = noteObj;
             }
@@ -827,8 +842,8 @@ namespace BMSPlayer
                 // 시작노트
                 if(note.PlayNoteType == NoteType.LNSTART)
                 {
-                    GameObject noteObj = generator.AddNewNote(note.Line, note.Timing, playArea.transform);
-                    noteObj.transform.SetParent(playArea.transform, false);
+                    GameObject noteObj = generator.AddNewNote(note.Line, note.Timing, noteParentObj.transform);
+                    noteObj.transform.SetParent(noteParentObj.transform, false);
                     note.OnScreen = true;
                     note.NoteObject = noteObj;
 
@@ -839,15 +854,15 @@ namespace BMSPlayer
                         {
                         // 가운데노트
                             PlayNote lnNote = lnlist[i].Mid;
-                            GameObject lnObj = generator.AddNewNote(lnNote.Line, lnNote.Timing, playArea.transform);
-                            lnObj.transform.SetParent(playArea.transform, false);
+                            GameObject lnObj = generator.AddNewNote(lnNote.Line, lnNote.Timing, noteParentObj.transform);
+                            lnObj.transform.SetParent(noteParentObj.transform, false);
                             lnNote.OnScreen = true;
                             lnNote.NoteObject = lnObj;
 
                             // 끝노트
                             PlayNote endNote = lnlist[i].End;
-                            GameObject endObj = generator.AddNewNote(endNote.Line, endNote.Timing, playArea.transform);
-                            endObj.transform.SetParent(playArea.transform, false);
+                            GameObject endObj = generator.AddNewNote(endNote.Line, endNote.Timing, noteParentObj.transform);
+                            endObj.transform.SetParent(noteParentObj.transform, false);
                             endNote.OnScreen = true;
                             endNote.NoteObject = endObj;
 
@@ -919,6 +934,102 @@ namespace BMSPlayer
         public void DeactiveLoading()
         {
             txtLoading.gameObject.SetActive(false);
+        }
+
+        public void CoverSuddenDown()
+        {
+            float posx = coverSud.transform.localPosition.x;
+            float posy = coverSud.transform.localPosition.y;
+
+            coverSudPos -= 10;
+            if(coverSudPos < 0)
+            {
+                coverSudPos = 0;
+            }
+
+            coverSud.transform.localPosition = new Vector3(posx, posy, coverSudPos);
+
+            Const.CoverSudPos = coverSudPos;
+        }
+
+        public void CoverSuddenUp()
+        {
+            float posx = coverSud.transform.localPosition.x;
+            float posy = coverSud.transform.localPosition.y;
+
+            coverSudPos += 10;
+            if (coverSudPos > 2000)
+            {
+                coverSudPos = 2000;
+            }
+
+            coverSud.transform.localPosition = new Vector3(posx, posy, coverSudPos);
+
+            Const.CoverSudPos = coverSudPos;
+        }
+
+        public void CoverHiddenDown()
+        {
+            float posx = coverHid.transform.localPosition.x;
+            float posy = coverHid.transform.localPosition.y;
+
+            coverHidPos += 10;
+            if (coverHidPos > 2000)
+            {
+                coverHidPos = 2000;
+            }
+
+            coverHid.transform.localPosition = new Vector3(posx, posy, -1f * coverHidPos);
+
+            Const.CoverHidPos = coverHidPos;
+        }
+
+        public void CoverHiddenUp()
+        {
+            float posx = coverHid.transform.localPosition.x;
+            float posy = coverHid.transform.localPosition.y;
+
+            coverHidPos -= 10;
+            if (coverHidPos < 0)
+            {
+                coverHidPos = 0;
+            }
+
+            coverHid.transform.localPosition = new Vector3(posx, posy, -1f * coverHidPos);
+
+            Const.CoverHidPos = coverHidPos;
+        }
+
+        public void CoverLiftDown()
+        {
+            float posx = playArea.transform.localPosition.x;
+            float posy = playArea.transform.localPosition.y;
+
+            playAreaPos -= 10;
+            if (playAreaPos < 0)
+            {
+                playAreaPos = 0;
+            }
+
+            playArea.transform.localPosition = new Vector3(posx, posy, playAreaPos);
+
+            Const.AreaLiftPos = playAreaPos;
+        }
+
+        public void CoverLiftUp()
+        {
+            float posx = playArea.transform.localPosition.x;
+            float posy = playArea.transform.localPosition.y;
+
+            playAreaPos += 10;
+            if (playAreaPos > 2000)
+            {
+                playAreaPos = 2000;
+            }
+
+            playArea.transform.localPosition = new Vector3(posx, posy, playAreaPos);
+
+            Const.AreaLiftPos = playAreaPos;
         }
     }
 }

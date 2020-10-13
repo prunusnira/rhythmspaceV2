@@ -29,7 +29,6 @@ namespace BMSPlayer
         // Execute after BMSAnalyzer.FullAnalyzer worked
         public void PreloadSound(BMS bms)
         {
-
             foreach (string val in bms.WavList.Keys)
             {
                 string filepath = bms.FolderPath + bms.WavList[val];
@@ -78,6 +77,14 @@ namespace BMSPlayer
         public void StopAll()
         {
             channelGroup.stop();
+        }
+
+        public void FreeMemory(BMS bms)
+        {
+            foreach (FMOD.Sound snd in bms.WavFilesFM.Values)
+            {
+                snd.release();
+            }
         }
 
         public void FMODErrorCheck(FMOD.RESULT result)

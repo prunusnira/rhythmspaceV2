@@ -213,6 +213,8 @@ namespace BMSPlayer {
                     // 재생중인 모든 음악 종료
                     soundController.StopAll();
 
+                    soundController.FreeMemory(Data.BMS);
+
                     // 결과 데이터 수집 후 result로 넘기기
                     scroller.GetResultData(Data.TotalNotes);
 
@@ -255,7 +257,41 @@ namespace BMSPlayer {
                     UI.HidePauseMenu();
                 }
             }
-		}
+
+            // 셔터 조정
+            // SUD down
+            if(Input.GetKey(KeyCode.Alpha3))
+            {
+                UI.CoverSuddenDown();
+            }
+            // SUD up
+            else if (Input.GetKey(KeyCode.Alpha4))
+            {
+                UI.CoverSuddenUp();
+            }
+
+            // LIFT down
+            if (Input.GetKey(KeyCode.Alpha5))
+            {
+                UI.CoverLiftDown();
+            }
+            // LIFT up
+            else if (Input.GetKey(KeyCode.Alpha6))
+            {
+                UI.CoverLiftUp();
+            }
+
+            // HID down
+            if (Input.GetKey(KeyCode.Alpha7))
+            {
+                UI.CoverHiddenDown();
+            }
+            // HID up
+            else if (Input.GetKey(KeyCode.Alpha8))
+            {
+                UI.CoverHiddenUp();
+            }
+        }
 
         IEnumerator LoadBMS()
         {

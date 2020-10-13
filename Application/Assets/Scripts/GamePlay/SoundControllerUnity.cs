@@ -67,5 +67,13 @@ namespace BMSPlayer
                 if (source.isPlaying) source.Stop();
             }
         }
+
+        public void FreeMemory(BMS bms)
+        {
+            foreach (FMOD.Sound snd in bms.WavFilesFM.Values)
+            {
+                snd.release();
+            }
+        }
     }
 }

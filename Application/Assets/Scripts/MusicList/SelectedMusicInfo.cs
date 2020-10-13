@@ -1,7 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using BMSCore;
 using UnityEngine;
 
-public class SelectedMusicInfo : MonoBehaviour {
-    public int index;
+namespace BMSPlayer
+{
+    public class SelectedInfo : MonoBehaviour
+    {
+        public int index;
+        public bool isMusic;
+        public MusicListData musicData;
+        public string path;
+    }
 }

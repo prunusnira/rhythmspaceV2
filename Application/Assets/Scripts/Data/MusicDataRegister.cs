@@ -38,9 +38,14 @@ namespace BMSPlayer
             return null;
         }
 
-        public void LoadBMSFromDBOverall()
+        public List<MusicListData> LoadBMSFromDBOverall()
         {
-            executor.select(SQLiteExecutor.TABLETYPE.LIST);
+            return executor.SelectMusicList();
+        }
+
+        public List<MusicListData> LoadBMSFromFolder(string path)
+        {
+            return executor.SelectMusicList(path);
         }
 
         public void AddDataToDB(List<MusicListData> list)
@@ -58,11 +63,11 @@ namespace BMSPlayer
 
                     string[] param =
                     {
-                            d.Title, d.SubTitle, d.Artist, d.SubArtist, d.Gerne,
-                            d.BPMstart.ToString(), d.BPMmin.ToString(), d.BPMmax.ToString(),
-                            d.Path, hash, d.Level.ToString(), d.Difficulty.ToString(), d.FileName, d.Jacket
-                        };
-                    executor.insertInto(SQLiteExecutor.TABLETYPE.LIST, param);
+                        d.Title, d.SubTitle, d.Artist, d.SubArtist, d.Gerne,
+                        d.BPMstart.ToString(), d.BPMmin.ToString(), d.BPMmax.ToString(),
+                        d.Path, hash, d.Level.ToString(), d.Difficulty.ToString(), d.FileName, d.Jacket
+                    };
+                    executor.InsertBMS(param);
                     fstream.Close();
                 }
             }

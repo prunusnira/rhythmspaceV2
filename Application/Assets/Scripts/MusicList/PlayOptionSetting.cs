@@ -165,29 +165,36 @@ namespace BMSPlayer
             // 배치
             switch(Const.NoteLayout)
             {
-                case NoteLayout.NORMAL:
-                    txtNoteLayout.text = "NORMAL";
-                    txtNoteDesc.text = Const.RandomDescNR[(int)Const.Language];
-                    break;
                 case NoteLayout.RANDOM:
                     txtNoteLayout.text = "RANDOM";
+                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
                     txtNoteDesc.text = Const.RandomDescRD[(int)Const.Language];
                     break;
                 case NoteLayout.MIRROR:
                     txtNoteLayout.text = "MIRROR";
+                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
                     txtNoteDesc.text = Const.RandomDescMR[(int)Const.Language];
                     break;
                 case NoteLayout.SRAN:
                     txtNoteLayout.text = "S-RAN";
+                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
                     txtNoteDesc.text = Const.RandomDescSR[(int)Const.Language];
                     break;
                 case NoteLayout.CRAN:
                     txtNoteLayout.text = "C-RAN";
+                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
                     txtNoteDesc.text = Const.RandomDescCR[(int)Const.Language];
                     break;
                 case NoteLayout.CUSTOM:
                     txtNoteLayout.text = "CUSTOM";
+                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
                     txtNoteDesc.text = Const.RandomDescCU[(int)Const.Language];
+                    break;
+                case NoteLayout.NORMAL:
+                default:
+                    txtNoteLayout.text = "NORMAL";
+                    txtNoteLayout.color = Color.white;
+                    txtNoteDesc.text = Const.RandomDescNR[(int)Const.Language];
                     break;
             }
         }
@@ -256,7 +263,7 @@ namespace BMSPlayer
         {
             if(speed < 1000) speed += 25;
             Const.SpeedFixed = speed;
-            speedfl = (int)(Const.selectedMusic.BPMstart * speed / 100);
+            speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
             Const.SpeedFluid = speedfl;
 
             txtSpeed.text = ((float)speed/100).ToString("0.00") + "x";
@@ -267,7 +274,7 @@ namespace BMSPlayer
         {
             if (speed > 50) speed -= 25;
             Const.SpeedFixed = speed;
-            speedfl = (int)(Const.selectedMusic.BPMstart * speed / 100);
+            speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
             Const.SpeedFluid = speedfl;
 
             txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
@@ -278,7 +285,7 @@ namespace BMSPlayer
         {
             if (speedfl < 1000) speedfl++;
             Const.SpeedFluid = speedfl;
-            speed = (int)((double)speedfl / Const.selectedMusic.BPMstart * 100);
+            speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
             Const.SpeedFixed = speed;
 
             txtSpeed.text = speedfl.ToString();
@@ -289,7 +296,7 @@ namespace BMSPlayer
         {
             if (speedfl > 100) speedfl--;
             Const.SpeedFluid = speedfl;
-            speed = (int)((double)speedfl / Const.selectedMusic.BPMstart * 100);
+            speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
             Const.SpeedFixed = speed;
 
             txtSpeed.text = speedfl.ToString();

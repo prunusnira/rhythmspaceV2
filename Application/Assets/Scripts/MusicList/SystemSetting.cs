@@ -17,6 +17,7 @@ namespace BMSPlayer
         private MusicListManager mlm;
         private LoadBMSList bmsLoader;
         private List<MusicListData> musicList;
+        private ListItemTree tree;
 
         public Text txtPathTitle;
         public Text txtPathVar;
@@ -63,7 +64,7 @@ namespace BMSPlayer
             bmsLoader = new LoadBMSList();
             
             rows = 6;
-            btn = new int[] { 2, 3, 2, 2, 2, 1 };
+            btn = new int[] { 2, 3, 3, 2, 1, 2 };
 
             EncolorBtn(0, 0);
         }
@@ -247,11 +248,36 @@ namespace BMSPlayer
         {
             musicList.RemoveRange(0, musicList.Count);
 
+            // Generate Folder Tree
+            txtLoadingPath.text = "Creating BMS File Tree";
+            yield return new WaitForSeconds(0.00001f);
+            tree = new ListItemTree(Const.BMSFolderPath);
+            tree.Head = tree.CreateTree(tree.Head);
+
+            txtLoadingPath.text = "Generating JSON Structure";
+            yield return new WaitForSeconds(0.00001f);
+            string jsonStrTest = tree.CreateTreeJSON(tree.Head);
+
+            // Save as JSON file
+            txtLoadingPath.text = "Saving JSON File";
+            yield return new WaitForSeconds(0.00001f);
+            if (!File.Exists(Const.JSONPath))
+            {
+                Directory.CreateDirectory(Directory.GetParent(Const.JSONPath).FullName);
+            }
+            else
+            {
+                File.Delete(Const.JSONPath);
+            }
+            File.Create(Const.JSONPath).Close();
+            File.WriteAllText(Const.JSONPath, jsonStrTest);
+
+            // 실제 파일을 DB에 등록
             // Directory List
-            txtLoadingPath.text = "Loading folder list";
+            txtLoadingPath.text = "Loading Folder List";
             yield return new WaitForSeconds(0.00001f);
             List<string> dirlist = bmsLoader.GetDirectories(Const.BMSFolderPath);
-
+            
             // File List
             txtLoadingPath.text = "Loading file list";
             yield return new WaitForSeconds(0.00001f);
@@ -273,6 +299,7 @@ namespace BMSPlayer
             // 수집한 BMS 데이터를 DB에 등록
             txtLoadingPath.text = "Registering into database";
             yield return new WaitForSeconds(0.00001f);
+            mlm = new MusicListManager();
             mlm.AddDataToDB(musicList);
             mlm.close();
 

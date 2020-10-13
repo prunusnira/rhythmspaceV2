@@ -7,12 +7,15 @@ namespace BMSPlayer
     public class Const
     {
         public static string DBPath = "";
+        public static string JSONPath = "";
         static Const()
         {
 #if(UNITY_EDITOR)
             DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db.sqlite";
+            JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\structure.json";
 #elif(UNITY_STANDALONE)
             DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db1.sqlite";
+            JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\structure.json";
 #endif
         }
         public static int CHANNEL = 320;
@@ -24,10 +27,13 @@ namespace BMSPlayer
         public static bool isKeyChanged = false;
         public static bool isRefreshDone = false;
 
-        public static List<MusicListData> list = new List<MusicListData>();
         public static List<RecordData> record = new List<RecordData>();
-        public static MusicListData selectedMusic = null;
         public static int musiclistIdx = 0;
+
+        public static ListItemTree BMSTree;
+        public static ListItemNode selectedOnList = null;
+        public static List<int> ListDepth = new List<int>();
+        public static int ListPos = 0;
 
         public static int[] CustomRandom =
         {
@@ -40,6 +46,8 @@ namespace BMSPlayer
             PlayerPrefs.GetInt("custom_r7", 7)
         };
 
+        // Language
+        #region Language
         public static string[] settingDesc = new string[3]
         {
         "게임 설정을 변경합니다",
@@ -91,15 +99,15 @@ namespace BMSPlayer
 
         public static string[] browserDesc = new string[3]
         {
-            "1) 탐색기로 폴더를 탐색\n" +
-            "2)Path가 맞는지 확인\n" +
-            "3) 오른쪽 아래의 버튼으로 적용",
-            "1) エキスプローラーでフォルダーを探索\n" +
-            "2) Pathを確認\n" +
-            "3) 右下のボタンを押す",
-            "1) Search path with explorer\n" +
-            "2) Check Path on the top\n" +
-            "3) Click the button on bottom-right"
+            "파일 브라우저 사용법\n" +
+            "1) 상단의 ↑ 버튼과 탐색창을 사용하여 원하는 폴더로 이동\n" +
+            "2) 오른쪽 아래의 SELECT 버튼으로 적용",
+            "ファイルブラウザの利用について\n" +
+            "1) 上段の↑ボタンと探索画面をクリックしてフォルダーへ移動\n" +
+            "2) 右下のSELECTボタンで確認",
+            "How to use file browser\n" +
+            "1) Move to your BMS folder with ↑ button and mouse click on browser\n" +
+            "2) Click the button on bottom-right 'SELECT' to apply"
         };
 
         public static string[] videoCodecMsg = new string[3]
@@ -150,6 +158,7 @@ namespace BMSPlayer
             "ユーザーが指定のラインになります\n(F10を押して変更)",
             "Notes will be shown as user setting\n(Press F10 to change line)"
         };
+        #endregion
 
         // System Setting Values
         #region System Setting
@@ -369,6 +378,42 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("noteLayout", (int)value);
+            }
+        }
+
+        public static int CoverSudPos
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("suddenPos", 2000);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("suddenPos", value);
+            }
+        }
+
+        public static int CoverHidPos
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("hiddenPos", 2000);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("hiddenPos", value);
+            }
+        }
+
+        public static int AreaLiftPos
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("areaPos", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("areaPos", value);
             }
         }
         #endregion

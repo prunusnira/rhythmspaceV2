@@ -16,5 +16,7 @@ namespace BMSPlayer
         bool CheckSoundPlaying();
 
         void StopAll();
+
+        void FreeMemory(BMS bms);
     }
 }

@@ -2,6 +2,7 @@ using BMSCore;
 using BMSPlayer;
 using Mono.Data.Sqlite;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
@@ -14,8 +15,6 @@ namespace DatabaseManager
         public IDbConnection dbconn;
         public IDbCommand dbcommand;
         public IDataReader dbreader;
-
-        public enum TABLETYPE { LIST, RECORD }
 
         public static SQLiteExecutor Instance;
 
@@ -113,7 +112,7 @@ namespace DatabaseManager
             dbcommand.ExecuteNonQuery();
         }
 
-        public void insertInto(TABLETYPE type, string[] param)
+        public void InsertBMS(string[] param)
         {
             dbcommand = dbconn.CreateCommand();
 
@@ -123,32 +122,38 @@ namespace DatabaseManager
                 param[i] = param[i].Replace("\"", "\"\"");
             }
 
-            string query = "";
-            switch (type)
-            {
-                case TABLETYPE.LIST:
-                    // 리스트를 새로 만들땐 리셋을 시키고 해야 됨
-                    query = "insert into list " +
-                        "(title, subtitle, artist, subartist, gerne," +
-                        " bpmstart, bpmmin, bpmmax," +
-                        " path, md5hash, level, diff," +
-                        " fname, jacket)" +
-                        "values" +
-                        "('" +
-                            param[0] +"','" + param[1] +"','" + param[2] + "','" + param[3] + "','" + param[4] +"'," +
-                            param[5] + "," + param[6] + "," + param[7] + ",'" +
-                            param[8] + "', '" + param[9] + "','" + param[10] + "','" + param[11] + "','" +
-                            param[12] + "','" + param[13] + "')";
-                    break;
-                case TABLETYPE.RECORD:
-                    query = "insert into record " +
-                        "(name, rank, score) values" +
-                        "('" + param[0] + "','" + param[1] + "','" + param[2] + "'," + param[3] + ") " +
-                        "on duplicate key update name='"+param[0]+"', rank='"+param[1]+"', score='"+param[2]+"'";
-                    break;
-            }
+            string query =
+                "insert into list " +
+                    "(title, subtitle, artist, subartist, gerne," +
+                    " bpmstart, bpmmin, bpmmax," +
+                    " path, md5hash, level, diff," +
+                    " fname, jacket)" +
+                    "values" +
+                    "('" +
+                        param[0] + "','" + param[1] + "','" + param[2] + "','" + param[3] + "','" + param[4] + "'," +
+                        param[5] + "," + param[6] + "," + param[7] + ",'" +
+                        param[8] + "', '" + param[9] + "','" + param[10] + "','" + param[11] + "','" +
+                        param[12] + "','" + param[13] + "')"; ;
+            
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
+        }
+
+        public void InsertRecord(string[] param)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            for (int i = 0; i < param.Length; i++)
+            {
+                param[i] = param[i].Replace("'", "''");
+                param[i] = param[i].Replace("\"", "\"\"");
+            }
+
+            string query =
+                "insert into record " +
+                    "(name, rank, score) values" +
+                    "('" + param[0] + "','" + param[1] + "','" + param[2] + "'," + param[3] + ") " +
+                    "on duplicate key update name='" + param[0] + "', rank='" + param[1] + "', score='" + param[2] + "'";
         }
 
         public bool checkTableExist()
@@ -174,18 +179,18 @@ namespace DatabaseManager
             return allexist;
         }
 
-        public void select(TABLETYPE type, string name = null)
+        public List<MusicListData> SelectMusicList(string param = null)
         {
+            List<MusicListData> musiclist = new List<MusicListData>();
+
             dbcommand = dbconn.CreateCommand();
-            string table = null;
-            if (type == TABLETYPE.LIST) table = "list";
-            else if (type == TABLETYPE.RECORD) table = "record";
 
-            string query = "select * from " + table;
+            string query = "select * from list";
 
-            if(type == TABLETYPE.RECORD)
+            if(param != null)
             {
-                query += " where name='"+name+"'";
+                param = param.Replace("'", "''");
+                query += " where path='"+param+"/'";
             }
 
             dbcommand.CommandText = query;
@@ -193,42 +198,52 @@ namespace DatabaseManager
 
             while(dbreader.Read())
             {
-                if(type == TABLETYPE.RECORD)
-                {
-                    int recid = dbreader.GetInt32(0);
-                    string recname = dbreader.GetString(1);
-                    string recrank = dbreader.GetString(2);
-                    int recscore = dbreader.GetInt32(3);
-                    string recmd5 = dbreader.GetString(4);
+                int lid = dbreader.GetInt32(0);
+                string ltitle = dbreader.GetString(1);
+                string lsubtitle = dbreader.GetString(2);
+                string lartist = dbreader.GetString(3);
+                string lsubartist = dbreader.GetString(4);
+                string lgerne = dbreader.GetString(5);
+                float lbpmstart = dbreader.GetFloat(6);
+                float lbpmmin = dbreader.GetFloat(7);
+                float lbpmmax = dbreader.GetFloat(8);
+                string lpath = dbreader.GetString(9);
+                string lmd5 = dbreader.GetString(10);
+                int llv = dbreader.GetInt32(11);
+                int ldiff = dbreader.GetInt32(12);
+                string lfname = dbreader.GetString(13);
+                string ljacket = dbreader.GetString(14);
 
-                    Const.record.Add(new RecordData(recid, recname, recrank, recscore, recmd5));
-                }
-                else
-                {
-                    int lid = dbreader.GetInt32(0);
-                    string ltitle = dbreader.GetString(1);
-                    string lsubtitle = dbreader.GetString(2);
-                    string lartist = dbreader.GetString(3);
-                    string lsubartist = dbreader.GetString(4);
-                    string lgerne = dbreader.GetString(5);
-                    float lbpmstart = dbreader.GetFloat(6);
-                    float lbpmmin = dbreader.GetFloat(7);
-                    float lbpmmax = dbreader.GetFloat(8);
-                    string lpath = dbreader.GetString(9);
-                    string lmd5 = dbreader.GetString(10);
-                    int llv = dbreader.GetInt32(11);
-                    int ldiff = dbreader.GetInt32(12);
-                    string lfname = dbreader.GetString(13);
-                    string ljacket = dbreader.GetString(14);
+                MusicListData data = new MusicListData(
+                    lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
+                    lbpmstart, lbpmmin, lbpmmax,
+                    lpath, lmd5, llv, ldiff, lfname, ljacket);
 
-                    MusicListData data = new MusicListData(
-                        lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
-                        lbpmstart, lbpmmin, lbpmmax,
-                        lpath, lmd5, llv, ldiff, lfname, ljacket);
-
-                    Const.list.Add(data);
-                }
+                musiclist.Add(data);
             }
+
+            return musiclist;
+        }
+
+        public RecordData SelectRecord(string param = null)
+        {
+            string query = "select * from record";
+
+            if (param != null)
+            {
+                query += " where md5hash='" + param + "'";
+            }
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+            dbreader.Read();
+            int recid = dbreader.GetInt32(0);
+            string recname = dbreader.GetString(1);
+            string recrank = dbreader.GetString(2);
+            int recscore = dbreader.GetInt32(3);
+            string recmd5 = dbreader.GetString(4);
+
+            return new RecordData(recid, recname, recrank, recscore, recmd5);
         }
     }
 }

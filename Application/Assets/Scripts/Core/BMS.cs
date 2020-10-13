@@ -6,15 +6,23 @@
  * #PLAYER		: 플레이어
  * #GENRE		: 장르
  * #TITLE		: 이름
+ * #SUBTITLE    : 부제목
  * #ARTIST		: 작곡가
- * #BPM		: BPM
+ * #SUBARTIST   : BGA 등 다른 작업
+ * #BPM 		: BPM
  * #PLAYLEVEL	: 보면 레벨
- * #RANK		: 난이도
- * #TOTAL		: 노트 수
+ * #RANK		: 판정 난이도
+ *                (0 = Very Hard, 1 = Hard, 2 = Normal, 3 = Easy)
+ * #DIFFUCULTY  : 패턴 난이도 (1~5 기반, beginner, normal, hyper 등)
+ * #TOTAL		: 토탈 치
  * #STAGEFILE	: 타이틀 이미지
- * #WAVXX		: 노래 및 키음 데이터, XX는 0~9와 A~Z를 모두 사용함
- * #BMPXX		: BGA
- * #BACKBMP	: BGA 미지원시 백그라운드 이미지
+ * #WAVXX		: 노래 및 키음 데이터
+ * #BMPXX		: BGA (04 Channel)
+ * #BPMXX       : BPM Type2 (08 Channel)
+ * #STOPXX      : STOP (09 Channel)
+ * #BACKBMP     : BGA 미지원시 백그라운드 이미지
+ * #LNTYPE      : (있다면) LNType 지정 (1 혹은 2)
+ * #LNOBJ       : LNOBJ 형식일 때 사용하는 롱노트 끝 노트
  * 
  * 2. Main Data Field
  * #00000
@@ -26,16 +34,27 @@
  * 
  * Bar는 한 박자, Channel == 노트 라인을 의미함
  * 노트 배치 기준에 따라 Channel의 각 숫자의 의미가 달라진다.
+ * 
+ * Player 1
  * 16 = 스크래치
  * 11 = 1, 12 = 2, 13 = 3, 14 = 4, 15 = 5, 18 = 6, 19 = 7
+ * 51~56, 58, 59 = 각 라인 별 롱노트 (LNType 1)
+ * D1, D2, D3, D4, D5, D6, D8, D9 = 라인별 지뢰노트
+ * 
+ * Player 2
+ * 26 = 스크래치
+ * 21 = 1, 22 = 2, 23 = 3, 24 = 4, 25 = 5, 28 = 6, 29 = 7
+ * 61~66, 68, 69 = 각 라인 별 롱노트 (LNType 1)
+ * E1, E2, E3, E4, E5, E6, E8, E9 = 라인별 지뢰노트
+ * 
  * 03 = BPM, 값은 Hex로 들어간다
  * 04 = BGA, 07 = LAYER, 06 = POOR
  * 01 = B01~B32 (백그라운드로 나오는 사운드, B1~B32까지의 모든 구간이 01 하나로 되어있음에 주의해야 함)
- * 02 = 마디 단축, 뒤에 소수점이 오며 이 값에 맞게 마디의 크기가 달라진다
- * 51~56, 58, 59 = 각 라인 별 롱노트
+ * 02 = 마디 길이, 뒤에 소수점이 오며 이 값에 맞게 마디의 크기가 달라진다
+ *      (ex - 0.75 = 3/4박, 1.25 = 5/4박)
  * (11~16, 18, 19에서 10자리만 5로 바꾼 것, 롱노트는 2개씩 짝이 되어야 한다)
  * 09 = STOP
- * (스크롤을 잠시 멈추는 STOP은 별도로 헤더에 #STOPxx 가 발생한다, 아마 순서일듯?)
+ * (스크롤을 잠시 멈추는 STOP은 별도로 헤더에 #STOPxx 가 발생한다)
  * 
  * 노트 데이터
  * 노트 데이터는 그리드 방식으로 찍는다.
