@@ -39,7 +39,7 @@ namespace BMSPlayer
         private double avgTimeDiff = 0;
         private double sumRate = 0;
         private double avgRate = 0;
-        private double stopStartTime = 0;
+        private double addStopTiming = 0;
 
         // 공푸어 처리용
         private int notesInTimingWindow = 0; // 개수가 0보다 크면 노트가 있음
@@ -125,38 +125,25 @@ namespace BMSPlayer
         private void SetNotePosition(
             NoteObject note, PlayData data, double timePassed, double bps)
         {
-            /*if (data.BPMNum == 0)
+            // 현재 시간을 계산해야 하는 부분에는 addStopTiming을
+            // 전체 평균 시간을 계산해야 하는 부분에는 BPMStopFix를 사용
+            if(data.BPMPositionFix.Count == 0)
             {
-                note.OnScrPos =
-                    note.Position - (timePassed * bps / 10);
+                note.OnScrPos = note.Position - (timePassed - addStopTiming) * bps / 10;
             }
-            else
-            {
-                note.OnScrPos =
-                    note.Position - data.BPMPositionFix[data.BPMNum - 1]
-                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10);
-            }*/
-            if (data.BPMNum == 0)
+            else if (data.BPMNum == 0)
             {
                 note.OnScrPos =
                     note.Position
-                    - data.BPMPositionFix[0] / (data.BPMTimingFix[0] - data.BPMStopTiming[0])
-                    * timePassed;
+                    //- data.BPMPositionFix[0] / (data.BPMTimingFix[0] - data.BPMStopFix[0])
+                    - bps * timePassed / 10;
             }
             else if(data.BPMNum == data.BPMPositionFix.Count)
             {
                 note.OnScrPos =
                     note.Position
-                    - data.BPMPositionFix[data.BPMNum - 1];
-                if(data.BPMStopTiming.Count == data.BPMNum)
-                {
-                    note.OnScrPos -= (timePassed - data.BPMTimingFix[data.BPMNum - 1] - data.BPMStopTiming[data.BPMNum]) * bps / 10;
-                }
-                else
-                {
-                    note.OnScrPos -= (timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10;
-                }
-                    
+                    - data.BPMPositionFix[data.BPMNum - 1]
+                    - (timePassed - data.BPMTimingFix[data.BPMNum - 1] - addStopTiming) * bps / 10;
             }
             else
             {
@@ -164,9 +151,9 @@ namespace BMSPlayer
                     note.Position
                     - data.BPMPositionFix[data.BPMNum - 1]
                     - (
-                        (data.BPMPositionFix[data.BPMNum] - data.BPMPositionFix[data.BPMNum - 1])
-                        / (data.BPMTimingFix[data.BPMNum] - data.BPMTimingFix[data.BPMNum - 1] - data.BPMStopTiming[data.BPMNum])
-                        * (timePassed - data.BPMTimingFix[data.BPMNum - 1] - data.BPMStopTiming[data.BPMNum])
+                        /*(data.BPMPositionFix[data.BPMNum] - data.BPMPositionFix[data.BPMNum - 1])
+                        / (data.BPMTimingFix[data.BPMNum] - data.BPMTimingFix[data.BPMNum - 1] - data.BPMStopFix[data.BPMNum])*/
+                        bps * (timePassed - data.BPMTimingFix[data.BPMNum - 1] - addStopTiming) / 10
                       );
             }
         }
@@ -184,7 +171,7 @@ namespace BMSPlayer
                 foreach (MineNote current in notes)
                 {
                     // 노트가 화면에 표시되지 않은 상태라면 노트를 화면에 뿌림
-                    if (!current.OnScreen)// && current.OnScrPos * speed * Const.SPEEDMULTIPLIER < 3000)
+                    if (!current.OnScreen && current.OnScrPos * speed * Const.SPEEDMULTIPLIER < 3000)
                     {
                         ui.DisplayMineNote(current);
                     }
@@ -237,7 +224,7 @@ namespace BMSPlayer
                 foreach (PlayNote current in notes)
                 {
                     // 노트가 화면에 표시되지 않은 상태라면 노트를 화면에 뿌림
-                    if (!current.OnScreen)// && current.OnScrPos * speed * Const.SPEEDMULTIPLIER < 3000)
+                    if (!current.OnScreen && current.OnScrPos * speed * Const.SPEEDMULTIPLIER < 3000)
                     {
                         ui.DisplayPlayNote(current, data.NoteLong);
                     }
@@ -451,6 +438,31 @@ namespace BMSPlayer
                     ui.SetGearCurBPM(bpm);
                     Data.IsBPMChanged = true;
                     Data.BPMNum++;
+                    addStopTiming = 0;
+
+                    // BPM 변경된 후 다음 범위 내에서 노트 위치 계산을 위해
+                    // Stop 노트의 범위를 계산
+                    /*Data.StopAvailableList.Clear();
+                    foreach (double d in Data.BPMStopTiming.Keys)
+                    {
+                        double p = Data.BPMPositionFix[Data.BPMNum - 1];
+
+                        if(Data.BPMPositionFix.Count - 1 == Data.BPMNum)
+                        {
+                            double n = Data.BPMPositionFix[Data.BPMNum];
+                            if (d >= p && d < n)
+                            {
+                                Data.StopAvailableList.Add(d, Data.BPMStopTiming[d]);
+                            }
+                        }
+                        else
+                        {
+                            if (d >= p)
+                            {
+                                Data.StopAvailableList.Add(d, Data.BPMStopTiming[d]);
+                            }
+                        }
+                    }*/
                 }
             }
 
@@ -484,6 +496,7 @@ namespace BMSPlayer
                     // 지정된 시간동안 노트 움직임을 멈춤
                     double stop = current.StopDuration;
                     Data.Stop += stop / bps * 10;
+                    addStopTiming += stop / bps * 10;
                     Data.CurrentStopPos = current.Position;
                     Data.IsStopOn = true;
                     current.Used = true;

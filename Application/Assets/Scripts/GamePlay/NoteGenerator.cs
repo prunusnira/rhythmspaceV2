@@ -840,6 +840,11 @@ namespace BMSPlayer
                             if (isStop && n.Position == stopPos)
                             {
                                 CalculateTiming(n, bps, stopTime, PosStart);
+
+                                if (!data.BPMStopTiming.ContainsKey(n.Timing))
+                                {
+                                    data.BPMStopTiming.Add(n.Timing, n.StopDuration / bps * 10);
+                                }
                             }
                             else if (n.Bar == bar &&
                                     n.Position >= PosStart &&
@@ -847,6 +852,11 @@ namespace BMSPlayer
                                 )
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
+
+                                if (!data.BPMStopTiming.ContainsKey(n.Timing))
+                                {
+                                    data.BPMStopTiming.Add(n.Timing, n.StopDuration / bps * 10);
+                                }
                             }
                         }
 
@@ -864,7 +874,7 @@ namespace BMSPlayer
                                 nextbps = bpm.BPMValue / 240;
                                 if (data.BPMStopTiming.Count != fixidx + 1)
                                 {
-                                    data.BPMStopTiming.Add(0);
+                                    data.BPMStopFix.Add(0);
                                 }
                                 fixidx++;
                             }
@@ -877,13 +887,13 @@ namespace BMSPlayer
                                 isStop = true;
                                 prevTime += stop.StopDuration / bps * 10;
 
-                                if(data.BPMStopTiming.Count == fixidx + 1)
+                                if (data.BPMStopFix.Count - 1 == fixidx)
                                 {
-                                    data.BPMStopTiming[fixidx] += stop.StopDuration / bps * 10;
+                                    data.BPMStopFix[fixidx] += stop.StopDuration / bps * 10;
                                 }
                                 else
                                 {
-                                    data.BPMStopTiming.Add(stop.StopDuration / bps * 10);
+                                    data.BPMStopFix.Add(stop.StopDuration / bps * 10);
                                 }
                             }
 

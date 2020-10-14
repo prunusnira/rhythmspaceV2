@@ -38,7 +38,10 @@ namespace BMSPlayer
         public List<BGMNote> NoteBGM { get; set; }
         public List<double> BPMPositionFix { get; set; }
         public List<double> BPMTimingFix { get; set; }
-        public List<double> BPMStopTiming { get; set; }
+        public List<double> BPMStopFix { get; set; }
+        // timing, duration
+        public Dictionary<double, double> BPMStopTiming { get; set; }
+        public Dictionary<double, double> StopAvailableList { get; set; }
         public int BPMNum { get; set; }
 
         public PlayData()
@@ -72,8 +75,11 @@ namespace BMSPlayer
             NoteStop = new List<StopNote>();
             BPMPositionFix = new List<double>();
             BPMTimingFix = new List<double>();
-            BPMStopTiming = new List<double>();
+            BPMStopFix = new List<double>();
+            BPMStopTiming = new Dictionary<double, double>();
+            StopAvailableList = new Dictionary<double, double>();
 
+            BPMNum = 0;
             Stop = 0;
             IsBPMChanged = false;
             IsStopOn = false;
