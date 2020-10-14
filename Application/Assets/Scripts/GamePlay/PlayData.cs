@@ -14,11 +14,9 @@ namespace BMSPlayer
         public double BPS { get; set; }
         public double SPB { get; set; }
         public double Stop { get; set; }
-        public double StopStart { get; set; }
-        public double PartialStop { get; set; }
+        public double CurrentStopPos { get; set; }
         public bool IsBPMChanged { get; set; }
         public bool IsStopOn { get; set; }
-        public bool Display { get; set; }
 
         // 전체 게임 길이 (4박 기준, 1 = 4/4)
         // BMS 데이터의 02 채널과 연관
@@ -40,6 +38,7 @@ namespace BMSPlayer
         public List<BGMNote> NoteBGM { get; set; }
         public List<double> BPMPositionFix { get; set; }
         public List<double> BPMTimingFix { get; set; }
+        public List<double> BPMStopTiming { get; set; }
         public int BPMNum { get; set; }
 
         public PlayData()
@@ -73,13 +72,11 @@ namespace BMSPlayer
             NoteStop = new List<StopNote>();
             BPMPositionFix = new List<double>();
             BPMTimingFix = new List<double>();
+            BPMStopTiming = new List<double>();
 
             Stop = 0;
-            StopStart = 0;
-            PartialStop = 0;
             IsBPMChanged = false;
             IsStopOn = false;
-            Display = true;
         }
     }
 }

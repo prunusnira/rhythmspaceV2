@@ -116,10 +116,16 @@ namespace BMSPlayer
             soundController = GetComponent<SoundControllerFMOD>();
         }
 
-        private void CalculateNotePosition(
+        private void SetNotePositionOnStop(
             NoteObject note, PlayData data, double timePassed, double bps)
         {
-            if (data.BPMNum == 0)
+            note.OnScrPos = note.Position - data.CurrentStopPos;
+        }
+
+        private void SetNotePosition(
+            NoteObject note, PlayData data, double timePassed, double bps)
+        {
+            /*if (data.BPMNum == 0)
             {
                 note.OnScrPos =
                     note.Position - (timePassed * bps / 10);
@@ -129,17 +135,47 @@ namespace BMSPlayer
                 note.OnScrPos =
                     note.Position - data.BPMPositionFix[data.BPMNum - 1]
                     - ((timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10);
-                /*note.OnScrPos =
+            }*/
+            if (data.BPMNum == 0)
+            {
+                note.OnScrPos =
+                    note.Position
+                    - data.BPMPositionFix[0] / (data.BPMTimingFix[0] - data.BPMStopTiming[0])
+                    * timePassed;
+            }
+            else if(data.BPMNum == data.BPMPositionFix.Count)
+            {
+                note.OnScrPos =
+                    note.Position
+                    - data.BPMPositionFix[data.BPMNum - 1];
+                if(data.BPMStopTiming.Count == data.BPMNum)
+                {
+                    note.OnScrPos -= (timePassed - data.BPMTimingFix[data.BPMNum - 1] - data.BPMStopTiming[data.BPMNum]) * bps / 10;
+                }
+                else
+                {
+                    note.OnScrPos -= (timePassed - data.BPMTimingFix[data.BPMNum - 1]) * bps / 10;
+                }
+                    
+            }
+            else
+            {
+                note.OnScrPos =
                     note.Position
                     - data.BPMPositionFix[data.BPMNum - 1]
-                    - ((timePassed - data.BPMTimingFix[data.BPMNum - 1] - data.PartialStop) * bps / 10);*/
+                    - (
+                        (data.BPMPositionFix[data.BPMNum] - data.BPMPositionFix[data.BPMNum - 1])
+                        / (data.BPMTimingFix[data.BPMNum] - data.BPMTimingFix[data.BPMNum - 1] - data.BPMStopTiming[data.BPMNum])
+                        * (timePassed - data.BPMTimingFix[data.BPMNum - 1] - data.BPMStopTiming[data.BPMNum])
+                      );
             }
         }
 
         public int currentBar = 0;
         public int currentStop = 0;
 
-        public void MoveMine(PlayData data, double playTime, double bps)
+        public void MoveMine(PlayData data,
+            double playTime, double bps)
         {
             foreach (List<MineNote> notes in data.NoteMine)
             {
@@ -154,7 +190,14 @@ namespace BMSPlayer
                     }
 
                     // 시간에 따라 실제 노트가 표시될 위치 계산
-                    CalculateNotePosition(current, data, playTime, bps);
+                    if (data.IsStopOn)
+                    {
+                        SetNotePositionOnStop(current, data, playTime, bps);
+                    }
+                    else
+                    {
+                        SetNotePosition(current, data, playTime, bps);
+                    }
 
                     // 실제 오브젝트가 존재할 때 위치를 이동시킴
                     if (current.OnScreen && current.NoteObject != null)
@@ -200,7 +243,14 @@ namespace BMSPlayer
                     }
 
                     // 시간에 따라 실제 노트가 표시될 위치 계산
-                    CalculateNotePosition(current, data, timePassed, bps);
+                    if(data.IsStopOn)
+                    {
+                        SetNotePositionOnStop(current, data, timePassed, bps);
+                    }
+                    else
+                    {
+                        SetNotePosition(current, data, timePassed, bps);
+                    }
 
                     // 실제 오브젝트가 존재할 때 위치를 이동시킴
                     if (current.OnScreen && current.NoteObject != null)
@@ -252,7 +302,7 @@ namespace BMSPlayer
                      * 노트 위치에 대해 판정선까지의 시간계산하기
                      * 시간 = (노트의 처음위치 - 노트의 현재위치) / 시간당 비트(bps)
                      */
-                    if (judgeTiming < EPOOR * -1 &&
+            if (judgeTiming < EPOOR * -1 &&
                         current.ObjType == ObjectType.PLAYABLE &&
                         current.OnScreen)
                     {
@@ -327,6 +377,11 @@ namespace BMSPlayer
             }
         }
 
+        public void FixStoppedPosition()
+        {
+
+        }
+
         public void PlayBGA(List<BGANote> noteBGA, BMS bms, double time)
         {
             List<BGANote> removeCandidate = new List<BGANote>();
@@ -396,7 +451,6 @@ namespace BMSPlayer
                     ui.SetGearCurBPM(bpm);
                     Data.IsBPMChanged = true;
                     Data.BPMNum++;
-                    Data.PartialStop = 0;
                 }
             }
 
@@ -429,10 +483,9 @@ namespace BMSPlayer
                     currentBar = current.Bar;
                     // 지정된 시간동안 노트 움직임을 멈춤
                     double stop = current.StopDuration;
-                    Debug.Log("StopDuration:" + current.Bar + " " + (stop / bps * 10));
                     Data.Stop += stop / bps * 10;
+                    Data.CurrentStopPos = current.Position;
                     Data.IsStopOn = true;
-                    Data.StopStart = current.Timing;
                     current.Used = true;
                     removeCandidate.Add(current);
                 }

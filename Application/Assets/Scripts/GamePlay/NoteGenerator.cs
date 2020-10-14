@@ -679,6 +679,7 @@ namespace BMSPlayer
             double stopPos = 0;
             double stopTime = 0;
             bool isStop = false;
+            int fixidx = 0;
 
             // Bar는 000부터 시작하므로 시간 계산을 0부터 진행
             for (int bar = 0; bar < data.BMS.LastBar + 1; bar++)
@@ -727,10 +728,6 @@ namespace BMSPlayer
                     {
                         double PosStart = 0;
                         double PosEnd = 0;
-                        if(bar == 101)
-                        {
-                            int a = 1 + 1;
-                        }
                         bps = nextbps;
 
                         // i == 0이면 bar 시작위치에서 bpm 변경 노트까지를 판단
@@ -865,6 +862,11 @@ namespace BMSPlayer
                             {
                                 BPMNote bpm = timeChangeInBar[i] as BPMNote;
                                 nextbps = bpm.BPMValue / 240;
+                                if (data.BPMStopTiming.Count != fixidx + 1)
+                                {
+                                    data.BPMStopTiming.Add(0);
+                                }
+                                fixidx++;
                             }
 
                             if(timeChangeInBar[i] is StopNote)
@@ -874,6 +876,15 @@ namespace BMSPlayer
                                 stopTime = prevTime + (stopPos - prevChangePos) / bps * 10;
                                 isStop = true;
                                 prevTime += stop.StopDuration / bps * 10;
+
+                                if(data.BPMStopTiming.Count == fixidx + 1)
+                                {
+                                    data.BPMStopTiming[fixidx] += stop.StopDuration / bps * 10;
+                                }
+                                else
+                                {
+                                    data.BPMStopTiming.Add(stop.StopDuration / bps * 10);
+                                }
                             }
 
                             prevTime += (timeChangeInBar[i].Position - prevChangePos) / bps * 10;
@@ -928,11 +939,6 @@ namespace BMSPlayer
                         {
                             CalculateTiming(n, bps, prevTime, PosStart);
                         }
-                    }
-
-                    if (bar == 48)
-                    {
-                        int a = 1 + 1;
                     }
 
                     prevBarPos += barLength;
