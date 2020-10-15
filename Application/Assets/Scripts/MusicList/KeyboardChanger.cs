@@ -8,104 +8,103 @@ namespace BMSPlayer
     public class KeyboardChanger : MonoBehaviour
     {
         public GameObject self;
+        public TextMesh desc;
         public TextMesh changeableKey;
 
         void Update()
         {
-            string name = Const.KeyChange;
-            changeKeyName(name);
-            StartCoroutine(KeyInputChecker(name));
+            SetKeyName(Const.KeyToChange);
+            StartCoroutine(KeyInputChecker(Const.KeyToChange));
             if (Const.isKeyChanged)
             {
-                Const.KeyChange = "";
+                Const.KeyToChange = "";
                 self.SetActive(false);
             }
 
-            if (name != "" && Input.GetMouseButtonDown(0))
+            if(Input.GetKeyDown(KeyCode.Escape))
             {
-                Vector3 touchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-                RaycastHit hit;
-
-                if (Physics.Raycast(touchPos, Vector3.forward, out hit))
-                {
-                    switch (hit.collider.name)
-                    {
-                        case "closeKeySetting":
-                            self.SetActive(false);
-                            break;
-                    }
-                }
+                Const.KeyToChange = "";
+                self.SetActive(false);
             }
         }
 
-        private void changeKeyName(string name)
+        private void SetKeyName(string name)
         {
+            desc.text = Const.KeyChangeDescription[(int)Const.Language];
             switch (name)
             {
-                case "k51":
-                    changeableKey.text = "5/6/8 Key Button 1";
+                case "k1":
+                    changeableKey.text = "TurnTable 1 (Keyboard)";
                     break;
-                case "k52":
-                    changeableKey.text = "5/6/8 Key Button 2";
+                case "k2":
+                    changeableKey.text = "Button 1 (Keyboard)";
                     break;
-                case "k53":
-                    changeableKey.text = "5/6/8 Key Button 3\n(In 5 buttons, Button 3 and 4 is mapped to middle button)";
+                case "k3":
+                    changeableKey.text = "Button 2 (Keyboard)";
                     break;
-                case "k54":
-                    changeableKey.text = "5/6/8 Key Button 4\n(In 5 buttons, Button 3 and 4 is mapped to middle button)";
+                case "k4":
+                    changeableKey.text = "Button 3 (Keyboard)";
                     break;
-                case "k55":
-                    changeableKey.text = "5/6/8 Key Button 5";
+                case "k5":
+                    changeableKey.text = "Button 4 (Keyboard)";
                     break;
-                case "k56":
-                    changeableKey.text = "5/6/8 Key Button 6";
+                case "k6":
+                    changeableKey.text = "Button 5 (Keyboard)";
                     break;
-                case "k87":
-                    changeableKey.text = "8 Key Button 7";
+                case "k7":
+                    changeableKey.text = "Button 6 (Keyboard)";
                     break;
-                case "k88":
-                    changeableKey.text = "8 Key Button 8";
+                case "k8":
+                    changeableKey.text = "Button 7 (Keyboard)";
+                    break;
+                case "k9":
+                    changeableKey.text = "TurnTable 2 (Keyboard)";
                     break;
             }
         }
 
         IEnumerator KeyInputChecker(string name)
         {
-            if (Input.anyKeyDown)
+            string key = null;
+
+            foreach (KeyCode code in Enum.GetValues(typeof(KeyCode)))
             {
-                string key = Input.inputString;
-                key = key.ToUpper();
-
-                switch (name)
+                if (Input.GetKeyDown(code))
                 {
-                    case "k51":
-                        Keys.btnkb[0] = key;
-                        break;
-                    case "k52":
-                        Keys.btnkb[1] = key;
-                        break;
-                    case "k53":
-                        Keys.btnkb[2] = key;
-                        break;
-                    case "k54":
-                        Keys.btnkb[3] = key;
-                        break;
-                    case "k55":
-                        Keys.btnkb[4] = key;
-                        break;
-                    case "k56":
-                        Keys.btnkb[5] = key;
-                        break;
-                    case "k87":
-                        Keys.btnkb[6] = key;
-                        break;
-                    case "k88":
-                        Keys.btnkb[7] = key;
-                        break;
-                }
+                    key = code.ToString();
 
-                Const.isKeyChanged = true;
+                    switch (name)
+                    {
+                        case "k1":
+                            Keys.btnkb[0] = key;
+                            break;
+                        case "k2":
+                            Keys.btnkb[1] = key;
+                            break;
+                        case "k3":
+                            Keys.btnkb[2] = key;
+                            break;
+                        case "k4":
+                            Keys.btnkb[3] = key;
+                            break;
+                        case "k5":
+                            Keys.btnkb[4] = key;
+                            break;
+                        case "k6":
+                            Keys.btnkb[5] = key;
+                            break;
+                        case "k7":
+                            Keys.btnkb[6] = key;
+                            break;
+                        case "k8":
+                            Keys.btnkb[7] = key;
+                            break;
+                        case "k9":
+                            Keys.btnkb[8] = key;
+                            break;
+                    }
+                    Const.isKeyChanged = true;
+                }
             }
 
             yield return null;

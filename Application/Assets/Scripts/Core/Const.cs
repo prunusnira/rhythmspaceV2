@@ -14,7 +14,7 @@ namespace BMSPlayer
             DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db.sqlite";
             JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\structure.json";
 #elif(UNITY_STANDALONE)
-            DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db1.sqlite";
+            DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db.sqlite";
             JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\structure.json";
 #endif
         }
@@ -158,6 +158,13 @@ namespace BMSPlayer
             "ユーザーが指定のラインになります\n(F10を押して変更)",
             "Notes will be shown as user setting\n(Press F10 to change line)"
         };
+
+        public static string[] KeyChangeDescription = new string[3]
+        {
+            "변경할 키를 눌러주세요\n(ESC로 취소)",
+            "キーを選択してください\n(ESCでキャンセル)",
+            "Press key\n(Cancel with ESC)"
+        };
         #endregion
 
         // System Setting Values
@@ -234,7 +241,7 @@ namespace BMSPlayer
             }
         }
 
-        public static string KeyChange
+        public static string KeyToChange
         {
             get
             {
@@ -243,6 +250,52 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetString("keyToChange", value);
+            }
+        }
+
+        public static int ScrWidth
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("scrWidth", 1920);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("scrWidth", value);
+            }
+        }
+        public static int ScrHeight
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("scrHeight", 1080);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("scrHeight", value);
+            }
+        }
+        public static int ScrRefresh
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("scrRefresh", 144);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("scrRefresh", value);
+            }
+        }
+
+        public static FullScreenMode ScreenMode
+        {
+            get
+            {
+                return (FullScreenMode)PlayerPrefs.GetInt("scrMode", (int)FullScreenMode.MaximizedWindow);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("scrMode", (int)value);
             }
         }
         #endregion

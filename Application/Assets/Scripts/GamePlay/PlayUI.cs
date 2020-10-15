@@ -375,6 +375,7 @@ namespace BMSPlayer
 
         public void UpdateGraph(int ex, int procNotes, int totalNotes)
         {
+            Debug.Log(ex + " " + procNotes + " " + totalNotes);
             graphCurrent.material.SetFloat("_Progress", ((float)ex) / (totalNotes * 2));
 
             // 현재 자기 랭크 글자 변경
@@ -872,25 +873,6 @@ namespace BMSPlayer
                 }
             }
         }
-
-        /*public void FixAllNotePositionOnScreen(PlayData data, int idx)
-        {
-            foreach(List<PlayNote> pnotes in data.NotePlay)
-            {
-                foreach(PlayNote n in pnotes)
-                {
-                    n.OnScrPos = n.Position - data.BPMPositionFix[idx];
-                }
-            }
-
-            foreach (List<MineNote> mnotes in data.NoteMine)
-            {
-                foreach (MineNote n in mnotes)
-                {
-                    n.OnScrPos = n.Position - data.BPMPositionFix[idx];
-                }
-            }
-        }*/
 
         public void PauseMenuMove()
         {

@@ -106,7 +106,7 @@ namespace BMSPlayer {
             }
 
             // 플레이 키 (최 우선 체크)
-            scroller.ProcessBeamOnTouch();
+            scroller.ButtonPushState();
 
             if (firstrun && !isPaused)
             {
@@ -123,7 +123,6 @@ namespace BMSPlayer {
                 // 노트위치를 계산하는 것은 불가능함
                 if (Data.Stop > 0)
                 {
-                    Debug.Log(Data.Stop + " " + DeltaTime);
                     Data.Stop -= DeltaTime;
 
                     if (Data.Stop <= 0)
@@ -141,14 +140,6 @@ namespace BMSPlayer {
                 scroller.PlayBPM(Data, PlayTimePassed, ref bpm, ref bps);
                 scroller.PlayStop(Data, PlayTimePassed, bps);
 
-                // Stop과 상관없이 모든 오브젝트를 이동시킴
-                // 단, Stop으로 소모된 시간만큼 노트 위치에 대한 보정이 필요함
-                //if (Data.Display)
-                //{
-                //    scroller.MoveNotes(Data, PlayTimePassed, ref bps);
-                //    scroller.MoveMine(Data, PlayTimePassed, bps);
-                //}
-
                 scroller.SpeedChangeAndBeam(bpm);
 
                 if (isPlayAuto)
@@ -165,12 +156,6 @@ namespace BMSPlayer {
 
                 Data.CurrentBPM = bpm;
                 Data.BPS = bps;
-
-                if(Data.IsBPMChanged)
-                {
-                    //UI.FixAllNotePositionOnScreen(Data, Data.BPMNum - 1);
-                    Data.IsBPMChanged = false;
-                }
 
                 // 게임 종료 시 처리
                 // Type 1: 게이지가 0이 되었을 때

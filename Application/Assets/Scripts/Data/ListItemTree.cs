@@ -124,7 +124,8 @@ namespace BMSPlayer
         public bool HasBMS(ListItemNode node)
         {
             string[] bmsfiles = Directory.GetFiles(node.Path, "*.*", SearchOption.TopDirectoryOnly)
-                        .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")).ToArray();
+                        .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")
+                        || s.ToLower().EndsWith(".bml")).ToArray();
 
             if (bmsfiles.Length > 0) return true;
             else return false;

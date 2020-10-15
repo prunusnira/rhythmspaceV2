@@ -679,7 +679,6 @@ namespace BMSPlayer
             double stopPos = 0;
             double stopTime = 0;
             bool isStop = false;
-            int fixidx = 0;
 
             // Bar는 000부터 시작하므로 시간 계산을 0부터 진행
             for (int bar = 0; bar < data.BMS.LastBar + 1; bar++)
@@ -840,11 +839,6 @@ namespace BMSPlayer
                             if (isStop && n.Position == stopPos)
                             {
                                 CalculateTiming(n, bps, stopTime, PosStart);
-
-                                if (!data.BPMStopTiming.ContainsKey(n.Timing))
-                                {
-                                    data.BPMStopTiming.Add(n.Timing, n.StopDuration / bps * 10);
-                                }
                             }
                             else if (n.Bar == bar &&
                                     n.Position >= PosStart &&
@@ -852,11 +846,6 @@ namespace BMSPlayer
                                 )
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
-
-                                if (!data.BPMStopTiming.ContainsKey(n.Timing))
-                                {
-                                    data.BPMStopTiming.Add(n.Timing, n.StopDuration / bps * 10);
-                                }
                             }
                         }
 
@@ -872,11 +861,6 @@ namespace BMSPlayer
                             {
                                 BPMNote bpm = timeChangeInBar[i] as BPMNote;
                                 nextbps = bpm.BPMValue / 240;
-                                if (data.BPMStopTiming.Count != fixidx + 1)
-                                {
-                                    data.BPMStopFix.Add(0);
-                                }
-                                fixidx++;
                             }
 
                             if(timeChangeInBar[i] is StopNote)
@@ -886,15 +870,6 @@ namespace BMSPlayer
                                 stopTime = prevTime + (stopPos - prevChangePos) / bps * 10;
                                 isStop = true;
                                 prevTime += stop.StopDuration / bps * 10;
-
-                                if (data.BPMStopFix.Count - 1 == fixidx)
-                                {
-                                    data.BPMStopFix[fixidx] += stop.StopDuration / bps * 10;
-                                }
-                                else
-                                {
-                                    data.BPMStopFix.Add(stop.StopDuration / bps * 10);
-                                }
                             }
 
                             prevTime += (timeChangeInBar[i].Position - prevChangePos) / bps * 10;

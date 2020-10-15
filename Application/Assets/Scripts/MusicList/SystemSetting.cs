@@ -53,6 +53,19 @@ namespace BMSPlayer
         public GameObject layerKeySetting;
         public Button btnKeySetting;
 
+        // Resolution Change
+        public Button btn1080p;
+        public Button btn900p;
+        public Button btn768p;
+        public Button btn720p;
+        public Text txtResol;
+
+        // Screen mode Change
+        public Button btnWindowed;
+        public Button btnFullScr;
+        public Button btnBorderless;
+        public Text txtScrMode;
+
         public Text debugText;
 
         public override void Awake()
@@ -63,8 +76,8 @@ namespace BMSPlayer
             musicList = new List<MusicListData>();
             bmsLoader = new LoadBMSList();
             
-            rows = 6;
-            btn = new int[] { 2, 3, 3, 2, 1, 2 };
+            rows = 7;
+            btn = new int[] { 2, 3, 3, 2, 1, 4, 3 };
 
             EncolorBtn(0, 0);
         }
@@ -73,7 +86,6 @@ namespace BMSPlayer
         {
             LanguageType lang = Const.Language;
             int enc = Const.Encoding;
-            int sync = Const.Sync;
 
             switch(lang)
             {
@@ -142,6 +154,16 @@ namespace BMSPlayer
                     break;
                 case 5:
                     // Resolution
+                    if (col == 0) ChangeSprite(btn1080p);
+                    else if (col == 1) ChangeSprite(btn900p);
+                    else if (col == 2) ChangeSprite(btn768p);
+                    else if (col == 3) ChangeSprite(btn720p);
+                    break;
+                case 6:
+                    // Screen Mode
+                    if (col == 0) ChangeSprite(btnWindowed);
+                    else if (col == 1) ChangeSprite(btnFullScr);
+                    else if(col == 2) ChangeSprite(btnBorderless);
                     break;
             }
         }
@@ -151,47 +173,86 @@ namespace BMSPlayer
             switch (row)
             {
                 case 0:
-                    if (col == 0)
+                    switch (col)
                     {
-                        changePath();
-                    }
-                    else if (col == 1)
-                    {
-                        pathRefresh();
+                        case 0:
+                            changePath();
+                            break;
+                        case 1:
+                            pathRefresh();
+                            break;
                     }
                     break;
                 case 1:
                     changeLang((LanguageType)col);
                     break;
                 case 2:
-                    if(col == 0)
+                    switch(col)
                     {
-                        SetAutoSync();
-                    }
-                    else if (col == 1)
-                    {
-                        changeSync(false);
-                    }
-                    else if (col == 2)
-                    {
-                        changeSync(true);
+                        case 0:
+                            SetAutoSync();
+                            break;
+                        case 1:
+                            changeSync(false);
+                            break;
+                        case 2:
+                            changeSync(true);
+                            break;
                     }
                     break;
                 case 3:
-                    if (col == 0)
+                    switch(col)
                     {
-                        changeEncoding(932);
-                    }
-                    else if (col == 1)
-                    {
-                        changeEncoding(949);
+                        case 0:
+                            changeEncoding(932);
+                            break;
+                        case 1:
+                            changeEncoding(949);
+                            break;
                     }
                     break;
                 case 4:
                     ShowKeySetting();
                     break;
                 case 5:
-                    // Resoultion
+                    switch (col)
+                    {
+                        case 0:
+                            Const.ScrWidth = 1920;
+                            Const.ScrHeight = 1080;
+                            break;
+                        case 1:
+                            Const.ScrWidth = 1600;
+                            Const.ScrHeight = 900;
+                            break;
+                        case 2:
+                            Const.ScrWidth = 1366;
+                            Const.ScrHeight = 768;
+                            break;
+                        case 3:
+                            Const.ScrWidth = 1280;
+                            Const.ScrHeight = 720;
+                            break;
+                    }
+                    changeVideoSetting();
+                    break;
+                case 6:
+                    switch(col)
+                    {
+                        case 0:
+                            // Windowed
+                            Const.ScreenMode = FullScreenMode.Windowed;
+                            break;
+                        case 1:
+                            // FullScreen
+                            Const.ScreenMode = FullScreenMode.ExclusiveFullScreen;
+                            break;
+                        case 2:
+                            // Borderless
+                            Const.ScreenMode = FullScreenMode.MaximizedWindow;
+                            break;
+                    }
+                    changeVideoSetting();
                     break;
             }
         }
@@ -323,14 +384,13 @@ namespace BMSPlayer
 
         public void changeSync(bool up)
         {
-            int sync = Const.Sync;
             if (up)
             {
-                Const.Sync = sync + 1;
+                Const.Sync++;
             }
             else
             {
-                Const.Sync = sync - 1;
+                Const.Sync--;
             }
             showSync();
         }
@@ -379,6 +439,16 @@ namespace BMSPlayer
                     curEncoding.text = "KR-Based";
                     break;
             }
+        }
+
+        public void changeVideoSetting()
+        {
+            Screen.SetResolution(
+                Const.ScrWidth,
+                Const.ScrHeight,
+                Const.ScreenMode,
+                Const.ScrRefresh
+            );
         }
 
         public void ShowKeySetting()

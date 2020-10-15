@@ -16,7 +16,7 @@ namespace BMSPlayer
 
                 RaycastHit hit;
 
-                string name = Const.KeyChange;
+                string name = Const.KeyToChange;
                 string key = "";
                 bool dp = false;
 
@@ -153,7 +153,7 @@ namespace BMSPlayer
 
             if (Const.isKeyChanged)
             {
-                Const.KeyChange = "";
+                Const.KeyToChange = "";
                 self.SetActive(false);
             }
         }

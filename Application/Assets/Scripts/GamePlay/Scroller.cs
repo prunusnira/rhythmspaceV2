@@ -70,7 +70,6 @@ namespace BMSPlayer
 
         // 라인 눌렀을 때 소리를 재생했는지 여부 확인
         private bool[] btnPushSound;
-        private int syncControl = 0;
 
         // 롱노트 처리 변수
         private bool[] isLnWorking; // 라인별 처리중 상태 on/off
@@ -96,7 +95,6 @@ namespace BMSPlayer
             btnPushSound = new bool[8] { false, false, false, false, false, false, false, false };
             isLnWorking = new bool[8];
             lnTiming = new double[8];
-            syncControl = Const.Sync * 5;
 
             for (int i = 0; i < 8; i++)
             {
@@ -125,41 +123,32 @@ namespace BMSPlayer
         private void SetNotePosition(
             NoteObject note, PlayData data, double timePassed, double bps)
         {
-            // 현재 시간을 계산해야 하는 부분에는 addStopTiming을
-            // 전체 평균 시간을 계산해야 하는 부분에는 BPMStopFix를 사용
-            if(data.BPMPositionFix.Count == 0)
+            // 현재 시간을 계산해야 하는 부분에 addStopTiming을 사용
+            // addStopTiming은 BPM 변경 포인트간의 STOP 합을 정의한다
+            if(note is PlayNote
+                && (note as PlayNote).PlayNoteType == NoteType.LNSTART
+                && note.Timing <= timePassed)
             {
-                note.OnScrPos = note.Position - (timePassed - addStopTiming) * bps / 10;
+                    note.OnScrPos = 0;
+            }
+            else if(data.BPMPositionFix.Count == 0)
+            {
+                note.OnScrPos =
+                    note.Position - (timePassed - addStopTiming) * bps / 10;
             }
             else if (data.BPMNum == 0)
             {
                 note.OnScrPos =
-                    note.Position
-                    //- data.BPMPositionFix[0] / (data.BPMTimingFix[0] - data.BPMStopFix[0])
-                    - bps * timePassed / 10;
-            }
-            else if(data.BPMNum == data.BPMPositionFix.Count)
-            {
-                note.OnScrPos =
-                    note.Position
-                    - data.BPMPositionFix[data.BPMNum - 1]
-                    - (timePassed - data.BPMTimingFix[data.BPMNum - 1] - addStopTiming) * bps / 10;
+                    note.Position - (timePassed - addStopTiming) * bps / 10;
             }
             else
             {
                 note.OnScrPos =
                     note.Position
                     - data.BPMPositionFix[data.BPMNum - 1]
-                    - (
-                        /*(data.BPMPositionFix[data.BPMNum] - data.BPMPositionFix[data.BPMNum - 1])
-                        / (data.BPMTimingFix[data.BPMNum] - data.BPMTimingFix[data.BPMNum - 1] - data.BPMStopFix[data.BPMNum])*/
-                        bps * (timePassed - data.BPMTimingFix[data.BPMNum - 1] - addStopTiming) / 10
-                      );
+                    - (timePassed - data.BPMTimingFix[data.BPMNum - 1] - addStopTiming) * bps / 10;
             }
         }
-
-        public int currentBar = 0;
-        public int currentStop = 0;
 
         public void MoveMine(PlayData data,
             double playTime, double bps)
@@ -289,7 +278,7 @@ namespace BMSPlayer
                      * 노트 위치에 대해 판정선까지의 시간계산하기
                      * 시간 = (노트의 처음위치 - 노트의 현재위치) / 시간당 비트(bps)
                      */
-            if (judgeTiming < EPOOR * -1 &&
+                    if (judgeTiming < EPOOR * -1 &&
                         current.ObjType == ObjectType.PLAYABLE &&
                         current.OnScreen)
                     {
@@ -436,33 +425,8 @@ namespace BMSPlayer
                     current.Used = true;
                     removeCandidate.Add(current);
                     ui.SetGearCurBPM(bpm);
-                    Data.IsBPMChanged = true;
                     Data.BPMNum++;
                     addStopTiming = 0;
-
-                    // BPM 변경된 후 다음 범위 내에서 노트 위치 계산을 위해
-                    // Stop 노트의 범위를 계산
-                    /*Data.StopAvailableList.Clear();
-                    foreach (double d in Data.BPMStopTiming.Keys)
-                    {
-                        double p = Data.BPMPositionFix[Data.BPMNum - 1];
-
-                        if(Data.BPMPositionFix.Count - 1 == Data.BPMNum)
-                        {
-                            double n = Data.BPMPositionFix[Data.BPMNum];
-                            if (d >= p && d < n)
-                            {
-                                Data.StopAvailableList.Add(d, Data.BPMStopTiming[d]);
-                            }
-                        }
-                        else
-                        {
-                            if (d >= p)
-                            {
-                                Data.StopAvailableList.Add(d, Data.BPMStopTiming[d]);
-                            }
-                        }
-                    }*/
                 }
             }
 
@@ -491,8 +455,6 @@ namespace BMSPlayer
 
                 if (current.Timing <= time && !current.Used)
                 {
-                    currentStop++;
-                    currentBar = current.Bar;
                     // 지정된 시간동안 노트 움직임을 멈춤
                     double stop = current.StopDuration;
                     Data.Stop += stop / bps * 10;
@@ -603,29 +565,23 @@ namespace BMSPlayer
 
         public void SpeedChangeAndBeam(double bpm)
         {
-            if (Input.GetButtonDown("spdup"))
+            if (Input.GetKey(KeyCode.Alpha2))
             {
                 if (spdType == SpdType.FIXED)
                 {
                     SpeedUpFixed(bpm);
                 }
-            }
-            if (Input.GetButtonDown("spddn"))
-            {
-                if (spdType == SpdType.FIXED)
-                {
-                    SpeedDownFixed(bpm);
-                }
-            }
-            if (Input.GetButton("spdup"))
-            {
                 if (spdType == SpdType.FLUID)
                 {
                     SpeedUpFluid(bpm);
                 }
             }
-            if (Input.GetButton("spddn"))
+            if (Input.GetKey(KeyCode.Alpha1))
             {
+                if (spdType == SpdType.FIXED)
+                {
+                    SpeedDownFixed(bpm);
+                }
                 if (spdType == SpdType.FLUID)
                 {
                     SpeedDownFluid(bpm);
@@ -700,7 +656,7 @@ namespace BMSPlayer
 
                         // 4. 판정 처리하기
                         // 여기부터는 타이밍으로 간 봐야 할것
-                        double time = GetJudgeTiming(cnote.Timing, timePassed);
+                        double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
 
                         // Timing Window 내에 노트가 있으면
                         if (time < EPOOR && time >= BAD)
@@ -728,6 +684,7 @@ namespace BMSPlayer
                                 else
                                 {
                                     // 틀린 처리하고 넘어감
+                                    processedNotes++;
                                     lnlist[cnote.LNNum].Used = true;
                                 }
                                 
@@ -779,7 +736,7 @@ namespace BMSPlayer
 
                     if (isLnWorking[i])
                     {
-                        double time = GetJudgeTiming(cnote.Timing, timePassed);
+                        double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
 
                         if (time < BAD)
                         {
@@ -809,6 +766,7 @@ namespace BMSPlayer
                             else
                             {
                                 // 노트 이펙트 켜기
+                                processedNotes++;
                                 ui.TurnOnNoteEffectLN(i, false);
 
                             }
@@ -838,7 +796,7 @@ namespace BMSPlayer
             }
         }
 
-        public void ProcessBeamOnTouch()
+        public void ButtonPushState()
         {
             /**
              * 사용자의 플레이에 대한 처리
@@ -879,31 +837,65 @@ namespace BMSPlayer
             {
                 if (Keys.GetKeyAxisDown(Keys.btnkb[i]))
                 {
-                    btnPushState[i] = true;
+                    if(i != 8)
+                    {
+                        btnPushState[i] = true;
+                    }
+                    else
+                    {
+                        btnPushState[0] = true;
+                    }
                 }
                 if (Keys.GetKeyAxisDown(Keys.btnct[i]))
                 {
                     if (Keys.dpad[i] && !isAxisPushed[i])
                     {
-                        btnPushState[i] = true;
-                        isAxisPushed[i] = true;
+                        if (i != 8)
+                        {
+                            btnPushState[i] = true;
+                            isAxisPushed[i] = true;
+                        }
+                        else
+                        {
+                            btnPushState[0] = true;
+                            isAxisPushed[0] = true;
+                        }
                     }
                 }
 
                 if (Keys.GetKeyAxisUp(Keys.btnkb[i]))
                 {
-                    btnPushState[i] = false;
-                    btnPushSound[i] = false;
-                    btnProcState[i] = false;
+                    if (i != 8)
+                    {
+                        btnPushState[i] = false;
+                        btnPushSound[i] = false;
+                        btnProcState[i] = false;
+                    }
+                    else
+                    {
+                        btnPushState[0] = false;
+                        btnPushSound[0] = false;
+                        btnProcState[0] = false;
+                    }
                 }
                 if (Keys.GetKeyAxisUp(Keys.btnct[i]))
                 {
                     if (Keys.dpad[i] && isAxisPushed[i])
                     {
-                        btnPushState[i] = false;
-                        btnPushSound[i] = false;
-                        isAxisPushed[i] = false;
-                        btnProcState[i] = false;
+                        if (i != 8)
+                        {
+                            btnPushState[i] = false;
+                            btnPushSound[i] = false;
+                            isAxisPushed[i] = false;
+                            btnProcState[i] = false;
+                        }
+                        else
+                        {
+                            btnPushState[0] = false;
+                            btnPushSound[0] = false;
+                            isAxisPushed[0] = false;
+                            btnProcState[0] = false;
+                        }
                     }
                 }
             }
@@ -992,6 +984,7 @@ namespace BMSPlayer
                     break;
             }
 
+            processedNotes++;
             UpdateTiming(time, true);
             UpdateScore(totalNotes);
             ui.UpdateHP(hpController.CurrentHP);
@@ -1086,9 +1079,9 @@ namespace BMSPlayer
 
         private void SpeedUpFixed(double bpm)
         {
-            if (speed < 1000)
+            if (speed < 2000)
             {
-                speed += 25;
+                speed += 1;
                 Const.SpeedFixed = speed;
                 Const.SpeedFluid = (int)(speed * bpm / 100);
                 ui.UpdateSpeed();
@@ -1099,7 +1092,7 @@ namespace BMSPlayer
         {
             if (speed > 50)
             {
-                speed -= 25;
+                speed -= 1;
                 Const.SpeedFixed = speed;
                 Const.SpeedFluid = (int)(speed * bpm / 100);
                 ui.UpdateSpeed();
@@ -1108,7 +1101,7 @@ namespace BMSPlayer
 
         private void SpeedUpFluid(double bpm)
         {
-            if (speedfl < 1000)
+            if (speedfl < 2000)
             {
                 speedfl += 1;
                 speed = (int)(speedfl / bpm * 100);
@@ -1120,7 +1113,7 @@ namespace BMSPlayer
 
         private void SpeedDownFluid(double bpm)
         {
-            if (speedfl > 50)
+            if (speedfl > 100)
             {
                 speedfl -= 1;
                 speed = (int)(speedfl / bpm * 100);

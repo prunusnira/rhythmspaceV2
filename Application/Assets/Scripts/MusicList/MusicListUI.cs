@@ -78,13 +78,10 @@ namespace BMSPlayer
 
         public void Start()
         {
+            Application.targetFrameRate = Const.ScrRefresh;
+
             evtsystem = GetComponent<EventSystem>();
             raycast = GetComponent<GraphicRaycaster>();
-
-            for(int i = 0; i < 8; i++)
-            {
-                musicRect.AddItemTop(ObjectSetup);
-            }
 
             showInfo(musicRect.GetCurrent());
 
@@ -154,14 +151,10 @@ namespace BMSPlayer
                         Const.ListDepth.Add(musicRect.GetCurrentIdx());
                         Const.ListPos = 0;
                         musicRect.Clear();
+                        musicRect.ResetIndex();
                         SelectListGenerator();
                         musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
                         mlm.close();
-
-                        for (int i = 0; i < 8; i++)
-                        {
-                            musicRect.AddItemTop(ObjectSetup);
-                        }
                         showInfo(musicRect.GetCurrent());
                     }
                     else if (Const.selectedOnList.Type == ItemType.BMS)
@@ -178,14 +171,10 @@ namespace BMSPlayer
                         Const.ListDepth.RemoveAt(Const.ListDepth.Count - 1);
                         Const.ListPos = 0;
                         musicRect.Clear();
+                        musicRect.ResetIndex();
                         SelectListGenerator();
                         musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
                         mlm.close();
-
-                        for (int i = 0; i < 8; i++)
-                        {
-                            musicRect.AddItemTop(ObjectSetup);
-                        }
                         showInfo(musicRect.GetCurrent());
                     }
                 }

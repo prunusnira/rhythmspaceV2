@@ -15,7 +15,6 @@ namespace BMSPlayer
         public double SPB { get; set; }
         public double Stop { get; set; }
         public double CurrentStopPos { get; set; }
-        public bool IsBPMChanged { get; set; }
         public bool IsStopOn { get; set; }
 
         // 전체 게임 길이 (4박 기준, 1 = 4/4)
@@ -36,12 +35,10 @@ namespace BMSPlayer
         public List<StopNote> NoteStop { get; set; }
         public List<BGANote> NoteBGA { get; set; }
         public List<BGMNote> NoteBGM { get; set; }
+
+        // 노트 위치 계산을 위한 변수
         public List<double> BPMPositionFix { get; set; }
         public List<double> BPMTimingFix { get; set; }
-        public List<double> BPMStopFix { get; set; }
-        // timing, duration
-        public Dictionary<double, double> BPMStopTiming { get; set; }
-        public Dictionary<double, double> StopAvailableList { get; set; }
         public int BPMNum { get; set; }
 
         public PlayData()
@@ -75,13 +72,9 @@ namespace BMSPlayer
             NoteStop = new List<StopNote>();
             BPMPositionFix = new List<double>();
             BPMTimingFix = new List<double>();
-            BPMStopFix = new List<double>();
-            BPMStopTiming = new Dictionary<double, double>();
-            StopAvailableList = new Dictionary<double, double>();
 
             BPMNum = 0;
             Stop = 0;
-            IsBPMChanged = false;
             IsStopOn = false;
         }
     }

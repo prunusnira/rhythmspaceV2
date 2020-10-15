@@ -111,6 +111,7 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\JudgeUIType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\LanguageType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\NoteLayout.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enum\ScreenModeType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\SpdType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\TimingType.cs" />
     <Compile Include="Assets\Scripts\Intro\Intro.cs" />

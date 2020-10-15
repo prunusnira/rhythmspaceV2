@@ -27,7 +27,8 @@ namespace BMSCore
             foreach (string subdir in dirs)
             {
                 string[] bmsfiles = Directory.GetFiles(subdir, "*.*", SearchOption.TopDirectoryOnly)
-                        .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")).ToArray();
+                        .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")
+                         || s.ToLower().EndsWith(".bml")).ToArray();
 
                 foreach(string bms in bmsfiles)
                 {
