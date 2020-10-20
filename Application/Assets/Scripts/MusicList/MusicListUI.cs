@@ -17,6 +17,7 @@ namespace BMSPlayer
         // Data store
         private List<ListItemNode> bmslist;
         private MusicListManager mlm;
+        private RecordDataManager rdm;
         private List<int> listDepth;
         private int listPosition;
 
@@ -38,6 +39,7 @@ namespace BMSPlayer
         public Sprite rampEX;
         public Sprite rampFC;
         public Sprite rampPFC;
+        public Sprite rampFail;
         public ScrollRectInfinite musicRect;
         public GameObject layerSysOpt;
 
@@ -61,6 +63,15 @@ namespace BMSPlayer
 
         public Text optSpdAppend;
 
+        public TextMeshProUGUI recordScore;
+        public TextMeshProUGUI recordPerfect;
+        public TextMeshProUGUI recordGreat;
+        public TextMeshProUGUI recordGood;
+        public TextMeshProUGUI recordOk;
+        public TextMeshProUGUI recordPoor;
+        public TextMeshProUGUI recordCBreak;
+        public TextMeshProUGUI recordClearStat;
+
         public Sprite empty;
 
         // data
@@ -76,10 +87,10 @@ namespace BMSPlayer
             // Initialize
             bmslist = new List<ListItemNode>();
             mlm = new MusicListManager();
+            rdm = new RecordDataManager();
             ListTreeGenerator();
             SelectListGenerator();
             musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-            mlm.close();
         }
 
         public void Start()
@@ -153,14 +164,12 @@ namespace BMSPlayer
                 {
                     if(Const.selectedOnList.Type == ItemType.DIRECTORY)
                     {
-                        mlm = new MusicListManager();
                         Const.ListDepth.Add(musicRect.GetCurrentIdx());
                         Const.ListPos = 0;
                         musicRect.Clear();
                         musicRect.ResetIndex();
                         SelectListGenerator();
                         musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-                        mlm.close();
                         showInfo(musicRect.GetCurrent());
                     }
                     else if (Const.selectedOnList.Type == ItemType.BMS)
@@ -173,14 +182,12 @@ namespace BMSPlayer
                 {
                     if(Const.ListDepth.Count > 0)
                     {
-                        mlm = new MusicListManager();
                         Const.ListDepth.RemoveAt(Const.ListDepth.Count - 1);
                         Const.ListPos = 0;
                         musicRect.Clear();
                         musicRect.ResetIndex();
                         SelectListGenerator();
                         musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-                        mlm.close();
                         showInfo(musicRect.GetCurrent());
                     }
                 }
@@ -193,11 +200,9 @@ namespace BMSPlayer
                 musicRect.Clear();
                 bmslist.Clear();
                 
-                mlm = new MusicListManager();
                 ListTreeGenerator();
                 SelectListGenerator();
                 musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-                mlm.close();
 
                 showInfo(musicRect.GetCurrent());
             }
@@ -290,6 +295,58 @@ namespace BMSPlayer
                         diffIns.text = bms.Level.ToString("00");
                         break;
                 }
+
+                // 기록 값 표기
+                RecordData data = rdm.GetFullClearStat(bms.MD5Hash);
+                if(data != null)
+                {
+                    recordScore.text = data.Score.ToString();
+                    recordPerfect.text = data.Perfect.ToString();
+                    recordGreat.text = data.Great.ToString();
+                    recordGood.text = data.Good.ToString();
+                    recordOk.text = data.OK.ToString();
+                    recordPoor.text = data.Poor.ToString();
+                    recordCBreak.text = data.CBreak.ToString();
+
+                    switch (data.Clear)
+                    {
+                        case ClearType.ASSISTCLEAR:
+                            recordClearStat.text = "ASSISTED CLEAR";
+                            break;
+                        case ClearType.EASYCLEAR:
+                            recordClearStat.text = "EASY CLEAR";
+                            break;
+                        case ClearType.NORMALCLEAR:
+                            recordClearStat.text = "NORMAL CLEAR";
+                            break;
+                        case ClearType.HARDCLEAR:
+                            recordClearStat.text = "HARD CLEAR";
+                            break;
+                        case ClearType.EXCLEAR:
+                            recordClearStat.text = "EX CLEAR";
+                            break;
+                        case ClearType.FULLCB:
+                            recordClearStat.text = "FULLCOMBO";
+                            break;
+                        case ClearType.PERFECT:
+                            recordClearStat.text = "PERFECT";
+                            break;
+                        case ClearType.FAIL:
+                            recordClearStat.text = "FAILED";
+                            break;
+                    }
+                }
+                else
+                {
+                    recordScore.text = "0";
+                    recordPerfect.text = "0";
+                    recordGreat.text = "0";
+                    recordGood.text = "0";
+                    recordOk.text = "0";
+                    recordPoor.text = "0";
+                    recordCBreak.text = "0";
+                    recordClearStat.text = "NO PLAY";
+                }
             }
             else if(node.Type == ItemType.DIRECTORY)
             {
@@ -300,7 +357,16 @@ namespace BMSPlayer
                 infoArtist.text = "";
                 infoSubArtist.text = "";
                 infoBpm.text = "";
-            }
+
+                recordScore.text = "0";
+                recordPerfect.text = "0";
+                recordGreat.text = "0";
+                recordGood.text = "0";
+                recordOk.text = "0";
+                recordPoor.text = "0";
+                recordCBreak.text = "0";
+                recordClearStat.text = "NO PLAY";
+    }
         }
 
         public GameObject ObjectSetup(ListItemNode n)
@@ -312,6 +378,7 @@ namespace BMSPlayer
                 Transform c = music.transform;
                 TextMeshProUGUI level = c.GetChild(0).GetComponent<TextMeshProUGUI>();
                 TextMeshProUGUI title = c.GetChild(1).GetComponent<TextMeshProUGUI>();
+                Image ramp = c.GetChild(2).GetComponent<Image>();
 
                 level.text = d.Level.ToString();
                 title.text = d.Title;
@@ -339,6 +406,35 @@ namespace BMSPlayer
                         break;
                 }
 
+                // 기록을 가져옴
+                switch((ClearType)rdm.GetClearStat(d.MD5Hash))
+                {
+                    case ClearType.ASSISTCLEAR:
+                        ramp.sprite = rampAssisted;
+                        break;
+                    case ClearType.EASYCLEAR:
+                        ramp.sprite = rampEasy;
+                        break;
+                    case ClearType.NORMALCLEAR:
+                        ramp.sprite = rampNormal;
+                        break;
+                    case ClearType.HARDCLEAR:
+                        ramp.sprite = rampHard;
+                        break;
+                    case ClearType.EXCLEAR:
+                        ramp.sprite = rampEX;
+                        break;
+                    case ClearType.FULLCB:
+                        ramp.sprite = rampFC;
+                        break;
+                    case ClearType.PERFECT:
+                        ramp.sprite = rampPFC;
+                        break;
+                    case ClearType.FAIL:
+                        ramp.sprite = rampFail;
+                        break;
+                }
+
                 return music;
             }
             else if (n.Type == ItemType.DIRECTORY)
@@ -361,6 +457,7 @@ namespace BMSPlayer
                 // 선택한 패턴의 정보를 표시하고 플레이 시작이 가능
                 Debug.Log(pattern.Title + " " + pattern.Artist);
 
+                OnFinish();
                 Const.PlayingBMSPath = pattern.Path + pattern.FileName;
 
                 Debug.Log("READY TO RUN");
@@ -447,6 +544,12 @@ namespace BMSPlayer
                     bmslist.Add(child);
                 }
             }
+        }
+
+        public void OnFinish()
+        {
+            mlm.Close();
+            rdm.Close();
         }
     }
 }

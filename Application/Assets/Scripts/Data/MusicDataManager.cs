@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace BMSPlayer
 {
@@ -20,7 +18,7 @@ namespace BMSPlayer
             md5 = MD5.Create();
         }
 
-        public void close()
+        public void Close()
         {
             executor.closeDB();
             md5.Clear();
@@ -62,13 +60,14 @@ namespace BMSPlayer
         {
             if (list.Count != 0)
             {
-                executor.dropList();
+                executor.DropList();
                 List<string[]> paramList = new List<string[]>();
                 // 리스트의 각 파일을 DB에 등록(이 때 MD5 Hash값도 계산)
                 foreach (MusicListData d in list)
                 {
                     FileStream fstream = File.OpenRead(d.Path + d.FileName);
                     var bytehash = md5.ComputeHash(fstream);
+                    fstream.Close();
 
                     string hash = BitConverter.ToString(bytehash);
 

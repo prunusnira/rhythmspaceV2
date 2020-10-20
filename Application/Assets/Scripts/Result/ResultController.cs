@@ -1,6 +1,9 @@
 ﻿using BMSCore;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -50,6 +53,9 @@ namespace BMSPlayer
         // BG Sound
         public AudioSource bgLoop;
         public AudioClip[] loop;
+
+        private RecordDataManager rdm;
+        private RecordData record;
 
         void Awake()
         {
@@ -135,6 +141,105 @@ namespace BMSPlayer
                     fcpfmark.SetActive(true);
                     fcpfmark.GetComponent<Image>().sprite = fcmark;
                 }
+            }
+
+            if(Const.Auto == AutoPlayType.OFF)
+            {
+                rdm = new RecordDataManager();
+
+                string nrank;
+                int nscore;
+                JudgeType njtype;
+                ClearType nclear;
+                int npf;
+                int ngr;
+                int ngd;
+                int nok;
+                int npr;
+                int ncb;
+
+                // 기존 등록된 스코어와 비교 수행
+                // 1. 스코어가 높다면 - 스코어와 판정을 갱신
+                // 2. 게이지 레벨이 높다면 - 게이지만 갱신
+                // 3. 스코어 무관하게 풀콤을 했다면 - 풀콤 여부 갱신
+
+                FileStream fstream = File.OpenRead(Data.BMS.FilePath);
+                MD5 md5 = MD5.Create();
+                var bytehash = md5.ComputeHash(fstream);
+                fstream.Close();
+                md5.Clear();
+
+                string hash = BitConverter.ToString(bytehash);
+
+                // 기존 기록 값 가져오기
+                RecordData prev = rdm.GetFullClearStat(hash);
+
+                if(prev != null)
+                {
+                    // 1. 스코어 비교
+                    if (Const.ResultScore > prev.Score)
+                    {
+                        nrank = Const.ResultRank;
+                        nscore = Const.ResultScore;
+                        npf = Const.ResultPerfect;
+                        ngr = Const.ResultGreat;
+                        ngd = Const.ResultGood;
+                        nok = Const.ResultOk;
+                        npr = Const.ResultMiss;
+                        ncb = Const.ResultComboBreak;
+                    }
+                    else
+                    {
+                        nrank = prev.Rank;
+                        nscore = prev.Score;
+                        npf = prev.Perfect;
+                        ngr = prev.Great;
+                        ngd = prev.Good;
+                        nok = prev.OK;
+                        npr = prev.Poor;
+                        ncb = prev.CBreak;
+                    }
+
+                    // 2. 게이지 레벨 비교
+                    if(Const.Clear > prev.Clear)
+                    {
+                        njtype = Const.JudgeType;
+                        nclear = Const.Clear;
+                    }
+                    else
+                    {
+                        njtype = prev.GaugeType;
+                        nclear = prev.Clear;
+                    }
+                }
+                else
+                {
+                    // 새 기록 바로 적용
+                    nrank = Const.ResultRank;
+                    nscore = Const.ResultScore;
+                    npf = Const.ResultPerfect;
+                    ngr = Const.ResultGreat;
+                    ngd = Const.ResultGood;
+                    nok = Const.ResultOk;
+                    npr = Const.ResultMiss;
+                    ncb = Const.ResultComboBreak;
+                    njtype = Const.JudgeType;
+                    nclear = Const.Clear;
+                }
+                
+
+                record = new RecordData(
+                    hash,
+                    nrank, nscore, (int)njtype, (int)nclear,
+                    npf, ngr, ngd, nok, npr, ncb
+                );
+
+                // 테스트용 리셋
+                /*rdm.DropTable();
+                rdm.CreateNewTable();*/
+
+                rdm.RegisterRecord(record);
+                rdm.Close();
             }
         }
 

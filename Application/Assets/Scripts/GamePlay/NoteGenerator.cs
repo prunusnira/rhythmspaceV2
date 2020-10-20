@@ -669,11 +669,12 @@ namespace BMSPlayer
                         ObjType = ObjectType.BGA
                     };
 
-                    if (data.BMS.BGAImages.Count == 0)
+                    if (data.BMS.BGAVideoFile != "")
                     {
                         note.VideoFile = data.BMS.BGAVideoFile;
                     }
-                    else
+                    
+                    if(data.BMS.BGAImages.Count > 0)
                     {
                         if(data.BMS.BGAImages.ContainsKey(noteStr))
                         {

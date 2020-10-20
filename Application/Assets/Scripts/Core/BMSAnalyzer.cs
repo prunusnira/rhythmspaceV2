@@ -290,7 +290,15 @@ namespace BMSCore
                                 filename += "ogg";
                             else
                             {
-                                // 혼돈의 카오스...
+                                // 각각의 파일에 대해서 직접 검사 할 수 밖에 없음
+                                if(File.Exists(bms.FolderPath + filename + "wav"))
+                                {
+                                    filename = filename + "wav";
+                                }
+                                else
+                                {
+                                    filename = filename + "ogg";
+                                }
                             }
 
                             bms.WavList.Add(tag.Substring(4, 2), filename);

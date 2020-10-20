@@ -1,63 +1,36 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿namespace BMSPlayer
+{
+    public class RecordData
+    {
+        public string MD5Hash { get; set; }
+        public string Rank { get; set; }
+        public int Score { get; set; }
+        public JudgeType GaugeType { get; set; }
+        public ClearType Clear { get; set; }
+        public int Perfect { get; set; }
+        public int Great { get; set; }
+        public int Good { get; set; }
+        public int OK { get; set; }
+        public int Poor { get; set; }
+        public int CBreak { get; set; }
 
-public class RecordData {
-    private int id;
-    private string name;
-    private string rank;
-    private int score;
-    private string md5hash;
-
-    public RecordData() { }
-
-    public RecordData(int id, string name, string rank, int score, string md5hash)
-    {
-        SetId(id);
-        SetName(name);
-        SetRank(rank);
-        SetScore(score);
-        SetMD5(md5hash);
-    }
-
-    public int GetId()
-    {
-        return id;
-    }
-    public void SetId(int id)
-    {
-        this.id = id;
-    }
-    public string GetName()
-    {
-        return name;
-    }
-    public void SetName(string name)
-    {
-        this.name = name;
-    }
-    public string GetRank()
-    {
-        return rank;
-    }
-    public void SetRank(string rank)
-    {
-        this.rank = rank;
-    }
-    public int GetScore()
-    {
-        return score;
-    }
-    public void SetScore(int score)
-    {
-        this.score = score;
-    }
-    public string GetMD5()
-    {
-        return md5hash;
-    }
-    public void SetMD5(string md5hash)
-    {
-        this.md5hash = md5hash;
+        public RecordData(
+            string md5hash, string rank,
+            int score, int judge,
+            int clear, int pf, int gr, int gd, int ok,
+            int pr, int cb)
+        {
+            MD5Hash = md5hash;
+            Rank = rank;
+            Score = score;
+            GaugeType = (JudgeType)judge;
+            Clear = (ClearType)clear;
+            Perfect = pf;
+            Great = gr;
+            Good = gd;
+            OK = ok;
+            Poor = pr;
+            CBreak = cb;
+        }
     }
 }

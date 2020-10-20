@@ -20,6 +20,7 @@ namespace BMSPlayer
 
         // Pause Menu
         public Button btnRestart;
+        public Button btnRestartSame;
         public Button btnExit;
 
         public Sprite cb0;
@@ -150,9 +151,12 @@ namespace BMSPlayer
         private bool FadeStart = false;
         private bool FadeReady = false;
 
-        private int pauseSel = 0;
+        // Menu btn
         public Sprite normalBtn;
         public Sprite selectBtn;
+
+        // Key info
+        public GameObject keyInfo;
 
         // Music Info
         public TextMeshPro infoTitle;
@@ -188,7 +192,8 @@ namespace BMSPlayer
             hpController = GetComponent<HPController>();
 
             // 일시정지 메뉴
-            btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
+            btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
+            btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
             btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
 
             // 판정 표시 타입 변경
@@ -886,43 +891,88 @@ namespace BMSPlayer
             }
         }
 
-        public void PauseMenuMove()
+        public void PauseMenuMove(ref int pauseSel, bool down)
         {
             if(pauseSel == 0)
             {
-                pauseSel = 1;
-                btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
-                btnExit.gameObject.GetComponent<Image>().sprite = selectBtn;
+                if (down)
+                {
+                    pauseSel = 1;
+                }
+                else
+                {
+                    pauseSel = 2;
+                }
+            }
+            else if(pauseSel == 1)
+            {
+                if (down)
+                {
+                    pauseSel = 2;
+                }
+                else
+                {
+                    pauseSel = 0;
+                }
             }
             else
             {
-                pauseSel = 0;
-                btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
-                btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
+                if (down)
+                {
+                    pauseSel = 0;
+                }
+                else
+                {
+                    pauseSel = 1;
+                }
+            }
+            SetPauseMenu(pauseSel);
+        }
+
+        public void SetPauseMenu(int newsel)
+        {
+            switch(newsel)
+            {
+                case 0:
+                    btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
+                    btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    break;
+                case 1:
+                    btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    btnRestartSame.gameObject.GetComponent<Image>().sprite = selectBtn;
+                    btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    break;
+                case 2:
+                    btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    btnExit.gameObject.GetComponent<Image>().sprite = selectBtn;
+                    break;
             }
         }
 
-        public void PauseMenuExec()
+        public bool PauseMenuExec(int pauseSel)
         {
             if(pauseSel == 0)
             {
+                Const.ChangeLayout = true;
                 RestartGame();
             }
-            else
-            {
-                ExitGame();
+            else if (pauseSel == 1) {
+                Const.ChangeLayout = false;
+                RestartGame();
             }
+            else if (pauseSel == 2)
+            {
+                return true;
+            }
+            return false;
         }
 
         public void RestartGame()
         {
             Scene scene = SceneManager.GetActiveScene();
             SceneManager.LoadScene("PlayScreen");
-        }
-
-        public void ExitGame()
-        {
-            SceneManager.LoadScene("MusicSelect");
         }
 
         public void DeactiveLoading()
@@ -940,6 +990,11 @@ namespace BMSPlayer
             stageSubtitle.text = subt;
             stageArtist.text = art;
             stageSubartist.text = subart;
+        }
+
+        public void RemoveKeyInfo()
+        {
+            keyInfo.SetActive(false);
         }
 
         public void UpdateTimerCur(double time)

@@ -75,7 +75,7 @@ namespace BMSPlayer
             musicList = new List<MusicListData>();
             
             rows = 7;
-            btn = new int[] { 2, 3, 3, 2, 1, 4, 3 };
+            btn = new int[] { 2, 4, 3, 3, 3, 2, 1 };
 
             EncolorBtn(0, 0);
         }
@@ -134,34 +134,34 @@ namespace BMSPlayer
                     else if (col == 1) ChangeSprite(btnRefresh);
                     break;
                 case 1:
-                    if (col == 0) ChangeSprite(btnKor);
-                    else if (col == 1) ChangeSprite(btnJpn);
-                    else if (col == 2) ChangeSprite(btnEng);
-                    break;
-                case 2:
-                    if (col == 0) ChangeSprite(btnAutoSync);
-                    else if (col == 1) ChangeSprite(btnSyncDown);
-                    else if (col == 2) ChangeSprite(btnSyncUp);
-                    break;
-                case 3:
-                    if (col == 0) ChangeSprite(btn932);
-                    else if (col == 1) ChangeSprite(btn949);
-                    break;
-                case 4:
-                    ChangeSprite(btnKeySetting);
-                    break;
-                case 5:
                     // Resolution
                     if (col == 0) ChangeSprite(btn1080p);
                     else if (col == 1) ChangeSprite(btn900p);
                     else if (col == 2) ChangeSprite(btn768p);
                     else if (col == 3) ChangeSprite(btn720p);
                     break;
-                case 6:
+                case 2:
                     // Screen Mode
                     if (col == 0) ChangeSprite(btnWindowed);
                     else if (col == 1) ChangeSprite(btnFullScr);
-                    else if(col == 2) ChangeSprite(btnBorderless);
+                    else if (col == 2) ChangeSprite(btnBorderless);
+                    break;
+                case 3:
+                    if (col == 0) ChangeSprite(btnKor);
+                    else if (col == 1) ChangeSprite(btnJpn);
+                    else if (col == 2) ChangeSprite(btnEng);
+                    break;
+                case 4:
+                    if (col == 0) ChangeSprite(btnAutoSync);
+                    else if (col == 1) ChangeSprite(btnSyncDown);
+                    else if (col == 2) ChangeSprite(btnSyncUp);
+                    break;
+                case 5:
+                    if (col == 0) ChangeSprite(btn932);
+                    else if (col == 1) ChangeSprite(btn949);
+                    break;
+                case 6:
+                    ChangeSprite(btnKeySetting);
                     break;
             }
         }
@@ -182,37 +182,6 @@ namespace BMSPlayer
                     }
                     break;
                 case 1:
-                    changeLang((LanguageType)col);
-                    break;
-                case 2:
-                    switch(col)
-                    {
-                        case 0:
-                            SetAutoSync();
-                            break;
-                        case 1:
-                            changeSync(false);
-                            break;
-                        case 2:
-                            changeSync(true);
-                            break;
-                    }
-                    break;
-                case 3:
-                    switch(col)
-                    {
-                        case 0:
-                            changeEncoding(932);
-                            break;
-                        case 1:
-                            changeEncoding(949);
-                            break;
-                    }
-                    break;
-                case 4:
-                    ShowKeySetting();
-                    break;
-                case 5:
                     switch (col)
                     {
                         case 0:
@@ -234,8 +203,8 @@ namespace BMSPlayer
                     }
                     changeVideoSetting();
                     break;
-                case 6:
-                    switch(col)
+                case 2:
+                    switch (col)
                     {
                         case 0:
                             // Windowed
@@ -251,6 +220,37 @@ namespace BMSPlayer
                             break;
                     }
                     changeVideoSetting();
+                    break;
+                case 3:
+                    changeLang((LanguageType)col);
+                    break;
+                case 4:
+                    switch(col)
+                    {
+                        case 0:
+                            SetAutoSync();
+                            break;
+                        case 1:
+                            changeSync(false);
+                            break;
+                        case 2:
+                            changeSync(true);
+                            break;
+                    }
+                    break;
+                case 5:
+                    switch(col)
+                    {
+                        case 0:
+                            changeEncoding(932);
+                            break;
+                        case 1:
+                            changeEncoding(949);
+                            break;
+                    }
+                    break;
+                case 6:
+                    ShowKeySetting();
                     break;
             }
         }
@@ -349,7 +349,7 @@ namespace BMSPlayer
             yield return new WaitForSeconds(0.0001f);
             mlm = new MusicListManager();
             mlm.AddDataToDB(musicList);
-            mlm.close();
+            mlm.Close();
 
             layerLoading.SetActive(false);
             Const.isRefreshDone = true;

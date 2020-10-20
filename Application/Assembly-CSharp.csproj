@@ -87,9 +87,10 @@
     <Compile Include="Assets\Scripts\Data\JSONObject.cs" />
     <Compile Include="Assets\Scripts\Data\ListItemNode.cs" />
     <Compile Include="Assets\Scripts\Data\ListItemTree.cs" />
-    <Compile Include="Assets\Scripts\Data\MusicDataRegister.cs" />
+    <Compile Include="Assets\Scripts\Data\MusicDataManager.cs" />
     <Compile Include="Assets\Scripts\Data\MusicListData.cs" />
     <Compile Include="Assets\Scripts\Data\RecordData.cs" />
+    <Compile Include="Assets\Scripts\Data\RecordDataManager.cs" />
     <Compile Include="Assets\Scripts\Data\enum\ItemType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\HPController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\ISoundController.cs" />
@@ -125,7 +126,6 @@
     <Compile Include="Assets\Scripts\MusicList\buttonsetting\MappingChanger.cs" />
     <Compile Include="Assets\Scripts\MusicList\buttonsetting\PlayKeySetting.cs" />
     <Compile Include="Assets\Scripts\Result\ResultController.cs" />
-    <Compile Include="Assets\Scripts\SQLite\Record.cs" />
     <Compile Include="Assets\Scripts\SQLite\SQLiteExecutor.cs" />
     <Compile Include="Assets\Scripts\UI\GUILayoutx.cs" />
     <Compile Include="Assets\Scripts\UI\MultiScaleCamera.cs" />

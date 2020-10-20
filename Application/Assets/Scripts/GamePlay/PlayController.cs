@@ -32,6 +32,7 @@ namespace BMSPlayer {
         private bool isBGAMovieExist = false;
         private bool isBMSReady = false;
         private bool isLoading = false;
+        private bool isKeyInfo = true;
 
         // 시간 관리
         private double StartTime = 0;
@@ -39,6 +40,7 @@ namespace BMSPlayer {
         private double PlayTimePassed = 0;
 
         public double BarLengthPrevbar = 0;
+        private int pauseSel = 0;
 
         // Audio Management
         private ISoundController soundController;
@@ -190,7 +192,47 @@ namespace BMSPlayer {
                 // Type 2: 노트가 다 사용되었을 때
                 if (scroller.GetProcessedNotes() >= Data.TotalNotes)
                 {
-                    Const.Clear = ClearType.CLEAR;
+                    // 게이지 타입과 퍼센트에 따라 클리어 유무 결정
+                    switch(Const.JudgeType)
+                    {
+                        case JudgeType.ASSISTED:
+                            if(hpController.CurrentHP >= 6000)
+                            {
+                                Const.Clear = ClearType.ASSISTCLEAR;
+                            }
+                            else
+                            {
+                                Const.Clear = ClearType.FAIL;
+                            }
+                            break;
+                        case JudgeType.EASY:
+                            if (hpController.CurrentHP >= 8000)
+                            {
+                                Const.Clear = ClearType.EASYCLEAR;
+                            }
+                            else
+                            {
+                                Const.Clear = ClearType.FAIL;
+                            }
+                            break;
+                        case JudgeType.NORMAL:
+                            if (hpController.CurrentHP >= 8000)
+                            {
+                                Const.Clear = ClearType.NORMALCLEAR;
+                            }
+                            else
+                            {
+                                Const.Clear = ClearType.FAIL;
+                            }
+                            break;
+                        case JudgeType.HARD:
+                            Const.Clear = ClearType.HARDCLEAR;
+                            break;
+                        case JudgeType.EXHARD:
+                            Const.Clear = ClearType.EXCLEAR;
+                            break;
+                    }
+
                     bool isPlayingMusic = soundController.CheckSoundPlaying();
                     bool isPlayingBGA = false;
 
@@ -228,17 +270,34 @@ namespace BMSPlayer {
                 UI.UpdateTimerCur(PlayTimePassed);
 
                 PrevTickTime = PlayTimePassed;
+
+                if (isKeyInfo && PlayTimePassed > 50)
+                {
+                    isKeyInfo = false;
+                    UI.RemoveKeyInfo();
+                }
             }
             else if(firstrun && isPaused)
             {
                 // 위 아래 버튼 이동시 메뉴 변경
-                if(Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+                if(Input.GetKeyDown(KeyCode.UpArrow))
                 {
-                    UI.PauseMenuMove();
+                    UI.PauseMenuMove(ref pauseSel, true);
                 }
-                if(Input.GetKeyDown(KeyCode.Return))
+                if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    UI.PauseMenuExec();
+                    UI.PauseMenuMove(ref pauseSel, false);
+                }
+                if (Input.GetKeyDown(KeyCode.Return))
+                {
+                    bool isEnd = UI.PauseMenuExec(pauseSel);
+                    if(isEnd)
+                    {
+                        Const.Clear = ClearType.FAIL;
+                        isGameOver = true;
+                        isPaused = false;
+                        UI.HidePauseMenu();
+                    }
                 }
             }
             else

@@ -34,6 +34,7 @@ namespace BMSPlayer
         public static ListItemNode selectedOnList = null;
         public static List<int> ListDepth = new List<int>();
         public static int ListPos = 0;
+        public static bool ChangeLayout = false;
 
         public static int[] CustomRandom =
         {

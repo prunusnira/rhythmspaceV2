@@ -139,7 +139,11 @@ namespace BMSPlayer
 
         public void Clear()
         {
-            content.transform.DetachChildren();
+            //content.transform.DetachChildren();
+            for(int i = content.transform.childCount - 1; i >= 0; i--)
+            {
+                Destroy(content.transform.GetChild(i).gameObject);
+            }
         }
 
         // Getter/Setter

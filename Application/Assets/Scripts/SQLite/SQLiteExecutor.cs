@@ -23,7 +23,8 @@ namespace DatabaseManager
             if (Instance == null)
             {
                 Instance = new SQLiteExecutor();
-                if(!Instance.checkTableExist()) Instance.initializeTable();
+                if (!Instance.CheckListTableExist()) Instance.InitListTable();
+                if (!Instance.CheckRecordTableExist()) Instance.InitRecordTable();
             }
             else
             {
@@ -62,13 +63,16 @@ namespace DatabaseManager
 
         public void closeDB()
         {
-            dbcommand.Dispose();
-            dbconn.Close();
-            dbcommand = null;
-            dbconn = null;
+            if(dbcommand != null)
+            {
+                dbcommand.Dispose();
+                dbconn.Close();
+                dbcommand = null;
+                dbconn = null;
+            }
         }
 
-        public void initializeTable()
+        public void InitListTable()
         {
             dbcommand = dbconn.CreateCommand();
             string list =
@@ -88,21 +92,34 @@ namespace DatabaseManager
                 diff integer default 2,
                 fname varchar (100) not null,
                 jacket varchar (100))";
-            string record =
-                @"create table record (
-                id integer primary key autoincrement,
-                name varhar(100) not null,
-                rank varchar(2) not null,
-                score integer(10) not null,
-                md5hash varchar(1000) not null)";
 
             dbcommand.CommandText = list;
             dbcommand.ExecuteNonQuery();
+        }
+
+        public void InitRecordTable()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string record =
+                @"create table record (
+                id integer primary key autoincrement,
+                md5hash varchar(100) unique not null,
+                rank varchar(2) not null,
+                score integer(5) not null,
+                judge integer(1) not null,
+                clear integer(1) not null,
+                pf integer(5) not null,
+                gr integer(5) not null,
+                gd integer(5) not null,
+                ok integer(5) not null,
+                pr integer(5) not null,
+                cb integer(5) not null)";
+
             dbcommand.CommandText = record;
             dbcommand.ExecuteNonQuery();
         }
 
-        public void dropList()
+        public void DropList()
         {
             dbcommand = dbconn.CreateCommand();
             string query = "delete from list";
@@ -110,6 +127,14 @@ namespace DatabaseManager
             dbcommand.ExecuteNonQuery();
             // AUTO INC RESET
             query = "update sqlite_sequence set seq=0 where name='list'";
+            dbcommand.CommandText = query;
+            dbcommand.ExecuteNonQuery();
+        }
+
+        public void DropRecord()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string query = @"drop table record";
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
         }
@@ -154,24 +179,47 @@ namespace DatabaseManager
             dbcommand.ExecuteNonQuery();
         }
 
-        public void InsertRecord(string[] param)
+        public void InsertRecord(
+            string hash, string rank,
+            int score, int judge,
+            int clear, int pf, int gr, int gd,
+            int ok, int pr, int cb
+            )
         {
             dbcommand = dbconn.CreateCommand();
 
-            for (int i = 0; i < param.Length; i++)
-            {
-                param[i] = param[i].Replace("'", "''");
-                param[i] = param[i].Replace("\"", "\"\"");
-            }
-
             string query =
-                "insert into record " +
-                    "(name, rank, score) values" +
-                    "('" + param[0] + "','" + param[1] + "','" + param[2] + "'," + param[3] + ") " +
-                    "on duplicate key update name='" + param[0] + "', rank='" + param[1] + "', score='" + param[2] + "'";
+                @"insert into record
+                    (md5hash, rank, score, judge,
+                        clear, pf, gr, gd, ok, pr, cb) values
+                    ('" + hash + "','" +
+                        rank + "'," +
+                        score + "," +
+                        judge + "," +
+                        clear + "," +
+                        pf + "," +
+                        gr + "," +
+                        gd + "," +
+                        ok + "," +
+                        pr + "," +
+                        cb + ") " +
+                    " on conflict(md5hash) do update set"+
+                        " rank='" + rank + "'," +
+                        " score=" + score + "," +
+                        " judge=" + judge + "," +
+                        " clear=" + clear + "," +
+                        " pf=" + pf + "," +
+                        " gr=" + gr + "," +
+                        " gd=" + gd + "," +
+                        " ok=" + ok + "," +
+                        " pr=" + pr + "," +
+                        " cb=" + cb;
+
+            dbcommand.CommandText = query;
+            dbcommand.ExecuteNonQuery();
         }
 
-        public bool checkTableExist()
+        public bool CheckListTableExist()
         {
             dbcommand = dbconn.CreateCommand();
             string query = "SELECT name FROM sqlite_master WHERE type='table'";
@@ -179,19 +227,30 @@ namespace DatabaseManager
             dbcommand.CommandText = query;
             dbreader = dbcommand.ExecuteReader();
 
-            bool allexist = false;
             bool existlist = false;
-            bool existrec = false;
             while(dbreader.Read())
             {
                 string name = dbreader.GetString(0);
                 if (name == "list") existlist = true;
+            }
+            return existlist;
+        }
+
+        public bool CheckRecordTableExist()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string query = "SELECT name FROM sqlite_master WHERE type='table'";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            bool existrec = false;
+            while (dbreader.Read())
+            {
+                string name = dbreader.GetString(0);
                 if (name == "record") existrec = true;
             }
-
-            if (existlist && existrec) allexist = true;
-
-            return allexist;
+            return existrec;
         }
 
         public List<MusicListData> SelectMusicList(string param = null)
@@ -242,6 +301,8 @@ namespace DatabaseManager
 
         public RecordData SelectRecord(string param = null)
         {
+            dbcommand = dbconn.CreateCommand();
+
             string query = "select * from record";
 
             if (param != null)
@@ -251,14 +312,51 @@ namespace DatabaseManager
 
             dbcommand.CommandText = query;
             dbreader = dbcommand.ExecuteReader();
-            dbreader.Read();
-            int recid = dbreader.GetInt32(0);
-            string recname = dbreader.GetString(1);
-            string recrank = dbreader.GetString(2);
-            int recscore = dbreader.GetInt32(3);
-            string recmd5 = dbreader.GetString(4);
+            bool exist = dbreader.Read();
+            if(exist)
+            {
+                int recid = dbreader.GetInt32(0);
+                string recmd5 = dbreader.GetString(1);
+                string recrank = dbreader.GetString(2);
+                int recscore = dbreader.GetInt32(3);
+                int recjudge = dbreader.GetInt32(4);
+                int recclear = dbreader.GetInt32(5);
+                int recpf = dbreader.GetInt32(6);
+                int recgr = dbreader.GetInt32(7);
+                int recgd = dbreader.GetInt32(8);
+                int recok = dbreader.GetInt32(9);
+                int recpr = dbreader.GetInt32(10);
+                int reccb = dbreader.GetInt32(11);
 
-            return new RecordData(recid, recname, recrank, recscore, recmd5);
+                return new RecordData(recmd5, recrank,
+                    recscore, recjudge,
+                    recclear, recpf, recgr, recgd, recok, recpr, reccb);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public int SelectRecordClear(string param)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            string query = "select clear from record";
+            query += " where md5hash='" + param + "'";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            bool resultExist = dbreader.Read();
+            if(resultExist)
+            {
+                return dbreader.GetInt32(0);
+            }
+            else
+            {
+                return -1;
+            }
         }
     }
 }
