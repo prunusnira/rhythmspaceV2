@@ -16,6 +16,7 @@ namespace BMSPlayer
         public double Stop { get; set; }
         public double CurrentStopPos { get; set; }
         public bool IsStopOn { get; set; }
+        public double LastTiming { get; set; }
 
         // 전체 게임 길이 (4박 기준, 1 = 4/4)
         // BMS 데이터의 02 채널과 연관
@@ -75,6 +76,7 @@ namespace BMSPlayer
 
             BPMNum = 0;
             Stop = 0;
+            LastTiming = 0;
             IsStopOn = false;
         }
     }

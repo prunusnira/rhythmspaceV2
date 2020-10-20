@@ -93,7 +93,6 @@
     <Compile Include="Assets\Scripts\Data\enum\ItemType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\HPController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\ISoundController.cs" />
-    <Compile Include="Assets\Scripts\GamePlay\Keys.cs" />
     <Compile Include="Assets\Scripts\GamePlay\NoteGenerator.cs" />
     <Compile Include="Assets\Scripts\GamePlay\PlayController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\PlayData.cs" />
@@ -116,15 +115,15 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\TimingType.cs" />
     <Compile Include="Assets\Scripts\Intro\Intro.cs" />
     <Compile Include="Assets\Scripts\Loading\Loading.cs" />
-    <Compile Include="Assets\Scripts\MusicList\ControllerChanger.cs" />
-    <Compile Include="Assets\Scripts\MusicList\KeyboardChanger.cs" />
-    <Compile Include="Assets\Scripts\MusicList\LoadBMSList.cs" />
     <Compile Include="Assets\Scripts\MusicList\MusicListUI.cs" />
-    <Compile Include="Assets\Scripts\MusicList\PlayKeySetting.cs" />
     <Compile Include="Assets\Scripts\MusicList\PlayOptionSetting.cs" />
     <Compile Include="Assets\Scripts\MusicList\SelectedMusicInfo.cs" />
     <Compile Include="Assets\Scripts\MusicList\Setting.cs" />
     <Compile Include="Assets\Scripts\MusicList\SystemSetting.cs" />
+    <Compile Include="Assets\Scripts\MusicList\buttonsetting\KeyMapping.cs" />
+    <Compile Include="Assets\Scripts\MusicList\buttonsetting\Keys.cs" />
+    <Compile Include="Assets\Scripts\MusicList\buttonsetting\MappingChanger.cs" />
+    <Compile Include="Assets\Scripts\MusicList\buttonsetting\PlayKeySetting.cs" />
     <Compile Include="Assets\Scripts\Result\ResultController.cs" />
     <Compile Include="Assets\Scripts\SQLite\Record.cs" />
     <Compile Include="Assets\Scripts\SQLite\SQLiteExecutor.cs" />

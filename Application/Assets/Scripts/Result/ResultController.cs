@@ -25,6 +25,8 @@ namespace BMSPlayer
         public Text combo;
         public Text combobreak;
         public Text timediff;
+        public Text fast;
+        public Text slow;
 
         public GameObject fcpfmark;
         public Material failMaterial;
@@ -74,6 +76,9 @@ namespace BMSPlayer
             ok.text = vok.ToString();
             miss.text = vmiss.ToString();
             combobreak.text = vcb.ToString();
+            fast.text = Const.ResultFast.ToString();
+            slow.text = Const.ResultSlow.ToString();
+
             avgrate.text = (rate * 100).ToString("0.00") + "%";
             exscore.text = Const.ResultScore.ToString();
             combo.text = Const.ResultMaxCombo.ToString();

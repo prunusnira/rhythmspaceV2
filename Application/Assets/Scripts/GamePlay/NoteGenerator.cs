@@ -144,6 +144,10 @@ namespace BMSPlayer
             }
             LongnoteSetup(data.NotePlay, data.NoteLong);
 
+            bool isSRan = (Layout == null) ? true : false;
+            if(isSRan)
+                RearrangeSRAN(data.NotePlay, data.NoteLong);
+
             // 노트 오브젝트 등록 후 각 라인별로 position에 따라 정렬 수행
             // (롱노트 순서 정렬을 위해서)
             SortNote(data.NotePlay);
@@ -220,7 +224,6 @@ namespace BMSPlayer
             int[] Layout)
         {
             int longcnt = 0;
-            System.Random rand = new System.Random();
 
             // 라인별 노트 추가
             for (int cline = 0; cline < 18; cline++)
@@ -283,6 +286,9 @@ namespace BMSPlayer
                                 // 라인 설정
                                 switch (cline)
                                 {
+                                    case 0:
+                                        note.Line = cline;
+                                        break;
                                     case 1:
                                     case 2:
                                     case 3:
@@ -297,8 +303,11 @@ namespace BMSPlayer
                                         }
                                         else
                                         {
-                                            note.Line = rand.Next(1, 8);
+                                            note.Line = cline;
                                         }
+                                        break;
+                                    case 10:
+                                        note.Line = cline - 10;
                                         break;
                                     case 11:
                                     case 12:
@@ -314,7 +323,7 @@ namespace BMSPlayer
                                         }
                                         else
                                         {
-                                            note.Line = rand.Next(1, 8);
+                                            note.Line = cline - 10;
                                         }
                                         break;
                                 }
@@ -328,7 +337,8 @@ namespace BMSPlayer
             data.TotalNotes += longcnt / 2;
         }
 
-        public void LongnoteSetup(List<PlayNote>[] notePlay, List<LongNote> lnlist)
+        public void LongnoteSetup(
+            List<PlayNote>[] notePlay, List<LongNote> lnlist)
         {
             bool[] LNAdding = new bool[8];
             for (int i = 0; i < 8; i++)
@@ -390,6 +400,108 @@ namespace BMSPlayer
                             LNAdding[cline] = true;
                         }
                     }
+                }
+            }
+        }
+
+        public void RearrangeSRAN(
+            List<PlayNote>[] notePlay, List<LongNote> lnlist)
+        {
+            System.Random rand = new System.Random();
+            double prevPos = 0;
+            double currentPos = 0;
+            bool[] isLnAdd = new bool[7] { false, false, false, false, false, false, false };
+            double[] lnEndPos = new double[7] { 0, 0, 0, 0, 0, 0, 0 };
+
+            // 배치 중 가능한 위치 처리
+            List<int> available = new List<int>();
+            for(int i = 1; i < 8; i++)
+            {
+                available.Add(i);
+            }
+
+            // 모든 노트를 합쳐서 하나로 나타냄
+            List<PlayNote> allNotes = new List<PlayNote>();
+            for (int i = 1; i < 8; i++)
+            {
+                foreach(PlayNote n in notePlay[i])
+                {
+                    allNotes.Add(n);
+                }
+                notePlay[i].Clear();
+            }
+            allNotes.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+
+            // 각 노트 순회하면서 슈랜 배치
+            foreach(PlayNote n in allNotes)
+            {
+                if(!n.IsSRanDone)
+                {
+                    currentPos = n.Position;
+
+                    // 이전 노트와 다른 위치이면 아래 사항에 대해서 처리를 수행
+                    if (prevPos != currentPos)
+                    {
+                        // 현재 위치가 아닌 라인 중에서
+                        // 롱노트 처리가 끝나있다면 해당 라인에
+                        // 새로운 노트가 들어갈 수 있도록 처리
+                        for (int i = 0; i < 7; i++)
+                        {
+                            if (isLnAdd[i]
+                                && lnEndPos[i] > 0
+                                && currentPos > lnEndPos[i])
+                            {
+                                lnEndPos[i] = 0;
+                                isLnAdd[i] = false;
+                                available.Add(i + 1);
+                                available.Sort();
+                            }
+                        }
+
+                        // 롱노트를 제외한 라인에 대해 리셋 수행
+                        for (int i = 0; i < isLnAdd.Length; i++)
+                        {
+                            if (!isLnAdd[i] && !available.Contains(i + 1))
+                            {
+                                available.Add(i + 1);
+                                available.Sort();
+                            }
+                        }
+                    }
+
+                    // 다음 랜덤 노트 위치를 가져옴
+                    int nextLine = available[rand.Next(0, available.Count)];
+                    available.Remove(nextLine);
+
+                    n.Line = nextLine;
+                    n.IsSRanDone = true;
+                    notePlay[nextLine].Add(n);
+
+                    if (n.PlayNoteType == NoteType.LNSTART)
+                    {
+                        LongNote cln = null;
+                        // 해당 롱노트 내의 중간/끝노트 모두 이동시킴
+                        foreach(LongNote ln in lnlist)
+                        {
+                            if(ln.Start == n)
+                            {
+                                cln = ln;
+                            }
+                        }
+
+                        cln.Mid.Line = nextLine;
+                        cln.End.Line = nextLine;
+
+                        cln.Mid.IsSRanDone = true;
+                        cln.End.IsSRanDone = true;
+                        
+                        notePlay[nextLine].Add(cln.End);
+
+                        lnEndPos[nextLine - 1] = cln.End.Position;
+                        isLnAdd[nextLine - 1] = true;
+                    }
+
+                    prevPos = currentPos;
                 }
             }
         }
@@ -766,6 +878,11 @@ namespace BMSPlayer
                                 {
                                     CalculateTiming(n, bps, prevTime, PosStart);
                                 }
+
+                                if(n.Timing > data.LastTiming)
+                                {
+                                    data.LastTiming = n.Timing;
+                                }
                             }
                         }
 
@@ -783,6 +900,11 @@ namespace BMSPlayer
                                     )
                                 {
                                     CalculateTiming(n, bps, prevTime, PosStart);
+                                }
+
+                                if (n.Timing > data.LastTiming)
+                                {
+                                    data.LastTiming = n.Timing;
                                 }
                             }
                         }
@@ -802,6 +924,11 @@ namespace BMSPlayer
                                 CalculateTiming(n, bps, prevTime, PosStart);
                                 data.BPMTimingFix.Add(n.Timing);
                             }
+
+                            if (n.Timing > data.LastTiming)
+                            {
+                                data.LastTiming = n.Timing;
+                            }
                         }
 
                         foreach (BGANote n in data.NoteBGA)
@@ -816,6 +943,11 @@ namespace BMSPlayer
                                 )
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+
+                            if (n.Timing > data.LastTiming)
+                            {
+                                data.LastTiming = n.Timing;
                             }
                         }
 
@@ -832,6 +964,11 @@ namespace BMSPlayer
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
                             }
+
+                            if (n.Timing > data.LastTiming)
+                            {
+                                data.LastTiming = n.Timing;
+                            }
                         }
 
                         foreach (StopNote n in data.NoteStop)
@@ -846,6 +983,11 @@ namespace BMSPlayer
                                 )
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+
+                            if (n.Timing > data.LastTiming)
+                            {
+                                data.LastTiming = n.Timing;
                             }
                         }
 
@@ -896,6 +1038,11 @@ namespace BMSPlayer
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
                             }
+
+                            if (n.Timing > data.LastTiming)
+                            {
+                                data.LastTiming = n.Timing;
+                            }
                         }
                     }
 
@@ -907,6 +1054,11 @@ namespace BMSPlayer
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
                             }
+
+                            if (n.Timing > data.LastTiming)
+                            {
+                                data.LastTiming = n.Timing;
+                            }
                         }
                     }
 
@@ -916,6 +1068,11 @@ namespace BMSPlayer
                         {
                             CalculateTiming(n, bps, prevTime, PosStart);
                         }
+
+                        if (n.Timing > data.LastTiming)
+                        {
+                            data.LastTiming = n.Timing;
+                        }
                     }
 
                     foreach(BGMNote n in data.NoteBGM)
@@ -923,6 +1080,11 @@ namespace BMSPlayer
                         if (n.Bar == bar)
                         {
                             CalculateTiming(n, bps, prevTime, PosStart);
+                        }
+
+                        if (n.Timing > data.LastTiming)
+                        {
+                            data.LastTiming = n.Timing;
                         }
                     }
 

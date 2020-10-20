@@ -53,6 +53,12 @@ namespace BMSPlayer
         public TextMeshProUGUI infoBpm;
         public GameObject btnStart;
 
+        public Text diffBeg;
+        public Text diffNor;
+        public Text diffHyp;
+        public Text diffAno;
+        public Text diffIns;
+
         public Text optSpdAppend;
 
         public Sprite empty;
@@ -242,6 +248,47 @@ namespace BMSPlayer
                     int spd = (int)(Const.SpeedFluid / bms.BPMstart * 100);
                     Const.SpeedFixed = spd;
                     optSpdAppend.text = "FIXED " + ((float)spd / 100).ToString("0.00") + "x";
+                }
+
+                // 난이도 숫자 표기
+                switch(bms.Difficulty)
+                {
+                    case 1:
+                        diffBeg.text = bms.Level.ToString("00");
+                        diffNor.text = "00";
+                        diffHyp.text = "00";
+                        diffAno.text = "00";
+                        diffIns.text = "00";
+                        break;
+                    case 2:
+                        diffBeg.text = "00";
+                        diffNor.text = bms.Level.ToString("00");
+                        diffHyp.text = "00";
+                        diffAno.text = "00";
+                        diffIns.text = "00";
+                        break;
+                    case 3:
+                        diffBeg.text = "00";
+                        diffNor.text = "00";
+                        diffHyp.text = bms.Level.ToString("00");
+                        diffAno.text = "00";
+                        diffIns.text = "00";
+                        break;
+                    case 4:
+                        diffBeg.text = "00";
+                        diffNor.text = "00";
+                        diffHyp.text = "00";
+                        diffAno.text = bms.Level.ToString("00");
+                        diffIns.text = "00";
+                        break;
+                    case 5:
+                    default:
+                        diffBeg.text = "00";
+                        diffNor.text = "00";
+                        diffHyp.text = "00";
+                        diffAno.text = "00";
+                        diffIns.text = bms.Level.ToString("00");
+                        break;
                 }
             }
             else if(node.Type == ItemType.DIRECTORY)

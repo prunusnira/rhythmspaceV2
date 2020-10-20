@@ -91,6 +91,26 @@ namespace BMSPlayer {
             }
         }
 
+        private void Start()
+        {
+            // Stage 정보 넣기
+            UI.SetStageInfo(
+                Const.selectedOnList.Info.Gerne,
+                Const.selectedOnList.Info.Title,
+                Const.selectedOnList.Info.SubTitle,
+                Const.selectedOnList.Info.Artist,
+                Const.selectedOnList.Info.SubArtist
+            );
+
+            // 저장된 커버 이동 수치만큼 이동
+            UI.CoverHiddenUp();
+            UI.CoverHiddenDown();
+            UI.CoverSuddenDown();
+            UI.CoverSuddenUp();
+            UI.CoverLiftUp();
+            UI.CoverLiftDown();
+        }
+
         private void Update ()
         {
             // 데이터 로딩
@@ -204,6 +224,8 @@ namespace BMSPlayer {
                     // 결과창으로 이동
                     SceneManager.LoadScene("Result");
                 }
+
+                UI.UpdateTimerCur(PlayTimePassed);
 
                 PrevTickTime = PlayTimePassed;
             }
@@ -341,6 +363,10 @@ namespace BMSPlayer {
             yield return null;
 
             scroller.Init(Data.TotalNotes);
+            yield return null;
+
+            UI.UpdateTimerTotal(Data.LastTiming);
+            UI.UpdateHP(hpController.CurrentHP);
             yield return null;
 
             isBMSReady = true;

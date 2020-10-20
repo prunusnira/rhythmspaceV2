@@ -67,6 +67,12 @@ namespace BMSPlayer
         public Text txtOk;
         public Text txtMiss;
         public Text txtComboBreak;
+        public Text txtFast;
+        public Text txtSlow;
+
+        // Timer
+        public Text txtCurrentTime;
+        public Text txtTotalTime;
 
         // Gear
         public GameObject noteParentObj;
@@ -149,7 +155,13 @@ namespace BMSPlayer
         public Sprite selectBtn;
 
         // Music Info
-        public TextMeshPro infoTtile;
+        public TextMeshPro infoTitle;
+        public GameObject stagePanel;
+        public TextMeshProUGUI stageGerne;
+        public TextMeshProUGUI stageTitle;
+        public TextMeshProUGUI stageSubtitle;
+        public TextMeshProUGUI stageArtist;
+        public TextMeshProUGUI stageSubartist;
 
         // Display Note
         private NoteGenerator generator;
@@ -174,7 +186,6 @@ namespace BMSPlayer
 
             // HP 기본 수치 설정
             hpController = GetComponent<HPController>();
-            UpdateHP(hpController.CurrentHP);
 
             // 일시정지 메뉴
             btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
@@ -351,7 +362,7 @@ namespace BMSPlayer
         public void SetMusicInfo(string name)
         {
             // 곡 정보 설정
-            infoTtile.text = name;
+            infoTitle.text = name;
         }
 
         public void UpdateSpeed()
@@ -375,7 +386,6 @@ namespace BMSPlayer
 
         public void UpdateGraph(int ex, int procNotes, int totalNotes)
         {
-            Debug.Log(ex + " " + procNotes + " " + totalNotes);
             graphCurrent.material.SetFloat("_Progress", ((float)ex) / (totalNotes * 2));
 
             // 현재 자기 랭크 글자 변경
@@ -601,7 +611,7 @@ namespace BMSPlayer
                 if(ms > 0)
                 {
                     txtTimingMsBM.color = new Color(135f / 255, 206f / 255, 235f / 255);
-                    txtTimingMsBM.text = "FAST" + ms.ToString() + "ms";
+                    txtTimingMsBM.text = "FAST " + ms.ToString() + "ms";
                 }
                 else if(ms < 0)
                 {
@@ -623,7 +633,7 @@ namespace BMSPlayer
         }
 
         public void UpdateSideJudge(
-            int p, int gr, int gd, int o, int m, int cb,
+            int p, int gr, int gd, int o, int m, int cb, int fast, int slow,
             string a, string d)
         {
             txtPerfect.text = p.ToString();
@@ -634,6 +644,8 @@ namespace BMSPlayer
             txtComboBreak.text = cb.ToString();
             txtAvgRate.text = a;
             txtAvgDiff.text = d;
+            txtFast.text = fast.ToString();
+            txtSlow.text = slow.ToString();
         }
 
         // Beam 보이기
@@ -916,8 +928,37 @@ namespace BMSPlayer
         public void DeactiveLoading()
         {
             txtLoading.gameObject.SetActive(false);
+            stagePanel.SetActive(false);
         }
 
+        public void SetStageInfo(
+            string gerne, string title,
+            string subt, string art, string subart)
+        {
+            stageGerne.text = gerne;
+            stageTitle.text = title;
+            stageSubtitle.text = subt;
+            stageArtist.text = art;
+            stageSubartist.text = subart;
+        }
+
+        public void UpdateTimerCur(double time)
+        {
+            string min = (Convert.ToInt32(time) / 600).ToString("00");
+            string sec = (Convert.ToInt32(time) % 600 / 10).ToString("00");
+
+            txtCurrentTime.text = min + ":" + sec;
+        }
+
+        public void UpdateTimerTotal(double time)
+        {
+            string min = (Convert.ToInt32(time) / 600).ToString("00");
+            string sec = (Convert.ToInt32(time) % 600 / 10).ToString("00");
+
+            txtTotalTime.text = min + ":" + sec;
+        }
+
+        #region Play Area Cover
         public void CoverSuddenDown()
         {
             float posx = coverSud.transform.localPosition.x;
@@ -1013,5 +1054,6 @@ namespace BMSPlayer
 
             Const.AreaLiftPos = playAreaPos;
         }
+        #endregion
     }
 }

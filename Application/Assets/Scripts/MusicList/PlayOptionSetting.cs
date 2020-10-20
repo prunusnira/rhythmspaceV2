@@ -201,30 +201,24 @@ namespace BMSPlayer
 
         public void Update()
         {
-            if(Input.GetKeyDown(KeyCode.F1))
+            if(Input.GetKey(KeyCode.F1))
             {
                 if(Const.SpdType == SpdType.FIXED)
                 {
                     SpeedDownFixed();
                 }
+                else if (Const.SpdType == SpdType.FLUID)
+                {
+                    SpeedDownFluid();
+                }
             }
-            else if(Input.GetKeyDown(KeyCode.F2))
+            else if(Input.GetKey(KeyCode.F2))
             {
                 if (Const.SpdType == SpdType.FIXED)
                 {
                     SpeedUpFixed();
                 }
-            }
-            else if(Input.GetKey(KeyCode.F1))
-            {
-                if (Const.SpdType == SpdType.FLUID)
-                {
-                    SpeedDownFluid();
-                }
-            }
-            else if (Input.GetKey(KeyCode.F2))
-            {
-                if (Const.SpdType == SpdType.FLUID)
+                else if (Const.SpdType == SpdType.FLUID)
                 {
                     SpeedUpFluid();
                 }
@@ -257,11 +251,15 @@ namespace BMSPlayer
             {
                 NoteLayoutChange();
             }
+            else if(Input.GetKeyDown(KeyCode.F10))
+            {
+                // 커스텀 키 배열 변경
+            }
         }
 
         private void SpeedUpFixed()
         {
-            if(speed < 1000) speed += 25;
+            if(speed < 2000) speed++;
             Const.SpeedFixed = speed;
             speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
             Const.SpeedFluid = speedfl;
@@ -272,7 +270,7 @@ namespace BMSPlayer
 
         private void SpeedDownFixed()
         {
-            if (speed > 50) speed -= 25;
+            if (speed > 50) speed--;
             Const.SpeedFixed = speed;
             speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
             Const.SpeedFluid = speedfl;
@@ -283,7 +281,7 @@ namespace BMSPlayer
 
         private void SpeedUpFluid()
         {
-            if (speedfl < 1000) speedfl++;
+            if (speedfl < 2000) speedfl++;
             Const.SpeedFluid = speedfl;
             speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
             Const.SpeedFixed = speed;

@@ -28,8 +28,7 @@ namespace BMSPlayer
         public override void Awake()
         {
             base.Awake();
-            Keys.LoadKBSetting();
-            Keys.LoadSOSetting();
+            Keys.LoadButtonSetting();
 
             rows = 10;
             btn = new int[] { 3, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
@@ -112,12 +111,12 @@ namespace BMSPlayer
                     }
                     break;
                 case 1:
-                    if (col == 0) ChangeKey("k1");
-                    else if (col == 1) ChangeKey("c1");
+                    if (col == 0) ChangeKey(10);
+                    else if (col == 1) ChangeKey(20);
                     break;
                 case 2:
-                    if (col == 0) ChangeKey("k9");
-                    else if (col == 1) ChangeKey("c9");
+                    if (col == 0) ChangeKey(18);
+                    else if (col == 1) ChangeKey(28);
                     break;
                 case 3:
                 case 4:
@@ -126,8 +125,8 @@ namespace BMSPlayer
                 case 7:
                 case 8:
                 case 9:
-                    if (col == 0) ChangeKey("k"+(row-2));
-                    else if (col == 1) ChangeKey("c"+(row-2));
+                    if (col == 0) ChangeKey(10+row-2);
+                    else if (col == 1) ChangeKey(20+row-2);
                     break;
             }
         }
@@ -136,8 +135,8 @@ namespace BMSPlayer
         {
             for(int i = 0; i < 9; i++)
             {
-                UpdateButtonText(btnKey[i], Keys.btnkb[i]);
-                UpdateButtonText(btnCon[i], Keys.btnct[i]);
+                UpdateButtonText(btnKey[i], Keys.btnSet1[i]);
+                UpdateButtonText(btnCon[i], Keys.btnSet2[i]);
             }
         }
 
@@ -146,9 +145,10 @@ namespace BMSPlayer
             btn.GetComponentInChildren<Text>().text = key;
         }
 
-        public void ChangeKey(string name)
+        public void ChangeKey(int keypos)
         {
-            Const.KeyToChange = name;
+            KeyMapping.keyAssigned = false;
+            Const.KeyToChange = keypos;
             keyPopup.SetActive(true);
         }
     }

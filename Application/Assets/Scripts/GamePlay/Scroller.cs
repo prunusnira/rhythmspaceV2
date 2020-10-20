@@ -35,6 +35,8 @@ namespace BMSPlayer
         private int miss = 0;
         private int epoor = 0;
         private int cb = 0;
+        private int fast = 0;
+        private int slow = 0;
         private double sumTimeDiff = 0;
         private double avgTimeDiff = 0;
         private double sumRate = 0;
@@ -52,8 +54,9 @@ namespace BMSPlayer
         private JudgeType judgeType;
         private HPController hpController;
 
-        // 패드용 눌림 체크
-        private bool[] isAxisPushed;
+        // 눌림 체크
+        private bool[] isSet1Pushed;
+        private bool[] isSet2Pushed;
 
         // 노트 스크롤
         private double noteTiming;
@@ -89,7 +92,8 @@ namespace BMSPlayer
             speedfl = Const.SpeedFluid;
             spdType = Const.SpdType;
 
-            isAxisPushed = new bool[8] { false, false, false, false, false, false, false, false };
+            isSet1Pushed = new bool[8] { false, false, false, false, false, false, false, false };
+            isSet2Pushed = new bool[8] { false, false, false, false, false, false, false, false };
             btnPushState = new bool[8] { false, false, false, false, false, false, false, false };
             btnProcState = new bool[8] { false, false, false, false, false, false, false, false };
             btnPushSound = new bool[8] { false, false, false, false, false, false, false, false };
@@ -268,7 +272,6 @@ namespace BMSPlayer
                         current.PlayNoteType == NoteType.SINGLE)
                     {
                         notesInTimingWindow++;
-                        //Debug.Log("NotesInTimingWindow++: " + notesInTimingWindow);
                         current.InTimingWindow = true;
                     }
 
@@ -299,11 +302,9 @@ namespace BMSPlayer
                             if(judgeTiming < BAD * -1)
                             {
                                 notesInTimingWindow--;
-                                //Debug.Log("NotesInTimingWindow--: " + notesInTimingWindow);
                             }
 
                             // 노트 삭제
-                            //Destroy(current.Noteobj);
                             removeCandidate.Add(current);
                         }
                         else if (current.PlayNoteType == NoteType.LNSTART &&
@@ -335,9 +336,6 @@ namespace BMSPlayer
                             data.NoteLong[current.LNNum].Processing = false;
 
                             // 롱노트 구성요소를 모두 삭제처리
-                            //Destroy(lnlist[lnNum].StartNote.Noteobj);
-                            //Destroy(lnlist[lnNum].MidNote.Noteobj);
-                            //Destroy(current.Noteobj);
                             removeCandidate.Add(current);
                             removeCandidate.Add(data.NoteLong[lnNum].Start);
                             removeCandidate.Add(data.NoteLong[lnNum].Mid);
@@ -348,14 +346,10 @@ namespace BMSPlayer
                 // 삭제
                 foreach (PlayNote n in removeCandidate)
                 {
+                    Destroy(n.NoteObject);
                     notes.Remove(n);
                 }
             }
-        }
-
-        public void FixStoppedPosition()
-        {
-
         }
 
         public void PlayBGA(List<BGANote> noteBGA, BMS bms, double time)
@@ -694,7 +688,6 @@ namespace BMSPlayer
                             {
                                 ProcessSingleNote(i, time, totalNotes, bms, cnote, removeCandidate, lnlist);
                                 notesInTimingWindow--;
-                                //Debug.Log("NotesInTimingWindow--: " + notesInTimingWindow);
 
                                 // 노트 이펙트 켜기
                                 ui.TurnOnNoteEffect(i);
@@ -755,9 +748,6 @@ namespace BMSPlayer
                                 isLnWorking[i] = false;
                                 lnlist[lnNum].Processing = false;
                                 
-                                //Destroy(lnlist[lnNum].Start.Noteobj);
-                                //Destroy(lnlist[lnNum].Mid.Noteobj);
-                                //Destroy(cnote.Noteobj);
                                 removeCandidate.Add(lnlist[lnNum].Start);
                                 removeCandidate.Add(lnlist[lnNum].Mid);
                                 removeCandidate.Add(cnote);
@@ -831,70 +821,171 @@ namespace BMSPlayer
             // 노트의 처리와 상관없이 beam이 나오고 현재 채널의 음이 재생된다
             // 판정 범위 내에 노트가 없으면 채널에 음이 할당되어있지 않으면 (null이면) 무시
 
-            
+
             // Button Down Check
-            for(int i = 0; i < Keys.btnkb.Length; i++)
+            for (int i = 0; i < Keys.btnSet1.Length; i++)
             {
-                if (Keys.GetKeyAxisDown(Keys.btnkb[i]))
+                if (i != 8)
                 {
-                    if(i != 8)
+                    if (Keys.btnAxisSet1[i])
                     {
-                        btnPushState[i] = true;
-                    }
-                    else
-                    {
-                        btnPushState[0] = true;
-                    }
-                }
-                if (Keys.GetKeyAxisDown(Keys.btnct[i]))
-                {
-                    if (Keys.dpad[i] && !isAxisPushed[i])
-                    {
-                        if (i != 8)
+                        // Axis 값일때
+                        if(Keys.GetAxisValue(Keys.btnSet1[i]) != 0)
                         {
                             btnPushState[i] = true;
-                            isAxisPushed[i] = true;
+                            isSet1Pushed[i] = true;
                         }
                         else
                         {
-                            btnPushState[0] = true;
-                            isAxisPushed[0] = true;
+                            if(!isSet2Pushed[i])
+                            {
+                                btnPushState[i] = false;
+                                btnPushSound[i] = false;
+                                btnProcState[i] = false;
+                            }
+                            isSet1Pushed[i] = false;
                         }
-                    }
-                }
-
-                if (Keys.GetKeyAxisUp(Keys.btnkb[i]))
-                {
-                    if (i != 8)
-                    {
-                        btnPushState[i] = false;
-                        btnPushSound[i] = false;
-                        btnProcState[i] = false;
                     }
                     else
                     {
-                        btnPushState[0] = false;
-                        btnPushSound[0] = false;
-                        btnProcState[0] = false;
-                    }
-                }
-                if (Keys.GetKeyAxisUp(Keys.btnct[i]))
-                {
-                    if (Keys.dpad[i] && isAxisPushed[i])
-                    {
-                        if (i != 8)
+                        // 일반 버튼일때
+                        if (Keys.GetKeyDown(Keys.btnSet1[i])
+                            && !isSet1Pushed[i]
+                            && !isSet2Pushed[i])
+                        {
+                            btnPushState[i] = true;
+                            isSet1Pushed[i] = true;
+                        }
+
+                        if (Keys.GetKeyUp(Keys.btnSet1[i])
+                            && isSet1Pushed[i])
                         {
                             btnPushState[i] = false;
                             btnPushSound[i] = false;
-                            isAxisPushed[i] = false;
                             btnProcState[i] = false;
+                            isSet1Pushed[i] = false;
+                        }
+                    }
+
+                    if (Keys.btnAxisSet2[i])
+                    {
+                        // Axis 값일때
+                        if (Keys.GetAxisValue(Keys.btnSet2[i]) != 0)
+                        {
+                            btnPushState[i] = true;
+                            isSet2Pushed[i] = true;
                         }
                         else
                         {
+                            if (!isSet1Pushed[i])
+                            {
+                                btnPushState[i] = false;
+                                btnPushSound[i] = false;
+                                btnProcState[i] = false;
+                            }
+                            isSet2Pushed[i] = false;
+                        }
+                    }
+                    else
+                    {
+                        // 일반 버튼일때
+                        if (Keys.GetKeyDown(Keys.btnSet2[i])
+                            && !isSet1Pushed[i]
+                            && !isSet2Pushed[i])
+                        {
+                            btnPushState[i] = true;
+                            isSet2Pushed[i] = true;
+                        }
+
+                        if (Keys.GetKeyUp(Keys.btnSet2[i])
+                            && isSet2Pushed[i])
+                        {
+                            btnPushState[i] = false;
+                            btnPushSound[i] = false;
+                            btnProcState[i] = false;
+                            isSet2Pushed[i] = false;
+                        }
+                    }
+                }
+                else
+                {
+                    if (Keys.btnAxisSet1[i])
+                    {
+                        // Axis 값일때
+                        if (Keys.GetAxisValue(Keys.btnSet1[i]) != 0)
+                        {
+                            btnPushState[0] = true;
+                            isSet1Pushed[0] = true;
+                        }
+                        else
+                        {
+                            if(!isSet2Pushed[0])
+                            {
+                                btnPushState[0] = false;
+                                btnPushSound[0] = false;
+                                btnProcState[0] = false;
+                            }
+                            isSet1Pushed[0] = false;
+                        }
+                    }
+                    else
+                    {
+                        // 일반 버튼일때
+                        if (Keys.GetKeyDown(Keys.btnSet1[i])
+                            && !isSet1Pushed[0]
+                            && !isSet2Pushed[0])
+                        {
+                            btnPushState[0] = true;
+                            isSet1Pushed[0] = true;
+                        }
+
+                        if (Keys.GetKeyUp(Keys.btnSet1[i])
+                            && isSet1Pushed[0])
+                        {
                             btnPushState[0] = false;
                             btnPushSound[0] = false;
-                            isAxisPushed[0] = false;
                             btnProcState[0] = false;
+                            isSet1Pushed[0] = false;
+                        }
+                    }
+                    
+                    if (Keys.btnAxisSet2[i])
+                    {
+                        // Axis 값일때
+                        if (Keys.GetAxisValue(Keys.btnSet2[i]) != 0)
+                        {
+                            btnPushState[0] = true;
+                            isSet2Pushed[0] = true;
+                        }
+                        else
+                        {
+                            if(!isSet1Pushed[0])
+                            {
+                                btnPushState[0] = false;
+                                btnPushSound[0] = false;
+                                btnProcState[0] = false;
+                            }
+                            isSet2Pushed[0] = false;
+                        }
+                    }
+                    else
+                    {
+                        // 일반 버튼일때
+                        if (Keys.GetKeyDown(Keys.btnSet2[i])
+                            && !isSet1Pushed[0]
+                            && !isSet2Pushed[0])
+                        {
+                            btnPushState[0] = true;
+                            isSet2Pushed[0] = true;
+                        }
+
+                        if (Keys.GetKeyUp(Keys.btnSet2[i])
+                            && isSet2Pushed[0])
+                        {
+                            btnPushState[0] = false;
+                            btnPushSound[0] = false;
+                            btnProcState[0] = false;
+                            isSet2Pushed[0] = false;
                         }
                     }
                 }
@@ -995,6 +1086,18 @@ namespace BMSPlayer
             double abstime = Math.Abs(time);
             TimingType timingType = GetTimingType(abstime, false);
 
+            double timefs = 0;
+            if (time > PERFECT)
+            {
+                timefs = time - PERFECT;
+                if(time <= GOOD) fast++;
+            }
+            else if(time < -PERFECT)
+            {
+                timefs = time + PERFECT;
+                if(time >= -GOOD) slow++;
+            }
+
             if(timingType == TimingType.POOR)
             {
                 combo = 0;
@@ -1019,12 +1122,12 @@ namespace BMSPlayer
                     ui.UpdateMaxCombo(maxcombo);
                 }
 
-                ui.UpdateJudge(timingType, combo, ((1 - abstime / BAD) * 100).ToString("0.00") + "%", (int)Math.Round(time*10));
+                ui.UpdateJudge(timingType, combo, ((1 - abstime / BAD) * 100).ToString("0.00") + "%", (int)Math.Round(timefs*100));
             }
 
             avgRate = Math.Round(sumRate * 100 / processedNotes) / 100;
             avgTimeDiff = sumTimeDiff / processedNotes;
-            ui.UpdateSideJudge(perfect, great, good, ok, miss, cb,
+            ui.UpdateSideJudge(perfect, great, good, ok, miss, cb, fast, slow,
                 avgRate.ToString("0.00") + "%", avgTimeDiff.ToString("0.0") + "ms");
         }
 
@@ -1070,6 +1173,8 @@ namespace BMSPlayer
             Const.ResultOk = ok;
             Const.ResultMiss = miss;
             Const.ResultComboBreak = cb;
+            Const.ResultFast = fast;
+            Const.ResultSlow = slow;
             Const.ResultAvgRate = (float)avgRate;
             Const.ResultTimeDiff = (float)avgTimeDiff;
             Const.ResultScore = score;

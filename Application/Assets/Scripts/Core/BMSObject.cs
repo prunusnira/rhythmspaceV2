@@ -18,10 +18,12 @@
         public int Line { get; set; }
         public bool OnScreen { get; set; }
         public UnityEngine.GameObject NoteObject { get; set; }
+        public bool IsSRanDone { get; set; } // S-RAN 전용 변수
 
         public VisibleNote()
         {
             OnScreen = false;
+            IsSRanDone = false;
         }
     }
 

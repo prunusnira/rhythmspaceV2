@@ -71,28 +71,30 @@ namespace DatabaseManager
         public void initializeTable()
         {
             dbcommand = dbconn.CreateCommand();
-            string list = "create table list (" +
-                "id integer primary key autoincrement," +
-                "title varchar(100) not null," +
-                "subtitle varchar(100) not null," +
-                "artist varchar (100) not null," +
-                "subartist varchar (100) not null," +
-                "gerne varchar (100)," +
-                "bpmstart float not null," +
-                "bpmmin float not null," +
-                "bpmmax float not null," +
-                "path varchar(1000) not null," +
-                "md5hash varchar(1000) not null," +
-                "level integer not null," +
-                "diff integer default 2," +
-                "fname varchar (100) not null," +
-                "jacket varchar (100))";
-            string record = "create table record (" +
-                "id integer primary key autoincrement," +
-                "name varhar(100) not null," +
-                "rank varchar(2) not null," +
-                "score integer(10) not null," +
-                "md5hash varchar(1000) not null)";
+            string list =
+                @"create table list (
+                id integer primary key autoincrement,
+                title varchar(100) not null,
+                subtitle varchar(100) not null,
+                artist varchar (100) not null,
+                subartist varchar (100) not null,
+                gerne varchar (100),
+                bpmstart float not null,
+                bpmmin float not null,
+                bpmmax float not null,
+                path varchar(1000) not null,
+                md5hash varchar(1000) not null,
+                level integer not null,
+                diff integer default 2,
+                fname varchar (100) not null,
+                jacket varchar (100))";
+            string record =
+                @"create table record (
+                id integer primary key autoincrement,
+                name varhar(100) not null,
+                rank varchar(2) not null,
+                score integer(10) not null,
+                md5hash varchar(1000) not null)";
 
             dbcommand.CommandText = list;
             dbcommand.ExecuteNonQuery();
@@ -112,28 +114,41 @@ namespace DatabaseManager
             dbcommand.ExecuteNonQuery();
         }
 
-        public void InsertBMS(string[] param)
+        public void InsertBMS(List<string[]> paramList)
         {
             dbcommand = dbconn.CreateCommand();
 
-            for(int i = 0; i < param.Length; i++)
+            for(int i = 0; i < paramList.Count; i++)
             {
-                param[i] = param[i].Replace("'", "''");
-                param[i] = param[i].Replace("\"", "\"\"");
+                string[] param = paramList[i];
+                for(int j = 0; j < param.Length; j++)
+                {
+                    param[j] = param[j].Replace("'", "''");
+                    param[j] = param[j].Replace("\"", "\"\"");
+                }
             }
 
             string query =
-                "insert into list " +
-                    "(title, subtitle, artist, subartist, gerne," +
-                    " bpmstart, bpmmin, bpmmax," +
-                    " path, md5hash, level, diff," +
-                    " fname, jacket)" +
-                    "values" +
-                    "('" +
+                @"insert into list
+                    (title, subtitle, artist, subartist, gerne,
+                    bpmstart, bpmmin, bpmmax,
+                    path, md5hash, level, diff,
+                    fname, jacket)
+                    values";
+
+            foreach(string[] param in paramList)
+            {
+                query += "('" +
                         param[0] + "','" + param[1] + "','" + param[2] + "','" + param[3] + "','" + param[4] + "'," +
                         param[5] + "," + param[6] + "," + param[7] + ",'" +
                         param[8] + "', '" + param[9] + "','" + param[10] + "','" + param[11] + "','" +
-                        param[12] + "','" + param[13] + "')"; ;
+                        param[12] + "','" + param[13] + "')";
+
+                if(paramList.IndexOf(param) != paramList.Count - 1)
+                {
+                    query += ",";
+                }
+            }
             
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();

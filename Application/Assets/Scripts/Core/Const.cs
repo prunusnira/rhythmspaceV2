@@ -241,15 +241,15 @@ namespace BMSPlayer
             }
         }
 
-        public static string KeyToChange
+        public static int KeyToChange
         {
             get
             {
-                return PlayerPrefs.GetString("keyToChange", "");
+                return PlayerPrefs.GetInt("keyToChange", 0);
             }
             set
             {
-                PlayerPrefs.SetString("keyToChange", value);
+                PlayerPrefs.SetInt("keyToChange", value);
             }
         }
 
@@ -614,6 +614,30 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetString("rst_rank", value);
+            }
+        }
+
+        public static int ResultFast
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("rst_fast", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_fast", value);
+            }
+        }
+
+        public static int ResultSlow
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("rst_slow", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_slow", value);
             }
         }
         #endregion

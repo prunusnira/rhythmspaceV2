@@ -12,13 +12,11 @@ namespace BMSPlayer
     public class MusicListManager
     {
         SQLiteExecutor executor;
-        LoadBMSList loader;
         MD5 md5;
 
         public MusicListManager()
         {
             executor = SQLiteExecutor.getInstance();
-            loader = new LoadBMSList();
             md5 = MD5.Create();
         }
 
@@ -32,8 +30,20 @@ namespace BMSPlayer
         {
             if (path != "")
             {
-                // 모든 bms의 목록을 가져와야 함
-                return loader.LoadBms(path, index);
+                BMS bms = new BMS(path);
+                BMSAnalyzer analyzer = new BMSAnalyzer();
+                analyzer.HeaderAnalyzer(bms);
+                if (bms.Player != 1) return null;
+
+                MusicListData data = new MusicListData(
+                        index, bms.Title, bms.SubTitle,
+                        bms.Artist, bms.SubArtist, bms.Gerne,
+                        bms.BPMStart, bms.BPMMin, bms.BPMMax,
+                        bms.FolderPath, bms.Level, bms.Difficulty,
+                        bms.FileName, bms.StageFile
+                    );
+
+                return data;
             }
             return null;
         }
@@ -53,6 +63,7 @@ namespace BMSPlayer
             if (list.Count != 0)
             {
                 executor.dropList();
+                List<string[]> paramList = new List<string[]>();
                 // 리스트의 각 파일을 DB에 등록(이 때 MD5 Hash값도 계산)
                 foreach (MusicListData d in list)
                 {
@@ -65,11 +76,13 @@ namespace BMSPlayer
                     {
                         d.Title, d.SubTitle, d.Artist, d.SubArtist, d.Gerne,
                         d.BPMstart.ToString(), d.BPMmin.ToString(), d.BPMmax.ToString(),
-                        d.Path, hash, d.Level.ToString(), d.Difficulty.ToString(), d.FileName, d.Jacket
+                        d.Path, hash, d.Level.ToString(), d.Difficulty.ToString(),
+                        d.FileName, d.Jacket
                     };
-                    executor.InsertBMS(param);
+                    paramList.Add(param);
                     fstream.Close();
                 }
+                executor.InsertBMS(paramList);
             }
         }
     }

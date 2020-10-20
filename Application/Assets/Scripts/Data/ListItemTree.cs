@@ -7,10 +7,17 @@ namespace BMSPlayer
     public class ListItemTree
     {
         public ListItemNode Head { get; set; }
+        public List<string> DirList { get; set; }
+        public List<string> FileList { get; set; }
+        public string JSONStr { get; set; }
 
         public ListItemTree(string topPath)
         {
             Head = GenerateFolderNode(topPath, null);
+            DirList = new List<string>();
+            DirList.Add(topPath);
+            FileList = new List<string>();
+            JSONStr = "";
         }
 
         public ListItemTree(ListItemNode topNode)
@@ -25,6 +32,10 @@ namespace BMSPlayer
 
         public ListItemNode CreateTree(ListItemNode current)
         {
+            JSONStr += "{\n\"Path\":\"" + current.Path.Replace("\\", "/") + "\",\n" +
+                "\"BMS\":\"" + HasBMS(current).ToString() + "\",\n" +
+                "\"Children\":[\n";
+
             string[] dirs = GetSubFolders(current);
 
             // Depth 가져오기
@@ -43,36 +54,27 @@ namespace BMSPlayer
             {
                 for(int i = 0; i < dirs.Length; i++)
                 {
+                    // dir path 추가
+                    DirList.Add(dirs[i]);
+
                     // Depth 추가
                     List<int> cdepth = DepthClone(depth);
                     cdepth.Add(i);
                     AddChild(current, CreateTree(GenerateFolderNode(dirs[i], cdepth)));
+
+                    if (i == dirs.Length - 1)
+                    {
+                        JSONStr += "\n";
+                    }
+                    else
+                    {
+                        JSONStr += ",\n";
+                    }
                 }
             }
+
+            JSONStr += "]\n}";
             return current;
-        }
-
-        public string CreateTreeJSON(ListItemNode current)
-        {
-            string jsonStr = "{\n\"Path\":\"" + current.Path.Replace("\\", "/") + "\",\n" +
-                "\"BMS\":\"" + HasBMS(current).ToString() + "\",\n" +
-                "\"Children\":[\n";
-            for (int i = 0; i < current.Children.Count; i++)
-            {
-                ListItemNode node = current.Children[i];
-                jsonStr += "\t" + CreateTreeJSON(node);
-                if (i == current.Children.Count - 1)
-                {
-                    jsonStr += "\n";
-                }
-                else
-                {
-                    jsonStr += ",\n";
-                }
-            }
-            jsonStr += "]\n}";
-
-            return jsonStr;
         }
 
         // JSON Control
@@ -127,8 +129,18 @@ namespace BMSPlayer
                         .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")
                         || s.ToLower().EndsWith(".bml")).ToArray();
 
-            if (bmsfiles.Length > 0) return true;
-            else return false;
+            if (bmsfiles.Length > 0)
+            {
+                foreach (string bms in bmsfiles)
+                {
+                    FileList.Add(bms);
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void AddChild(ListItemNode current, ListItemNode child)
