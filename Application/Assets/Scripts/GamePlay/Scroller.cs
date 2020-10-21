@@ -154,6 +154,55 @@ namespace BMSPlayer
             }
         }
 
+        public void MoveSplitLine(PlayData data,
+            double playTime, double bps)
+        {
+            List<SplitLine> removeCandidate = new List<SplitLine>();
+
+            foreach (SplitLine current in data.SplitLine)
+            {
+                // 화면에 표시되지 않은 상태라면 라인을 화면에 뿌림
+                if (!current.OnScreen && current.OnScrPos * speed * Const.SPEEDMULTIPLIER < 3000)
+                {
+                    ui.DisplaySplitLine(current);
+                }
+
+                // 시간에 따라 실제 라인이 표시될 위치 계산
+                if (data.IsStopOn)
+                {
+                    SetNotePositionOnStop(current, data, playTime, bps);
+                }
+                else
+                {
+                    SetNotePosition(current, data, playTime, bps);
+                }
+
+                // 실제 오브젝트가 존재할 때 위치를 이동시킴
+                if (current.OnScreen && current.NoteObject != null)
+                {
+                    GameObject noteobj = current.NoteObject;
+                    noteobj.transform.localPosition = new Vector3(
+                        noteobj.transform.localPosition.x,
+                        (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER),
+                        noteobj.transform.localPosition.z);
+                }
+
+                if (current.Timing < playTime)
+                {
+                    Destroy(current.NoteObject);
+                    current.NoteObject = null;
+                    current.OnScreen = false;
+                    removeCandidate.Add(current);
+                }
+            }
+
+            // 삭제
+            foreach (SplitLine n in removeCandidate)
+            {
+                data.SplitLine.Remove(n);
+            }
+        }
+
         public void MoveMine(PlayData data,
             double playTime, double bps)
         {
@@ -185,8 +234,8 @@ namespace BMSPlayer
                         GameObject noteobj = current.NoteObject;
                         noteobj.transform.localPosition = new Vector3(
                             noteobj.transform.localPosition.x,
-                            noteobj.transform.localPosition.y,
-                            (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER));
+                            (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER),
+                            noteobj.transform.localPosition.z);
                     }
 
                     if(current.Timing < playTime)
@@ -238,8 +287,8 @@ namespace BMSPlayer
                         GameObject noteobj = current.NoteObject;
                         noteobj.transform.localPosition = new Vector3(
                             noteobj.transform.localPosition.x,
-                            noteobj.transform.localPosition.y,
-                            (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER));
+                            (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER),
+                            noteobj.transform.localPosition.z);
                     }
 
                     // 롱노트 가운데 노트의 위치와 넓이 설정
@@ -261,7 +310,7 @@ namespace BMSPlayer
                         // 위치 변경
                         Vector3 pos = ln.Mid.NoteObject.transform.localPosition;
                         ln.Mid.NoteObject.transform.localPosition = new Vector3(
-                            pos.x, pos.y, (float)((startRealPos + endRealPos) / 2));
+                            pos.x, (float)((startRealPos + endRealPos) / 2), pos.z);
                     }
 
                     double judgeTiming = GetJudgeTiming(current.Timing, timePassed);

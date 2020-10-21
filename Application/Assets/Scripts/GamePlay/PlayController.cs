@@ -38,6 +38,7 @@ namespace BMSPlayer {
         private double StartTime = 0;
         private double PrevTickTime = 0;
         private double PlayTimePassed = 0;
+        private double DeltaTempSum = 0; // 그래프 기록용
 
         public double BarLengthPrevbar = 0;
         private int pauseSel = 0;
@@ -115,245 +116,265 @@ namespace BMSPlayer {
 
         private void Update ()
         {
-            // 데이터 로딩
-            if(!isLoading)
+            try
             {
-                StartCoroutine("LoadBMS");
-                return;
-            }
 
-            if(!isBMSReady)
-            {
-                return;
-            }
-
-            // 플레이 키 (최 우선 체크)
-            scroller.ButtonPushState();
-
-            if (firstrun && !isPaused)
-            {
-                double currentTick = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
-                PlayTimePassed = currentTick - StartTime;
-                double DeltaTime = PlayTimePassed - PrevTickTime;
-
-                double bpm = Data.CurrentBPM;
-                double bps = Data.BPS;
-
-                // 1틱 동안 노트가 움직이는 거리 (시간 * 속도)
-
-                // BPM이 변경되는 곡 때문에 총 플레이 시간과 bps만으로
-                // 노트위치를 계산하는 것은 불가능함
-                if (Data.Stop > 0)
+                // 데이터 로딩
+                if (!isLoading)
                 {
-                    Data.Stop -= DeltaTime;
-
-                    if (Data.Stop <= 0)
-                    {
-                        Data.Stop = 0;
-                        Data.IsStopOn = false;
-                    }
+                    StartCoroutine("LoadBMS");
+                    return;
                 }
 
-                scroller.MoveNotes(Data, PlayTimePassed, ref bps);
-                scroller.MoveMine(Data, PlayTimePassed, bps);
-
-                scroller.PlayBGA(Data.NoteBGA, Data.BMS, PlayTimePassed);
-                scroller.PlayBGM(Data.NoteBGM, Data.BMS, PlayTimePassed);
-                scroller.PlayBPM(Data, PlayTimePassed, ref bpm, ref bps);
-                scroller.PlayStop(Data, PlayTimePassed, bps);
-
-                scroller.SpeedChangeAndBeam(bpm);
-
-                if (isPlayAuto)
+                if (!isBMSReady)
                 {
-                    scroller.AutoPlay(Data.NotePlay, Data.NoteLong, Data.BMS,
-                        PlayTimePassed, ref bps, Data.TotalNotes);
+                    return;
+                }
+
+                // 플레이 키 (최 우선 체크)
+                scroller.ButtonPushState();
+
+                if (firstrun && !isPaused)
+                {
+                    double currentTick = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
+                    PlayTimePassed = currentTick - StartTime;
+                    double DeltaTime = PlayTimePassed - PrevTickTime;
+
+                    double bpm = Data.CurrentBPM;
+                    double bps = Data.BPS;
+
+                    // 1틱 동안 노트가 움직이는 거리 (시간 * 속도)
+
+                    // BPM이 변경되는 곡 때문에 총 플레이 시간과 bps만으로
+                    // 노트위치를 계산하는 것은 불가능함
+                    if (Data.Stop > 0)
+                    {
+                        Data.Stop -= DeltaTime;
+
+                        if (Data.Stop <= 0)
+                        {
+                            Data.Stop = 0;
+                            Data.IsStopOn = false;
+                        }
+                    }
+
+                    scroller.MoveNotes(Data, PlayTimePassed, ref bps);
+                    scroller.MoveMine(Data, PlayTimePassed, bps);
+                    scroller.MoveSplitLine(Data, PlayTimePassed, bps);
+
+                    scroller.PlayBGA(Data.NoteBGA, Data.BMS, PlayTimePassed);
+                    scroller.PlayBGM(Data.NoteBGM, Data.BMS, PlayTimePassed);
+                    scroller.PlayBPM(Data, PlayTimePassed, ref bpm, ref bps);
+                    scroller.PlayStop(Data, PlayTimePassed, bps);
+
+                    scroller.SpeedChangeAndBeam(bpm);
+
+                    if (isPlayAuto)
+                    {
+                        scroller.AutoPlay(Data.NotePlay, Data.NoteLong, Data.BMS,
+                            PlayTimePassed, ref bps, Data.TotalNotes);
+                    }
+                    else
+                    {
+                        scroller.Play(Data.NotePlay, Data.NoteLong, Data.BMS,
+                            PlayTimePassed,
+                            ref bpm, ref bps, Data.TotalNotes);
+                    }
+
+                    Data.CurrentBPM = bpm;
+                    Data.BPS = bps;
+
+                    // 게임 종료 시 처리
+                    // Type 1: 게이지가 0이 되었을 때
+                    if (hpController.IsHpMin())
+                    {
+                        if (GameOverCheck())
+                        {
+                            Const.Clear = ClearType.FAIL;
+                            isGameOver = true;
+                        }
+                    }
+                    // Type 2: 노트가 다 사용되었을 때
+                    if (scroller.GetProcessedNotes() >= Data.TotalNotes)
+                    {
+                        // 게이지 타입과 퍼센트에 따라 클리어 유무 결정
+                        switch (Const.JudgeType)
+                        {
+                            case JudgeType.ASSISTED:
+                                if (hpController.CurrentHP >= 6000)
+                                {
+                                    Const.Clear = ClearType.ASSISTCLEAR;
+                                }
+                                else
+                                {
+                                    Const.Clear = ClearType.FAIL;
+                                }
+                                break;
+                            case JudgeType.EASY:
+                                if (hpController.CurrentHP >= 8000)
+                                {
+                                    Const.Clear = ClearType.EASYCLEAR;
+                                }
+                                else
+                                {
+                                    Const.Clear = ClearType.FAIL;
+                                }
+                                break;
+                            case JudgeType.NORMAL:
+                                if (hpController.CurrentHP >= 8000)
+                                {
+                                    Const.Clear = ClearType.NORMALCLEAR;
+                                }
+                                else
+                                {
+                                    Const.Clear = ClearType.FAIL;
+                                }
+                                break;
+                            case JudgeType.HARD:
+                                Const.Clear = ClearType.HARDCLEAR;
+                                break;
+                            case JudgeType.EXHARD:
+                                Const.Clear = ClearType.EXCLEAR;
+                                break;
+                        }
+
+                        bool isPlayingMusic = soundController.CheckSoundPlaying();
+                        bool isPlayingBGA = false;
+
+                        if (isBGAMovieExist)
+                        {
+                            isPlayingBGA = UI.isBGAPlaying();
+                        }
+
+                        if (!isPlayingMusic && !isPlayingBGA)
+                        {
+                            isGameOver = true;
+                        }
+                    }
+                    // 게임오버 처리
+                    if (isGameOver && !gameOverTriggered)
+                    {
+                        // 게임오버로 가기 전에 페이드
+                        StartCoroutine("GameOver");
+                    }
+                    else if (isGameOver && gameOverTriggered && UI.GetFadeDone())
+                    {
+                        Debug.Log("GAMEOVER");
+                        // 재생중인 모든 음악 종료
+                        soundController.StopAll();
+
+                        soundController.FreeMemory(Data.BMS);
+
+                        Const.ResultGraph = Data.HPGraph;
+
+                        // 결과 데이터 수집 후 result로 넘기기
+                        scroller.GetResultData(Data.TotalNotes);
+
+                        // 결과창으로 이동
+                        SceneManager.LoadScene("Result");
+                    }
+
+                    UI.UpdateTimerCur(PlayTimePassed);
+
+                    PrevTickTime = PlayTimePassed;
+
+                    if (isKeyInfo && PlayTimePassed >= 50)
+                    {
+                        isKeyInfo = false;
+                        UI.RemoveKeyInfo();
+                    }
+
+                    // 1초에 한 번 hp 값을 기록
+                    DeltaTempSum += DeltaTime;
+                    if (DeltaTempSum >= 10)
+                    {
+                        Data.HPGraph.Add(hpController.CurrentHP);
+                        DeltaTempSum = 0;
+                    }
+                }
+                else if (firstrun && isPaused)
+                {
+                    // 위 아래 버튼 이동시 메뉴 변경
+                    if (Input.GetKeyDown(KeyCode.UpArrow))
+                    {
+                        UI.PauseMenuMove(ref pauseSel, true);
+                    }
+                    if (Input.GetKeyDown(KeyCode.DownArrow))
+                    {
+                        UI.PauseMenuMove(ref pauseSel, false);
+                    }
+                    if (Input.GetKeyDown(KeyCode.Return))
+                    {
+                        bool isEnd = UI.PauseMenuExec(pauseSel);
+                        if (isEnd)
+                        {
+                            Const.Clear = ClearType.FAIL;
+                            isGameOver = true;
+                            isPaused = false;
+                            UI.HidePauseMenu();
+                        }
+                    }
                 }
                 else
                 {
-                    scroller.Play(Data.NotePlay, Data.NoteLong, Data.BMS,
-                        PlayTimePassed,
-                        ref bpm, ref bps, Data.TotalNotes);
+                    firstrun = true;
+                    StartTime = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
+                    PrevTickTime = 0;
                 }
 
-                Data.CurrentBPM = bpm;
-                Data.BPS = bps;
-
-                // 게임 종료 시 처리
-                // Type 1: 게이지가 0이 되었을 때
-                if(hpController.IsHpMin())
+                // 일시정지 메뉴 소환
+                if (Input.GetKeyDown(KeyCode.Escape))
                 {
-                    if (GameOverCheck())
+                    isPaused = !isPaused;
+
+                    if (isPaused)
                     {
-                        Const.Clear = ClearType.FAIL;
-                        isGameOver = true;
+                        UI.ShowPauseMenu();
                     }
-                }
-                // Type 2: 노트가 다 사용되었을 때
-                if (scroller.GetProcessedNotes() >= Data.TotalNotes)
-                {
-                    // 게이지 타입과 퍼센트에 따라 클리어 유무 결정
-                    switch(Const.JudgeType)
+                    else
                     {
-                        case JudgeType.ASSISTED:
-                            if(hpController.CurrentHP >= 6000)
-                            {
-                                Const.Clear = ClearType.ASSISTCLEAR;
-                            }
-                            else
-                            {
-                                Const.Clear = ClearType.FAIL;
-                            }
-                            break;
-                        case JudgeType.EASY:
-                            if (hpController.CurrentHP >= 8000)
-                            {
-                                Const.Clear = ClearType.EASYCLEAR;
-                            }
-                            else
-                            {
-                                Const.Clear = ClearType.FAIL;
-                            }
-                            break;
-                        case JudgeType.NORMAL:
-                            if (hpController.CurrentHP >= 8000)
-                            {
-                                Const.Clear = ClearType.NORMALCLEAR;
-                            }
-                            else
-                            {
-                                Const.Clear = ClearType.FAIL;
-                            }
-                            break;
-                        case JudgeType.HARD:
-                            Const.Clear = ClearType.HARDCLEAR;
-                            break;
-                        case JudgeType.EXHARD:
-                            Const.Clear = ClearType.EXCLEAR;
-                            break;
-                    }
-
-                    bool isPlayingMusic = soundController.CheckSoundPlaying();
-                    bool isPlayingBGA = false;
-
-                    if(isBGAMovieExist)
-                    {
-                        isPlayingBGA = UI.isBGAPlaying();
-                    }
-
-                    if (!isPlayingMusic && !isPlayingBGA)
-                    {
-                        isGameOver = true;
-                    }
-                }
-                // 게임오버 처리
-                if (isGameOver && !gameOverTriggered)
-                {
-                    // 게임오버로 가기 전에 페이드
-                    StartCoroutine("GameOver");
-                }
-                else if (isGameOver && gameOverTriggered && UI.GetFadeDone())
-                {
-                    Debug.Log("GAMEOVER");
-                    // 재생중인 모든 음악 종료
-                    soundController.StopAll();
-
-                    soundController.FreeMemory(Data.BMS);
-
-                    // 결과 데이터 수집 후 result로 넘기기
-                    scroller.GetResultData(Data.TotalNotes);
-
-                    // 결과창으로 이동
-                    SceneManager.LoadScene("Result");
-                }
-
-                UI.UpdateTimerCur(PlayTimePassed);
-
-                PrevTickTime = PlayTimePassed;
-
-                if (isKeyInfo && PlayTimePassed > 50)
-                {
-                    isKeyInfo = false;
-                    UI.RemoveKeyInfo();
-                }
-            }
-            else if(firstrun && isPaused)
-            {
-                // 위 아래 버튼 이동시 메뉴 변경
-                if(Input.GetKeyDown(KeyCode.UpArrow))
-                {
-                    UI.PauseMenuMove(ref pauseSel, true);
-                }
-                if (Input.GetKeyDown(KeyCode.DownArrow))
-                {
-                    UI.PauseMenuMove(ref pauseSel, false);
-                }
-                if (Input.GetKeyDown(KeyCode.Return))
-                {
-                    bool isEnd = UI.PauseMenuExec(pauseSel);
-                    if(isEnd)
-                    {
-                        Const.Clear = ClearType.FAIL;
-                        isGameOver = true;
-                        isPaused = false;
                         UI.HidePauseMenu();
                     }
                 }
-            }
-            else
-            {
-                firstrun = true;
-                StartTime = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
-                PrevTickTime = 0;
-            }
 
-            // 일시정지 메뉴 소환
-            if(Input.GetKeyDown(KeyCode.Escape))
-            {
-                isPaused = !isPaused;
-
-                if(isPaused)
+                // 셔터 조정
+                // SUD down
+                if (Input.GetKey(KeyCode.Alpha3))
                 {
-                    UI.ShowPauseMenu();
+                    UI.CoverSuddenDown();
                 }
-                else
+                // SUD up
+                else if (Input.GetKey(KeyCode.Alpha4))
                 {
-                    UI.HidePauseMenu();
+                    UI.CoverSuddenUp();
+                }
+
+                // LIFT down
+                if (Input.GetKey(KeyCode.Alpha5))
+                {
+                    UI.CoverLiftDown();
+                }
+                // LIFT up
+                else if (Input.GetKey(KeyCode.Alpha6))
+                {
+                    UI.CoverLiftUp();
+                }
+
+                // HID down
+                if (Input.GetKey(KeyCode.Alpha7))
+                {
+                    UI.CoverHiddenDown();
+                }
+                // HID up
+                else if (Input.GetKey(KeyCode.Alpha8))
+                {
+                    UI.CoverHiddenUp();
                 }
             }
-
-            // 셔터 조정
-            // SUD down
-            if(Input.GetKey(KeyCode.Alpha3))
+            catch (Exception e)
             {
-                UI.CoverSuddenDown();
-            }
-            // SUD up
-            else if (Input.GetKey(KeyCode.Alpha4))
-            {
-                UI.CoverSuddenUp();
-            }
-
-            // LIFT down
-            if (Input.GetKey(KeyCode.Alpha5))
-            {
-                UI.CoverLiftDown();
-            }
-            // LIFT up
-            else if (Input.GetKey(KeyCode.Alpha6))
-            {
-                UI.CoverLiftUp();
-            }
-
-            // HID down
-            if (Input.GetKey(KeyCode.Alpha7))
-            {
-                UI.CoverHiddenDown();
-            }
-            // HID up
-            else if (Input.GetKey(KeyCode.Alpha8))
-            {
-                UI.CoverHiddenUp();
+                ErrorHandler.LogError(
+                    e.StackTrace + " " + e.Message);
             }
         }
 

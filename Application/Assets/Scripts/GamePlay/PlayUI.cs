@@ -682,7 +682,7 @@ namespace BMSPlayer
             noteEffects[pos].gameObject.SetActive(true);
             if (onoff)
             {
-                noteEffects[pos].transform.localScale = new Vector3(1f, 1f, 1f);
+                noteEffects[pos].transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
                 StartCoroutine(noteEffectLN(noteEffects[pos], pos));
             }
             else
@@ -694,13 +694,13 @@ namespace BMSPlayer
         // Note Effect Coroutine
         IEnumerator noteEffect(SpriteRenderer sprite)
         {
-            float x = 1f;
-            float y = 1f;
+            float x = 0.3f;
+            float y = 0.3f;
             sprite.transform.localScale = new Vector3(x, y, 1f);
             for(int i = 0; i < 12; i++)
             {
                 yield return new WaitForSeconds(0.02f);
-                sprite.transform.rotation = Quaternion.Euler(new Vector3(90f, 15f * i, 0f));
+                sprite.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 15f * i));
                 sprite.transform.localScale = new Vector3(x * 0.8f, y * 0.8f, 1f);
                 x *= 0.8f;
                 y *= 0.8f;
@@ -714,7 +714,7 @@ namespace BMSPlayer
             yield return new WaitForSeconds(0.02f);
             effectRotation[pos] += 15f;
             if (effectRotation[pos] % 360 == 0) effectRotation[pos] = 0f;
-            sprite.transform.rotation = Quaternion.Euler(new Vector3(90f, effectRotation[pos], 0f));
+            sprite.transform.rotation = Quaternion.Euler(new Vector3(0f, effectRotation[pos], 0f));
         }
 
         // Animation Effect Coroutine
@@ -832,6 +832,14 @@ namespace BMSPlayer
         public void HidePauseMenu()
         {
             layerPauseMenu.SetActive(false);
+        }
+
+        public void DisplaySplitLine(SplitLine line)
+        {
+            GameObject noteObj = generator.AddNewSplitLine(line.Timing, noteParentObj.transform);
+            noteObj.transform.SetParent(noteParentObj.transform, false);
+            line.OnScreen = true;
+            line.NoteObject = noteObj;
         }
 
         public void DisplayMineNote(MineNote note)
@@ -1017,15 +1025,15 @@ namespace BMSPlayer
         public void CoverSuddenDown()
         {
             float posx = coverSud.transform.localPosition.x;
-            float posy = coverSud.transform.localPosition.y;
+            float posz = coverSud.transform.localPosition.z;
 
-            coverSudPos -= 10;
+            coverSudPos -= 1;
             if(coverSudPos < 0)
             {
                 coverSudPos = 0;
             }
 
-            coverSud.transform.localPosition = new Vector3(posx, posy, coverSudPos);
+            coverSud.transform.localPosition = new Vector3(posx, coverSudPos, posz);
 
             Const.CoverSudPos = coverSudPos;
         }
@@ -1033,15 +1041,15 @@ namespace BMSPlayer
         public void CoverSuddenUp()
         {
             float posx = coverSud.transform.localPosition.x;
-            float posy = coverSud.transform.localPosition.y;
+            float posz = coverSud.transform.localPosition.z;
 
-            coverSudPos += 10;
-            if (coverSudPos > 2000)
+            coverSudPos += 1;
+            if (coverSudPos > 725)
             {
-                coverSudPos = 2000;
+                coverSudPos = 725;
             }
 
-            coverSud.transform.localPosition = new Vector3(posx, posy, coverSudPos);
+            coverSud.transform.localPosition = new Vector3(posx, coverSudPos, posz);
 
             Const.CoverSudPos = coverSudPos;
         }
@@ -1049,15 +1057,15 @@ namespace BMSPlayer
         public void CoverHiddenDown()
         {
             float posx = coverHid.transform.localPosition.x;
-            float posy = coverHid.transform.localPosition.y;
+            float posz = coverHid.transform.localPosition.z;
 
-            coverHidPos += 10;
-            if (coverHidPos > 2000)
+            coverHidPos += 1;
+            if (coverHidPos > 725)
             {
-                coverHidPos = 2000;
+                coverHidPos = 725;
             }
 
-            coverHid.transform.localPosition = new Vector3(posx, posy, -1f * coverHidPos);
+            coverHid.transform.localPosition = new Vector3(posx, -1f * coverHidPos, posz);
 
             Const.CoverHidPos = coverHidPos;
         }
@@ -1065,15 +1073,15 @@ namespace BMSPlayer
         public void CoverHiddenUp()
         {
             float posx = coverHid.transform.localPosition.x;
-            float posy = coverHid.transform.localPosition.y;
+            float posz = coverHid.transform.localPosition.z;
 
-            coverHidPos -= 10;
+            coverHidPos -= 1;
             if (coverHidPos < 0)
             {
                 coverHidPos = 0;
             }
 
-            coverHid.transform.localPosition = new Vector3(posx, posy, -1f * coverHidPos);
+            coverHid.transform.localPosition = new Vector3(posx, -1f * coverHidPos, posz);
 
             Const.CoverHidPos = coverHidPos;
         }
@@ -1081,15 +1089,15 @@ namespace BMSPlayer
         public void CoverLiftDown()
         {
             float posx = playArea.transform.localPosition.x;
-            float posy = playArea.transform.localPosition.y;
+            float posz = playArea.transform.localPosition.z;
 
-            playAreaPos -= 10;
+            playAreaPos -= 1;
             if (playAreaPos < 0)
             {
                 playAreaPos = 0;
             }
 
-            playArea.transform.localPosition = new Vector3(posx, posy, playAreaPos);
+            playArea.transform.localPosition = new Vector3(posx, playAreaPos, posz);
 
             Const.AreaLiftPos = playAreaPos;
         }
@@ -1097,15 +1105,15 @@ namespace BMSPlayer
         public void CoverLiftUp()
         {
             float posx = playArea.transform.localPosition.x;
-            float posy = playArea.transform.localPosition.y;
+            float posz = playArea.transform.localPosition.z;
 
-            playAreaPos += 10;
-            if (playAreaPos > 2000)
+            playAreaPos += 1;
+            if (playAreaPos > 725)
             {
-                playAreaPos = 2000;
+                playAreaPos = 725;
             }
 
-            playArea.transform.localPosition = new Vector3(posx, posy, playAreaPos);
+            playArea.transform.localPosition = new Vector3(posx, playAreaPos, posz);
 
             Const.AreaLiftPos = playAreaPos;
         }

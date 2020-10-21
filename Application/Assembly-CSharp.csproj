@@ -125,6 +125,7 @@
     <Compile Include="Assets\Scripts\MusicList\buttonsetting\Keys.cs" />
     <Compile Include="Assets\Scripts\MusicList\buttonsetting\MappingChanger.cs" />
     <Compile Include="Assets\Scripts\MusicList\buttonsetting\PlayKeySetting.cs" />
+    <Compile Include="Assets\Scripts\Result\GraphDrawer.cs" />
     <Compile Include="Assets\Scripts\Result\ResultController.cs" />
     <Compile Include="Assets\Scripts\SQLite\SQLiteExecutor.cs" />
     <Compile Include="Assets\Scripts\UI\GUILayoutx.cs" />

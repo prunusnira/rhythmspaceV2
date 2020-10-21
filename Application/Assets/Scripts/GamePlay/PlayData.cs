@@ -36,11 +36,16 @@ namespace BMSPlayer
         public List<StopNote> NoteStop { get; set; }
         public List<BGANote> NoteBGA { get; set; }
         public List<BGMNote> NoteBGM { get; set; }
+        public List<SplitLine> SplitLine { get; set; }
 
         // 노트 위치 계산을 위한 변수
         public List<double> BPMPositionFix { get; set; }
         public List<double> BPMTimingFix { get; set; }
+        public List<double> LineChangePos { get; set; }
         public int BPMNum { get; set; }
+
+        // 그래프 제작용
+        public List<int> HPGraph { get; set; }
 
         public PlayData()
         {
@@ -71,8 +76,11 @@ namespace BMSPlayer
             NoteBGA = new List<BGANote>();
             NoteBPM = new List<BPMNote>();
             NoteStop = new List<StopNote>();
+            SplitLine = new List<SplitLine>();
             BPMPositionFix = new List<double>();
             BPMTimingFix = new List<double>();
+            LineChangePos = new List<double>();
+            HPGraph = new List<int>();
 
             BPMNum = 0;
             Stop = 0;

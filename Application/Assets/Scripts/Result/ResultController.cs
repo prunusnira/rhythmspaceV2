@@ -54,8 +54,12 @@ namespace BMSPlayer
         public AudioSource bgLoop;
         public AudioClip[] loop;
 
+        // Record
         private RecordDataManager rdm;
         private RecordData record;
+
+        // Graph
+        public GraphDrawer Graph;
 
         void Awake()
         {
@@ -252,12 +256,25 @@ namespace BMSPlayer
             bgLoop.loop = true;
             bgLoop.playOnAwake = true;
             bgLoop.Play();
+
+            // 그래프 그리기
+            if(Const.ResultGraph != null)
+            {
+                Graph.AddVertexes(Const.ResultGraph);
+            }
         }
 
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
+                Const.ChangeLayout = true;
+                SceneManager.LoadScene("PlayScreen");
+            }
+
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                Const.ChangeLayout = false;
                 SceneManager.LoadScene("PlayScreen");
             }
 

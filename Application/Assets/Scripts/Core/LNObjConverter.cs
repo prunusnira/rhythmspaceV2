@@ -57,26 +57,17 @@ namespace BMSCore
                     List<int> lnPosList = new List<int>();
                     bool isLNObjExist = false;
                     bool isLNStartsFromPrev = false;
-                    bool hasMoreThanTwoLNObj = false;
 
                     // 00이거나 노트가 없으면 넘김
                     if (currentList == null) continue;
                     
                     // list 안에서 LNObj 유무 확인
-                    int lncnt = 0;
-
                     for (int k = 0; k < currentList.Count; k++)
                     {
                         if (currentList[k] == LNObj)
                         {
-                            lncnt++;
                             isLNObjExist = true;
                         }
-                    }
-
-                    if (lncnt > 1)
-                    {
-                        hasMoreThanTwoLNObj = true;
                     }
 
                     // LN이 있는가?

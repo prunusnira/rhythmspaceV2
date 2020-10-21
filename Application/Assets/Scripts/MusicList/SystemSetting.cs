@@ -35,6 +35,19 @@ namespace BMSPlayer
         public Button btnEng;
         public Text curLang;
 
+        // Resolution Change
+        public Button btn1080p;
+        public Button btn900p;
+        public Button btn768p;
+        public Button btn720p;
+        public Text txtResol;
+
+        // Screen mode Change
+        public Button btnWindowed;
+        public Button btnFullScr;
+        public Button btnBorderless;
+        public Text txtScrMode;
+
         // Sync changer
         public Button btnAutoSync;
         public Button btnSyncUp;
@@ -52,18 +65,8 @@ namespace BMSPlayer
         public GameObject layerKeySetting;
         public Button btnKeySetting;
 
-        // Resolution Change
-        public Button btn1080p;
-        public Button btn900p;
-        public Button btn768p;
-        public Button btn720p;
-        public Text txtResol;
-
-        // Screen mode Change
-        public Button btnWindowed;
-        public Button btnFullScr;
-        public Button btnBorderless;
-        public Text txtScrMode;
+        // Reset All
+        public Button btnResetAll;
 
         public Text debugText;
 
@@ -74,8 +77,8 @@ namespace BMSPlayer
             mlm = new MusicListManager();
             musicList = new List<MusicListData>();
             
-            rows = 7;
-            btn = new int[] { 2, 4, 3, 3, 3, 2, 1 };
+            rows = 8;
+            btn = new int[] { 2, 4, 3, 3, 3, 2, 1, 1 };
 
             EncolorBtn(0, 0);
         }
@@ -162,6 +165,9 @@ namespace BMSPlayer
                     break;
                 case 6:
                     ChangeSprite(btnKeySetting);
+                    break;
+                case 7:
+                    ChangeSprite(btnResetAll);
                     break;
             }
         }
@@ -251,6 +257,9 @@ namespace BMSPlayer
                     break;
                 case 6:
                     ShowKeySetting();
+                    break;
+                case 7:
+                    PlayerPrefs.DeleteAll();
                     break;
             }
         }

@@ -36,6 +36,8 @@ namespace BMSPlayer
         public static int ListPos = 0;
         public static bool ChangeLayout = false;
 
+        public static List<int> ResultGraph;
+
         public static int[] CustomRandom =
         {
             PlayerPrefs.GetInt("custom_r1", 1),
@@ -439,7 +441,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("suddenPos", 2000);
+                return PlayerPrefs.GetInt("suddenPos", 725);
             }
             set
             {
@@ -451,7 +453,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("hiddenPos", 2000);
+                return PlayerPrefs.GetInt("hiddenPos", 725);
             }
             set
             {

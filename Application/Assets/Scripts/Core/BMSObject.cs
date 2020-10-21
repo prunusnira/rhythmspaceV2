@@ -40,6 +40,10 @@
     {
     }
 
+    public class SplitLine : VisibleNote
+    {
+    }
+
     public class LongNote : NoteObject
     {
         public int Line { get; set; }

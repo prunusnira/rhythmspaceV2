@@ -12,6 +12,7 @@ namespace BMSPlayer
         public GameObject noteBlue;
         public GameObject notePink;
         public GameObject noteMine;
+        public GameObject splitLine;
 
         public GameObject AddNewNote(int clane, double timing, Transform parent)
         {
@@ -23,7 +24,8 @@ namespace BMSPlayer
              */
             GameObject noteObject = null;
 
-            Vector3 pos = new Vector3(GetXPos(clane), 0, (float)timing);
+            Vector3 pos = new Vector3(GetXPos(clane), (float)timing, 0);
+            Vector3 deg90 = new Vector3(90f, 0f);
 
             switch (clane)
             {
@@ -33,16 +35,19 @@ namespace BMSPlayer
                 case 7:
                     noteObject = Instantiate(noteWhite, pos, Quaternion.identity, parent);
                     noteObject.transform.localPosition = pos;
+                    noteObject.transform.localRotation = Quaternion.Euler(deg90);
                     break;
                 case 2:
                 case 4:
                 case 6:
                     noteObject = Instantiate(noteBlue, pos, Quaternion.identity, parent);
                     noteObject.transform.localPosition = pos;
+                    noteObject.transform.localRotation = Quaternion.Euler(deg90);
                     break;
                 case 0:
                     noteObject = Instantiate(notePink, pos, Quaternion.identity, parent);
                     noteObject.transform.localPosition = pos;
+                    noteObject.transform.localRotation = Quaternion.Euler(deg90);
                     break;
             }
 
@@ -59,27 +64,49 @@ namespace BMSPlayer
              */
             GameObject noteObject = null;
 
-            Vector3 pos = new Vector3(GetXPos(clane), 0, (float)timing);
+            Vector3 pos = new Vector3(GetXPos(clane), (float)timing, 0);
+            Vector3 deg90 = new Vector3(90f, 0f);
 
             noteObject = Instantiate(noteMine, pos, Quaternion.identity, parent);
             noteObject.transform.localPosition = pos;
+            noteObject.transform.localRotation = Quaternion.Euler(deg90);
 
             return noteObject;
         }
 
-        public int GetXPos(int line)
+        public GameObject AddNewSplitLine(double timing, Transform parent)
+        {
+            /**
+             * lanes 중 clane에 노트 오브젝트르 생성함
+             * 노트 배치: 흰파흰흰파흰
+             * 
+             * 노트를 추가하는 과정에서는 bpm을 전혀 고려하지 않고 있는 그대로 노트를 배치해야 변속 시 스크롤 속도를 조절할 수 있다.
+             */
+            GameObject noteObject = null;
+
+            Vector3 pos = new Vector3(0, (float)timing, 0);
+            Vector3 deg90 = new Vector3(90f, 0f);
+
+            noteObject = Instantiate(splitLine, pos, Quaternion.identity, parent);
+            noteObject.transform.localPosition = pos;
+            noteObject.transform.localRotation = Quaternion.Euler(deg90);
+
+            return noteObject;
+        }
+
+        public float GetXPos(int line)
         {
             switch(line)
             {
-                case 0: return -490;
-                case 1: return -315;
-                case 2: return -175;
-                case 3: return -35;
-                case 4: return 105;
-                case 5: return 245;
-                case 6: return 385;
-                case 7: return 525;
-                default: return -1000;
+                case 0: return -175f;
+                case 1: return -113.5f;
+                case 2: return -65.5f;
+                case 3: return -13.5f;
+                case 4: return 36.5f;
+                case 5: return 86.5f;
+                case 6: return 136.5f;
+                case 7: return 186.5f;
+                default: return -1000f;
             }
         }
 
@@ -141,6 +168,16 @@ namespace BMSPlayer
                 {
                     data.TotalLength += 1;
                 }
+
+                data.SplitLine.Add(
+                    new SplitLine
+                    {
+                        Position = data.TotalLength,
+                        OnScrPos = data.TotalLength,
+                        Bar = cbar
+                    }
+                );
+                data.LineChangePos.Add(data.TotalLength);
             }
             LongnoteSetup(data.NotePlay, data.NoteLong);
 
@@ -972,6 +1009,26 @@ namespace BMSPlayer
                             }
                         }
 
+                        foreach (SplitLine n in data.SplitLine)
+                        {
+                            if (isStop && n.Position == stopPos)
+                            {
+                                CalculateTiming(n, bps, stopTime, PosStart);
+                            }
+                            else if (n.Bar == bar &&
+                                    n.Position >= PosStart &&
+                                    n.Position < PosEnd
+                                )
+                            {
+                                CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+
+                            if (n.Timing > data.LastTiming)
+                            {
+                                data.LastTiming = n.Timing;
+                            }
+                        }
+
                         foreach (StopNote n in data.NoteStop)
                         {
                             if (isStop && n.Position == stopPos)
@@ -1077,6 +1134,19 @@ namespace BMSPlayer
                     }
 
                     foreach(BGMNote n in data.NoteBGM)
+                    {
+                        if (n.Bar == bar)
+                        {
+                            CalculateTiming(n, bps, prevTime, PosStart);
+                        }
+
+                        if (n.Timing > data.LastTiming)
+                        {
+                            data.LastTiming = n.Timing;
+                        }
+                    }
+
+                    foreach(SplitLine n in data.SplitLine)
                     {
                         if (n.Bar == bar)
                         {
