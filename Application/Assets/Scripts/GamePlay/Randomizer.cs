@@ -20,25 +20,32 @@ namespace BMSPlayer
         {
             int[] layout = { 1, 2, 3, 4, 5, 6, 7 };
 
-            switch(Const.NoteLayout)
+            if(Const.ChangeLayout)
             {
-                case NoteLayout.RANDOM:
-                    layout = CreateRandomSP(layout);
-                    break;
-                case NoteLayout.MIRROR:
-                    layout = CreateMirror(layout);
-                    break;
-                case NoteLayout.CRAN:
-                    layout = CreateCRan(layout);
-                    break;
-                case NoteLayout.CUSTOM:
-                    layout = Const.CustomRandom;
-                    break;
-                case NoteLayout.SRAN:
-                    layout = null;
-                    break;
+                switch (Const.NoteLayout)
+                {
+                    case NoteLayout.RANDOM:
+                        layout = CreateRandomSP(layout);
+                        break;
+                    case NoteLayout.MIRROR:
+                        layout = CreateMirror(layout);
+                        break;
+                    case NoteLayout.CRAN:
+                        layout = CreateCRan(layout);
+                        break;
+                    case NoteLayout.CUSTOM:
+                        layout = Const.CustomRandom;
+                        break;
+                    case NoteLayout.SRAN:
+                        layout = null;
+                        break;
+                }
+                Const.CurrentLayout = layout;
             }
-
+            else
+            {
+                layout = Const.CurrentLayout;
+            }
             return layout;
         }
 

@@ -50,8 +50,8 @@ namespace BMSPlayer
         public void hpChangeBad()
         {
             // 하드는 30퍼 이하에서 감소량 반값
-            JudgeType type = Const.JudgeType;
-            if (type == JudgeType.HARD && CurrentHP <= HPMax * 0.3)
+            GaugeType type = Const.GaugeType;
+            if (type == GaugeType.HARD && CurrentHP <= HPMax * 0.3)
             {
                 CurrentHP += HPBad / 2;
             }
@@ -65,8 +65,8 @@ namespace BMSPlayer
         public void hpChangeMiss()
         {
             // 하드는 30퍼 이하에서 감소량 반값
-            JudgeType type = Const.JudgeType;
-            if (type == JudgeType.HARD && CurrentHP <= HPMax * 0.3)
+            GaugeType type = Const.GaugeType;
+            if (type == GaugeType.HARD && CurrentHP <= HPMax * 0.3)
             {
                 CurrentHP += HPMiss / 2;
             }
@@ -80,8 +80,8 @@ namespace BMSPlayer
         public void hpChangeEPoor()
         {
             // 하드는 30퍼 이하에서 감소량 반값
-            JudgeType type = Const.JudgeType;
-            if (type == JudgeType.HARD && CurrentHP <= HPMax * 0.3)
+            GaugeType type = Const.GaugeType;
+            if (type == GaugeType.HARD && CurrentHP <= HPMax * 0.3)
             {
                 CurrentHP += HPEPoor / 2;
             }
@@ -92,13 +92,13 @@ namespace BMSPlayer
             if (CurrentHP < HPMin) { CurrentHP = HPMin; }
         }
 
-        public void SetHPJudgeType(JudgeType type, int notecount)
+        public void SetHPJudgeType(GaugeType type, int notecount)
         {
             int changeEN = CalculateHPChange(notecount);
             switch (type)
             {
-                case JudgeType.ASSISTED:
-                case JudgeType.EASY:
+                case GaugeType.ASSISTED:
+                case GaugeType.EASY:
                     CurrentHP = (int)(HPMax * 0.2);
                     HPPerfect = changeEN;
                     HPGreat = changeEN;
@@ -107,7 +107,7 @@ namespace BMSPlayer
                     HPMiss = -480;
                     HPEPoor = -160;
                     break;
-                case JudgeType.NORMAL:
+                case GaugeType.NORMAL:
                     CurrentHP = (int)(HPMax * 0.2);
                     HPPerfect = changeEN;
                     HPGreat = changeEN;
@@ -116,7 +116,7 @@ namespace BMSPlayer
                     HPMiss = -600;
                     HPEPoor = -200;
                     break;
-                case JudgeType.HARD:
+                case GaugeType.HARD:
                     CurrentHP = HPMax;
                     HPPerfect = 16;
                     HPGreat = 16;
@@ -125,7 +125,7 @@ namespace BMSPlayer
                     HPMiss = -960;
                     HPEPoor = -500;
                     break;
-                case JudgeType.EXHARD:
+                case GaugeType.EXHARD:
                     CurrentHP = HPMax;
                     HPPerfect = 16;
                     HPGreat = 16;

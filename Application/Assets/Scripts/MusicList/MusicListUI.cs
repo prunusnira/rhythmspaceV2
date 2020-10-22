@@ -69,8 +69,10 @@ namespace BMSPlayer
         public TextMeshProUGUI recordGood;
         public TextMeshProUGUI recordOk;
         public TextMeshProUGUI recordPoor;
+        public TextMeshProUGUI recordCombo;
         public TextMeshProUGUI recordCBreak;
         public TextMeshProUGUI recordClearStat;
+        public TextMeshProUGUI recordRank;
 
         public Sprite empty;
 
@@ -91,6 +93,11 @@ namespace BMSPlayer
             ListTreeGenerator();
             SelectListGenerator();
             musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+
+            for(int i = 0; i < Const.ListPos; i++)
+            {
+                musicRect.AddItemBottom(ObjectSetup);
+            }
         }
 
         public void Start()
@@ -298,15 +305,20 @@ namespace BMSPlayer
 
                 // 기록 값 표기
                 RecordData data = rdm.GetFullClearStat(bms.MD5Hash);
+                Const.MyBestPrev = data;
                 if(data != null)
                 {
+                    Const.MyBestScore = data.Score;
+                    Const.MyBestRank = data.Rank;
                     recordScore.text = data.Score.ToString();
                     recordPerfect.text = data.Perfect.ToString();
                     recordGreat.text = data.Great.ToString();
                     recordGood.text = data.Good.ToString();
                     recordOk.text = data.OK.ToString();
                     recordPoor.text = data.Poor.ToString();
+                    recordCombo.text = data.MaxCombo.ToString();
                     recordCBreak.text = data.CBreak.ToString();
+                    recordRank.text = data.Rank.ToUpper();
 
                     switch (data.Clear)
                     {
@@ -338,14 +350,18 @@ namespace BMSPlayer
                 }
                 else
                 {
+                    Const.MyBestScore = 0;
+                    Const.MyBestRank = "";
                     recordScore.text = "0";
                     recordPerfect.text = "0";
                     recordGreat.text = "0";
                     recordGood.text = "0";
                     recordOk.text = "0";
                     recordPoor.text = "0";
+                    recordCombo.text = "0";
                     recordCBreak.text = "0";
                     recordClearStat.text = "NO PLAY";
+                    recordRank.text = "";
                 }
             }
             else if(node.Type == ItemType.DIRECTORY)
@@ -364,9 +380,11 @@ namespace BMSPlayer
                 recordGood.text = "0";
                 recordOk.text = "0";
                 recordPoor.text = "0";
+                recordCombo.text = "0";
                 recordCBreak.text = "0";
                 recordClearStat.text = "NO PLAY";
-    }
+                recordRank.text = "";
+            }
         }
 
         public GameObject ObjectSetup(ListItemNode n)

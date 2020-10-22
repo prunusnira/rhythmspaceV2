@@ -198,9 +198,9 @@ namespace BMSPlayer {
                     if (scroller.GetProcessedNotes() >= Data.TotalNotes)
                     {
                         // 게이지 타입과 퍼센트에 따라 클리어 유무 결정
-                        switch (Const.JudgeType)
+                        switch (Const.GaugeType)
                         {
-                            case JudgeType.ASSISTED:
+                            case GaugeType.ASSISTED:
                                 if (hpController.CurrentHP >= 6000)
                                 {
                                     Const.Clear = ClearType.ASSISTCLEAR;
@@ -210,7 +210,7 @@ namespace BMSPlayer {
                                     Const.Clear = ClearType.FAIL;
                                 }
                                 break;
-                            case JudgeType.EASY:
+                            case GaugeType.EASY:
                                 if (hpController.CurrentHP >= 8000)
                                 {
                                     Const.Clear = ClearType.EASYCLEAR;
@@ -220,7 +220,7 @@ namespace BMSPlayer {
                                     Const.Clear = ClearType.FAIL;
                                 }
                                 break;
-                            case JudgeType.NORMAL:
+                            case GaugeType.NORMAL:
                                 if (hpController.CurrentHP >= 8000)
                                 {
                                     Const.Clear = ClearType.NORMALCLEAR;
@@ -230,10 +230,10 @@ namespace BMSPlayer {
                                     Const.Clear = ClearType.FAIL;
                                 }
                                 break;
-                            case JudgeType.HARD:
+                            case GaugeType.HARD:
                                 Const.Clear = ClearType.HARDCLEAR;
                                 break;
-                            case JudgeType.EXHARD:
+                            case GaugeType.EXHARD:
                                 Const.Clear = ClearType.EXCLEAR;
                                 break;
                         }
@@ -297,11 +297,11 @@ namespace BMSPlayer {
                     // 위 아래 버튼 이동시 메뉴 변경
                     if (Input.GetKeyDown(KeyCode.UpArrow))
                     {
-                        UI.PauseMenuMove(ref pauseSel, true);
+                        UI.PauseMenuMove(ref pauseSel, false);
                     }
                     if (Input.GetKeyDown(KeyCode.DownArrow))
                     {
-                        UI.PauseMenuMove(ref pauseSel, false);
+                        UI.PauseMenuMove(ref pauseSel, true);
                     }
                     if (Input.GetKeyDown(KeyCode.Return))
                     {
@@ -440,9 +440,10 @@ namespace BMSPlayer {
             yield return null;
 
             UI.UpdateSpeed();
+            UI.SetInitialGraph(Data.TotalNotes);
             yield return null;
 
-            scroller.Init(Data.TotalNotes);
+            scroller.Init(Data.TotalNotes, Data.BMS.Rank);
             yield return null;
 
             UI.UpdateTimerTotal(Data.LastTiming);
@@ -463,14 +464,14 @@ namespace BMSPlayer {
 
         private bool GameOverCheck()
         {
-            switch (Const.JudgeType)
+            switch (Const.GaugeType)
             {
-                case JudgeType.ASSISTED:
-                case JudgeType.EASY:
-                case JudgeType.NORMAL:
+                case GaugeType.ASSISTED:
+                case GaugeType.EASY:
+                case GaugeType.NORMAL:
                     return false;
-                case JudgeType.HARD:
-                case JudgeType.EXHARD:
+                case GaugeType.HARD:
+                case GaugeType.EXHARD:
                     return true;
                 default:
                     return false;

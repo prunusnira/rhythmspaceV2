@@ -36,18 +36,23 @@ namespace BMSPlayer
         public static int ListPos = 0;
         public static bool ChangeLayout = false;
 
+        public static int MyBestScore = 0;
+        public static string MyBestRank = "";
+        public static RecordData MyBestPrev;
         public static List<int> ResultGraph;
 
         public static int[] CustomRandom =
         {
-            PlayerPrefs.GetInt("custom_r1", 1),
-            PlayerPrefs.GetInt("custom_r2", 2),
-            PlayerPrefs.GetInt("custom_r3", 3),
-            PlayerPrefs.GetInt("custom_r4", 4),
-            PlayerPrefs.GetInt("custom_r5", 5),
-            PlayerPrefs.GetInt("custom_r6", 6),
-            PlayerPrefs.GetInt("custom_r7", 7)
+            Custom1,
+            Custom2,
+            Custom3,
+            Custom4,
+            Custom5,
+            Custom6,
+            Custom7,
         };
+
+        public static int[] CurrentLayout = { 1, 2, 3, 4, 5, 6, 7 };
 
         // Language
         #region Language
@@ -122,44 +127,44 @@ namespace BMSPlayer
 
         public static string[] RandomDescNR = new string[3]
         {
-            "정규 채보입니다",
-            "正規譜面です",
-            "Normal Layout"
+            "정규 배치",
+            "正規譜面",
+            "Normal Type"
         };
 
         public static string[] RandomDescRD = new string[3]
         {
-            "오브젝트가 출현하는 라인이 무작위로 섞입니다",
-            "オブジェクトの出現するラインが変わります",
-            "Line for notes will be mixed"
+            "라인 무작위 배치",
+            "ラインランダム",
+            "Line Random"
         };
 
         public static string[] RandomDescMR = new string[3]
         {
-            "오브젝트가 출현하는 라인의 순서가 반대로 됩니다",
-            "オブジェクトの出現するラインの順番が逆になります",
-            "Line for notes will be reversed"
+            "라인 순서 반대",
+            "ラインが逆番",
+            "Line Reversed"
         };
 
         public static string[] RandomDescSR = new string[3]
         {
-            "각각의 오브젝트가 무작위 라인에 출현합니다",
-            "各オブジェクトの出現ラインがランダムになります",
-            "Each note will be placed on randomized"
+            "노트 무작위 배치",
+            "各オブジェクトがランダム",
+            "Random for Each Note"
         };
 
         public static string[] RandomDescCR = new string[3]
         {
-            "오브젝트가 출현하는 라인이 색상별로 섞입니다",
-            "オブジェクトの出現するラインがカラーによって変わります",
-            "Line for notes will be mixed by its color"
+            "색상별 라인 무작위",
+            "ラインカラーランダム",
+            "Line Random by Color"
         };
 
         public static string[] RandomDescCU = new string[3]
         {
-            "사용자가 지정한대로 라인이 변경됩니다\n(F10으로 라인 변경)",
-            "ユーザーが指定のラインになります\n(F10を押して変更)",
-            "Notes will be shown as user setting\n(Press F10 to change line)"
+            "커스텀 라인 (F11으로 변경)",
+            "カスタムライン (F11で変更)",
+            "User custom (F11 to change)"
         };
 
         public static string[] KeyChangeDescription = new string[3]
@@ -167,6 +172,20 @@ namespace BMSPlayer
             "변경할 키를 눌러주세요\n(ESC로 취소)",
             "キーを選択してください\n(ESCでキャンセル)",
             "Press key\n(Cancel with ESC)"
+        };
+
+        public static string[] CustomRandomError = new string[3]
+        {
+            "1~7의 모든 숫자가 들어오도록 재설정하세요",
+            "１から７のすべての数字が入るようにしてください",
+            "All the 1 to 7 numbers are needed"
+        };
+
+        public static string[] CustomRandomDesc = new string[3]
+        {
+            "마우스로 각 칸을 선택하여 숫자를 입력하세요",
+            "マウスで各ボタンの数字を入力してください",
+            "Click on each input field to fill the numbers"
         };
         #endregion
 
@@ -377,15 +396,15 @@ namespace BMSPlayer
             }
         }
 
-        public static JudgeType JudgeType
+        public static GaugeType GaugeType
         {
             get
             {
-                return (JudgeType)PlayerPrefs.GetInt("judgeType", (int)JudgeType.NORMAL);
+                return (GaugeType)PlayerPrefs.GetInt("gaugeType", (int)GaugeType.NORMAL);
             }
             set
             {
-                PlayerPrefs.SetInt("judgeType", (int)value);
+                PlayerPrefs.SetInt("gaugeType", (int)value);
             }
         }
 
@@ -413,18 +432,6 @@ namespace BMSPlayer
             }
         }
 
-        public static CoverType AreaCover
-        {
-            get
-            {
-                return (CoverType)PlayerPrefs.GetInt("areaCover", (int)CoverType.OFF);
-            }
-            set
-            {
-                PlayerPrefs.SetInt("areaCover", (int)value);
-            }
-        }
-
         public static NoteLayout NoteLayout
         {
             get
@@ -434,6 +441,18 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("noteLayout", (int)value);
+            }
+        }
+
+        public static JudgeType JudgeType
+        {
+            get
+            {
+                return (JudgeType)PlayerPrefs.GetInt("judgeType", (int)JudgeType.ARCADE);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("judgeType", (int)value);
             }
         }
 
@@ -472,6 +491,86 @@ namespace BMSPlayer
                 PlayerPrefs.SetInt("areaPos", value);
             }
         }
+
+        public static string Skin
+        {
+            get
+            {
+                return PlayerPrefs.GetString("skin", "");
+            }
+            set
+            {
+                PlayerPrefs.SetString("skin", value);
+            }
+        }
+        #endregion
+
+        // Judge Timing
+        #region Judge Timing
+        public static double[] JudgeArcade = new double[5]
+        {
+            10d / 60, 30d / 60, 80d / 60, 100d / 60, 120d / 60
+        };
+
+        public static double[] JudgeOriginEasy = new double[5]
+        {
+            0.2, 0.6, 1.2, 2.0, 4.0
+        };
+
+        public static double[] JudgeOriginNormal = new double[5]
+        {
+            0.15, 0.45, 0.9, 1.5, 4.0
+        };
+
+        public static double[] JudgeOriginHard = new double[5]
+        {
+            0.125, 0.375, 0.75, 1.25, 4.0
+        };
+
+        public static double[] JudgeOriginVeryHard = new double[5]
+        {
+            0.1, 0.3, 0.6, 1.0, 4.0
+        };
+
+        public static double[] JudgeLR2Easy = new double[5]
+        {
+            0.21, 0.6, 1.2, 2.0, 10.0
+        };
+
+        public static double[] JudgeLR2Normal = new double[5]
+        {
+            0.18, 0.4, 1.0, 2.0, 10.0
+        };
+
+        public static double[] JudgeLR2Hard = new double[5]
+        {
+            0.15, 0.3, 0.6, 2.0, 10.0
+        };
+
+        public static double[] JudgeLR2VeryHard = new double[5]
+        {
+            0.08, 0.24, 0.4, 2.0, 10.0
+        };
+
+        public static double[] JudgeBREasy = new double[5]
+        {
+            0.2, 0.6, 1.5, 2.2, 5.0
+        };
+
+        public static double[] JudgeBRNormal = new double[5]
+        {
+            0.15, 0.45, 1.125, 2.75, 5.0
+        };
+
+        public static double[] JudgeBRHard = new double[5]
+        {
+            0.1, 0.3, 0.75, 3.3, 5.0
+        };
+
+        public static double[] JudgeBRVeryHard = new double[5]
+        {
+            0.05, 0.15, 0.375, 3.85, 5.0
+        };
         #endregion
 
         // Play Status
@@ -641,6 +740,93 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("rst_slow", value);
+            }
+        }
+        #endregion
+
+        // Custom Key
+        #region Custom Key
+        public static int Custom1
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("customKey1", 1);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("customKey1", value);
+            }
+        }
+
+        public static int Custom2
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("customKey2", 2);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("customKey2", value);
+            }
+        }
+
+        public static int Custom3
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("customKey3", 3);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("customKey3", value);
+            }
+        }
+
+        public static int Custom4
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("customKey4", 4);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("customKey4", value);
+            }
+        }
+
+        public static int Custom5
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("customKey5", 5);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("customKey5", value);
+            }
+        }
+
+        public static int Custom6
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("customKey6", 6);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("customKey6", value);
+            }
+        }
+
+        public static int Custom7
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("customKey7", 7);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("customKey7", value);
             }
         }
         #endregion

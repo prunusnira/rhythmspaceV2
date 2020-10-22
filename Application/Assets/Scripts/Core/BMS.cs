@@ -151,7 +151,7 @@ namespace BMSCore
             BPMMin = 0;
             BPMMax = 0;
             Level = 0;
-            Rank = 0;
+            Rank = 2;
             TotalNotes = 0;
             Difficulty = 0;
             StageFile = "";

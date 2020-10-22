@@ -112,6 +112,7 @@ namespace BMSPlayer
 
             if (currentIdx == 0) currentIdx = itemList.Count - 1;
             else currentIdx--;
+            Const.ListPos = currentIdx;
         }
 
         // 가장 위에 있는 아이템을 지우고 맨 아래에 index에 맞는 아이템 추가
@@ -135,6 +136,7 @@ namespace BMSPlayer
 
             if (currentIdx == itemList.Count - 1) currentIdx = 0;
             else currentIdx++;
+            Const.ListPos = currentIdx;
         }
 
         public void Clear()

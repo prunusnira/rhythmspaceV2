@@ -105,7 +105,7 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\AutoPlayType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\AutoSyncType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\ClearType.cs" />
-    <Compile Include="Assets\Scripts\GamePlay\enum\CoverType.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enum\GaugeType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\GraphTargetType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\JudgeType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\JudgeUIType.cs" />
@@ -116,6 +116,7 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\TimingType.cs" />
     <Compile Include="Assets\Scripts\Intro\Intro.cs" />
     <Compile Include="Assets\Scripts\Loading\Loading.cs" />
+    <Compile Include="Assets\Scripts\MusicList\CustomPattern.cs" />
     <Compile Include="Assets\Scripts\MusicList\MusicListUI.cs" />
     <Compile Include="Assets\Scripts\MusicList\PlayOptionSetting.cs" />
     <Compile Include="Assets\Scripts\MusicList\SelectedMusicInfo.cs" />

@@ -11,11 +11,11 @@ namespace BMSPlayer
     public class Scroller : MonoBehaviour
     {
         // ms단위 타이밍
-        public static double PERFECT = 10d / 60;
-        public static double GREAT = 30d / 60;
-        public static double GOOD = 80d / 60;
-        public static double BAD = 100d / 60;
-        public static double EPOOR = 120d / 60;
+        public static double PERFECT = Const.JudgeArcade[0];
+        public static double GREAT = Const.JudgeArcade[1];
+        public static double GOOD = Const.JudgeArcade[2];
+        public static double BAD = Const.JudgeArcade[3];
+        public static double POOR = Const.JudgeArcade[4];
 
         public TextMesh DebugConsole;
 
@@ -51,7 +51,7 @@ namespace BMSPlayer
         private SpdType spdType;
 
         // 체력 관리
-        private JudgeType judgeType;
+        private GaugeType gaugeType;
         private HPController hpController;
 
         // 눌림 체크
@@ -84,8 +84,122 @@ namespace BMSPlayer
         // 외부 클래스 연계
         private PlayUI ui;
 
-        public void Init(int noteCount)
+        public void Init(int noteCount, int rank)
         {
+            // 판정 타입에 따른 판정 값 변경
+            switch(Const.JudgeType)
+            {
+                case JudgeType.ARCADE:
+                    PERFECT = Const.JudgeArcade[0];
+                    GREAT = Const.JudgeArcade[1];
+                    GOOD = Const.JudgeArcade[2];
+                    BAD = Const.JudgeArcade[3];
+                    POOR = Const.JudgeArcade[4];
+                    break;
+                case JudgeType.ORIGINAL:
+                    switch(rank)
+                    {
+                        case 0:
+                            PERFECT = Const.JudgeOriginVeryHard[0];
+                            GREAT = Const.JudgeOriginVeryHard[1];
+                            GOOD = Const.JudgeOriginVeryHard[2];
+                            BAD = Const.JudgeOriginVeryHard[3];
+                            POOR = Const.JudgeOriginVeryHard[4];
+                            break;
+                        case 1:
+                            PERFECT = Const.JudgeOriginHard[0];
+                            GREAT = Const.JudgeOriginHard[1];
+                            GOOD = Const.JudgeOriginHard[2];
+                            BAD = Const.JudgeOriginHard[3];
+                            POOR = Const.JudgeOriginHard[4];
+                            break;
+                        case 3:
+                            PERFECT = Const.JudgeOriginEasy[0];
+                            GREAT = Const.JudgeOriginEasy[1];
+                            GOOD = Const.JudgeOriginEasy[2];
+                            BAD = Const.JudgeOriginEasy[3];
+                            POOR = Const.JudgeOriginEasy[4];
+                            break;
+                        case 2:
+                        default:
+                            PERFECT = Const.JudgeOriginNormal[0];
+                            GREAT = Const.JudgeOriginNormal[1];
+                            GOOD = Const.JudgeOriginNormal[2];
+                            BAD = Const.JudgeOriginNormal[3];
+                            POOR = Const.JudgeOriginNormal[4];
+                            break;
+                    }
+                    break;
+                case JudgeType.LR2:
+                    switch (rank)
+                    {
+                        case 0:
+                            PERFECT = Const.JudgeLR2VeryHard[0];
+                            GREAT = Const.JudgeLR2VeryHard[1];
+                            GOOD = Const.JudgeLR2VeryHard[2];
+                            BAD = Const.JudgeLR2VeryHard[3];
+                            POOR = Const.JudgeLR2VeryHard[4];
+                            break;
+                        case 1:
+                            PERFECT = Const.JudgeLR2Hard[0];
+                            GREAT = Const.JudgeLR2Hard[1];
+                            GOOD = Const.JudgeLR2Hard[2];
+                            BAD = Const.JudgeLR2Hard[3];
+                            POOR = Const.JudgeLR2Hard[4];
+                            break;
+                        case 3:
+                            PERFECT = Const.JudgeLR2Easy[0];
+                            GREAT = Const.JudgeLR2Easy[1];
+                            GOOD = Const.JudgeLR2Easy[2];
+                            BAD = Const.JudgeLR2Easy[3];
+                            POOR = Const.JudgeLR2Easy[4];
+                            break;
+                        case 2:
+                        default:
+                            PERFECT = Const.JudgeLR2Normal[0];
+                            GREAT = Const.JudgeLR2Normal[1];
+                            GOOD = Const.JudgeLR2Normal[2];
+                            BAD = Const.JudgeLR2Normal[3];
+                            POOR = Const.JudgeLR2Normal[4];
+                            break;
+                    }
+                    break;
+                case JudgeType.BEATORAJA:
+                    switch (rank)
+                    {
+                        case 0:
+                            PERFECT = Const.JudgeBRVeryHard[0];
+                            GREAT = Const.JudgeBRVeryHard[1];
+                            GOOD = Const.JudgeBRVeryHard[2];
+                            BAD = Const.JudgeBRVeryHard[3];
+                            POOR = Const.JudgeBRVeryHard[4];
+                            break;
+                        case 1:
+                            PERFECT = Const.JudgeBRHard[0];
+                            GREAT = Const.JudgeBRHard[1];
+                            GOOD = Const.JudgeBRHard[2];
+                            BAD = Const.JudgeBRHard[3];
+                            POOR = Const.JudgeBRHard[4];
+                            break;
+                        case 3:
+                            PERFECT = Const.JudgeBREasy[0];
+                            GREAT = Const.JudgeBREasy[1];
+                            GOOD = Const.JudgeBREasy[2];
+                            BAD = Const.JudgeBREasy[3];
+                            POOR = Const.JudgeBREasy[4];
+                            break;
+                        case 2:
+                        default:
+                            PERFECT = Const.JudgeBRNormal[0];
+                            GREAT = Const.JudgeBRNormal[1];
+                            GOOD = Const.JudgeBRNormal[2];
+                            BAD = Const.JudgeBRNormal[3];
+                            POOR = Const.JudgeBRNormal[4];
+                            break;
+                    }
+                    break;
+            }
+
             ui = GetComponent<PlayUI>();
 
             speed = Const.SpeedFixed;
@@ -111,8 +225,8 @@ namespace BMSPlayer
 
             // 초기 HP 지정
             hpController = GetComponent<HPController>();
-            judgeType = Const.JudgeType;
-            hpController.SetHPJudgeType(judgeType, noteCount);
+            gaugeType = Const.GaugeType;
+            hpController.SetHPJudgeType(gaugeType, noteCount);
 
             // 사운드 컨트롤러 정의
             soundController = GetComponent<SoundControllerFMOD>();
@@ -330,7 +444,7 @@ namespace BMSPlayer
                      * 노트 위치에 대해 판정선까지의 시간계산하기
                      * 시간 = (노트의 처음위치 - 노트의 현재위치) / 시간당 비트(bps)
                      */
-                    if (judgeTiming < EPOOR * -1 &&
+                    if (judgeTiming < POOR * -1 &&
                         current.ObjType == ObjectType.PLAYABLE &&
                         current.OnScreen)
                     {
@@ -702,7 +816,7 @@ namespace BMSPlayer
                         double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
 
                         // Timing Window 내에 노트가 있으면
-                        if (time < EPOOR && time >= BAD)
+                        if (time < POOR && time >= BAD)
                         {
                             // 빠른 공푸어 처리
                             // 이 경우에는 콤보 초기화가 있음
@@ -742,7 +856,7 @@ namespace BMSPlayer
                                 ui.TurnOnNoteEffect(i);
                             }
                         }
-                        else if(time < BAD * -1 && time >= EPOOR * -1)
+                        else if(time < BAD * -1 && time >= POOR * -1)
                         {
                             // 느린 공푸어 처리
                             // 콤보 초기화 없음

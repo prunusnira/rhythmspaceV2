@@ -22,7 +22,7 @@ namespace BMSPlayer
         public Text txtAuto;
 
         // Judge
-        public Text txtJudge;
+        public Text txtJudgePanel;
 
         // Gauge Type
         public Text txtGauge;
@@ -30,12 +30,18 @@ namespace BMSPlayer
         // Target Graph Type
         public Text txtTarget;
 
-        // Play Area Type
-        public Text txtPlayArea;
-
         // Note Layout
         public Text txtNoteLayout;
         public Text txtNoteDesc;
+
+        // Judgement Type
+        public Text txtJudgeType;
+
+        // Skin
+        public Text txtSkin;
+
+        // Custom Random
+        public GameObject customRandom;
 
         public void Awake()
         {
@@ -56,13 +62,13 @@ namespace BMSPlayer
             // 판정 표시 설정
             if(Const.DisplayJudge == 0)
             {
-                txtJudge.text = "OFF";
-                txtJudge.color = Color.white;
+                txtJudgePanel.text = "OFF";
+                txtJudgePanel.color = Color.white;
             }
             else
             {
-                txtJudge.text = "ON";
-                txtJudge.color = new Color(1f, 120f / 255, 0f);
+                txtJudgePanel.text = "ON";
+                txtJudgePanel.color = new Color(1f, 120f / 255, 0f);
             }
 
             // 속도
@@ -82,25 +88,25 @@ namespace BMSPlayer
             }
 
             // 게이지 타입
-            switch(Const.JudgeType)
+            switch(Const.GaugeType)
             {
-                case JudgeType.ASSISTED:
+                case GaugeType.ASSISTED:
                     txtGauge.text = "ASSISTED";
                     txtGauge.color = new Color(206f / 255, 159f / 255, 1f);
                     break;
-                case JudgeType.EASY:
+                case GaugeType.EASY:
                     txtGauge.text = "EASY";
                     txtGauge.color = new Color(159f / 255, 1f, 180f / 255);
                     break;
-                case JudgeType.NORMAL:
+                case GaugeType.NORMAL:
                     txtGauge.text = "NORMAL";
                     txtGauge.color = new Color(159f / 255, 215f / 255, 1f);
                     break;
-                case JudgeType.HARD:
+                case GaugeType.HARD:
                     txtGauge.text = "HARD";
                     txtGauge.color = new Color(1f, 159f / 255, 159f / 255);
                     break;
-                case JudgeType.EXHARD:
+                case GaugeType.EXHARD:
                     txtGauge.text = "EX-HARD";
                     txtGauge.color = new Color(1f, 207f / 255, 79f / 255);
                     break;
@@ -132,33 +138,20 @@ namespace BMSPlayer
                     break;
             }
 
-            // 플레이 공간 설정
-            switch(Const.AreaCover)
+            // 판정
+            switch(Const.JudgeType)
             {
-                case CoverType.SUD:
-                    txtPlayArea.text = "SUDDEN";
-                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                case JudgeType.ARCADE:
+                    txtJudgeType.text = "ARCADE";
                     break;
-                case CoverType.HID:
-                    txtPlayArea.text = "HIDDEN";
-                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                case JudgeType.ORIGINAL:
+                    txtJudgeType.text = "ORIGINAL";
                     break;
-                case CoverType.LIFT:
-                    txtPlayArea.text = "LIFT";
-                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
+                case JudgeType.LR2:
+                    txtJudgeType.text = "LR2";
                     break;
-                case CoverType.SUDLIFT:
-                    txtPlayArea.text = "SUD+LIFT";
-                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
-                    break;
-                case CoverType.SUDHID:
-                    txtPlayArea.text = "SUD+HID";
-                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
-                    break;
-                case CoverType.OFF:
-                default:
-                    txtPlayArea.text = "OFF";
-                    txtTarget.color = Color.white;
+                case JudgeType.BEATORAJA:
+                    txtJudgeType.text = "BEATORAJA";
                     break;
             }
 
@@ -197,6 +190,21 @@ namespace BMSPlayer
                     txtNoteDesc.text = Const.RandomDescNR[(int)Const.Language];
                     break;
             }
+
+            // 스킨
+            if (Const.Skin == "") Const.Skin = "black";
+            switch (Const.Skin)
+            {
+                case "black":
+                    txtSkin.text = "BLACK";
+                    break;
+                case "white":
+                    txtSkin.text = "WHITE";
+                    break;
+                case "dark":
+                    txtSkin.text = "DARK";
+                    break;
+            }
         }
 
         public void Update()
@@ -233,27 +241,33 @@ namespace BMSPlayer
             }
             else if (Input.GetKeyDown(KeyCode.F5))
             {
-                JudgeOnOff();
+                JudgeUIOnOff();
             }
             else if (Input.GetKeyDown(KeyCode.F6))
             {
-                JudgeTypeChange();
+                GaugeTypeChange();
             }
             else if (Input.GetKeyDown(KeyCode.F7))
             {
                 GraphTargetChange();
             }
-            else if (Input.GetKeyDown(KeyCode.F8))
-            {
-                AreaCoverChange();
-            }
-            else if(Input.GetKeyDown(KeyCode.F9))
+            else if(Input.GetKeyDown(KeyCode.F8))
             {
                 NoteLayoutChange();
             }
-            else if(Input.GetKeyDown(KeyCode.F10))
+            else if(Input.GetKeyDown(KeyCode.F9))
             {
-                // 커스텀 키 배열 변경
+                JudgeTypeChange();
+            }
+            else if (Input.GetKeyDown(KeyCode.F10))
+            {
+                SkinChange();
+            }
+            else if(Input.GetKeyDown(KeyCode.F11))
+            {
+                MusicListUI.SetNotOnTop();
+                customRandom.SetActive(true);
+                GetComponent<CustomPattern>().EnableWindow();
             }
         }
 
@@ -301,19 +315,19 @@ namespace BMSPlayer
             txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
         }
 
-        private void JudgeOnOff()
+        private void JudgeUIOnOff()
         {
             if(Const.DisplayJudge == 0)
             {
                 Const.DisplayJudge = 1;
-                txtJudge.text = "ON";
-                txtJudge.color = new Color(1f, 120f / 255, 0f);
+                txtJudgePanel.text = "ON";
+                txtJudgePanel.color = new Color(1f, 120f / 255, 0f);
             }
             else
             {
                 Const.DisplayJudge = 0;
-                txtJudge.text = "OFF";
-                txtJudge.color = Color.white;
+                txtJudgePanel.text = "OFF";
+                txtJudgePanel.color = Color.white;
             }
         }
 
@@ -333,34 +347,34 @@ namespace BMSPlayer
             }
         }
 
-        private void JudgeTypeChange()
+        private void GaugeTypeChange()
         {
-            switch (Const.JudgeType)
+            switch (Const.GaugeType)
             {
-                case JudgeType.ASSISTED:
+                case GaugeType.ASSISTED:
                     txtGauge.text = "EASY";
                     txtGauge.color = new Color(159f / 255, 1f, 180f / 255);
-                    Const.JudgeType = JudgeType.EASY;
+                    Const.GaugeType = GaugeType.EASY;
                     break;
-                case JudgeType.EASY:
+                case GaugeType.EASY:
                     txtGauge.text = "NORMAL";
                     txtGauge.color = new Color(159f / 255, 215f / 255, 1f);
-                    Const.JudgeType = JudgeType.NORMAL;
+                    Const.GaugeType = GaugeType.NORMAL;
                     break;
-                case JudgeType.NORMAL:
+                case GaugeType.NORMAL:
                     txtGauge.text = "HARD";
                     txtGauge.color = new Color(1f, 159f / 255, 159f / 255);
-                    Const.JudgeType = JudgeType.HARD;
+                    Const.GaugeType = GaugeType.HARD;
                     break;
-                case JudgeType.HARD:
+                case GaugeType.HARD:
                     txtGauge.text = "EX-HARD";
                     txtGauge.color = new Color(1f, 207f / 255, 79f / 255);
-                    Const.JudgeType = JudgeType.EXHARD;
+                    Const.GaugeType = GaugeType.EXHARD;
                     break;
-                case JudgeType.EXHARD:
+                case GaugeType.EXHARD:
                     txtGauge.text = "ASSISTED";
                     txtGauge.color = new Color(206f / 255, 159f / 255, 1f);
-                    Const.JudgeType = JudgeType.ASSISTED;
+                    Const.GaugeType = GaugeType.ASSISTED;
                     break;
             }
         }
@@ -418,42 +432,6 @@ namespace BMSPlayer
             }
         }
 
-        private void AreaCoverChange()
-        {
-            switch (Const.AreaCover)
-            {
-                case CoverType.SUD:
-                    txtPlayArea.text = "HIDDEN";
-                    Const.AreaCover = CoverType.HID;
-                    break;
-                case CoverType.HID:
-                    txtPlayArea.text = "LIFT";
-                    Const.AreaCover = CoverType.LIFT;
-
-                    break;
-                case CoverType.LIFT:
-                    txtPlayArea.text = "SUD+LIFT";
-                    Const.AreaCover = CoverType.SUDLIFT;
-
-                    break;
-                case CoverType.SUDLIFT:
-                    txtPlayArea.text = "SUD+HID";
-                    Const.AreaCover = CoverType.SUDHID;
-                    break;
-                case CoverType.SUDHID:
-                    txtPlayArea.text = "OFF";
-                    txtPlayArea.color = Color.white;
-                    Const.AreaCover = CoverType.OFF;
-                    break;
-                case CoverType.OFF:
-                default:
-                    txtPlayArea.text = "SUDDEN";
-                    txtPlayArea.color = new Color(109f / 255, 204f / 255, 202f / 255);
-                    Const.AreaCover = CoverType.SUD;
-                    break;
-            }
-        }
-
         private void NoteLayoutChange()
         {
             switch (Const.NoteLayout)
@@ -489,6 +467,49 @@ namespace BMSPlayer
                     txtNoteLayout.color = Color.white;
                     txtNoteDesc.text = Const.RandomDescNR[(int)Const.Language];
                     Const.NoteLayout = NoteLayout.NORMAL;
+                    break;
+            }
+        }
+
+        private void JudgeTypeChange()
+        {
+            switch (Const.JudgeType)
+            {
+                case JudgeType.ARCADE:
+                    txtJudgeType.text = "ORIGINAL";
+                    Const.JudgeType = JudgeType.ORIGINAL;
+                    break;
+                case JudgeType.ORIGINAL:
+                    txtJudgeType.text = "LR2";
+                    Const.JudgeType = JudgeType.LR2;
+                    break;
+                case JudgeType.LR2:
+                    txtJudgeType.text = "BEATORAJA";
+                    Const.JudgeType = JudgeType.BEATORAJA;
+                    break;
+                case JudgeType.BEATORAJA:
+                    txtJudgeType.text = "ARCADE";
+                    Const.JudgeType = JudgeType.ARCADE;
+                    break;
+            }
+        }
+
+        private void SkinChange()
+        {
+
+            switch (Const.Skin)
+            {
+                case "black":
+                    txtSkin.text = "WHITE";
+                    Const.Skin = "white";
+                    break;
+                case "white":
+                    txtSkin.text = "DARK";
+                    Const.Skin = "dark";
+                    break;
+                case "dark":
+                    txtSkin.text = "BLACK";
+                    Const.Skin = "black";
                     break;
             }
         }

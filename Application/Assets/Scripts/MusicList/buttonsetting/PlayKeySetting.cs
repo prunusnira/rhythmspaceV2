@@ -20,7 +20,6 @@ namespace BMSPlayer
         public GameObject presetSave;
         public GameObject presetSaveInput;
         public GameObject keyPopup;
-        public GameObject ctrlPopup;
 
         public InputField presetSaveInputField;
         public GameObject presetSaveInputError;

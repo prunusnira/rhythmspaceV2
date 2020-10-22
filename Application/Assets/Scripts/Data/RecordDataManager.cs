@@ -46,6 +46,7 @@ namespace BMSPlayer
                 data.Good,
                 data.OK,
                 data.Poor,
+                data.MaxCombo,
                 data.CBreak
             );
         }

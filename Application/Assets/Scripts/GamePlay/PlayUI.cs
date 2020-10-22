@@ -90,6 +90,16 @@ namespace BMSPlayer
         public TextMesh txtLoading;
         public GameObject[] gearBtnPress;
 
+        // Skin
+        public SpriteRenderer skinGear;
+        public SpriteRenderer skinGraph;
+        public Sprite skinGearBlack;
+        public Sprite skinGearWhite;
+        public Sprite skinGearDark;
+        public Sprite skinGraphBlack;
+        public Sprite skinGraphWhite;
+        public Sprite skinGraphDark;
+
         // Cover
         public GameObject coverSud;
         public GameObject coverHid;
@@ -212,15 +222,28 @@ namespace BMSPlayer
                 txtAutoPlay.gameObject.SetActive(true);
             }
 
-            // 그래프 초기화
-            SetInitialGraph();
-
             // 커버 포지션 변경
             coverSudPos = Const.CoverSudPos;
             coverHidPos = Const.CoverHidPos;
             playAreaPos = Const.AreaLiftPos;
 
             NoteOnScreen = new List<GameObject>();
+
+            if(Const.Skin == "" || Const.Skin == "black")
+            {
+                skinGear.sprite = skinGearBlack;
+                skinGraph.sprite = skinGraphBlack;
+            }
+            else if(Const.Skin == "white")
+            {
+                skinGear.sprite = skinGearWhite;
+                skinGraph.sprite = skinGraphWhite;
+            }
+            else if(Const.Skin == "dark")
+            {
+                skinGear.sprite = skinGearDark;
+                skinGraph.sprite = skinGraphDark;
+            }
         }
 
         private void Update()
@@ -295,29 +318,29 @@ namespace BMSPlayer
 
         private void SetInitialHPBar()
         {
-            switch (Const.JudgeType)
+            switch (Const.GaugeType)
             {
-                case JudgeType.ASSISTED:
+                case GaugeType.ASSISTED:
                     hpBarType.text = "ASSISTED";
                     hpBarType.color = new Color(206f / 255, 159f / 255, 1f);
                     hpBar.sprite = hpBarAssisted;
                     break;
-                case JudgeType.EASY:
+                case GaugeType.EASY:
                     hpBarType.text = "EASY";
                     hpBarType.color = new Color(159f / 255, 1f, 180f / 255);
                     hpBar.sprite = hpBarEasy;
                     break;
-                case JudgeType.NORMAL:
+                case GaugeType.NORMAL:
                     hpBarType.text = "NORMAL";
                     hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
                     hpBar.sprite = hpBarNormal;
                     break;
-                case JudgeType.HARD:
+                case GaugeType.HARD:
                     hpBarType.text = "HARD";
                     hpBarType.color = new Color(1f, 159f / 255, 159f / 255);
                     hpBar.sprite = hpBarHard;
                     break;
-                case JudgeType.EXHARD:
+                case GaugeType.EXHARD:
                     hpBarType.text = "EX-HARD";
                     hpBarType.color = new Color(246f / 255, 1f, 159f / 255);
                     hpBar.sprite = hpBarExHard;
@@ -330,14 +353,40 @@ namespace BMSPlayer
             }
         }
 
-        private void SetInitialGraph()
+        public void SetInitialGraph(int totalNotes)
         {
             graphCurrent.material.SetFloat("_Progress", 0f);
             graphMyBest.material.SetFloat("_Progress", 0f);
             graphTarget.material.SetFloat("_Progress", 0f);
 
-            graphBestBase.material.SetFloat("_Progress", 0f);
-            rankBest.sprite = rankF;
+            graphBestBase.material.SetFloat("_Progress", (float)Const.MyBestScore / totalNotes / 2);
+            switch(Const.MyBestRank)
+            {
+                case "aaa":
+                    rankBest.sprite = rankAAA;
+                    break;
+                case "aa":
+                    rankBest.sprite = rankAA;
+                    break;
+                case "a":
+                    rankBest.sprite = rankA;
+                    break;
+                case "b":
+                    rankBest.sprite = rankB;
+                    break;
+                case "c":
+                    rankBest.sprite = rankC;
+                    break;
+                case "d":
+                    rankBest.sprite = rankD;
+                    break;
+                case "e":
+                    rankBest.sprite = rankE;
+                    break;
+                default:
+                    rankBest.sprite = rankF;
+                    break;
+            }
 
             switch(Const.GraphTarget)
             {
@@ -443,6 +492,9 @@ namespace BMSPlayer
                     scoreTarget.text = (procNotes * 2).ToString();
                     break;
             }
+
+            graphMyBest.material.SetFloat("_Progress", ((float)procNotes) / totalNotes * Const.MyBestScore / totalNotes / 2);
+            scoreBest.text = (Const.MyBestScore * procNotes / totalNotes).ToString();
         }
 
         public string GetRank(int ex, int proc)

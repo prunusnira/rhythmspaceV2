@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -36,6 +37,20 @@ namespace BMSPlayer
         public Image rank;
         public Image cleared;
 
+        // Difference
+        public TextMeshProUGUI scorePrev;
+        public TextMeshProUGUI scoreNew;
+        public TextMeshProUGUI scoreDiff;
+        public TextMeshProUGUI missPrev;
+        public TextMeshProUGUI missNew;
+        public TextMeshProUGUI missDiff;
+        public TextMeshProUGUI comboPrev;
+        public TextMeshProUGUI comboNew;
+        public TextMeshProUGUI comboDiff;
+        public TextMeshProUGUI clearPrev;
+        public TextMeshProUGUI clearNew;
+
+        // Rank
         public Sprite rankaaa;
         public Sprite rankaa;
         public Sprite ranka;
@@ -60,6 +75,11 @@ namespace BMSPlayer
 
         // Graph
         public GraphDrawer Graph;
+        public SpriteRenderer GraphBG;
+        public Sprite GraphAS;
+        public Sprite GraphNR;
+        public Sprite GraphHD;
+        public Sprite GraphEX;
 
         void Awake()
         {
@@ -95,6 +115,112 @@ namespace BMSPlayer
             timediff.text = vdiff.ToString("0.00") + "ms";
 
             isClear = Const.Clear;
+
+            // 차이
+            scorePrev.text = Const.MyBestScore.ToString();
+            scoreNew.text = Const.ResultScore.ToString();
+            missNew.text = vmiss.ToString();
+            comboNew.text = Const.ResultMaxCombo.ToString();
+
+            switch (isClear)
+            {
+                case ClearType.ASSISTCLEAR:
+                    clearNew.text = "ASSISTED CLEAR";
+                    break;
+                case ClearType.EASYCLEAR:
+                    clearNew.text = "EASY CLEAR";
+                    break;
+                case ClearType.NORMALCLEAR:
+                    clearNew.text = "NORMAL CLEAR";
+                    break;
+                case ClearType.HARDCLEAR:
+                    clearNew.text = "HARD CLEAR";
+                    break;
+                case ClearType.EXCLEAR:
+                    clearNew.text = "EX CLEAR";
+                    break;
+                case ClearType.FULLCB:
+                    clearNew.text = "FULLCOMBO";
+                    break;
+                case ClearType.PERFECT:
+                    clearNew.text = "PERFECT";
+                    break;
+                case ClearType.FAIL:
+                    clearNew.text = "FAILED";
+                    break;
+            }
+
+            if (Const.MyBestPrev != null)
+            {
+                missPrev.text = Const.MyBestPrev.Poor.ToString();
+                comboPrev.text = Const.MyBestPrev.MaxCombo.ToString();
+                switch (Const.MyBestPrev.Clear)
+                {
+                    case ClearType.ASSISTCLEAR:
+                        clearPrev.text = "ASSISTED CLEAR";
+                        break;
+                    case ClearType.EASYCLEAR:
+                        clearPrev.text = "EASY CLEAR";
+                        break;
+                    case ClearType.NORMALCLEAR:
+                        clearPrev.text = "NORMAL CLEAR";
+                        break;
+                    case ClearType.HARDCLEAR:
+                        clearPrev.text = "HARD CLEAR";
+                        break;
+                    case ClearType.EXCLEAR:
+                        clearPrev.text = "EX CLEAR";
+                        break;
+                    case ClearType.FULLCB:
+                        clearPrev.text = "FULLCOMBO";
+                        break;
+                    case ClearType.PERFECT:
+                        clearPrev.text = "PERFECT";
+                        break;
+                    case ClearType.FAIL:
+                        clearPrev.text = "FAILED";
+                        break;
+                }
+
+                int vscorediff = Const.ResultScore - Const.MyBestScore;
+                if(vscorediff < 0)
+                {
+                    scoreDiff.text = vscorediff.ToString();
+                }
+                else
+                {
+                    scoreDiff.text = "+" + vscorediff.ToString();
+                }
+
+                int vmissdiff = vmiss - Const.MyBestPrev.Poor;
+                if(vmissdiff < 0)
+                {
+                    missDiff.text = vmissdiff.ToString();
+                }
+                else
+                {
+                    missDiff.text = "+" + vmissdiff.ToString();
+                }
+
+                int vcombodiff = Const.ResultMaxCombo - Const.MyBestPrev.MaxCombo;
+                if (vcombodiff < 0)
+                {
+                    comboDiff.text = vcombodiff.ToString();
+                }
+                else
+                {
+                    comboDiff.text = "+" + vcombodiff.ToString();
+                }
+            }
+            else
+            {
+                missPrev.text = "0";
+                comboPrev.text = "0";
+                clearPrev.text = "NO PLAY";
+                missDiff.text = "+" + vmiss.ToString();
+                scoreDiff.text = "+" + Const.ResultScore.ToString();
+                comboDiff.text = "+" + Const.ResultMaxCombo.ToString();
+            }
 
             switch(rankstr)
             {
@@ -150,16 +276,21 @@ namespace BMSPlayer
             if(Const.Auto == AutoPlayType.OFF)
             {
                 rdm = new RecordDataManager();
+                
+                // 테스트용 리셋
+                /*rdm.DropTable();
+                rdm.CreateNewTable();*/
 
                 string nrank;
                 int nscore;
-                JudgeType njtype;
+                GaugeType njtype;
                 ClearType nclear;
                 int npf;
                 int ngr;
                 int ngd;
                 int nok;
                 int npr;
+                int ncombo;
                 int ncb;
 
                 // 기존 등록된 스코어와 비교 수행
@@ -201,19 +332,30 @@ namespace BMSPlayer
                         ngd = prev.Good;
                         nok = prev.OK;
                         npr = prev.Poor;
+                        ncombo = prev.MaxCombo;
                         ncb = prev.CBreak;
                     }
 
                     // 2. 게이지 레벨 비교
                     if(Const.Clear > prev.Clear)
                     {
-                        njtype = Const.JudgeType;
+                        njtype = Const.GaugeType;
                         nclear = Const.Clear;
                     }
                     else
                     {
                         njtype = prev.GaugeType;
                         nclear = prev.Clear;
+                    }
+
+                    // 3. 콤보
+                    if(Const.ResultMaxCombo > prev.MaxCombo)
+                    {
+                        ncombo = Const.ResultMaxCombo;
+                    }
+                    else
+                    {
+                        ncombo = prev.MaxCombo;
                     }
                 }
                 else
@@ -226,8 +368,9 @@ namespace BMSPlayer
                     ngd = Const.ResultGood;
                     nok = Const.ResultOk;
                     npr = Const.ResultMiss;
+                    ncombo = Const.ResultMaxCombo;
                     ncb = Const.ResultComboBreak;
-                    njtype = Const.JudgeType;
+                    njtype = Const.GaugeType;
                     nclear = Const.Clear;
                 }
                 
@@ -235,12 +378,8 @@ namespace BMSPlayer
                 record = new RecordData(
                     hash,
                     nrank, nscore, (int)njtype, (int)nclear,
-                    npf, ngr, ngd, nok, npr, ncb
+                    npf, ngr, ngd, nok, npr, ncombo, ncb
                 );
-
-                // 테스트용 리셋
-                /*rdm.DropTable();
-                rdm.CreateNewTable();*/
 
                 rdm.RegisterRecord(record);
                 rdm.Close();
@@ -256,6 +395,23 @@ namespace BMSPlayer
             bgLoop.loop = true;
             bgLoop.playOnAwake = true;
             bgLoop.Play();
+
+            switch(Const.GaugeType)
+            {
+                case GaugeType.ASSISTED:
+                    GraphBG.sprite = GraphAS;
+                    break;
+                case GaugeType.EASY:
+                case GaugeType.NORMAL:
+                    GraphBG.sprite = GraphNR;
+                    break;
+                case GaugeType.HARD:
+                    GraphBG.sprite = GraphHD;
+                    break;
+                case GaugeType.EXHARD:
+                    GraphBG.sprite = GraphEX;
+                    break;
+            }
 
             // 그래프 그리기
             if(Const.ResultGraph != null)

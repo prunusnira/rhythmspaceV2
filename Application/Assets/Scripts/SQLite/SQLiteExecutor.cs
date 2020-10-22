@@ -113,6 +113,7 @@ namespace DatabaseManager
                 gd integer(5) not null,
                 ok integer(5) not null,
                 pr integer(5) not null,
+                combo integer(5) not null,
                 cb integer(5) not null)";
 
             dbcommand.CommandText = record;
@@ -183,7 +184,7 @@ namespace DatabaseManager
             string hash, string rank,
             int score, int judge,
             int clear, int pf, int gr, int gd,
-            int ok, int pr, int cb
+            int ok, int pr, int combo, int cb
             )
         {
             dbcommand = dbconn.CreateCommand();
@@ -191,7 +192,7 @@ namespace DatabaseManager
             string query =
                 @"insert into record
                     (md5hash, rank, score, judge,
-                        clear, pf, gr, gd, ok, pr, cb) values
+                        clear, pf, gr, gd, ok, pr, combo, cb) values
                     ('" + hash + "','" +
                         rank + "'," +
                         score + "," +
@@ -202,6 +203,7 @@ namespace DatabaseManager
                         gd + "," +
                         ok + "," +
                         pr + "," +
+                        combo + "," +
                         cb + ") " +
                     " on conflict(md5hash) do update set"+
                         " rank='" + rank + "'," +
@@ -213,6 +215,7 @@ namespace DatabaseManager
                         " gd=" + gd + "," +
                         " ok=" + ok + "," +
                         " pr=" + pr + "," +
+                        " combo=" + combo + "," +
                         " cb=" + cb;
 
             dbcommand.CommandText = query;
@@ -326,11 +329,12 @@ namespace DatabaseManager
                 int recgd = dbreader.GetInt32(8);
                 int recok = dbreader.GetInt32(9);
                 int recpr = dbreader.GetInt32(10);
-                int reccb = dbreader.GetInt32(11);
+                int reccombo = dbreader.GetInt32(11);
+                int reccb = dbreader.GetInt32(12);
 
                 return new RecordData(recmd5, recrank,
                     recscore, recjudge,
-                    recclear, recpf, recgr, recgd, recok, recpr, reccb);
+                    recclear, recpf, recgr, recgd, recok, recpr, reccombo, reccb);
             }
             else
             {
