@@ -39,7 +39,6 @@ namespace BMSPlayer
             button6.onValueChanged.AddListener(CheckValue);
             button7.onValueChanged.AddListener(CheckValue);
 
-            desc.text = Const.CustomRandomDesc[(int)Const.Language];
             button1.text = "1";
             button2.text = "2";
             button3.text = "3";
@@ -59,11 +58,6 @@ namespace BMSPlayer
         public override void Update()
         {
             base.Update();
-
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-
-            }
         }
         public override void EncolorBtn(int row, int col)
         {
@@ -161,6 +155,12 @@ namespace BMSPlayer
             {
                 return false;
             }
+        }
+
+        public override void EnableWindow()
+        {
+            base.EnableWindow();
+            desc.text = Const.CustomRandomDesc[(int)Const.Language];
         }
     }
 }

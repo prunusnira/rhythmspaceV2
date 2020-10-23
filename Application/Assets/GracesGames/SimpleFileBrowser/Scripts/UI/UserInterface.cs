@@ -75,7 +75,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 		public void Setup(FileBrowser fileBrowser) {
 			_fileBrowser = fileBrowser;
 			name = "FileBrowserUI";
-            transform.position = new Vector3(0, 100, -100); // 포지션 커스텀
+            transform.position = new Vector3(0, 30, 0); // 포지션 커스텀
 			transform.localScale = new Vector3(UserInterfaceScale, UserInterfaceScale, 1f);
 			SetupDirectoryAndFilePrefab();
 			SetupClickListeners();

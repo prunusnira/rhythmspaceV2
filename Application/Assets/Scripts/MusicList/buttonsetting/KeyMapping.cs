@@ -13,7 +13,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key1", null);
+                return PlayerPrefs.GetString("btnSet1Key1", "");
             }
             set
             {
@@ -25,7 +25,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key2", null);
+                return PlayerPrefs.GetString("btnSet1Key2", "");
             }
             set
             {
@@ -37,7 +37,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key3", null);
+                return PlayerPrefs.GetString("btnSet1Key3", "");
             }
             set
             {
@@ -49,7 +49,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key4", null);
+                return PlayerPrefs.GetString("btnSet1Key4", "");
             }
             set
             {
@@ -61,7 +61,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key5", null);
+                return PlayerPrefs.GetString("btnSet1Key5", "");
             }
             set
             {
@@ -73,7 +73,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key6", null);
+                return PlayerPrefs.GetString("btnSet1Key6", "");
             }
             set
             {
@@ -85,7 +85,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key7", null);
+                return PlayerPrefs.GetString("btnSet1Key7", "");
             }
             set
             {
@@ -97,7 +97,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key8", null);
+                return PlayerPrefs.GetString("btnSet1Key8", "");
             }
             set
             {
@@ -109,7 +109,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet1Key9", null);
+                return PlayerPrefs.GetString("btnSet1Key9", "");
             }
             set
             {
@@ -123,7 +123,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key1", null);
+                return PlayerPrefs.GetString("btnSet2Key1", "");
             }
             set
             {
@@ -135,7 +135,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key2", null);
+                return PlayerPrefs.GetString("btnSet2Key2", "");
             }
             set
             {
@@ -147,7 +147,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key3", null);
+                return PlayerPrefs.GetString("btnSet2Key3", "");
             }
             set
             {
@@ -159,7 +159,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key4", null);
+                return PlayerPrefs.GetString("btnSet2Key4", "");
             }
             set
             {
@@ -171,7 +171,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key5", null);
+                return PlayerPrefs.GetString("btnSet2Key5", "");
             }
             set
             {
@@ -183,7 +183,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key6", null);
+                return PlayerPrefs.GetString("btnSet2Key6", "");
             }
             set
             {
@@ -195,7 +195,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key7", null);
+                return PlayerPrefs.GetString("btnSet2Key7", "");
             }
             set
             {
@@ -207,7 +207,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key8", null);
+                return PlayerPrefs.GetString("btnSet2Key8", "");
             }
             set
             {
@@ -219,7 +219,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("btnSet2Key9", null);
+                return PlayerPrefs.GetString("btnSet2Key9", "");
             }
             set
             {

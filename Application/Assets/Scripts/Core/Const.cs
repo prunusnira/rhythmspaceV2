@@ -108,13 +108,13 @@ namespace BMSPlayer
         public static string[] browserDesc = new string[3]
         {
             "파일 브라우저 사용법\n" +
-            "1) 상단의 ↑ 버튼과 탐색창을 사용하여 원하는 폴더로 이동\n" +
+            "1) 상단의 ↑ 버튼과 탐색창을 사용해 폴더 이동\n" +
             "2) 오른쪽 아래의 SELECT 버튼으로 적용",
             "ファイルブラウザの利用について\n" +
-            "1) 上段の↑ボタンと探索画面をクリックしてフォルダーへ移動\n" +
+            "1) 上段の↑ボタンと探索画面を利用してフォルダーへ移動\n" +
             "2) 右下のSELECTボタンで確認",
             "How to use file browser\n" +
-            "1) Move to your BMS folder with ↑ button and mouse click on browser\n" +
+            "1) Move to BMS folder with ↑ button and click on browser\n" +
             "2) Click the button on bottom-right 'SELECT' to apply"
         };
 

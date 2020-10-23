@@ -90,11 +90,15 @@ namespace BMSPlayer
             bmslist = new List<ListItemNode>();
             mlm = new MusicListManager();
             rdm = new RecordDataManager();
-            ListTreeGenerator();
-            SelectListGenerator();
+            if(File.Exists(Const.JSONPath))
+            {
+                ListTreeGenerator();
+                SelectListGenerator();
+            }
+
             musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
 
-            for(int i = 0; i < Const.ListPos; i++)
+            for (int i = 0; i < Const.ListPos; i++)
             {
                 musicRect.AddItemBottom(ObjectSetup);
             }
@@ -104,10 +108,21 @@ namespace BMSPlayer
         {
             Application.targetFrameRate = Const.ScrRefresh;
 
+            // 리프레시를 해줘야 standalone에서 배경이 재생됨
+            Screen.SetResolution(
+                Const.ScrWidth,
+                Const.ScrHeight,
+                Const.ScreenMode,
+                Const.ScrRefresh
+            );
+
             evtsystem = GetComponent<EventSystem>();
             raycast = GetComponent<GraphicRaycaster>();
 
-            showInfo(musicRect.GetCurrent());
+            if(musicRect.GetItemCount() > 0)
+            {
+                showInfo(musicRect.GetCurrent());
+            }
 
             // MusicLoop on
             System.Random rand = new System.Random();

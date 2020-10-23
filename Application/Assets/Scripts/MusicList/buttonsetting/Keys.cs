@@ -213,8 +213,8 @@ namespace BMSPlayer
                 KeyMapping.Set2Axis9
             };
 
-            if (btnSet1[0].Equals(null)) setKBDefault();
-            if (btnSet2[0].Equals(null)) setDS4Default();
+            if (btnSet1[0].Equals("")) setKBDefault();
+            if (btnSet2[0].Equals("")) setDS4Default();
         }
 
         public static void SaveButtonSetting(int keypos, string key, bool isAxis)

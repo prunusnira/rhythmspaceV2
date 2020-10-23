@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using BMSCore;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +14,6 @@ namespace BMSPlayer
         public Text settingDesc;
         public Sprite normalBtn;
         public Sprite selectedBtn;
-        public GameObject blur;
 
         protected int row;
         protected int col;
@@ -32,55 +33,61 @@ namespace BMSPlayer
 
         public virtual void Update()
         {
-            if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.Escape))
+            try
             {
-                CloseSetting();
-            }
+                if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.Escape))
+                {
+                    CloseSetting();
+                }
 
-            if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                // 옵션 항목 이동
-                if (row == 0) row = rows - 1;
-                else row--;
-                col = 0;
-                EncolorBtn(row, col);
-            }
+                if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.UpArrow))
+                {
+                    // 옵션 항목 이동
+                    if (row == 0) row = rows - 1;
+                    else row--;
+                    col = 0;
+                    EncolorBtn(row, col);
+                }
 
-            if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                // 옵션 항목 이동
-                if (row == rows - 1) row = 0;
-                else row++;
-                col = 0;
-                EncolorBtn(row, col);
-            }
+                if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.DownArrow))
+                {
+                    // 옵션 항목 이동
+                    if (row == rows - 1) row = 0;
+                    else row++;
+                    col = 0;
+                    EncolorBtn(row, col);
+                }
 
-            if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                // 옵션 데이터 이동
-                if (col == 0) col = btn[row] - 1;
-                else col--;
-                EncolorBtn(row, col);
-            }
+                if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.LeftArrow))
+                {
+                    // 옵션 데이터 이동
+                    if (col == 0) col = btn[row] - 1;
+                    else col--;
+                    EncolorBtn(row, col);
+                }
 
-            if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                // 옵션 데이터 이동
-                if (col == btn[row] - 1) col = 0;
-                else col++;
-                EncolorBtn(row, col);
-            }
+                if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.RightArrow))
+                {
+                    // 옵션 데이터 이동
+                    if (col == btn[row] - 1) col = 0;
+                    else col++;
+                    EncolorBtn(row, col);
+                }
 
-            if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.Return))
+                if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.Return))
+                {
+                    // 옵션 버튼 클릭
+                    ExecuteOption(row, col);
+                }
+            }
+            catch(Exception e)
             {
-                // 옵션 버튼 클릭
-                ExecuteOption(row, col);
+                ErrorHandler.LogError(e.Message + " " + e.StackTrace);
             }
         }
 
-        public void EnableWindow()
+        public virtual void EnableWindow()
         {
-            blur.SetActive(true);
         }
 
         public void ChangeSprite(Button b)
@@ -100,7 +107,6 @@ namespace BMSPlayer
 
         public void CloseSetting()
         {
-            blur.SetActive(false);
             settingAll.SetActive(false);
             MusicListUI.SetOnTop();
         }

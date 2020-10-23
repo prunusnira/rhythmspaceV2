@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
 using BMSCore;
+using TMPro;
 
 namespace BMSPlayer
 {
@@ -22,7 +23,7 @@ namespace BMSPlayer
         public Text txtPathVar;
         public GameObject objBrowser;
         public GameObject browserBg;
-        public TextMesh txtBrowserDesc;
+        public Text txtBrowserDesc;
         public string[] extensions;
         public Button btnChange;
         public Button btnRefresh;
@@ -280,7 +281,7 @@ namespace BMSPlayer
             txtBrowserDesc.text = Const.browserDesc[(int)Const.Language];
             /* https://github.com/GracesGames/SimpleFileBrowser */
             GameObject browser = Instantiate(objBrowser, browserBg.transform);
-            browser.name = "BMS Top Path Select";
+            browser.name = "BrowserPathSelector";
 
             FileBrowser browserScr = browser.GetComponent<FileBrowser>();
             browserScr.SetupFileBrowser(ViewMode.Landscape);

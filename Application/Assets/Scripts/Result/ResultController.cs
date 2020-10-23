@@ -425,18 +425,18 @@ namespace BMSPlayer
             if (Input.GetKeyDown(KeyCode.R))
             {
                 Const.ChangeLayout = true;
-                SceneManager.LoadScene("PlayScreen");
+                SceneManager.LoadScene("PlayScreen", LoadSceneMode.Single);
             }
 
             if (Input.GetKeyDown(KeyCode.T))
             {
                 Const.ChangeLayout = false;
-                SceneManager.LoadScene("PlayScreen");
+                SceneManager.LoadScene("PlayScreen", LoadSceneMode.Single);
             }
 
             if (Input.GetKeyDown(KeyCode.Return))
             {
-                SceneManager.LoadScene("MusicSelect");
+                SceneManager.LoadScene("MusicSelect", LoadSceneMode.Single);
             }
         }
 

@@ -32,54 +32,57 @@ namespace BMSPlayer
                 itemList.Add(itemList.Count, n);
             }
 
-            if (itemList.Count / (upperSize + bottomSize) < 1)
+            if(itemList.Count > 0)
             {
-                // Top 설정
-                int upperCount = upperSize / itemList.Count;
-                int upperLeft = upperSize % itemList.Count;
+                if (itemList.Count / (upperSize + bottomSize) < 1)
+                {
+                    // Top 설정
+                    int upperCount = upperSize / itemList.Count;
+                    int upperLeft = upperSize % itemList.Count;
 
-                for(int i = 0; i < upperLeft; i++)
-                {
-                    itemidx[i] = i + itemList.Count - upperLeft;
-                }
-                for(int i = 0; i < upperCount; i++)
-                {
-                    for(int j = 0; j < itemList.Count; j++)
+                    for (int i = 0; i < upperLeft; i++)
                     {
-                        itemidx[upperLeft + itemList.Count * i + j] = j;
+                        itemidx[i] = i + itemList.Count - upperLeft;
+                    }
+                    for (int i = 0; i < upperCount; i++)
+                    {
+                        for (int j = 0; j < itemList.Count; j++)
+                        {
+                            itemidx[upperLeft + itemList.Count * i + j] = j;
+                        }
+                    }
+
+                    // Bottom 설정
+                    int bottomCount = bottomSize / itemList.Count;
+                    int bottomLeft = bottomSize % itemList.Count;
+
+                    for (int i = 0; i < bottomCount; i++)
+                    {
+                        for (int j = 0; j < itemList.Count; j++)
+                        {
+                            itemidx[upperSize + itemList.Count * i + j] = j;
+                        }
+                    }
+                    for (int i = 0; i < bottomLeft; i++)
+                    {
+                        itemidx[upperSize + i + itemList.Count * bottomCount] = i;
+                    }
+                }
+                else
+                {
+                    for (int i = itemList.Count - 8; i < itemList.Count; i++)
+                    {
+                        itemidx[i - (itemList.Count - 8)] = i;
+                    }
+                    for (int i = 0; i < 10; i++)
+                    {
+                        itemidx[i + 8] = i;
                     }
                 }
 
-                // Bottom 설정
-                int bottomCount = bottomSize / itemList.Count;
-                int bottomLeft = bottomSize % itemList.Count;
-
-                for(int i = 0; i < bottomCount; i++)
-                {
-                    for(int j = 0; j < itemList.Count; j++)
-                    {
-                        itemidx[upperSize + itemList.Count * i + j] = j;
-                    }
-                }
-                for (int i = 0; i < bottomLeft; i++)
-                {
-                    itemidx[upperSize + i + itemList.Count * bottomCount] = i;
-                }
+                // 리스트에 아이템 채우기
+                AddItem(f);
             }
-            else
-            {
-                for(int i = itemList.Count - 8; i < itemList.Count; i++)
-                {
-                    itemidx[i - (itemList.Count - 8)] = i;
-                }
-                for (int i = 0; i < 10; i++)
-                {
-                    itemidx[i + 8] = i;
-                }
-            }
-
-            // 리스트에 아이템 채우기
-            AddItem(f);
         }
 
         // 초기 아이템 추가
@@ -162,6 +165,11 @@ namespace BMSPlayer
         public void ResetIndex()
         {
             currentIdx = 0;
+        }
+
+        public int GetItemCount()
+        {
+            return itemList.Count;
         }
 
         // 마우스로 움직이지 않도록 변경
