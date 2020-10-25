@@ -9,6 +9,11 @@ namespace BMSPlayer
 {
     public class PlayOptionSetting: MonoBehaviour
     {
+        // Page
+        private int Page = 0;
+        public GameObject PageSet0;
+        public GameObject PageSet1;
+
         // Speed
         public Text txtSpeed;
         public Text txtSpdAnother;
@@ -37,11 +42,24 @@ namespace BMSPlayer
         // Judgement Type
         public Text txtJudgeType;
 
+        // Custom Random
+        public GameObject customRandom;
+
         // Skin
         public Text txtSkin;
 
-        // Custom Random
-        public GameObject customRandom;
+        // GraphSize
+        public Text txtGraphType;
+
+        // Layout
+        public Text txtLayoutType;
+        public Text txtLayoutDesc;
+
+        // BGA ON/OFF
+        public Text txtBGAOnOff;
+
+        // PlaySide
+        public Text txtPlaySide;
 
         public void Awake()
         {
@@ -192,8 +210,8 @@ namespace BMSPlayer
             }
 
             // 스킨
-            if (Const.Skin == "") Const.Skin = "black";
-            switch (Const.Skin)
+            if (Const.GearSkin == "") Const.GearSkin = "black";
+            switch (Const.GearSkin)
             {
                 case "black":
                     txtSkin.text = "BLACK";
@@ -205,69 +223,175 @@ namespace BMSPlayer
                     txtSkin.text = "DARK";
                     break;
             }
+
+            // 그래프 사이즈
+            switch (Const.GraphType)
+            {
+                case GraphType.NORMAL:
+                    txtGraphType.text = "NORMAL";
+                    break;
+                case GraphType.SMALL:
+                    txtGraphType.text = "SMALL";
+                    break;
+                case GraphType.MINI:
+                    txtGraphType.text = "MINI";
+                    break;
+                case GraphType.OFFGEAR:
+                    txtGraphType.text = "OFF(GEAR)";
+                    break;
+                case GraphType.OFFBGA:
+                    txtGraphType.text = "OFF(BGA)";
+                    break;
+            }
+
+            // UI 레이아웃
+            switch (Const.LayoutType)
+            {
+                case UILayoutType.TYPEA:
+                    txtLayoutType.text = "TYPE A";
+                    txtLayoutDesc.text = Const.LayoutDesc[0, (int)Const.Language];
+                    break;
+                case UILayoutType.TYPEB:
+                    txtLayoutType.text = "TYPE B";
+                    txtLayoutDesc.text = Const.LayoutDesc[1, (int)Const.Language];
+                    break;
+            }
+
+            // BGA
+            switch(Const.BGAOnOff)
+            {
+                case 0:
+                    txtBGAOnOff.text = "OFF";
+                    break;
+                case 1:
+                    txtBGAOnOff.text = "ON";
+                    break;
+            }
+
+            // 플레이사이드
+            switch (Const.PlayerSide)
+            {
+                case 0:
+                    txtPlaySide.text = "1P";
+                    break;
+                case 1:
+                    txtPlaySide.text = "2P";
+                    break;
+            }
+        }
+
+        public void Start()
+        {
+            Page = 0;
+            PageSet0.SetActive(true);
+            PageSet1.SetActive(false);
         }
 
         public void Update()
         {
-            if(Input.GetKey(KeyCode.F1))
+            if(Input.GetKeyDown(KeyCode.Tab))
             {
-                if(Const.SpdType == SpdType.FIXED)
+                PageChange();
+            }
+
+            if(Page == 0)
+            {
+
+                if (Input.GetKey(KeyCode.F1))
                 {
-                    SpeedDownFixed();
+                    if (Const.SpdType == SpdType.FIXED)
+                    {
+                        SpeedDownFixed();
+                    }
+                    else if (Const.SpdType == SpdType.FLUID)
+                    {
+                        SpeedDownFluid();
+                    }
                 }
-                else if (Const.SpdType == SpdType.FLUID)
+                else if (Input.GetKey(KeyCode.F2))
                 {
-                    SpeedDownFluid();
+                    if (Const.SpdType == SpdType.FIXED)
+                    {
+                        SpeedUpFixed();
+                    }
+                    else if (Const.SpdType == SpdType.FLUID)
+                    {
+                        SpeedUpFluid();
+                    }
                 }
-            }
-            else if(Input.GetKey(KeyCode.F2))
-            {
-                if (Const.SpdType == SpdType.FIXED)
+                else if (Input.GetKeyDown(KeyCode.F3))
                 {
-                    SpeedUpFixed();
+                    SpeedTypeChange();
                 }
-                else if (Const.SpdType == SpdType.FLUID)
+                else if (Input.GetKeyDown(KeyCode.F4))
                 {
-                    SpeedUpFluid();
+                    AutoOnOff();
+                }
+                else if (Input.GetKeyDown(KeyCode.F5))
+                {
+                    JudgeUIOnOff();
+                }
+                else if (Input.GetKeyDown(KeyCode.F6))
+                {
+                    GaugeTypeChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F7))
+                {
+                    GraphTargetChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F8))
+                {
+                    NoteLayoutChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F9))
+                {
+                    JudgeTypeChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F11))
+                {
+                    MusicListUI.SetNotOnTop();
+                    customRandom.SetActive(true);
+                    GetComponent<CustomPattern>().EnableWindow();
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.F3))
+            else
             {
-                SpeedTypeChange();
+                if (Input.GetKeyDown(KeyCode.F1))
+                {
+                    SkinChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F2))
+                {
+                    GraphSizeChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F3))
+                {
+                    LayoutChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F4))
+                {
+                    BGAChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F5))
+                {
+                    PlaySideChange();
+                }
             }
-            else if(Input.GetKeyDown(KeyCode.F4))
+        }
+
+        private void PageChange()
+        {
+            if(Page == 0)
             {
-                AutoOnOff();
+                Page = 1;
+                PageSet0.SetActive(false);
+                PageSet1.SetActive(true);
             }
-            else if (Input.GetKeyDown(KeyCode.F5))
+            else
             {
-                JudgeUIOnOff();
-            }
-            else if (Input.GetKeyDown(KeyCode.F6))
-            {
-                GaugeTypeChange();
-            }
-            else if (Input.GetKeyDown(KeyCode.F7))
-            {
-                GraphTargetChange();
-            }
-            else if(Input.GetKeyDown(KeyCode.F8))
-            {
-                NoteLayoutChange();
-            }
-            else if(Input.GetKeyDown(KeyCode.F9))
-            {
-                JudgeTypeChange();
-            }
-            else if (Input.GetKeyDown(KeyCode.F10))
-            {
-                SkinChange();
-            }
-            else if(Input.GetKeyDown(KeyCode.F11))
-            {
-                MusicListUI.SetNotOnTop();
-                customRandom.SetActive(true);
-                GetComponent<CustomPattern>().EnableWindow();
+                Page = 0;
+                PageSet0.SetActive(true);
+                PageSet1.SetActive(false);
             }
         }
 
@@ -496,20 +620,93 @@ namespace BMSPlayer
 
         private void SkinChange()
         {
-
-            switch (Const.Skin)
+            switch (Const.GearSkin)
             {
                 case "black":
                     txtSkin.text = "WHITE";
-                    Const.Skin = "white";
+                    Const.GearSkin = "white";
                     break;
                 case "white":
                     txtSkin.text = "DARK";
-                    Const.Skin = "dark";
+                    Const.GearSkin = "dark";
                     break;
                 case "dark":
                     txtSkin.text = "BLACK";
-                    Const.Skin = "black";
+                    Const.GearSkin = "black";
+                    break;
+            }
+        }
+
+        private void GraphSizeChange()
+        {
+            switch (Const.GraphType)
+            {
+                case GraphType.NORMAL:
+                    Const.GraphType = GraphType.SMALL;
+                    txtGraphType.text = "SMALL";
+                    break;
+                case GraphType.SMALL:
+                    Const.GraphType = GraphType.MINI;
+                    txtGraphType.text = "MINI";
+                    break;
+                case GraphType.MINI:
+                    Const.GraphType = GraphType.OFFGEAR;
+                    txtGraphType.text = "OFF(2P)";
+                    break;
+                case GraphType.OFFGEAR:
+                    Const.GraphType = GraphType.OFFBGA;
+                    txtGraphType.text = "OFF(BGA)";
+                    break;
+                case GraphType.OFFBGA:
+                    Const.GraphType = GraphType.NORMAL;
+                    txtGraphType.text = "NORMAL";
+                    break;
+            }
+        }
+
+        private void LayoutChange()
+        {
+            switch(Const.LayoutType)
+            {
+                case UILayoutType.TYPEA:
+                    Const.LayoutType = UILayoutType.TYPEB;
+                    txtLayoutType.text = "TYPE B";
+                    txtLayoutDesc.text = Const.LayoutDesc[1, (int)Const.Language];
+                    break;
+                case UILayoutType.TYPEB:
+                    Const.LayoutType = UILayoutType.TYPEA;
+                    txtLayoutType.text = "TYPE A";
+                    txtLayoutDesc.text = Const.LayoutDesc[0, (int)Const.Language];
+                    break;
+            }
+        }
+
+        private void BGAChange()
+        {
+            switch (Const.BGAOnOff)
+            {
+                case 0:
+                    Const.BGAOnOff = 1;
+                    txtBGAOnOff.text = "ON";
+                    break;
+                case 1:
+                    Const.BGAOnOff = 0;
+                    txtBGAOnOff.text = "OFF";
+                    break;
+            }
+        }
+
+        private void PlaySideChange()
+        {
+            switch (Const.PlayerSide)
+            {
+                case 0:
+                    Const.PlayerSide = 1;
+                    txtPlaySide.text = "2P";
+                    break;
+                case 1:
+                    Const.PlayerSide = 0;
+                    txtPlaySide.text = "1P";
                     break;
             }
         }

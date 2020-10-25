@@ -19,7 +19,7 @@ namespace BMSPlayer
 #endif
         }
         public static int CHANNEL = 320;
-        public static int SPEEDMULTIPLIER = 10;
+        public static int SPEEDMULTIPLIER = 5;
         public static int DEFAULTPOS = 0;
         public static int LINE = 8;
 
@@ -40,6 +40,8 @@ namespace BMSPlayer
         public static string MyBestRank = "";
         public static RecordData MyBestPrev;
         public static List<int> ResultGraph;
+
+        public static int NoteStartPos = 1100;
 
         public static int[] CustomRandom =
         {
@@ -186,6 +188,20 @@ namespace BMSPlayer
             "마우스로 각 칸을 선택하여 숫자를 입력하세요",
             "マウスで各ボタンの数字を入力してください",
             "Click on each input field to fill the numbers"
+        };
+
+        public static string[,] LayoutDesc = new string[2, 3]
+        {
+            {
+                "기어-BGA-그래프 (2P 반대)",
+                "ギアー・BGA・グラフ(２Pは逆)",
+                "Gear-BGA-Graph (Opposite on 2P)"
+            },
+            {
+                "기어-그래프-BGA (2P 반대)",
+                "ギアー・グラフ・BGA(２Pは逆)",
+                "Gear-Graph-BGA (Opposite on 2P)"
+            },
         };
         #endregion
 
@@ -491,18 +507,6 @@ namespace BMSPlayer
                 PlayerPrefs.SetInt("areaPos", value);
             }
         }
-
-        public static string Skin
-        {
-            get
-            {
-                return PlayerPrefs.GetString("skin", "");
-            }
-            set
-            {
-                PlayerPrefs.SetString("skin", value);
-            }
-        }
         #endregion
 
         // Judge Timing
@@ -742,6 +746,142 @@ namespace BMSPlayer
                 PlayerPrefs.SetInt("rst_slow", value);
             }
         }
+        #endregion
+
+        // Play Skin Setting
+        #region Play Skin
+        public static string GearSkin
+        {
+            get
+            {
+                return PlayerPrefs.GetString("skin", "");
+            }
+            set
+            {
+                PlayerPrefs.SetString("skin", value);
+            }
+        }
+
+        public static GraphType GraphType
+        {
+            get
+            {
+                return (GraphType)PlayerPrefs.GetInt("graphType", (int)GraphType.NORMAL);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("graphType", (int)value);
+            }
+        }
+
+        public static UILayoutType LayoutType
+        {
+            get
+            {
+                return (UILayoutType)PlayerPrefs.GetInt("layoutType", (int)UILayoutType.TYPEA);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("layoutType", (int)value);
+            }
+        }
+
+        public static int BGAOnOff
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("bgaonoff", 1);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("bgaonoff", value);
+            }
+        }
+
+        public static int PlayerSide
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("playerside", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("playerside", value);
+            }
+        }
+        #endregion
+
+        // Position, Width, Height
+        #region
+        // 1P + (2P or GraphBig) or 2P + (1P or GraphBig)
+        public static int BGA_Center_PosX = -453;
+        public static int BGA_Center_PosY = -250;
+        public static int BGA_Center_Wid = 910;
+        public static int BGA_Center_Hei = 683;
+
+        public static int BGA_1P_GraphBig_Right_PosX = 48;
+        public static int BGA_1P_GraphBig_Right_PosY = -250;
+        public static int BGA_1P_GraphBig_Right_Wid = 910;
+        public static int BGA_1P_GraphBig_Right_Hei = 683;
+
+        public static int BGA_1P_GraphSm_Left_PosX = -448;
+        public static int BGA_1P_GraphSm_Left_PosY = -344;
+        public static int BGA_1P_GraphSm_Left_Wid = 1035;
+        public static int BGA_1P_GraphSm_Left_Hei = 777;
+
+        public static int BGA_1P_GraphSm_Right_PosX = -84;
+        public static int BGA_1P_GraphSm_Right_PosY = -344;
+        public static int BGA_1P_GraphSm_Right_Wid = 1035;
+        public static int BGA_1P_GraphSm_Right_Hei = 777;
+
+        public static int BGA_1P_GraphMini_PosX = -140;
+        public static int BGA_1P_GraphMini_PosY = -344;
+        public static int BGA_1P_GraphMini_Wid = 1035;
+        public static int BGA_1P_GraphMini_Hei = 777;
+
+        public static int BGA_1P_GraphOff_PosX = -240;
+        public static int BGA_1P_GraphOff_PosY = -344;
+        public static int BGA_1P_GraphOff_Wid = 1035;
+        public static int BGA_1P_GraphOff_Hei = 777;
+
+        public static int BGA_2P_GraphBig_Left_PosX = -958;
+        public static int BGA_2P_GraphBig_Left_PosY = -250;
+        public static int BGA_2P_GraphBig_Left_Wid = 910;
+        public static int BGA_2P_GraphBig_Left_Hei = 683;
+
+        public static int BGA_2P_GraphSm_Left_PosX = -590;
+        public static int BGA_2P_GraphSm_Left_PosY = -344;
+        public static int BGA_2P_GraphSm_Left_Wid = 1035;
+        public static int BGA_2P_GraphSm_Left_Hei = 777;
+
+        public static int BGA_2P_GraphSm_Right_PosX = -949;
+        public static int BGA_2P_GraphSm_Right_PosY = -344;
+        public static int BGA_2P_GraphSm_Right_Wid = 1035;
+        public static int BGA_2P_GraphSm_Right_Hei = 777;
+
+        public static int BGA_2P_GraphMini_PosX = -885;
+        public static int BGA_2P_GraphMini_PosY = -344;
+        public static int BGA_2P_GraphMini_Wid = 1035;
+        public static int BGA_2P_GraphMini_Hei = 777;
+
+        public static int BGA_2P_GraphOff_PosX = -765;
+        public static int BGA_2P_GraphOff_PosY = -344;
+        public static int BGA_2P_GraphOff_Wid = 1035;
+        public static int BGA_2P_GraphOff_Hei = 777;
+
+        // 1P Right = 0
+        public static int Graph_1P_Big_Left_PosX = -913;
+        public static int Graph_2P_Big_Left_PosX = -1417;
+        public static int Graph_2P_Big_Right_PosX = -503;
+
+        // 1P Right = 0
+        public static int Graph_1P_Small_Left_PosX = -1052;
+        public static int Graph_2P_Small_Left_PosX = -1556;
+        public static int Graph_2P_Small_Right_PosX = -503;
+
+        public static int Graph_1P_Mini_PosX = -1038;
+        public static int Graph_2P_Mini_PosX = -379;
+
         #endregion
 
         // Custom Key

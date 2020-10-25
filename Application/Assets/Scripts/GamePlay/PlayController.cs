@@ -16,6 +16,7 @@ namespace BMSPlayer {
 	public class PlayController : MonoBehaviour {
 		private PlayData Data;
 		private PlayUI UI;
+        private Graph Graph;
 		private NoteGenerator generator;
         private Scroller scroller;
         private LNObjConverter LNConverter;
@@ -55,6 +56,7 @@ namespace BMSPlayer {
 
             // UI 가져오기
             UI = GetComponent<PlayUI>();
+            Graph = GetComponent<Graph>();
 
             // HP Controller
             hpController = GetComponent<HPController>();
@@ -440,7 +442,7 @@ namespace BMSPlayer {
             yield return null;
 
             UI.UpdateSpeed();
-            UI.SetInitialGraph(Data.TotalNotes);
+            Graph.SetInitialGraph(Data.TotalNotes);
             yield return null;
 
             scroller.Init(Data.TotalNotes, Data.BMS.Rank);
