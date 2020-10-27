@@ -149,13 +149,22 @@ namespace BMSPlayer
         public TextMeshProUGUI stageSubartist;
 
         // frame
-        public GameObject Upper;
-        public GameObject Lower;
+        public SpriteRenderer Upper;
+        public SpriteRenderer Lower;
         public TextMeshPro UpperTitle;
+        public Sprite upperDark;
+        public Sprite lowerDark;
 
 
         public void Awake()
         {
+            // Dark Skin
+            if(Const.GearSkin == "dark")
+            {
+                Upper.sprite = upperDark;
+                Lower.sprite = lowerDark;
+            }
+
             // 사용자 설정에 따른 기어-BGA-그래프 위치 변경
             ObjectPositionSetup();
 
@@ -337,6 +346,7 @@ namespace BMSPlayer
 
         public void UpdateHP(int hp)
         {
+            Debug.Log(hp);
             float chp = (float)hp / hpController.HPMax;
             hpBar[Const.PlayerSide].material.SetFloat("_Progress", chp);
             HP.text = (chp * 100).ToString("0.00") + "%";
@@ -654,7 +664,6 @@ namespace BMSPlayer
                         rectWidth / width,
                         rectHeight / height
                     );
-                Debug.Log("BGA Changed");
             }
         }
 
@@ -675,7 +684,6 @@ namespace BMSPlayer
                         rectWidth / width,
                         rectHeight / height
                     );
-                Debug.Log("Layer Changed");
             }
         }
 
@@ -747,30 +755,6 @@ namespace BMSPlayer
                     btnExit.gameObject.GetComponent<Image>().sprite = selectBtn;
                     break;
             }
-        }
-
-        public bool PauseMenuExec(int pauseSel)
-        {
-            if(pauseSel == 0)
-            {
-                Const.ChangeLayout = true;
-                RestartGame();
-            }
-            else if (pauseSel == 1) {
-                Const.ChangeLayout = false;
-                RestartGame();
-            }
-            else if (pauseSel == 2)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public void RestartGame()
-        {
-            Scene scene = SceneManager.GetActiveScene();
-            SceneManager.LoadScene("PlayScreen");
         }
 
         public void DeactiveLoading()

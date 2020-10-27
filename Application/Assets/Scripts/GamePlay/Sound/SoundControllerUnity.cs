@@ -68,6 +68,22 @@ namespace BMSPlayer
             }
         }
 
+        public void PauseAll()
+        {
+            foreach (AudioSource source in audioSource)
+            {
+                if (source.isPlaying) source.Pause();
+            }
+        }
+
+        public void ResumeAll()
+        {
+            foreach (AudioSource source in audioSource)
+            {
+                if (source.isPlaying) source.UnPause();
+            }
+        }
+
         public void FreeMemory(BMS bms)
         {
             foreach (FMOD.Sound snd in bms.WavFilesFM.Values)

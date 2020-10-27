@@ -10,6 +10,13 @@ namespace BMSPlayer
         public GameObject GraphSmall;
         public GameObject GraphMini;
 
+        public SpriteRenderer GraphBigBody;
+        public SpriteRenderer GraphSmallBody;
+        public SpriteRenderer GraphMiniBody;
+        public Sprite GraphBigDark;
+        public Sprite GraphSmallDark;
+        public Sprite GraphMiniDark;
+
         public TextMesh[] valCur;
         public TextMesh[] valBest;
         public TextMesh[] valBestDiff;
@@ -35,6 +42,13 @@ namespace BMSPlayer
                 case GraphType.MINI:
                     GraphMini.SetActive(true);
                     break;
+            }
+
+            if(Const.GearSkin == "dark")
+            {
+                GraphBigBody.sprite = GraphBigDark;
+                GraphSmallBody.sprite = GraphSmallDark;
+                GraphMiniBody.sprite = GraphMiniDark;
             }
 
             ObjectPositionSetup();

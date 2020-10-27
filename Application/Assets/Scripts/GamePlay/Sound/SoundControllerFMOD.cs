@@ -80,6 +80,16 @@ namespace BMSPlayer
             channelGroup.stop();
         }
 
+        public void PauseAll()
+        {
+            channelGroup.setPaused(true);
+        }
+
+        public void ResumeAll()
+        {
+            channelGroup.setPaused(false);
+        }
+
         public void FreeMemory(BMS bms)
         {
             foreach (FMOD.Sound snd in bms.WavFilesFM.Values)

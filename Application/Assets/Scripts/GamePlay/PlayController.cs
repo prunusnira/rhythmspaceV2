@@ -40,6 +40,7 @@ namespace BMSPlayer {
         private double PrevTickTime = 0;
         private double PlayTimePassed = 0;
         private double DeltaTempSum = 0; // 그래프 기록용
+        private double PauseStartTime = 0;
 
         private int pauseSel = 0;
 
@@ -71,6 +72,7 @@ namespace BMSPlayer {
 
             // 분석된 데이터를 기반으로 스크롤러 준비
             scroller = GetComponent<Scroller>();
+            scroller.Init();
 
             // 분석된 데이터를 바탕으로 노트를 생성
             generator = GetComponent<NoteGenerator>();
@@ -119,6 +121,65 @@ namespace BMSPlayer {
         {
             try
             {
+                // 게임 플레이와 독립적으로 조절 가능해야 하는 부분들
+                // 스피드 조절
+                if (Input.GetKey(KeyCode.Alpha1))
+                {
+                    if (Const.SpdType == SpdType.FIXED)
+                    {
+                        scroller.SpeedDownFixed();
+                    }
+                    if (Const.SpdType == SpdType.FLUID)
+                    {
+                        scroller.SpeedDownFluid();
+                    }
+                }
+                if (Input.GetKey(KeyCode.Alpha2))
+                {
+                    if (Const.SpdType == SpdType.FIXED)
+                    {
+                        scroller.SpeedUpFixed();
+                    }
+                    if (Const.SpdType == SpdType.FLUID)
+                    {
+                        scroller.SpeedUpFluid();
+                    }
+                }
+
+                // 셔터 조정
+                // SUD down
+                if (Input.GetKey(KeyCode.Alpha3))
+                {
+                    UI.CoverSuddenDown();
+                }
+                // SUD up
+                else if (Input.GetKey(KeyCode.Alpha4))
+                {
+                    UI.CoverSuddenUp();
+                }
+
+                // LIFT down
+                if (Input.GetKey(KeyCode.Alpha5))
+                {
+                    UI.CoverLiftDown();
+                }
+                // LIFT up
+                else if (Input.GetKey(KeyCode.Alpha6))
+                {
+                    UI.CoverLiftUp();
+                }
+
+                // HID down
+                if (Input.GetKey(KeyCode.Alpha7))
+                {
+                    UI.CoverHiddenDown();
+                }
+                // HID up
+                else if (Input.GetKey(KeyCode.Alpha8))
+                {
+                    UI.CoverHiddenUp();
+                }
+
                 // 데이터 로딩
                 if (!isLoading)
                 {
@@ -308,13 +369,22 @@ namespace BMSPlayer {
                     }
                     if (Input.GetKeyDown(KeyCode.Return))
                     {
-                        bool isEnd = UI.PauseMenuExec(pauseSel);
-                        if (isEnd)
+                        switch(pauseSel)
                         {
-                            Const.Clear = ClearType.FAIL;
-                            isGameOver = true;
-                            isPaused = false;
-                            UI.HidePauseMenu();
+                            case 0:
+                                Const.ChangeLayout = true;
+                                RestartGame();
+                                break;
+                            case 1:
+                                Const.ChangeLayout = false;
+                                RestartGame();
+                                break;
+                            case 2:
+                                Const.Clear = ClearType.FAIL;
+                                isGameOver = true;
+                                isPaused = false;
+                                UI.HidePauseMenu();
+                                break;
                         }
                     }
                 }
@@ -329,49 +399,20 @@ namespace BMSPlayer {
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     isPaused = !isPaused;
+                    double currentTick = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
 
                     if (isPaused)
                     {
+                        PauseStartTime = currentTick;
+                        soundController.PauseAll();
                         UI.ShowPauseMenu();
                     }
                     else
                     {
+                        StartTime += currentTick - PauseStartTime;
+                        soundController.ResumeAll();
                         UI.HidePauseMenu();
                     }
-                }
-
-                // 셔터 조정
-                // SUD down
-                if (Input.GetKey(KeyCode.Alpha3))
-                {
-                    UI.CoverSuddenDown();
-                }
-                // SUD up
-                else if (Input.GetKey(KeyCode.Alpha4))
-                {
-                    UI.CoverSuddenUp();
-                }
-
-                // LIFT down
-                if (Input.GetKey(KeyCode.Alpha5))
-                {
-                    UI.CoverLiftDown();
-                }
-                // LIFT up
-                else if (Input.GetKey(KeyCode.Alpha6))
-                {
-                    UI.CoverLiftUp();
-                }
-
-                // HID down
-                if (Input.GetKey(KeyCode.Alpha7))
-                {
-                    UI.CoverHiddenDown();
-                }
-                // HID up
-                else if (Input.GetKey(KeyCode.Alpha8))
-                {
-                    UI.CoverHiddenUp();
                 }
             }
             catch (Exception e)
@@ -401,6 +442,7 @@ namespace BMSPlayer {
             Data.CurrentBPM = Data.BMS.BPMStart;
             Data.BPS = Data.CurrentBPM / 240;
             Data.SPB = (double)(240 * 1000) / Data.CurrentBPM;
+            scroller.UpdateBPM(Data.CurrentBPM);
             // BPM = 분당 비트수, 1분에 1/4박자(bar 1개)의 개수
             // beat per second는 bpm/60, 여기에 4 bar = 1박이므로 4로 추가로 나눈다
             // 모든 시간은 ms 단위로 한다
@@ -455,7 +497,7 @@ namespace BMSPlayer {
                 Graph.SetInitialGraph(Data.TotalNotes);
             yield return null;
 
-            scroller.Init(Data.TotalNotes, Data.BMS.Rank);
+            scroller.PlaySetup(Data.TotalNotes, Data.BMS.Rank);
             yield return null;
 
             UI.UpdateTimerTotal(Data.LastTiming);
@@ -488,6 +530,14 @@ namespace BMSPlayer {
                 default:
                     return false;
             }
+        }
+
+        public void RestartGame()
+        {
+            soundController.StopAll();
+            soundController.FreeMemory(Data.BMS);
+            Scene scene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene("PlayScreen");
         }
     }
 }

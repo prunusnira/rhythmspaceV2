@@ -14,9 +14,8 @@ namespace BMSPlayer
     public class ResultController : MonoBehaviour
     {
         // Music data
-        public Text gerne;
-        public Text title;
-        public Text artist;
+        public TextMeshProUGUI title;
+        public TextMeshProUGUI subtitle;
 
         // Judgement data
         public Text perfect;
@@ -25,7 +24,6 @@ namespace BMSPlayer
         public Text ok;
         public Text miss;
         public Text avgrate;
-        public Text exscore;
         public Text combo;
         public Text combobreak;
         public Text timediff;
@@ -44,13 +42,14 @@ namespace BMSPlayer
         public TextMeshProUGUI missPrev;
         public TextMeshProUGUI missNew;
         public TextMeshProUGUI missDiff;
-        public TextMeshProUGUI comboPrev;
-        public TextMeshProUGUI comboNew;
-        public TextMeshProUGUI comboDiff;
         public TextMeshProUGUI clearPrev;
         public TextMeshProUGUI clearNew;
+        public TextMeshProUGUI rankPrev;
+        public TextMeshProUGUI rankNew;
+        public TextMeshProUGUI targetScore;
+        public TextMeshProUGUI targetDiff;
 
-        // Rank
+        // Rank Sprite
         public Sprite rankaaa;
         public Sprite rankaa;
         public Sprite ranka;
@@ -81,15 +80,132 @@ namespace BMSPlayer
         public Sprite GraphHD;
         public Sprite GraphEX;
 
+        // Others
+        public Text Judgement;
+        public Text Pattern;
+
         void Awake()
         {
             // 곡 정보
             PlayData Data = new PlayData();
             BMSAnalyzer analyzer = new BMSAnalyzer();
             analyzer.HeaderAnalyzer(Data.BMS);
-            gerne.text = Data.BMS.Gerne;
             title.text = Data.BMS.Title;
-            artist.text = Data.BMS.Artist;
+            subtitle.text = Data.BMS.SubTitle;
+
+            // 패턴 정보
+            string difficulty = "";
+            switch (Data.BMS.Difficulty)
+            {
+                case 1:
+                    difficulty = "BEGINNER";
+                    break;
+                case 2:
+                    difficulty = "NORMAL";
+                    break;
+                case 3:
+                    difficulty = "HYPER";
+                    break;
+                case 4:
+                    difficulty = "ANOTHER";
+                    break;
+                case 5:
+                    difficulty = "INSANE";
+                    break;
+                default:
+                    difficulty = "UNKNOWN";
+                    break;
+            }
+
+            string layout = "";
+            switch(Const.NoteLayout)
+            {
+                case NoteLayout.NORMAL:
+                    layout = "NORMAL";
+                    break;
+                case NoteLayout.RANDOM:
+                    layout = "RANDOM";
+                    break;
+                case NoteLayout.MIRROR:
+                    layout = "MIRROR";
+                    break;
+                case NoteLayout.SRAN:
+                    layout = "S-RAN";
+                    break;
+                case NoteLayout.CRAN:
+                    layout = "C-RAN";
+                    break;
+                case NoteLayout.CUSTOM:
+                    layout = "CUSTOM";
+                    break;
+            }
+
+            Pattern.text =
+                "SP " + difficulty +
+                " " + Data.BMS.Level +
+                "     |     LAYOUT: " + layout;
+
+            // 판정 설정
+            switch(Const.JudgeType)
+            {
+                case JudgeType.ARCADE:
+                    Judgement.text = "ARCADE";
+                    break;
+                case JudgeType.ORIGINAL:
+                    switch(Data.BMS.Rank)
+                    {
+                        case 0:
+                            Judgement.text = "ORIGINAL VERY HARD";
+                            break;
+                        case 1:
+                            Judgement.text = "ORIGINAL HARD";
+                            break;
+                        case 3:
+                            Judgement.text = "ORIGINAL EASY";
+                            break;
+                        case 2:
+                        default:
+                            Judgement.text = "ORIGINAL NORMAL";
+                            break;
+                    }
+                    break;
+                case JudgeType.LR2:
+                    switch (Data.BMS.Rank)
+                    {
+                        case 0:
+                            Judgement.text = "LR2 VERY HARD";
+                            break;
+                        case 1:
+                            Judgement.text = "LR2 HARD";
+                            break;
+                        case 3:
+                            Judgement.text = "LR2 EASY";
+                            break;
+                        case 2:
+                        default:
+                            Judgement.text = "LR2 NORMAL";
+                            break;
+                    }
+                    break;
+                case JudgeType.BEATORAJA:
+                    switch (Data.BMS.Rank)
+                    {
+                        case 0:
+                            Judgement.text = "BEATORAJA VERY HARD";
+                            break;
+                        case 1:
+                            Judgement.text = "BEATORAJA HARD";
+                            break;
+                        case 3:
+                            Judgement.text = "BEATORAJA EASY";
+                            break;
+                        case 2:
+                        default:
+                            Judgement.text = "BEATORAJA NORMAL";
+                            break;
+                    }
+                    break;
+            }
 
             // 판정
             int vgd = Const.ResultGood;
@@ -110,7 +226,6 @@ namespace BMSPlayer
             slow.text = Const.ResultSlow.ToString();
 
             avgrate.text = (rate * 100).ToString("0.00") + "%";
-            exscore.text = Const.ResultScore.ToString();
             combo.text = Const.ResultMaxCombo.ToString();
             timediff.text = vdiff.ToString("0.00") + "ms";
 
@@ -120,18 +235,17 @@ namespace BMSPlayer
             scorePrev.text = Const.MyBestScore.ToString();
             scoreNew.text = Const.ResultScore.ToString();
             missNew.text = vmiss.ToString();
-            comboNew.text = Const.ResultMaxCombo.ToString();
 
             switch (isClear)
             {
                 case ClearType.ASSISTCLEAR:
-                    clearNew.text = "ASSISTED CLEAR";
+                    clearNew.text = "ASSIST CLEAR";
                     break;
                 case ClearType.EASYCLEAR:
                     clearNew.text = "EASY CLEAR";
                     break;
                 case ClearType.NORMALCLEAR:
-                    clearNew.text = "NORMAL CLEAR";
+                    clearNew.text = "CLEAR";
                     break;
                 case ClearType.HARDCLEAR:
                     clearNew.text = "HARD CLEAR";
@@ -140,7 +254,7 @@ namespace BMSPlayer
                     clearNew.text = "EX CLEAR";
                     break;
                 case ClearType.FULLCB:
-                    clearNew.text = "FULLCOMBO";
+                    clearNew.text = "FULL COMBO";
                     break;
                 case ClearType.PERFECT:
                     clearNew.text = "PERFECT";
@@ -152,18 +266,18 @@ namespace BMSPlayer
 
             if (Const.MyBestPrev != null)
             {
+                rankPrev.text = Const.MyBestRank.ToUpper();
                 missPrev.text = Const.MyBestPrev.Poor.ToString();
-                comboPrev.text = Const.MyBestPrev.MaxCombo.ToString();
                 switch (Const.MyBestPrev.Clear)
                 {
                     case ClearType.ASSISTCLEAR:
-                        clearPrev.text = "ASSISTED CLEAR";
+                        clearPrev.text = "ASSIST CLEAR";
                         break;
                     case ClearType.EASYCLEAR:
                         clearPrev.text = "EASY CLEAR";
                         break;
                     case ClearType.NORMALCLEAR:
-                        clearPrev.text = "NORMAL CLEAR";
+                        clearPrev.text = "CLEAR";
                         break;
                     case ClearType.HARDCLEAR:
                         clearPrev.text = "HARD CLEAR";
@@ -172,7 +286,7 @@ namespace BMSPlayer
                         clearPrev.text = "EX CLEAR";
                         break;
                     case ClearType.FULLCB:
-                        clearPrev.text = "FULLCOMBO";
+                        clearPrev.text = "FULL COMBO";
                         break;
                     case ClearType.PERFECT:
                         clearPrev.text = "PERFECT";
@@ -201,52 +315,49 @@ namespace BMSPlayer
                 {
                     missDiff.text = "+" + vmissdiff.ToString();
                 }
-
-                int vcombodiff = Const.ResultMaxCombo - Const.MyBestPrev.MaxCombo;
-                if (vcombodiff < 0)
-                {
-                    comboDiff.text = vcombodiff.ToString();
-                }
-                else
-                {
-                    comboDiff.text = "+" + vcombodiff.ToString();
-                }
             }
             else
             {
-                missPrev.text = "0";
-                comboPrev.text = "0";
+                missPrev.text = "-";
                 clearPrev.text = "NO PLAY";
+                rankPrev.text = "-";
                 missDiff.text = "+" + vmiss.ToString();
                 scoreDiff.text = "+" + Const.ResultScore.ToString();
-                comboDiff.text = "+" + Const.ResultMaxCombo.ToString();
             }
 
             switch(rankstr)
             {
                 case "aaa":
                     rank.sprite = rankaaa;
+                    rankNew.text = "AAA";
                     break;
                 case "aa":
                     rank.sprite = rankaa;
+                    rankNew.text = "AA";
                     break;
                 case "a":
                     rank.sprite = ranka;
+                    rankNew.text = "A";
                     break;
                 case "b":
                     rank.sprite = rankb;
+                    rankNew.text = "B";
                     break;
                 case "c":
                     rank.sprite = rankc;
+                    rankNew.text = "C";
                     break;
                 case "d":
                     rank.sprite = rankd;
+                    rankNew.text = "D";
                     break;
                 case "e":
                     rank.sprite = ranke;
+                    rankNew.text = "E";
                     break;
                 case "f":
                     rank.sprite = rankf;
+                    rankNew.text = "F";
                     break;
             }
 

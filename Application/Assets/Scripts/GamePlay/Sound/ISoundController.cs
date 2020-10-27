@@ -17,6 +17,10 @@ namespace BMSPlayer
 
         void StopAll();
 
+        void PauseAll();
+
+        void ResumeAll();
+
         void FreeMemory(BMS bms);
     }
 }

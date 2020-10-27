@@ -43,7 +43,8 @@ namespace BMSPlayer
 
         private int speed = 200;
         private int speedfl = 200;
-        private SpdType spdType;
+        private double BPM = 0;
+        private bool isSpeedChanged = true;
 
         // 체력 관리
         private GaugeType gaugeType;
@@ -81,12 +82,66 @@ namespace BMSPlayer
         private Graph Graph;
         private NoteObjectAdder NoteAdder;
 
-        public void Init(int noteCount, int rank)
+        public void Update()
+        {
+            // 배속 조절시 속도 변경 적용
+            if(isSpeedChanged)
+            {
+                if(Const.SpdType == SpdType.FIXED)
+                {
+                    Const.SpeedFluid = (int)(speed * BPM / 100);
+                }
+                else if(Const.SpdType == SpdType.FLUID)
+                {
+                    speed = (int)(speedfl / BPM * 100);
+                    Const.SpeedFixed = (int)(speedfl / BPM * 100);
+                }
+                ui.UpdateSpeed();
+                isSpeedChanged = false;
+            }
+        }
+
+        public void Init()
+        {
+            ui = GetComponent<PlayUI>();
+            Graph = GetComponent<Graph>();
+            NoteAdder = GetComponent<NoteObjectAdder>();
+
+            speed = Const.SpeedFixed;
+            speedfl = Const.SpeedFluid;
+
+            isSet1Pushed = new bool[8] { false, false, false, false, false, false, false, false };
+            isSet2Pushed = new bool[8] { false, false, false, false, false, false, false, false };
+            btnPushState = new bool[8] { false, false, false, false, false, false, false, false };
+            btnProcState = new bool[8] { false, false, false, false, false, false, false, false };
+            btnPushSound = new bool[8] { false, false, false, false, false, false, false, false };
+            isLnWorking = new bool[8];
+            lnTiming = new double[8];
+
+            for (int i = 0; i < 8; i++)
+            {
+                isLnWorking[i] = false;
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                lnTiming[i] = 0;
+            }
+
+            // 초기 HP 지정
+            hpController = GetComponent<HPController>();
+            gaugeType = Const.GaugeType;
+
+            // 사운드 컨트롤러 정의
+            soundController = GetComponent<SoundControllerFMOD>();
+        }
+
+        public void PlaySetup(int noteCount, int rank)
         {
             this.noteCount = noteCount;
+            hpController.SetHPJudgeType(gaugeType, noteCount);
 
             // 판정 타입에 따른 판정 값 변경
-            switch(Const.JudgeType)
+            switch (Const.JudgeType)
             {
                 case JudgeType.ARCADE:
                     PERFECT = Const.JudgeArcade[0];
@@ -96,7 +151,7 @@ namespace BMSPlayer
                     POOR = Const.JudgeArcade[4];
                     break;
                 case JudgeType.ORIGINAL:
-                    switch(rank)
+                    switch (rank)
                     {
                         case 0:
                             PERFECT = Const.JudgeOriginVeryHard[0];
@@ -198,39 +253,6 @@ namespace BMSPlayer
                     }
                     break;
             }
-
-            ui = GetComponent<PlayUI>();
-            Graph = GetComponent<Graph>();
-            NoteAdder = GetComponent<NoteObjectAdder>();
-
-            speed = Const.SpeedFixed;
-            speedfl = Const.SpeedFluid;
-            spdType = Const.SpdType;
-
-            isSet1Pushed = new bool[8] { false, false, false, false, false, false, false, false };
-            isSet2Pushed = new bool[8] { false, false, false, false, false, false, false, false };
-            btnPushState = new bool[8] { false, false, false, false, false, false, false, false };
-            btnProcState = new bool[8] { false, false, false, false, false, false, false, false };
-            btnPushSound = new bool[8] { false, false, false, false, false, false, false, false };
-            isLnWorking = new bool[8];
-            lnTiming = new double[8];
-
-            for (int i = 0; i < 8; i++)
-            {
-                isLnWorking[i] = false;
-            }
-            for (int i = 0; i < 8; i++)
-            {
-                lnTiming[i] = 0;
-            }
-
-            // 초기 HP 지정
-            hpController = GetComponent<HPController>();
-            gaugeType = Const.GaugeType;
-            hpController.SetHPJudgeType(gaugeType, noteCount);
-
-            // 사운드 컨트롤러 정의
-            soundController = GetComponent<SoundControllerFMOD>();
         }
 
         private void SetNotePositionOnStop(
@@ -763,29 +785,6 @@ namespace BMSPlayer
 
         public void SpeedChangeAndBeam(double bpm)
         {
-            if (Input.GetKey(KeyCode.Alpha2))
-            {
-                if (spdType == SpdType.FIXED)
-                {
-                    SpeedUpFixed(bpm);
-                }
-                if (spdType == SpdType.FLUID)
-                {
-                    SpeedUpFluid(bpm);
-                }
-            }
-            if (Input.GetKey(KeyCode.Alpha1))
-            {
-                if (spdType == SpdType.FIXED)
-                {
-                    SpeedDownFixed(bpm);
-                }
-                if (spdType == SpdType.FLUID)
-                {
-                    SpeedDownFluid(bpm);
-                }
-            }
-
             // 버튼 푸시 상태에 따라 빔 표시 상태 변경
             for (int i = 0; i < btnPushState.Length; i++)
             {
@@ -1401,55 +1400,55 @@ namespace BMSPlayer
             Const.ResultRank = ui.GetRank(score, processedNotes);
         }
 
-        private void SpeedUpFixed(double bpm)
+        public void SpeedUpFixed()
         {
             if (speed < 2000)
             {
                 speed += 1;
                 Const.SpeedFixed = speed;
-                Const.SpeedFluid = (int)(speed * bpm / 100);
-                ui.UpdateSpeed();
+                isSpeedChanged = true;
             }
         }
 
-        private void SpeedDownFixed(double bpm)
+        public void SpeedDownFixed()
         {
             if (speed > 50)
             {
                 speed -= 1;
                 Const.SpeedFixed = speed;
-                Const.SpeedFluid = (int)(speed * bpm / 100);
-                ui.UpdateSpeed();
+                isSpeedChanged = true;
             }
         }
 
-        private void SpeedUpFluid(double bpm)
+        public void SpeedUpFluid()
         {
             if (speedfl < 2000)
             {
                 speedfl += 1;
-                speed = (int)(speedfl / bpm * 100);
                 Const.SpeedFluid = speedfl;
-                Const.SpeedFixed = (int)(speedfl / bpm * 100);
-                ui.UpdateSpeed();
+                isSpeedChanged = true;
             }
         }
 
-        private void SpeedDownFluid(double bpm)
+        public void SpeedDownFluid()
         {
             if (speedfl > 100)
             {
                 speedfl -= 1;
-                speed = (int)(speedfl / bpm * 100);
                 Const.SpeedFluid = speedfl;
-                Const.SpeedFixed = (int)(speedfl / bpm * 100);
-                ui.UpdateSpeed();
+                isSpeedChanged = true;
             }
         }
 
         public int GetProcessedNotes()
         {
             return processedNotes;
+        }
+
+        public void UpdateBPM(double bpm)
+        {
+            BPM = bpm;
+            isSpeedChanged = true;
         }
     }
 }
