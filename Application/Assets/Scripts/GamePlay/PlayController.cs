@@ -427,6 +427,8 @@ namespace BMSPlayer {
             isLoading = true;
             yield return null;
 
+            scroller.UpdateBPM(Const.selectedOnList.Info.BPMstart);
+
             yield return StartCoroutine(analyzer.FullAnalyzer(Data.BMS));
             yield return null;
 

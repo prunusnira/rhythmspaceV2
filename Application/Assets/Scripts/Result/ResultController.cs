@@ -227,7 +227,7 @@ namespace BMSPlayer
 
             avgrate.text = (rate * 100).ToString("0.00") + "%";
             combo.text = Const.ResultMaxCombo.ToString();
-            timediff.text = vdiff.ToString("0.00") + "ms";
+            timediff.text = (vdiff * 100).ToString("0.00") + "ms";
 
             isClear = Const.Clear;
 

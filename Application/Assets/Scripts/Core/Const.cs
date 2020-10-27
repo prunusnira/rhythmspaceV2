@@ -181,7 +181,7 @@ namespace BMSPlayer
         {
             "버그로 인하여 마우스를 이용할 수 없습니다",
             "バグがありますのでキーボードを利用してください",
-            "Due to bug, you can not use "
+            "Due to bug, you can not use mouse for now"
         };
 
         public static string[,] LayoutDesc = new string[2, 3]

@@ -1344,7 +1344,7 @@ namespace BMSPlayer
             avgRate = Math.Round(sumRate * 100 / processedNotes) / 100;
             avgTimeDiff = sumTimeDiff / processedNotes;
             ui.UpdateSideJudge(perfect, great, good, ok, miss, cb, fast, slow,
-                avgRate.ToString("0.00") + "%", avgTimeDiff.ToString("0.0") + "ms");
+                avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
         }
 
         IEnumerator AutoTurnoffBeam(int i)
