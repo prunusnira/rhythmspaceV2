@@ -7,6 +7,7 @@
         BPM,
         BPMT2,
         BGA,
+        LAYER,
         STOP,
         MINE
     }

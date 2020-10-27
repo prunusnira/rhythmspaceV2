@@ -59,6 +59,11 @@
         public string VideoFile { get; set; }
     }
 
+    public class LayerNote : NoteObject
+    {
+        public UnityEngine.Sprite BGASprite { get; set; }
+    }
+
     public class BGMNote : NoteObject
     {
         public string Wav { get; set; }

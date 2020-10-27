@@ -13,13 +13,15 @@ namespace BMSPlayer
         public Button dfds4;
         public Button dfxb;
 
-        public Button[] btnKey;
-        public Button[] btnCon;
+        public Button[] btnKeySet1;
+        public Button[] btnKeySet2;
 
         public GameObject presetLoad;
         public GameObject presetSave;
         public GameObject presetSaveInput;
         public GameObject keyPopup;
+
+        public Text keySettingDesc;
 
         public InputField presetSaveInputField;
         public GameObject presetSaveInputError;
@@ -32,6 +34,36 @@ namespace BMSPlayer
             rows = 10;
             btn = new int[] { 3, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
             EncolorBtn(0, 0);
+
+            // 각 버튼 onclick 설정
+            dfkbd.onClick.AddListener(delegate
+            {
+                Keys.setKBDefault();
+                UpdateButton();
+            });
+            dfxb.onClick.AddListener(delegate
+            {
+                Keys.setXBDefault();
+                UpdateButton();
+            });
+            dfds4.onClick.AddListener(delegate
+            {
+                Keys.setDS4Default();
+                UpdateButton();
+            });
+            /*for(int i = 0; i < btnKeySet1.Length; i++)
+            {
+                btnKeySet1[i].onClick.AddListener(delegate
+                {
+                    ChangeKey(i + 10);
+                });
+                btnKeySet2[i].onClick.AddListener(delegate
+                {
+                    ChangeKey(i + 20);
+                });
+            }*/
+
+            keySettingDesc.text = Const.keySettingDesc[(int)Const.Language];
         }
 
         public override void Start()
@@ -68,12 +100,12 @@ namespace BMSPlayer
                     else if (col == 2) ChangeSprite(dfxb);
                     break;
                 case 1:
-                    if (col == 0) ChangeSprite(btnKey[0]);
-                    else if (col == 1) ChangeSprite(btnCon[0]);
+                    if (col == 0) ChangeSprite(btnKeySet1[0]);
+                    else if (col == 1) ChangeSprite(btnKeySet2[0]);
                     break;
                 case 2:
-                    if (col == 0) ChangeSprite(btnKey[8]);
-                    else if (col == 1) ChangeSprite(btnCon[8]);
+                    if (col == 0) ChangeSprite(btnKeySet1[8]);
+                    else if (col == 1) ChangeSprite(btnKeySet2[8]);
                     break;
                 case 3:
                 case 4:
@@ -82,8 +114,8 @@ namespace BMSPlayer
                 case 7:
                 case 8:
                 case 9:
-                    if (col == 0) ChangeSprite(btnKey[row - 2]);
-                    else if (col == 1) ChangeSprite(btnCon[row - 2]);
+                    if (col == 0) ChangeSprite(btnKeySet1[row - 2]);
+                    else if (col == 1) ChangeSprite(btnKeySet2[row - 2]);
                     break;
             }
         }
@@ -134,8 +166,8 @@ namespace BMSPlayer
         {
             for(int i = 0; i < 9; i++)
             {
-                UpdateButtonText(btnKey[i], Keys.btnSet1[i]);
-                UpdateButtonText(btnCon[i], Keys.btnSet2[i]);
+                UpdateButtonText(btnKeySet1[i], Keys.btnSet1[i]);
+                UpdateButtonText(btnKeySet2[i], Keys.btnSet2[i]);
             }
         }
 

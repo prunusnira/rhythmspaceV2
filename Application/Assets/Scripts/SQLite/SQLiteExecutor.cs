@@ -32,7 +32,6 @@ namespace DatabaseManager
                 {
                     Instance = new SQLiteExecutor();
                 }
-                Debug.Log("DB instance exist");
             }
             return Instance;
         }
@@ -274,6 +273,48 @@ namespace DatabaseManager
             dbreader = dbcommand.ExecuteReader();
 
             while(dbreader.Read())
+            {
+                int lid = dbreader.GetInt32(0);
+                string ltitle = dbreader.GetString(1);
+                string lsubtitle = dbreader.GetString(2);
+                string lartist = dbreader.GetString(3);
+                string lsubartist = dbreader.GetString(4);
+                string lgerne = dbreader.GetString(5);
+                float lbpmstart = dbreader.GetFloat(6);
+                float lbpmmin = dbreader.GetFloat(7);
+                float lbpmmax = dbreader.GetFloat(8);
+                string lpath = dbreader.GetString(9);
+                string lmd5 = dbreader.GetString(10);
+                int llv = dbreader.GetInt32(11);
+                int ldiff = dbreader.GetInt32(12);
+                string lfname = dbreader.GetString(13);
+                string ljacket = dbreader.GetString(14);
+
+                MusicListData data = new MusicListData(
+                    lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
+                    lbpmstart, lbpmmin, lbpmmax,
+                    lpath, lmd5, llv, ldiff, lfname, ljacket);
+
+                musiclist.Add(data);
+            }
+
+            return musiclist;
+        }
+
+        public List<MusicListData> FindMusicList(string queryText)
+        {
+            List<MusicListData> musiclist = new List<MusicListData>();
+
+            dbcommand = dbconn.CreateCommand();
+
+            queryText = queryText.Replace("'", "''");
+            string query = "select * from list where title like '%"
+                +queryText+"%' collate nocase";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            while (dbreader.Read())
             {
                 int lid = dbreader.GetInt32(0);
                 string ltitle = dbreader.GetString(1);

@@ -56,6 +56,11 @@ namespace BMSPlayer
             return executor.SelectMusicList(path);
         }
 
+        public List<MusicListData> FindBMSWithName(string text)
+        {
+            return executor.FindMusicList(text);
+        }
+
         public void AddDataToDB(List<MusicListData> list)
         {
             if (list.Count != 0)

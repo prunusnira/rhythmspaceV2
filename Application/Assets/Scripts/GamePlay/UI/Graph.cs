@@ -154,7 +154,7 @@ namespace BMSPlayer
                             // 2P Left BGA
                             GraphSmall.transform.localPosition =
                                 new Vector2(
-                                    Const.Graph_2P_Small_Left_PosX,
+                                    Const.Graph_2P_Small_Right_PosX,
                                     GraphSmall.transform.localPosition.y
                                 );
                         }
@@ -187,7 +187,24 @@ namespace BMSPlayer
                 case GraphType.OFFGEAR:
                 default:
                     // Type A일때는 가운데임
-                    if (!isTypeA)
+                    if (isTypeA)
+                    {
+                        if (PlaySide == 0)
+                        {
+                            // 1P Right BGA
+                            // 기본 그래프 위치
+                        }
+                        else
+                        {
+                            // 2P Left BGA
+                            GraphBig.transform.localPosition =
+                                new Vector2(
+                                    Const.Graph_2P_Big_Left_PosX,
+                                    GraphSmall.transform.localPosition.y
+                                );
+                        }
+                    }
+                    else
                     {
                         if (PlaySide == 0)
                         {

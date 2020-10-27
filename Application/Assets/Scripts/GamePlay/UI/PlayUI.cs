@@ -10,51 +10,35 @@ using UnityEngine.Video;
 
 namespace BMSPlayer
 {
-	// 플레이 화면의 모든 UI 요소 컨트롤
+	// 플레이 화면의 UI 요소 컨트롤
 	public class PlayUI : MonoBehaviour {
         // UI Object
         private List<GameObject> NoteOnScreen;
         public GameObject layerJudgeAll;
         public GameObject layerPauseMenu;
-        public Text FPSCounter;
+        public TextMesh FPSCounter;
 
         // Pause Menu
         public Button btnRestart;
         public Button btnRestartSame;
         public Button btnExit;
 
-        public Sprite cb0;
-        public Sprite cb1;
-        public Sprite cb2;
-        public Sprite cb3;
-        public Sprite cb4;
-        public Sprite cb5;
-        public Sprite cb6;
-        public Sprite cb7;
-        public Sprite cb8;
-        public Sprite cb9;
-
-        // Judge type ED
-        public GameObject judgeTypeED;
-
-        // Judge sprite renderer
-        public GameObject comboLayerED;
-        public SpriteRenderer judgeSpriteED;
-        public TextMesh txtTimingED;
-
         // Judge sprite
-        public Sprite spPerfect;
-        public Sprite spGreat;
-        public Sprite spGood;
-        public Sprite spOk;
-        public Sprite spMiss;
         private TimingType currentJudge = TimingType.NONE;
 
         // Judge type BM
-        public GameObject judgeTypeBM;
-        public TextMesh txtTimingPercentBM;
-        public TextMesh txtTimingMsBM;
-        public TextMeshPro txtJudgeBM;
+        public GameObject[] judgeTypeBM;
+        public TextMesh[] txtInfo1C;
+        public TextMesh[] txtInfo2C;
+        public TextMesh[] txtInfo3C;
+        public TextMesh[] txtInfo1S;
+        public TextMesh[] txtInfo2S;
+        public TextMesh[] txtInfo3S;
+        private TextMesh txtInfoFS;
+        private TextMesh txtInfoTarget;
+        private TextMesh txtInfoRate;
+        public TextMeshPro[] txtJudgeBM;
+        private int infoNumA = 0;
 
         private double timeLastComboPopup;
         private double timeLastTimingPopup;
@@ -72,30 +56,37 @@ namespace BMSPlayer
         public Text txtSlow;
 
         // Timer
-        public Text txtCurrentTime;
-        public Text txtTotalTime;
+        public TextMesh txtCurrentTime;
+        public TextMesh txtTotalTime;
 
-        // Gear
-        public GameObject noteParentObj;
-        public TextMesh gearCombo;
-        public TextMesh gearExScore;
-        public TextMesh gearSpeed;
-        public TextMesh gearSpeedFluid;
-        public TextMesh gearHP;
-        public TextMesh gearGuageType;
-        public TextMesh gearBPM;
-        public TextMesh gearBPMmin;
-        public TextMesh gearBPMmax;
-        public TextMesh txtAutoPlay;
-        public TextMesh txtLoading;
-        public GameObject[] gearBtnPress;
+        // Gear and Area
+        public GameObject Gear1P;
+        public GameObject Gear2P;
+        public GameObject Area1P;
+        public GameObject Area2P;
+
+        // Text display
+        public TextMesh Combo;
+        public TextMesh Score;
+        public TextMesh SpeedFixed;
+        public TextMesh SpeedFluid;
+        public TextMesh HP;
+        public TextMesh BPMcur;
+        public TextMesh BPMmin;
+        public TextMesh BPMmax;
+        public TextMesh Difficulty;
+        public TextMesh Level;
+
+        public TextMesh[] txtAutoPlay;
+        public TextMesh[] txtLoading;
+        public GameObject[] gearBtnPress1P;
+        public GameObject[] gearBtnPress2P;
 
         // Skin
-        public SpriteRenderer skinGear;
-        public SpriteRenderer skinGraph;
-        public Sprite skinGearBlack;
-        public Sprite skinGearWhite;
-        public Sprite skinGearDark;
+        public SpriteRenderer[] skinGear;
+        public Sprite[] skinGearBlack;
+        public Sprite[] skinGearWhite;
+        public Sprite[] skinGearDark;
 
         // Cover
         public GameObject coverSud;
@@ -106,7 +97,8 @@ namespace BMSPlayer
         private int playAreaPos;
 
         // Beam
-        public GameObject[] beam;
+        public GameObject[] beam1P;
+        public GameObject[] beam2P;
 
         // Note Effect
         private Coroutine[] effectCoroutine;
@@ -117,7 +109,7 @@ namespace BMSPlayer
         // HPBar
         private HPController hpController;
         public TextMesh hpBarType;
-        public SpriteRenderer hpBar;
+        public SpriteRenderer[] hpBar;
         public Sprite hpBarAssisted;
         public Sprite hpBarEasy;
         public Sprite hpBarNormal;
@@ -127,9 +119,13 @@ namespace BMSPlayer
         // BGA
         public SpriteRenderer bgaImage;
         public RectTransform bgaRect;
+        public SpriteRenderer layerImage;
+        public RectTransform layerRect;
         public VideoPlayer bgaVideo;
         public GameObject bgaVideoLayer;
+        public RectTransform bgaVideoRect;
         public GameObject bgaErrorLayer;
+        public RectTransform bgaFollowingObj;
 
         // Fader
         public Image Fader;
@@ -145,7 +141,6 @@ namespace BMSPlayer
         public GameObject keyInfo;
 
         // Music Info
-        public TextMeshPro infoTitle;
         public GameObject stagePanel;
         public TextMeshProUGUI stageGerne;
         public TextMeshProUGUI stageTitle;
@@ -153,17 +148,19 @@ namespace BMSPlayer
         public TextMeshProUGUI stageArtist;
         public TextMeshProUGUI stageSubartist;
 
-        // Display Note
-        private NoteGenerator generator;
-        private bool[] lnadd = new bool[8];
+        // frame
+        public GameObject Upper;
+        public GameObject Lower;
+        public TextMeshPro UpperTitle;
+
 
         public void Awake()
         {
-            // 노트 표시용 설정
-            generator = GetComponent<NoteGenerator>();
+            // 사용자 설정에 따른 기어-BGA-그래프 위치 변경
+            ObjectPositionSetup();
+
             for (int i = 0; i < 8; i++)
             {
-                lnadd[i] = false;
                 effectCoroutine = new Coroutine[8];
                 effectRotation[i] = 0f;
             }
@@ -183,19 +180,12 @@ namespace BMSPlayer
             btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
 
             // 판정 표시 타입 변경
-            if(Const.JudgeUIType == JudgeUIType.BM)
-            {
-                judgeTypeED.SetActive(false);
-            }
-            else
-            {
-                judgeTypeBM.SetActive(false);
-            }
+            judgeTypeBM[Const.PlayerSide].SetActive(true);
 
             // 오토 플레이 표기
-            if(Const.Auto == AutoPlayType.ON)
+            if(Const.Auto == AutoPlayType.ALL)
             {
-                txtAutoPlay.gameObject.SetActive(true);
+                txtAutoPlay[Const.PlayerSide].gameObject.SetActive(true);
             }
 
             // 커버 포지션 변경
@@ -205,21 +195,8 @@ namespace BMSPlayer
 
             NoteOnScreen = new List<GameObject>();
 
-            if(Const.GearSkin == "" || Const.GearSkin == "black")
-            {
-                skinGear.sprite = skinGearBlack;
-            }
-            else if(Const.GearSkin == "white")
-            {
-                skinGear.sprite = skinGearWhite;
-            }
-            else if(Const.GearSkin == "dark")
-            {
-                skinGear.sprite = skinGearDark;
-            }
-
-            // 사용자 설정에 따른 기어-BGA-그래프 위치 변경
-            ObjectPositionSetup();
+            // 기어에 표시하는 정보의 위치와 개수 확인
+            SideInfoDisplayPosition();
         }
 
         private void Update()
@@ -228,21 +205,16 @@ namespace BMSPlayer
             double timing = (double)DateTime.Now.Ticks / 1000000 - timeLastComboPopup;
             if (timing > 10)
             {
-                if(Const.JudgeUIType == JudgeUIType.ED)
-                {
-                    comboLayerED.SetActive(false);
-                    judgeSpriteED.gameObject.SetActive(false);
-                    txtTimingED.gameObject.SetActive(false);
-                }
-                else
-                {
-                    txtJudgeBM.gameObject.SetActive(false);
-                    txtTimingPercentBM.gameObject.SetActive(false);
-                    txtTimingMsBM.gameObject.SetActive(false);
-                }
+                txtJudgeBM[Const.PlayerSide].gameObject.SetActive(false);
+                if (txtInfoFS != null)
+                    txtInfoFS.gameObject.SetActive(false);
+                if (txtInfoRate != null)
+                    txtInfoRate.gameObject.SetActive(false);
+                if (txtInfoTarget != null)
+                    txtInfoTarget.gameObject.SetActive(false);
             }
 
-            if (txtJudgeBM.gameObject.activeSelf && timing % 1.5 < 0.1)
+            if (txtJudgeBM[Const.PlayerSide].gameObject.activeSelf && timing % 1.5 < 0.1)
             {
                 // 판정별 색상 변경 처리
                 StartCoroutine(comboChangeBM(currentJudge));
@@ -281,15 +253,15 @@ namespace BMSPlayer
 
         public void SetGearBPM(double bpm, double min, double max)
         {
-            gearBPM.text = bpm.ToString("0.00");
-            gearBPMmin.text = min.ToString("0.00");
-            gearBPMmax.text = max.ToString("0.00");
+            BPMcur.text = bpm.ToString("0.00");
+            BPMmin.text = min.ToString("0.00");
+            BPMmax.text = max.ToString("0.00");
         }
 
         public void SetGearCurBPM(double bpm)
         {
-            gearBPM.text = bpm.ToString("0.00");
-            gearSpeedFluid.text = ((int)(bpm * Const.SpeedFixed / 100)).ToString();
+            BPMcur.text = bpm.ToString("0.00");
+            SpeedFluid.text = ((int)(bpm * Const.SpeedFixed / 100)).ToString();
         }
 
         private void SetInitialHPBar()
@@ -299,58 +271,80 @@ namespace BMSPlayer
                 case GaugeType.ASSISTED:
                     hpBarType.text = "ASSISTED";
                     hpBarType.color = new Color(206f / 255, 159f / 255, 1f);
-                    hpBar.sprite = hpBarAssisted;
+                    hpBar[Const.PlayerSide].sprite = hpBarAssisted;
                     break;
                 case GaugeType.EASY:
                     hpBarType.text = "EASY";
                     hpBarType.color = new Color(159f / 255, 1f, 180f / 255);
-                    hpBar.sprite = hpBarEasy;
+                    hpBar[Const.PlayerSide].sprite = hpBarEasy;
                     break;
                 case GaugeType.NORMAL:
                     hpBarType.text = "NORMAL";
                     hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
-                    hpBar.sprite = hpBarNormal;
+                    hpBar[Const.PlayerSide].sprite = hpBarNormal;
                     break;
                 case GaugeType.HARD:
                     hpBarType.text = "HARD";
                     hpBarType.color = new Color(1f, 159f / 255, 159f / 255);
-                    hpBar.sprite = hpBarHard;
+                    hpBar[Const.PlayerSide].sprite = hpBarHard;
                     break;
                 case GaugeType.EXHARD:
                     hpBarType.text = "EX-HARD";
                     hpBarType.color = new Color(246f / 255, 1f, 159f / 255);
-                    hpBar.sprite = hpBarExHard;
+                    hpBar[Const.PlayerSide].sprite = hpBarExHard;
                     break;
                 default:
                     hpBarType.text = "NORMAL";
                     hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
-                    hpBar.sprite = hpBarNormal;
+                    hpBar[Const.PlayerSide].sprite = hpBarNormal;
                     break;
             }
         }
 
-        public void SetMusicInfo(string name)
+        public void SetMusicInfo(BMS bms)
         {
             // 곡 정보 설정
-            infoTitle.text = name;
+            UpperTitle.text = bms.Title;
+            Level.text = bms.Level.ToString();
+            switch(bms.Difficulty)
+            {
+                case 1:
+                    Difficulty.text = "BEGINNER";
+                    break;
+                case 2:
+                    Difficulty.text = "NORMAL";
+                    break;
+                case 3:
+                    Difficulty.text = "HYPER";
+                    break;
+                case 4:
+                    Difficulty.text = "ANOTHER";
+                    break;
+                case 5:
+                    Difficulty.text = "INSANE";
+                    break;
+                default:
+                    Difficulty.text = "UNKNOWN";
+                    break;
+            }
         }
 
         public void UpdateSpeed()
         {
-            gearSpeed.text = ((float)Const.SpeedFixed / 100).ToString("0.00") + "x";
-            gearSpeedFluid.text = Const.SpeedFluid.ToString();
+            SpeedFixed.text = ((float)Const.SpeedFixed / 100).ToString("0.00") + "x";
+            SpeedFluid.text = Const.SpeedFluid.ToString();
         }
 
         public void UpdateHP(int hp)
         {
             float chp = (float)hp / hpController.HPMax;
-            hpBar.material.SetFloat("_Progress", chp);
-            gearHP.text = (chp * 100).ToString("0.00") + "%";
+            hpBar[Const.PlayerSide].material.SetFloat("_Progress", chp);
+            HP.text = (chp * 100).ToString("0.00") + "%";
         }
 
         public void UpdateScore(int score)
         {
-            gearExScore.text = score.ToString();
+            Score.text = score.ToString();
         }
 
         public string GetRank(int ex, int proc)
@@ -396,7 +390,7 @@ namespace BMSPlayer
 
         public void UpdateMaxCombo(int combo)
         {
-            gearCombo.text = combo.ToString();
+            Combo.text = combo.ToString();
         }
 
         public void UpdateJudge(TimingType judgetype, int combo, string accuracy, int ms)
@@ -407,138 +401,57 @@ namespace BMSPlayer
             switch(judgetype)
             {
                 case TimingType.PERFECT:
-                    judgeSpriteED.sprite = spPerfect;
                     judgeStr = "GREAT";
                     break;
                 case TimingType.GREAT:
-                    judgeSpriteED.sprite = spGreat;
                     judgeStr = "GREAT";
                     break;
                 case TimingType.GOOD:
-                    judgeSpriteED.sprite = spGood;
                     judgeStr = "GOOD";
                     break;
                 case TimingType.BAD:
-                    judgeSpriteED.sprite = spOk;
                     judgeStr = "BAD";
                     break;
                 case TimingType.POOR:
                 case TimingType.EPOOR:
-                    judgeSpriteED.sprite = spMiss;
                     judgeStr = "POOR";
                     break;
             }
 
             // Combo update
-
-            if (Const.JudgeUIType == JudgeUIType.ED)
+            if (judgetype == TimingType.BAD || judgetype == TimingType.POOR)
             {
-                foreach (Transform t in comboLayerED.transform)
-                {
-                    Destroy(t.gameObject);
-                }
-                if (combo > 0)
-                {
-                    char[] numToChar = combo.ToString().ToCharArray();
-                    float fixval;
-                    switch (numToChar.Length)
-                    {
-                        case 1: fixval = 0f; break;
-                        case 2: fixval = -62.5f; break;
-                        case 3: fixval = -125f; break;
-                        case 4: fixval = -187.5f; break;
-                        case 5: fixval = -250f; break;
-                        default: fixval = 0; break;
-                    }
-                    int idx = 0;
-                    foreach (char c in numToChar)
-                    {
-                        GameObject piclayer = new GameObject();
-                        piclayer.transform.SetParent(comboLayerED.transform);
-                        piclayer.transform.localPosition = new Vector3(idx * 110 + fixval, 0f, 0f);
-                        piclayer.transform.localRotation = new Quaternion();
-                        piclayer.transform.localScale = new Vector3(2f, 2f, 2f);
-                        SpriteRenderer renderer = piclayer.AddComponent<SpriteRenderer>();
-                        switch (c)
-                        {
-                            case '0':
-                                renderer.sprite = cb0;
-                                break;
-                            case '1':
-                                renderer.sprite = cb1;
-                                break;
-                            case '2':
-                                renderer.sprite = cb2;
-                                break;
-                            case '3':
-                                renderer.sprite = cb3;
-                                break;
-                            case '4':
-                                renderer.sprite = cb4;
-                                break;
-                            case '5':
-                                renderer.sprite = cb5;
-                                break;
-                            case '6':
-                                renderer.sprite = cb6;
-                                break;
-                            case '7':
-                                renderer.sprite = cb7;
-                                break;
-                            case '8':
-                                renderer.sprite = cb8;
-                                break;
-                            case '9':
-                                renderer.sprite = cb9;
-                                break;
-                        }
-                        idx++;
-                    }
-                }
-
-                // accuracy update
-                txtTimingED.text = accuracy;
-
-                Vector3 ccp = comboLayerED.transform.localPosition;
-                comboLayerED.SetActive(true);
-                comboLayerED.transform.localScale = new Vector3(1.3f, 1.3f, 1.3f);
-                StartCoroutine(comboPopAni());
-                judgeSpriteED.gameObject.SetActive(true);
-                judgeSpriteED.transform.localScale = new Vector3(1.56f, 1.56f, 1.56f);
-                txtTimingED.gameObject.SetActive(true);
-                txtTimingED.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
-                StartCoroutine(timingPopAni());
+                txtJudgeBM[Const.PlayerSide].text = judgeStr;
             }
             else
             {
-                txtTimingPercentBM.text = accuracy;
-                if(judgetype == TimingType.BAD || judgetype == TimingType.POOR)
+                txtJudgeBM[Const.PlayerSide].text = judgeStr + " " + combo;
+            }
+            txtJudgeBM[Const.PlayerSide].gameObject.SetActive(true);
+
+            if (txtInfoRate != null)
+            {
+                txtInfoRate.text = accuracy;
+                txtInfoRate.gameObject.SetActive(true);
+            }
+
+            if(txtInfoFS != null)
+            {
+                if (ms > 0)
                 {
-                    txtJudgeBM.text = judgeStr;
+                    txtInfoFS.color = new Color(135f / 255, 206f / 255, 235f / 255);
+                    txtInfoFS.text = "FAST " + ms.ToString() + "ms";
+                }
+                else if (ms < 0)
+                {
+                    txtInfoFS.color = Color.red;
+                    txtInfoFS.text = "SLOW " + Math.Abs(ms).ToString() + "ms";
                 }
                 else
                 {
-                    txtJudgeBM.text = judgeStr + " " + combo;
+                    txtInfoFS.text = "";
                 }
-
-                if(ms > 0)
-                {
-                    txtTimingMsBM.color = new Color(135f / 255, 206f / 255, 235f / 255);
-                    txtTimingMsBM.text = "FAST " + ms.ToString() + "ms";
-                }
-                else if(ms < 0)
-                {
-                    txtTimingMsBM.color = Color.red;
-                    txtTimingMsBM.text = "SLOW " + Math.Abs(ms).ToString() + "ms";
-                }
-                else
-                {
-                    txtTimingMsBM.text = "";
-                }
-
-                txtTimingPercentBM.gameObject.SetActive(true);
-                txtJudgeBM.gameObject.SetActive(true);
-                txtTimingMsBM.gameObject.SetActive(true);
+                txtInfoFS.gameObject.SetActive(true);
             }
 
             timeLastComboPopup = (double)DateTime.Now.Ticks / 1000000;
@@ -566,13 +479,29 @@ namespace BMSPlayer
         {
             if (onoff)
             {
-                beam[line].SetActive(true);
-                gearBtnPress[line].SetActive(true);
+                if(Const.PlayerSide == 0)
+                {
+                    beam1P[line].SetActive(true);
+                    gearBtnPress1P[line].SetActive(true);
+                }
+                else
+                {
+                    beam2P[line].SetActive(true);
+                    gearBtnPress2P[line].SetActive(true);
+                }
             }
             else
             {
-                beam[line].SetActive(false);
-                gearBtnPress[line].SetActive(false);
+                if (Const.PlayerSide == 0)
+                {
+                    beam1P[line].SetActive(false);
+                    gearBtnPress1P[line].SetActive(false);
+                }
+                else
+                {
+                    beam2P[line].SetActive(false);
+                    gearBtnPress2P[line].SetActive(false);
+                }
             }
         }
 
@@ -625,53 +554,39 @@ namespace BMSPlayer
             sprite.transform.rotation = Quaternion.Euler(new Vector3(0f, effectRotation[pos], 0f));
         }
 
-        // Animation Effect Coroutine
-        IEnumerator comboPopAni()
-        {
-            yield return new WaitForSeconds(0.08f);
-            comboLayerED.transform.localScale = new Vector3(1f, 1f, 1f);
-        }
-
-        IEnumerator timingPopAni()
-        {
-            yield return new WaitForSeconds(0.08f);
-            judgeSpriteED.transform.localScale = new Vector3(1.3f, 1.3f, 1.3f);
-            txtTimingED.transform.localScale = new Vector3(1f, 1f, 1f);
-        }
-
         IEnumerator comboChangeBM(TimingType type)
         {
             if(type == TimingType.PERFECT)
             {
-                txtJudgeBM.colorGradient = new VertexGradient(
+                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
                     new Color(56f / 255, 122f / 255, 208f / 255),
                     new Color(56f / 255, 122f / 255, 208f / 255),
                     new Color(183f / 255, 196f / 255, 255f / 255),
                     new Color(183f / 255, 196f / 255, 255f / 255)
                     );
                 yield return new WaitForSeconds(0.05f);
-                txtJudgeBM.colorGradient = new VertexGradient(
+                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
                     new Color(232f / 255, 86f / 255, 155f / 255),
                     new Color(232f / 255, 86f / 255, 155f / 255),
                     new Color(234f / 255, 164f / 255, 179f / 255),
                     new Color(234f / 255, 164f / 255, 179f / 255)
                     );
                 yield return new WaitForSeconds(0.05f);
-                txtJudgeBM.colorGradient = new VertexGradient(
+                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
                     new Color(175f / 255, 232f / 255, 197f / 255)
                     );
                 yield return new WaitForSeconds(0.05f);
             }
             else
             {
-                txtJudgeBM.colorGradient = new VertexGradient(
+                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
                     new Color(217f / 255, 150f / 255, 0f),
                     new Color(217f / 255, 150f / 255, 0f),
                     new Color(255f / 255, 225f / 255, 196f / 255),
                     new Color(255f / 255, 225f / 255, 196f / 255)
                     );
                 yield return new WaitForSeconds(0.1f);
-                txtJudgeBM.colorGradient = new VertexGradient(
+                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
                     new Color(0f, 0f, 0f, 0f)
                     );
                 yield return new WaitForSeconds(0.05f);
@@ -683,16 +598,26 @@ namespace BMSPlayer
             bgaVideoLayer.SetActive(true);
         }
 
+        public void BGAVideoPreload(string file)
+        {
+            bgaVideo.url = "file://" + file;
+            bgaVideo.errorReceived += BGAErrorLayer;
+            bgaVideo.Prepare();
+        }
+
         public void BGAImageActivate()
         {
             bgaImage.gameObject.SetActive(true);
         }
 
-        // BGA Control
-        public void BGAVideoPlay(string file)
+        public void LayerImageActivate()
         {
-            bgaVideo.url = "file://"+file;
-            bgaVideo.errorReceived += BGAErrorLayer;
+            layerImage.gameObject.SetActive(true);
+        }
+
+        // BGA Control
+        public void BGAVideoPlay()
+        {
             bgaVideo.Play();
         }
 
@@ -729,6 +654,28 @@ namespace BMSPlayer
                         rectWidth / width,
                         rectHeight / height
                     );
+                Debug.Log("BGA Changed");
+            }
+        }
+
+        public void LayerImageSetting(Sprite img)
+        {
+            if (img != null)
+            {
+                layerImage.sprite = img;
+
+                float width = layerImage.sprite.bounds.size.x;
+                float height = layerImage.sprite.bounds.size.y;
+
+                float rectWidth = layerRect.sizeDelta.x;
+                float rectHeight = layerRect.sizeDelta.y;
+
+                layerImage.gameObject.transform.localScale =
+                    new Vector3(
+                        rectWidth / width,
+                        rectHeight / height
+                    );
+                Debug.Log("Layer Changed");
             }
         }
 
@@ -740,71 +687,6 @@ namespace BMSPlayer
         public void HidePauseMenu()
         {
             layerPauseMenu.SetActive(false);
-        }
-
-        public void DisplaySplitLine(SplitLine line)
-        {
-            GameObject noteObj = generator.AddNewSplitLine(line.Timing, noteParentObj.transform);
-            noteObj.transform.SetParent(noteParentObj.transform, false);
-            line.OnScreen = true;
-            line.NoteObject = noteObj;
-        }
-
-        public void DisplayMineNote(MineNote note)
-        {
-            GameObject noteObj = generator.AddNewMineNote(note.Line, note.Timing, noteParentObj.transform);
-            noteObj.transform.SetParent(noteParentObj.transform, false);
-            note.OnScreen = true;
-            note.NoteObject = noteObj;
-        }
-
-        public void DisplayPlayNote(PlayNote note, List<LongNote> lnlist)
-        {
-            if (note.PlayNoteType == NoteType.SINGLE)
-            {
-                GameObject noteObj = generator.AddNewNote(note.Line, note.Timing, noteParentObj.transform);
-                noteObj.transform.SetParent(noteParentObj.transform, false);
-                note.OnScreen = true;
-                note.NoteObject = noteObj;
-            }
-            else
-            {
-                // 아직 롱노트가 없으면 일반 노트를 하나 추가하고
-                // 롱노트를 이 노트의 위치와 시작 위치 사이에 추가할 수 있도록 함
-                // 이 동작은 Scroller.moveNotes()에서 isLong()을 확인해서 표기한다
-
-                // 시작노트
-                if(note.PlayNoteType == NoteType.LNSTART)
-                {
-                    GameObject noteObj = generator.AddNewNote(note.Line, note.Timing, noteParentObj.transform);
-                    noteObj.transform.SetParent(noteParentObj.transform, false);
-                    note.OnScreen = true;
-                    note.NoteObject = noteObj;
-
-                    // 끝노트도 같이 추가한다
-                    for (int i = 0; i < lnlist.Count; i++)
-                    {
-                        if (lnlist[i].Start == note)
-                        {
-                        // 가운데노트
-                            PlayNote lnNote = lnlist[i].Mid;
-                            GameObject lnObj = generator.AddNewNote(lnNote.Line, lnNote.Timing, noteParentObj.transform);
-                            lnObj.transform.SetParent(noteParentObj.transform, false);
-                            lnNote.OnScreen = true;
-                            lnNote.NoteObject = lnObj;
-
-                            // 끝노트
-                            PlayNote endNote = lnlist[i].End;
-                            GameObject endObj = generator.AddNewNote(endNote.Line, endNote.Timing, noteParentObj.transform);
-                            endObj.transform.SetParent(noteParentObj.transform, false);
-                            endNote.OnScreen = true;
-                            endNote.NoteObject = endObj;
-
-                            lnlist[i].Mid.Position = (note.Position + endNote.Position) / 2;
-                        }
-                    }
-                }
-            }
         }
 
         public void PauseMenuMove(ref int pauseSel, bool down)
@@ -893,7 +775,7 @@ namespace BMSPlayer
 
         public void DeactiveLoading()
         {
-            txtLoading.gameObject.SetActive(false);
+            txtLoading[Const.PlayerSide].gameObject.SetActive(false);
             stagePanel.SetActive(false);
         }
 
@@ -929,6 +811,97 @@ namespace BMSPlayer
             txtTotalTime.text = min + ":" + sec;
         }
 
+        #region Combo/Side Info Display Position
+        private void SideInfoDisplayPosition()
+        {
+            // 각 포지션 개수 확인
+            switch (Const.FastSlow)
+            {
+                case DisplayPosType.OFF:
+                    txtInfoFS = null;
+                    break;
+                case DisplayPosType.TYPEA:
+                    infoNumA++;
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtInfoFS = txtInfo3S[(int)Const.Language];
+                    break;
+            }
+            switch (Const.TargetDiff)
+            {
+                case DisplayPosType.OFF:
+                    txtInfoTarget = null;
+                    break;
+                case DisplayPosType.TYPEA:
+                    infoNumA++;
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtInfoTarget = txtInfo2S[(int)Const.Language];
+                    break;
+            }
+            switch (Const.RateDiff)
+            {
+                case DisplayPosType.OFF:
+                    txtInfoRate = null;
+                    break;
+                case DisplayPosType.TYPEA:
+                    infoNumA++;
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtInfoRate = txtInfo1S[(int)Const.Language];
+                    break;
+            }
+
+            // 개수 별 스타일 처리
+            switch (infoNumA)
+            {
+                case 1:
+                    if (Const.FastSlow == DisplayPosType.TYPEA)
+                    {
+                        txtInfoFS = txtInfo2C[(int)Const.Language];
+                    }
+                    if (Const.RateDiff == DisplayPosType.TYPEA)
+                    {
+                        txtInfoRate = txtInfo2C[(int)Const.Language];
+                    }
+                    if (Const.TargetDiff == DisplayPosType.TYPEA)
+                    {
+                        txtInfoTarget = txtInfo2C[(int)Const.Language];
+                    }
+                    break;
+                case 2:
+                    if (Const.FastSlow == DisplayPosType.TYPEA)
+                    {
+                        if(Const.RateDiff == DisplayPosType.TYPEA)
+                        {
+                            txtInfoRate = txtInfo1C[(int)Const.Language];
+                            txtInfoFS = txtInfo3C[(int)Const.Language];
+                        }
+                        else if(Const.TargetDiff == DisplayPosType.TYPEA)
+                        {
+                            txtInfoTarget = txtInfo1C[(int)Const.Language];
+                            txtInfoFS = txtInfo3C[(int)Const.Language];
+                        }
+                    }
+                    if (Const.RateDiff == DisplayPosType.TYPEA)
+                    {
+                        if (Const.TargetDiff == DisplayPosType.TYPEA)
+                        {
+                            txtInfoRate = txtInfo1C[(int)Const.Language];
+                            txtInfoTarget = txtInfo3C[(int)Const.Language];
+                        }
+                    }
+                    break;
+                case 3:
+                    txtInfoTarget = txtInfo1C[(int)Const.Language];
+                    txtInfoRate = txtInfo2C[(int)Const.Language];
+                    txtInfoFS = txtInfo3C[(int)Const.Language];
+                    break;
+            }
+        }
+        #endregion
+
+        #region Gear/BGA/Graph/Frame Position
         private void ObjectPositionSetup()
         {
             bool isTypeA = true;
@@ -942,7 +915,37 @@ namespace BMSPlayer
                     break;
             }
 
+            if (Const.GearSkin == "" || Const.GearSkin == "black")
+            {
+                skinGear[Const.PlayerSide].sprite = skinGearBlack[Const.PlayerSide];
+            }
+            else if (Const.GearSkin == "white")
+            {
+                skinGear[Const.PlayerSide].sprite = skinGearWhite[Const.PlayerSide];
+            }
+            else if (Const.GearSkin == "dark")
+            {
+                skinGear[Const.PlayerSide].sprite = skinGearDark[Const.PlayerSide];
+            }
+
             int PlaySide = Const.PlayerSide;
+            if(PlaySide == 0)
+            {
+                Gear1P.SetActive(true);
+                Area1P.SetActive(true);
+            }
+            else
+            {
+                Gear2P.SetActive(true);
+                Area2P.SetActive(true);
+
+                InvertObjectX(HP.gameObject);
+                InvertObjectX(hpBarType.gameObject);
+                InvertObjectX(SpeedFixed.gameObject);
+                InvertObjectX(SpeedFluid.gameObject);
+                InvertObjectX(Difficulty.gameObject);
+                InvertObjectX(Level.gameObject);
+            }
 
             switch (Const.GraphType)
             {
@@ -960,6 +963,26 @@ namespace BMSPlayer
                                 Const.BGA_1P_GraphSm_Left_PosX,
                                 Const.BGA_1P_GraphSm_Left_PosY
                             );
+                            layerRect.sizeDelta = new Vector2(
+                                Const.BGA_1P_GraphSm_Left_Wid,
+                                Const.BGA_1P_GraphSm_Left_Hei
+                            );
+                            layerRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Left_PosX,
+                                Const.BGA_1P_GraphSm_Left_PosY, -1
+                            );
+                            bgaVideoRect.sizeDelta = new Vector2(
+                                Const.BGA_1P_GraphSm_Left_Wid,
+                                Const.BGA_1P_GraphSm_Left_Hei
+                            );
+                            bgaVideoRect.localPosition = new Vector2(
+                                Const.BGA_1P_GraphSm_Left_PosX,
+                                Const.BGA_1P_GraphSm_Left_PosY
+                            );
+                            bgaFollowingObj.localPosition = new Vector2(
+                                Const.BGA_1P_GraphSm_Left_PosX,
+                                bgaFollowingObj.localPosition.y
+                            );
                         }
                         else
                         {
@@ -971,6 +994,26 @@ namespace BMSPlayer
                             bgaRect.localPosition = new Vector2(
                                 Const.BGA_2P_GraphSm_Right_PosX,
                                 Const.BGA_2P_GraphSm_Right_PosY
+                            );
+                            layerRect.sizeDelta = new Vector2(
+                                Const.BGA_2P_GraphSm_Right_Wid,
+                                Const.BGA_2P_GraphSm_Right_Hei
+                            );
+                            layerRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Right_PosX,
+                                Const.BGA_2P_GraphSm_Right_PosY, -1
+                            );
+                            bgaVideoRect.sizeDelta = new Vector2(
+                                Const.BGA_2P_GraphSm_Right_Wid,
+                                Const.BGA_2P_GraphSm_Right_Hei
+                            );
+                            bgaVideoRect.localPosition = new Vector2(
+                                Const.BGA_2P_GraphSm_Right_PosX,
+                                Const.BGA_2P_GraphSm_Right_PosY
+                            );
+                            bgaFollowingObj.localPosition = new Vector2(
+                                Const.BGA_2P_GraphSm_Right_PosX,
+                                bgaFollowingObj.localPosition.y
                             );
                         }
                     }
@@ -987,6 +1030,26 @@ namespace BMSPlayer
                                 Const.BGA_1P_GraphSm_Right_PosX,
                                 Const.BGA_1P_GraphSm_Right_PosY
                             );
+                            layerRect.sizeDelta = new Vector2(
+                                Const.BGA_1P_GraphSm_Right_Wid,
+                                Const.BGA_1P_GraphSm_Right_Hei
+                            );
+                            layerRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Right_PosX,
+                                Const.BGA_1P_GraphSm_Right_PosY, -1
+                            );
+                            bgaVideoRect.sizeDelta = new Vector2(
+                                Const.BGA_1P_GraphSm_Right_Wid,
+                                Const.BGA_1P_GraphSm_Right_Hei
+                            );
+                            bgaVideoRect.localPosition = new Vector2(
+                                Const.BGA_1P_GraphSm_Right_PosX,
+                                Const.BGA_1P_GraphSm_Right_PosY
+                            );
+                            bgaFollowingObj.localPosition = new Vector2(
+                                Const.BGA_1P_GraphSm_Right_PosX,
+                                bgaFollowingObj.localPosition.y
+                            );
                         }
                         else
                         {
@@ -998,6 +1061,26 @@ namespace BMSPlayer
                             bgaRect.localPosition = new Vector2(
                                 Const.BGA_2P_GraphSm_Left_PosX,
                                 Const.BGA_2P_GraphSm_Left_PosY
+                            );
+                            layerRect.sizeDelta = new Vector2(
+                                Const.BGA_2P_GraphSm_Left_Wid,
+                                Const.BGA_2P_GraphSm_Left_Hei
+                            );
+                            layerRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Left_PosX,
+                                Const.BGA_2P_GraphSm_Left_PosY, -1
+                            );
+                            bgaVideoRect.sizeDelta = new Vector2(
+                                Const.BGA_2P_GraphSm_Left_Wid,
+                                Const.BGA_2P_GraphSm_Left_Hei
+                            );
+                            bgaVideoRect.localPosition = new Vector2(
+                                Const.BGA_2P_GraphSm_Left_PosX,
+                                Const.BGA_2P_GraphSm_Left_PosY
+                            );
+                            bgaFollowingObj.localPosition = new Vector2(
+                                Const.BGA_2P_GraphSm_Left_PosX,
+                                bgaFollowingObj.localPosition.y
                             );
                         }
                     }
@@ -1015,6 +1098,26 @@ namespace BMSPlayer
                             Const.BGA_1P_GraphMini_PosX,
                             Const.BGA_1P_GraphMini_PosY
                         );
+                        layerRect.sizeDelta = new Vector2(
+                            Const.BGA_1P_GraphMini_Wid,
+                            Const.BGA_1P_GraphMini_Hei
+                        );
+                        layerRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphMini_PosX,
+                            Const.BGA_1P_GraphMini_PosY, -1
+                        );
+                        bgaVideoRect.sizeDelta = new Vector2(
+                            Const.BGA_1P_GraphMini_Wid,
+                            Const.BGA_1P_GraphMini_Hei
+                        );
+                        bgaVideoRect.localPosition = new Vector2(
+                            Const.BGA_1P_GraphMini_PosX,
+                            Const.BGA_1P_GraphMini_PosY
+                        );
+                        bgaFollowingObj.localPosition = new Vector2(
+                            Const.BGA_1P_GraphMini_PosX,
+                            bgaFollowingObj.localPosition.y
+                        );
                     }
                     else
                     {
@@ -1026,6 +1129,26 @@ namespace BMSPlayer
                         bgaRect.localPosition = new Vector2(
                             Const.BGA_2P_GraphMini_PosX,
                             Const.BGA_2P_GraphMini_PosY
+                        );
+                        layerRect.sizeDelta = new Vector2(
+                            Const.BGA_2P_GraphMini_Wid,
+                            Const.BGA_2P_GraphMini_Hei
+                        );
+                        layerRect.localPosition = new Vector3(
+                            Const.BGA_2P_GraphMini_PosX,
+                            Const.BGA_2P_GraphMini_PosY, -1
+                        );
+                        bgaVideoRect.sizeDelta = new Vector2(
+                            Const.BGA_2P_GraphMini_Wid,
+                            Const.BGA_2P_GraphMini_Hei
+                        );
+                        bgaVideoRect.localPosition = new Vector2(
+                            Const.BGA_2P_GraphMini_PosX,
+                            Const.BGA_2P_GraphMini_PosY
+                        );
+                        bgaFollowingObj.localPosition = new Vector2(
+                            Const.BGA_2P_GraphMini_PosX,
+                            bgaFollowingObj.localPosition.y
                         );
                     }
                     break;
@@ -1041,6 +1164,26 @@ namespace BMSPlayer
                             Const.BGA_1P_GraphOff_PosX,
                             Const.BGA_1P_GraphOff_PosY
                         );
+                        layerRect.sizeDelta = new Vector2(
+                            Const.BGA_1P_GraphOff_Wid,
+                            Const.BGA_1P_GraphOff_Hei
+                        );
+                        layerRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphOff_PosX,
+                            Const.BGA_1P_GraphOff_PosY, -1
+                        );
+                        bgaVideoRect.sizeDelta = new Vector2(
+                            Const.BGA_1P_GraphOff_Wid,
+                            Const.BGA_1P_GraphOff_Hei
+                        );
+                        bgaVideoRect.localPosition = new Vector2(
+                            Const.BGA_1P_GraphOff_PosX,
+                            Const.BGA_1P_GraphOff_PosY
+                        );
+                        bgaFollowingObj.localPosition = new Vector2(
+                            Const.BGA_1P_GraphOff_PosX,
+                            bgaFollowingObj.localPosition.y
+                        );
                     }
                     else
                     {
@@ -1053,13 +1196,33 @@ namespace BMSPlayer
                             Const.BGA_2P_GraphOff_PosX,
                             Const.BGA_2P_GraphOff_PosY
                         );
+                        layerRect.sizeDelta = new Vector2(
+                            Const.BGA_2P_GraphOff_Wid,
+                            Const.BGA_2P_GraphOff_Hei
+                        );
+                        layerRect.localPosition = new Vector3(
+                            Const.BGA_2P_GraphOff_PosX,
+                            Const.BGA_2P_GraphOff_PosY, -1
+                        );
+                        bgaVideoRect.sizeDelta = new Vector2(
+                            Const.BGA_2P_GraphOff_Wid,
+                            Const.BGA_2P_GraphOff_Hei
+                        );
+                        bgaVideoRect.localPosition = new Vector2(
+                            Const.BGA_2P_GraphOff_PosX,
+                            Const.BGA_2P_GraphOff_PosY
+                        );
+                        bgaFollowingObj.localPosition = new Vector2(
+                            Const.BGA_2P_GraphOff_PosX,
+                            bgaFollowingObj.localPosition.y
+                        );
                     }
                     break;
                 case GraphType.NORMAL:
                 case GraphType.OFFGEAR:
                 default:
                     // Type A일때는 가운데임
-                    if(!isTypeA)
+                    if (!isTypeA)
                     {
                         if (PlaySide == 0)
                         {
@@ -1072,6 +1235,28 @@ namespace BMSPlayer
                                 Const.BGA_1P_GraphBig_Right_PosX,
                                 Const.BGA_1P_GraphBig_Right_PosY
                             );
+                            layerRect.sizeDelta = new Vector2(
+                                Const.BGA_1P_GraphBig_Right_Wid,
+                                Const.BGA_1P_GraphBig_Right_Hei
+                            );
+                            layerRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphBig_Right_PosX,
+                                Const.BGA_1P_GraphBig_Right_PosY, -1
+                            );
+                            bgaVideoRect.sizeDelta = new Vector2(
+                                Const.BGA_1P_GraphBig_Right_Wid,
+                                Const.BGA_1P_GraphBig_Right_Hei
+                            );
+                            bgaVideoRect.localPosition = new Vector2(
+                                Const.BGA_1P_GraphBig_Right_PosX,
+                                Const.BGA_1P_GraphBig_Right_PosY
+                            );
+                            bgaFollowingObj.localPosition = new Vector2(
+                                Const.BGA_1P_GraphBig_Right_PosX,
+                                bgaFollowingObj.localPosition.y
+                            );
+
+                            FrameMoveRight();
                         }
                         else
                         {
@@ -1084,11 +1269,139 @@ namespace BMSPlayer
                                 Const.BGA_2P_GraphBig_Left_PosX,
                                 Const.BGA_2P_GraphBig_Left_PosY
                             );
+                            layerRect.sizeDelta = new Vector2(
+                                Const.BGA_2P_GraphBig_Left_Wid,
+                                Const.BGA_2P_GraphBig_Left_Hei
+                            );
+                            layerRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphBig_Left_PosX,
+                                Const.BGA_2P_GraphBig_Left_PosY, -1
+                            );
+                            bgaVideoRect.sizeDelta = new Vector2(
+                                Const.BGA_2P_GraphBig_Left_Wid,
+                                Const.BGA_2P_GraphBig_Left_Hei
+                            );
+                            bgaVideoRect.localPosition = new Vector2(
+                                Const.BGA_2P_GraphBig_Left_PosX,
+                                Const.BGA_2P_GraphBig_Left_PosY
+                            );
+                            bgaFollowingObj.localPosition = new Vector2(
+                                Const.BGA_2P_GraphBig_Left_PosX,
+                                bgaFollowingObj.localPosition.y
+                            );
+
+                            FrameMoveLeft();
                         }
                     }
                     break;
             }
         }
+
+        public void InvertObjectX(GameObject obj)
+        {
+            obj.transform.localPosition = new Vector3(
+                obj.transform.localPosition.x * -1,
+                obj.transform.localPosition.y,
+                obj.transform.localPosition.z
+            );
+        }
+
+        public void FrameMoveLeft()
+        {
+            Upper.transform.localPosition = new Vector2(
+                Upper.transform.localPosition.x - 503,
+                Upper.transform.localPosition.y
+            );
+            Lower.transform.localPosition = new Vector2(
+                Lower.transform.localPosition.x - 503,
+                Lower.transform.localPosition.y
+            );
+            Score.transform.localPosition = new Vector2(
+                Score.transform.localPosition.x - 503,
+                Score.transform.localPosition.y
+            );
+            Combo.transform.localPosition = new Vector2(
+                Combo.transform.localPosition.x - 503,
+                Combo.transform.localPosition.y
+            );
+            BPMcur.transform.localPosition = new Vector2(
+                BPMcur.transform.localPosition.x - 503,
+                BPMcur.transform.localPosition.y
+            );
+            BPMmin.transform.localPosition = new Vector2(
+                BPMmin.transform.localPosition.x - 503,
+                BPMmin.transform.localPosition.y
+            );
+            BPMmax.transform.localPosition = new Vector2(
+                BPMmax.transform.localPosition.x - 503,
+                BPMmax.transform.localPosition.y
+            );
+            UpperTitle.transform.localPosition = new Vector2(
+                UpperTitle.transform.localPosition.x - 503,
+                UpperTitle.transform.localPosition.y
+            );
+            txtCurrentTime.transform.localPosition = new Vector2(
+                txtCurrentTime.transform.localPosition.x - 503,
+                txtCurrentTime.transform.localPosition.y
+            );
+            txtTotalTime.transform.localPosition = new Vector2(
+                txtTotalTime.transform.localPosition.x - 503,
+                txtTotalTime.transform.localPosition.y
+            );
+            FPSCounter.transform.localPosition = new Vector2(
+                FPSCounter.transform.localPosition.x - 503,
+                FPSCounter.transform.localPosition.y
+            );
+        }
+
+        public void FrameMoveRight()
+        {
+            Upper.transform.localPosition = new Vector2(
+                Upper.transform.localPosition.x + 503,
+                Upper.transform.localPosition.y
+            );
+            Lower.transform.localPosition = new Vector2(
+                Lower.transform.localPosition.x + 503,
+                Lower.transform.localPosition.y
+            );
+            Score.transform.localPosition = new Vector2(
+                Score.transform.localPosition.x + 503,
+                Score.transform.localPosition.y
+            );
+            Combo.transform.localPosition = new Vector2(
+                Combo.transform.localPosition.x + 503,
+                Combo.transform.localPosition.y
+            );
+            BPMcur.transform.localPosition = new Vector2(
+                BPMcur.transform.localPosition.x + 503,
+                BPMcur.transform.localPosition.y
+            );
+            BPMmin.transform.localPosition = new Vector2(
+                BPMmin.transform.localPosition.x + 503,
+                BPMmin.transform.localPosition.y
+            );
+            BPMmax.transform.localPosition = new Vector2(
+                BPMmax.transform.localPosition.x + 503,
+                BPMmax.transform.localPosition.y
+            );
+            UpperTitle.transform.localPosition = new Vector2(
+                UpperTitle.transform.localPosition.x + 503,
+                UpperTitle.transform.localPosition.y
+            );
+            txtCurrentTime.transform.localPosition = new Vector2(
+                txtCurrentTime.transform.localPosition.x + 503,
+                txtCurrentTime.transform.localPosition.y
+            );
+            txtTotalTime.transform.localPosition = new Vector2(
+                txtTotalTime.transform.localPosition.x + 503,
+                txtTotalTime.transform.localPosition.y
+            );
+            FPSCounter.transform.localPosition = new Vector2(
+                FPSCounter.transform.localPosition.x + 503,
+                FPSCounter.transform.localPosition.y
+            );
+        }
+        #endregion
 
         #region Play Area Cover
         public void CoverSuddenDown()

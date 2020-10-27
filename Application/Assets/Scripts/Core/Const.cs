@@ -107,19 +107,6 @@ namespace BMSPlayer
         "If you change path or encoding, it will load all BMS files from scratch\nwhich takes lots of time"
         };
 
-        public static string[] browserDesc = new string[3]
-        {
-            "파일 브라우저 사용법\n" +
-            "1) 상단의 ↑ 버튼과 탐색창을 사용해 폴더 이동\n" +
-            "2) 오른쪽 아래의 SELECT 버튼으로 적용",
-            "ファイルブラウザの利用について\n" +
-            "1) 上段の↑ボタンと探索画面を利用してフォルダーへ移動\n" +
-            "2) 右下のSELECTボタンで確認",
-            "How to use file browser\n" +
-            "1) Move to BMS folder with ↑ button and click on browser\n" +
-            "2) Click the button on bottom-right 'SELECT' to apply"
-        };
-
         public static string[] videoCodecMsg = new string[3]
         {
             "Microsoft Store에서 MPEG-2 Video Extension을 설치해주세요",
@@ -144,7 +131,7 @@ namespace BMSPlayer
         public static string[] RandomDescMR = new string[3]
         {
             "라인 순서 반대",
-            "ラインが逆番",
+            "ラインが逆順",
             "Line Reversed"
         };
 
@@ -186,8 +173,15 @@ namespace BMSPlayer
         public static string[] CustomRandomDesc = new string[3]
         {
             "마우스로 각 칸을 선택하여 숫자를 입력하세요",
-            "マウスで各ボタンの数字を入力してください",
+            "マウスで各ボタンをクリックしてから数字を入力してください",
             "Click on each input field to fill the numbers"
+        };
+
+        public static string[] keySettingDesc = new string[3]
+        {
+            "버그로 인하여 마우스를 이용할 수 없습니다",
+            "バグがありますのでキーボードを利用してください",
+            "Due to bug, you can not use "
         };
 
         public static string[,] LayoutDesc = new string[2, 3]
@@ -201,7 +195,22 @@ namespace BMSPlayer
                 "기어-그래프-BGA (2P 반대)",
                 "ギアー・グラフ・BGA(２Pは逆)",
                 "Gear-Graph-BGA (Opposite on 2P)"
+            }
+        };
+
+        public static string[,] FSDiffDisplayDesc = new string[3, 3]
+        {
+            { "", "", "" },
+            {
+                "콤보 위",
+                "コンボ上",
+                "With combo"
             },
+            {
+                "사이드",
+                "サイド",
+                "Gear side"
+            }
         };
         #endregion
 
@@ -421,18 +430,6 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("gaugeType", (int)value);
-            }
-        }
-
-        public static JudgeUIType JudgeUIType
-        {
-            get
-            {
-                return (JudgeUIType)PlayerPrefs.GetInt("judgeUIType", 0);
-            }
-            set
-            {
-                PlayerPrefs.SetInt("judgeUIType", (int)value);
             }
         }
 
@@ -809,6 +806,42 @@ namespace BMSPlayer
                 PlayerPrefs.SetInt("playerside", value);
             }
         }
+
+        public static DisplayPosType FastSlow
+        {
+            get
+            {
+                return (DisplayPosType)PlayerPrefs.GetInt("fastslow", (int)DisplayPosType.OFF);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("fastslow", (int)value);
+            }
+        }
+
+        public static DisplayPosType TargetDiff
+        {
+            get
+            {
+                return (DisplayPosType)PlayerPrefs.GetInt("targetdiff", (int)DisplayPosType.OFF);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("targetdiff", (int)value);
+            }
+        }
+
+        public static DisplayPosType RateDiff
+        {
+            get
+            {
+                return (DisplayPosType)PlayerPrefs.GetInt("ratediff", (int)DisplayPosType.OFF);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("ratediff", (int)value);
+            }
+        }
         #endregion
 
         // Position, Width, Height
@@ -849,12 +882,12 @@ namespace BMSPlayer
         public static int BGA_2P_GraphBig_Left_Wid = 910;
         public static int BGA_2P_GraphBig_Left_Hei = 683;
 
-        public static int BGA_2P_GraphSm_Left_PosX = -590;
+        public static int BGA_2P_GraphSm_Left_PosX = -949;
         public static int BGA_2P_GraphSm_Left_PosY = -344;
         public static int BGA_2P_GraphSm_Left_Wid = 1035;
         public static int BGA_2P_GraphSm_Left_Hei = 777;
 
-        public static int BGA_2P_GraphSm_Right_PosX = -949;
+        public static int BGA_2P_GraphSm_Right_PosX = -590;
         public static int BGA_2P_GraphSm_Right_PosY = -344;
         public static int BGA_2P_GraphSm_Right_Wid = 1035;
         public static int BGA_2P_GraphSm_Right_Hei = 777;

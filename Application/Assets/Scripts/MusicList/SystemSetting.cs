@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GracesGames.SimpleFileBrowser.Scripts;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine.UI;
@@ -9,6 +8,7 @@ using System;
 using UnityEngine.EventSystems;
 using BMSCore;
 using TMPro;
+using SimpleFileBrowser;
 
 namespace BMSPlayer
 {
@@ -21,8 +21,6 @@ namespace BMSPlayer
 
         public Text txtPathTitle;
         public Text txtPathVar;
-        public GameObject objBrowser;
-        public GameObject browserBg;
         public Text txtBrowserDesc;
         public string[] extensions;
         public Button btnChange;
@@ -60,7 +58,6 @@ namespace BMSPlayer
         public Button btn932;
         public Button btn949;
         public Text curEncoding;
-        public Text encodingWarn;
 
         // Key Change
         public GameObject layerKeySetting;
@@ -77,11 +74,91 @@ namespace BMSPlayer
 
             mlm = new MusicListManager();
             musicList = new List<MusicListData>();
-            
+
             rows = 8;
             btn = new int[] { 2, 4, 3, 3, 3, 2, 1, 1 };
 
             EncolorBtn(0, 0);
+
+            // 각 버튼 onclick 설정
+            btnChange.onClick.AddListener(delegate
+            {
+                changePath();
+            });
+            btnRefresh.onClick.AddListener(pathRefresh);
+            btn1080p.onClick.AddListener(delegate
+            {
+                Const.ScrWidth = 1920;
+                Const.ScrHeight = 1080;
+                changeVideoSetting();
+            });
+            btn900p.onClick.AddListener(delegate
+            {
+                Const.ScrWidth = 1600;
+                Const.ScrHeight = 900;
+                changeVideoSetting();
+            });
+            btn768p.onClick.AddListener(delegate
+            {
+                Const.ScrWidth = 1366;
+                Const.ScrHeight = 768;
+                changeVideoSetting();
+            });
+            btn720p.onClick.AddListener(delegate
+            {
+                Const.ScrWidth = 1280;
+                Const.ScrHeight = 720;
+                changeVideoSetting();
+            });
+            btnWindowed.onClick.AddListener(delegate
+            {
+                Const.ScreenMode = FullScreenMode.Windowed;
+                changeVideoSetting();
+            });
+            btnFullScr.onClick.AddListener(delegate
+            {
+                Const.ScreenMode = FullScreenMode.ExclusiveFullScreen;
+                changeVideoSetting();
+            });
+            btnBorderless.onClick.AddListener(delegate
+            {
+                Const.ScreenMode = FullScreenMode.MaximizedWindow;
+                changeVideoSetting();
+            });
+            btnKor.onClick.AddListener(delegate
+            {
+                changeLang(LanguageType.KO);
+            });
+            btnJpn.onClick.AddListener(delegate
+            {
+                changeLang(LanguageType.JA);
+            });
+            btnEng.onClick.AddListener(delegate
+            {
+                changeLang(LanguageType.EN);
+            });
+            btnAutoSync.onClick.AddListener(SetAutoSync);
+            btnSyncDown.onClick.AddListener(delegate
+            {
+                changeSync(false);
+            });
+            btnSyncUp.onClick.AddListener(delegate
+            {
+                changeSync(true);
+            });
+            btn932.onClick.AddListener(delegate
+            {
+                changeEncoding(932);
+            });
+            btn949.onClick.AddListener(delegate
+            {
+                changeEncoding(949);
+            });
+            btnKeySetting.onClick.AddListener(ShowKeySetting);
+            btnResetAll.onClick.AddListener(delegate
+            {
+                PlayerPrefs.DeleteAll();
+            });
         }
 
         public override void Start()
@@ -112,8 +189,22 @@ namespace BMSPlayer
                     curEncoding.text = "KR-Based";
                     break;
             }
-
             showSync();
+
+            switch(Const.ScreenMode)
+            {
+                case FullScreenMode.Windowed:
+                    txtScrMode.text = "Windowed";
+                    break;
+                case FullScreenMode.ExclusiveFullScreen:
+                    txtScrMode.text = "Full Screen";
+                    break;
+                case FullScreenMode.MaximizedWindow:
+                    txtScrMode.text = "Borderless";
+                    break;
+            }
+
+            txtResol.text = Const.ScrWidth.ToString() + "x" + Const.ScrHeight.ToString();
         }
 
         public override void Update()
@@ -277,17 +368,15 @@ namespace BMSPlayer
 
         public void changePath()
         {
-            browserBg.SetActive(true);
-            txtBrowserDesc.text = Const.browserDesc[(int)Const.Language];
-            /* https://github.com/GracesGames/SimpleFileBrowser */
-            GameObject browser = Instantiate(objBrowser, browserBg.transform);
-            browser.name = "BrowserPathSelector";
-
-            FileBrowser browserScr = browser.GetComponent<FileBrowser>();
-            browserScr.SetupFileBrowser(ViewMode.Landscape);
-            browserScr.OpenFilePanel(extensions);
-            browserScr.OnFileSelect += pathCallback;
-            browserScr.OnFileBrowserClose += pathCancelCallback;
+            FileBrowser.ShowLoadDialog(
+                (path) => pathCallback(path),
+                null,
+                true,
+                false,
+                Const.BMSFolderPath,
+                "Select BMS Folder",
+                "Select"
+            );
         }
 
         public void pathRefresh()
@@ -296,21 +385,15 @@ namespace BMSPlayer
             StartCoroutine("refresh");
         }
 
-        public void pathCallback(string path)
+        public void pathCallback(string[] path)
         {
-            Const.BMSFolderPath = path;
-            browserBg.SetActive(false);
+            Const.BMSFolderPath = path[0];
             BinaryFormatter formatter = new BinaryFormatter();
-            string directory = Directory.GetDirectoryRoot(path);
-            txtPathVar.text = path;
+            string directory = Directory.GetDirectoryRoot(path[0]);
+            txtPathVar.text = path[0];
 
             layerLoading.SetActive(true);
             StartCoroutine("refresh");
-        }
-
-        public void pathCancelCallback()
-        {
-            browserBg.SetActive(false);
         }
 
         IEnumerator refresh()

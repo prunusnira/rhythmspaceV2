@@ -45,6 +45,11 @@ namespace BMSPlayer
 
         public Camera uiCam;
 
+        // Search
+        public InputField inputSearch;
+        public Button btnSearchSubmit;
+        private bool searchMode;
+
         // Selected info
         public RawImage infoJacket;
         public TextMeshProUGUI infoGerne;
@@ -102,6 +107,10 @@ namespace BMSPlayer
             {
                 musicRect.AddItemBottom(ObjectSetup);
             }
+
+            // Search
+            btnSearchSubmit.onClick.AddListener(SearchResult);
+            searchMode = false;
         }
 
         public void Start()
@@ -202,6 +211,16 @@ namespace BMSPlayer
 
                 if(Input.GetKeyDown(KeyCode.Backspace))
                 {
+                    if(searchMode)
+                    {
+                        // 본래대로 돌아감
+                        searchMode = false;
+                        musicRect.Clear();
+                        musicRect.ResetIndex();
+                        SelectListGenerator();
+                        musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+                        showInfo(musicRect.GetCurrent());
+                    }
                     if(Const.ListDepth.Count > 0)
                     {
                         Const.ListDepth.RemoveAt(Const.ListDepth.Count - 1);
@@ -221,13 +240,65 @@ namespace BMSPlayer
                 // 목록을 리셋하고 새로 리프레시
                 musicRect.Clear();
                 bmslist.Clear();
-                
+
+                mlm = new MusicListManager();
+
                 ListTreeGenerator();
                 SelectListGenerator();
                 musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
 
                 showInfo(musicRect.GetCurrent());
             }
+        }
+
+        public void SearchResult()
+        {
+            if (inputSearch.text != "")
+            {
+                string text = inputSearch.text;
+                List<MusicListData> searchResult = mlm.FindBMSWithName(text);
+                if (searchResult.Count > 0)
+                {
+                    musicRect.Clear();
+                    bmslist.Clear();
+                    foreach (MusicListData d in searchResult)
+                    {
+                        ListItemNode bmsNode = new ListItemNode
+                        {
+                            Display = d.Title,
+                            Info = d,
+                            Type = ItemType.BMS,
+                            Path = d.Path
+                        };
+                        bmslist.Add(bmsNode);
+                    }
+                    musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+                    showInfo(musicRect.GetCurrent());
+                    searchMode = true;
+                }
+                else
+                {
+                    // 검색 결과가 없음을 알림
+                    inputSearch.text = "";
+                    inputSearch.placeholder.GetComponent<Text>().text
+                        = "NO SEARCH RESULT";
+                }
+            }
+            else
+            {
+                inputSearch.placeholder.GetComponent<Text>().text
+                    = "INPUT KEYWORD HERE";
+            }
+        }
+
+        private void OnSearchActivated()
+        {
+            isTop = false;
+        }
+
+        private void OnSearchDeactivated()
+        {
+            isTop = true;
         }
 
         public void showInfo(ListItemNode node)
@@ -440,6 +511,7 @@ namespace BMSPlayer
                 }
 
                 // 기록을 가져옴
+                rdm = new RecordDataManager();
                 switch((ClearType)rdm.GetClearStat(d.MD5Hash))
                 {
                     case ClearType.ASSISTCLEAR:
@@ -559,11 +631,13 @@ namespace BMSPlayer
                     for (int j = 0; j < list.Count; j++)
                     {
                         MusicListData d = list[j];
-                        ListItemNode bmsNode = new ListItemNode();
-                        bmsNode.Display = d.Title;
-                        bmsNode.Info = d;
-                        bmsNode.Type = ItemType.BMS;
-                        bmsNode.Path = d.Path;
+                        ListItemNode bmsNode = new ListItemNode
+                        {
+                            Display = d.Title,
+                            Info = d,
+                            Type = ItemType.BMS,
+                            Path = d.Path
+                        };
                         bmslist.Add(bmsNode);
                     }
                 }

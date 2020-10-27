@@ -8,7 +8,7 @@ namespace BMSCore
 {
     public class Tools
     {
-        public static Sprite createSpriteFromFile(string FilePath, float PixelsPerUnit = 100.0f)
+        public static Sprite createSpriteFromFile(string FilePath, float PixelsPerUnit = 0.1f)
         {
 
             // Load a PNG or JPG image from disk to a Texture2D, assign this texture to a new sprite and return its reference

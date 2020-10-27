@@ -41,7 +41,6 @@ namespace BMSPlayer {
         private double PlayTimePassed = 0;
         private double DeltaTempSum = 0; // 그래프 기록용
 
-        public double BarLengthPrevbar = 0;
         private int pauseSel = 0;
 
         // Audio Management
@@ -82,7 +81,7 @@ namespace BMSPlayer {
             soundController.Initialize();
             soundController.InitSoundChannels();
 
-            if (Const.Auto == AutoPlayType.ON)
+            if (Const.Auto == AutoPlayType.ALL)
                 isPlayAuto = true;
             else
                 isPlayAuto = false;
@@ -120,7 +119,6 @@ namespace BMSPlayer {
         {
             try
             {
-
                 // 데이터 로딩
                 if (!isLoading)
                 {
@@ -164,7 +162,11 @@ namespace BMSPlayer {
                     scroller.MoveMine(Data, PlayTimePassed, bps);
                     scroller.MoveSplitLine(Data, PlayTimePassed, bps);
 
-                    scroller.PlayBGA(Data.NoteBGA, Data.BMS, PlayTimePassed);
+                    if(Const.BGAOnOff == 1)
+                    {
+                        scroller.PlayBGA(Data.NoteBGA, Data.BMS, PlayTimePassed);
+                        scroller.PlayLayer(Data.NoteLayer, Data.BMS, PlayTimePassed);
+                    }
                     scroller.PlayBGM(Data.NoteBGM, Data.BMS, PlayTimePassed);
                     scroller.PlayBPM(Data, PlayTimePassed, ref bpm, ref bps);
                     scroller.PlayStop(Data, PlayTimePassed, bps);
@@ -174,13 +176,12 @@ namespace BMSPlayer {
                     if (isPlayAuto)
                     {
                         scroller.AutoPlay(Data.NotePlay, Data.NoteLong, Data.BMS,
-                            PlayTimePassed, ref bps, Data.TotalNotes);
+                            PlayTimePassed, ref bps);
                     }
                     else
                     {
                         scroller.Play(Data.NotePlay, Data.NoteLong, Data.BMS,
-                            PlayTimePassed,
-                            ref bpm, ref bps, Data.TotalNotes);
+                            PlayTimePassed, ref bpm, ref bps);
                     }
 
                     Data.CurrentBPM = bpm;
@@ -188,7 +189,7 @@ namespace BMSPlayer {
 
                     // 게임 종료 시 처리
                     // Type 1: 게이지가 0이 되었을 때
-                    if (hpController.IsHpMin())
+                    if (!isGameOver && hpController.IsHpMin())
                     {
                         if (GameOverCheck())
                         {
@@ -197,7 +198,7 @@ namespace BMSPlayer {
                         }
                     }
                     // Type 2: 노트가 다 사용되었을 때
-                    if (scroller.GetProcessedNotes() >= Data.TotalNotes)
+                    if (!isGameOver && scroller.GetProcessedNotes() >= Data.TotalNotes)
                     {
                         // 게이지 타입과 퍼센트에 따라 클리어 유무 결정
                         switch (Const.GaugeType)
@@ -385,7 +386,7 @@ namespace BMSPlayer {
             isLoading = true;
             yield return null;
 
-            analyzer.FullAnalyzer(Data.BMS);
+            yield return StartCoroutine(analyzer.FullAnalyzer(Data.BMS));
             yield return null;
 
             // LNOBJ 타입이면 추가로 이식하는 작업을 수행함
@@ -406,7 +407,7 @@ namespace BMSPlayer {
             yield return null;
 
             // 곡 정보 출력
-            UI.SetMusicInfo(Data.BMS.Title);
+            UI.SetMusicInfo(Data.BMS);
             yield return null;
 
             // 기어 BPM 표시
@@ -421,10 +422,16 @@ namespace BMSPlayer {
             {
                 isBGAMovieExist = true;
                 UI.BGAVideoActivate();
+                UI.BGAVideoPreload(Data.BMS.BGAVideoFile);
             }
             else
             {
                 UI.BGAImageActivate();
+            }
+
+            if(Data.BMS.LayerNote.Count > 0)
+            {
+                UI.LayerImageActivate();
             }
             yield return null;
 
@@ -442,7 +449,10 @@ namespace BMSPlayer {
             yield return null;
 
             UI.UpdateSpeed();
-            Graph.SetInitialGraph(Data.TotalNotes);
+
+            if(Const.GraphType != GraphType.OFFBGA
+                && Const.GraphType != GraphType.OFFGEAR)
+                Graph.SetInitialGraph(Data.TotalNotes);
             yield return null;
 
             scroller.Init(Data.TotalNotes, Data.BMS.Rank);

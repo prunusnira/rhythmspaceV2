@@ -126,6 +126,9 @@ namespace BMSCore
         // <BAR#, Channel 04>
         public Dictionary<int, string> BGANote = new Dictionary<int, string>();
 
+        // <BAR#, Channel 07>
+        public Dictionary<int, string> LayerNote = new Dictionary<int, string>();
+
         // <STOP##, Time> - 192 노트를 1박 기준으로 보고 멈추는 시간을 설정
         public Dictionary<string, int> StopList = new Dictionary<string, int>();
 
@@ -134,6 +137,9 @@ namespace BMSCore
 
         // 호환성을 위해 임시로 남겨둠
         public Dictionary<string, AudioClip> WavFilesAC = new Dictionary<string, AudioClip>();
+
+        // 랜덤 처리를 위해 데이터 보존
+        public List<string> Random = new List<string>();
 
         // Constructor
         public BMS(string path)

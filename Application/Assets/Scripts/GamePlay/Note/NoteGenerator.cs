@@ -10,7 +10,8 @@ namespace BMSPlayer
     {
         public GameObject noteWhite;
         public GameObject noteBlue;
-        public GameObject notePink;
+        public GameObject noteTurn;
+        public GameObject noteTurnAuto;
         public GameObject noteMine;
         public GameObject splitLine;
 
@@ -45,7 +46,10 @@ namespace BMSPlayer
                     noteObject.transform.localRotation = Quaternion.Euler(deg90);
                     break;
                 case 0:
-                    noteObject = Instantiate(notePink, pos, Quaternion.identity, parent);
+                    if(Const.Auto == AutoPlayType.TURNTABLE)
+                        noteObject = Instantiate(noteTurnAuto, pos, Quaternion.identity, parent);
+                    else
+                        noteObject = Instantiate(noteTurn, pos, Quaternion.identity, parent);
                     noteObject.transform.localPosition = pos;
                     noteObject.transform.localRotation = Quaternion.Euler(deg90);
                     break;
@@ -96,17 +100,35 @@ namespace BMSPlayer
 
         public float GetXPos(int line)
         {
-            switch(line)
+            if(Const.PlayerSide == 0)
             {
-                case 0: return -175f;
-                case 1: return -113.5f;
-                case 2: return -65.5f;
-                case 3: return -13.5f;
-                case 4: return 36.5f;
-                case 5: return 86.5f;
-                case 6: return 136.5f;
-                case 7: return 186.5f;
-                default: return -1000f;
+                switch (line)
+                {
+                    case 0: return -175f;
+                    case 1: return -113.5f;
+                    case 2: return -65.5f;
+                    case 3: return -13.5f;
+                    case 4: return 36.5f;
+                    case 5: return 86.5f;
+                    case 6: return 136.5f;
+                    case 7: return 186.5f;
+                    default: return -1000f;
+                }
+            }
+            else
+            {
+                switch (line)
+                {
+                    case 0: return 175f;
+                    case 1: return -186.5f;
+                    case 2: return -136.5f;
+                    case 3: return -86.5f;
+                    case 4: return -36.5f;
+                    case 5: return 13.5f;
+                    case 6: return 65.5f;
+                    case 7: return 113.5f;
+                    default: return -1000f;
+                }
             }
         }
 
@@ -158,6 +180,11 @@ namespace BMSPlayer
                 if (data.BMS.BGANote.ContainsKey(cbar))
                 {
                     NoteAdderBGA(data, cbar);
+                }
+
+                if (data.BMS.LayerNote.ContainsKey(cbar))
+                {
+                    NoteAdderLayer(data, cbar);
                 }
 
                 if (data.BMS.BarLength.ContainsKey(cbar))
@@ -725,6 +752,45 @@ namespace BMSPlayer
             }
         }
 
+        public void NoteAdderLayer(PlayData data, int cbar)
+        {
+            int size = data.BMS.LayerNote[cbar].Length / 2;
+
+            for (int n = 0; n < size; n++)
+            {
+                string noteStr = data.BMS.LayerNote[cbar].Substring(n * 2, 2);
+                if (noteStr != "00")
+                {
+                    double position = (double)n / size;
+
+                    if (data.BMS.BarLength.ContainsKey(cbar))
+                    {
+                        position *= data.BMS.BarLength[cbar];
+                    }
+
+                    double realpos = (data.TotalLength + position);
+
+                    LayerNote note = new LayerNote
+                    {
+                        Position = realpos,
+                        Bar = cbar,
+                        ObjType = ObjectType.LAYER
+                    };
+
+                    if (data.BMS.BGAImages.Count > 0)
+                    {
+                        if (data.BMS.BGAImages.ContainsKey(noteStr))
+                        {
+                            note.BGASprite = data.BMS.BGAImages[noteStr];
+                        }
+                    }
+
+                    data.NoteLayer.Add(note);
+                    data.NoteCount++;
+                }
+            }
+        }
+
         public void NoteAdderStop(PlayData data, int cbar)
         {
             int size = data.BMS.StopNote[cbar].Length / 2;
@@ -989,6 +1055,26 @@ namespace BMSPlayer
                             }
                         }
 
+                        foreach (LayerNote n in data.NoteLayer)
+                        {
+                            if (isStop && n.Position == stopPos)
+                            {
+                                CalculateTiming(n, bps, stopTime, PosStart);
+                            }
+                            else if (n.Bar == bar &&
+                                    n.Position >= PosStart &&
+                                    n.Position < PosEnd
+                                )
+                            {
+                                CalculateTiming(n, bps, prevTime, PosStart);
+                            }
+
+                            if (n.Timing > data.LastTiming)
+                            {
+                                data.LastTiming = n.Timing;
+                            }
+                        }
+
                         foreach (BGMNote n in data.NoteBGM)
                         {
                             if (isStop && n.Position == stopPos)
@@ -1133,7 +1219,20 @@ namespace BMSPlayer
                         }
                     }
 
-                    foreach(BGMNote n in data.NoteBGM)
+                    foreach (LayerNote n in data.NoteLayer)
+                    {
+                        if (n.Bar == bar)
+                        {
+                            CalculateTiming(n, bps, prevTime, PosStart);
+                        }
+
+                        if (n.Timing > data.LastTiming)
+                        {
+                            data.LastTiming = n.Timing;
+                        }
+                    }
+
+                    foreach (BGMNote n in data.NoteBGM)
                     {
                         if (n.Bar == bar)
                         {
@@ -1175,6 +1274,7 @@ namespace BMSPlayer
         public void SortAllNotes(PlayData data)
         {
             data.NoteBGA.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
+            data.NoteLayer.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
             data.NoteBGM.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
             data.NoteBPM.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));
             data.NoteStop.Sort((x1, x2) => x1.Position.CompareTo(x2.Position));

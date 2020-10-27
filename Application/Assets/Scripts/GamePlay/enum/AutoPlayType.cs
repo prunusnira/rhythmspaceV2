@@ -7,6 +7,7 @@ namespace BMSPlayer
     public enum AutoPlayType
     {
         OFF = 0,
-        ON = 1
+        TURNTABLE = 1,
+        ALL = 2
     }
 }

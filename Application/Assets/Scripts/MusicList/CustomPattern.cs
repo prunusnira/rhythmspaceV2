@@ -46,6 +46,15 @@ namespace BMSPlayer
             button5.text = "5";
             button6.text = "6";
             button7.text = "7";
+
+            btnOK.onClick.AddListener(delegate
+            {
+                ExecuteOption(0, 0);
+            });
+            btnCancel.onClick.AddListener(delegate
+            {
+                ExecuteOption(0, 1);
+            });
         }
 
         public override void Start()
@@ -161,6 +170,14 @@ namespace BMSPlayer
         {
             base.EnableWindow();
             desc.text = Const.CustomRandomDesc[(int)Const.Language];
+
+            button1.text = Const.Custom1.ToString();
+            button2.text = Const.Custom2.ToString();
+            button3.text = Const.Custom3.ToString();
+            button4.text = Const.Custom4.ToString();
+            button5.text = Const.Custom5.ToString();
+            button6.text = Const.Custom6.ToString();
+            button7.text = Const.Custom7.ToString();
         }
     }
 }

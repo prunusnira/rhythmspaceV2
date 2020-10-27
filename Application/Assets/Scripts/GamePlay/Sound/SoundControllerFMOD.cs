@@ -50,6 +50,7 @@ namespace BMSPlayer
                     false,
                     out channel
                 );
+                channel.setVolume(0.5f);
                 channel.setLoopCount(0);
                 channels.Add(channel);
             }

@@ -35,6 +35,7 @@ namespace BMSPlayer
         public List<BPMNote> NoteBPM { get; set; }
         public List<StopNote> NoteStop { get; set; }
         public List<BGANote> NoteBGA { get; set; }
+        public List<LayerNote> NoteLayer { get; set; }
         public List<BGMNote> NoteBGM { get; set; }
         public List<SplitLine> SplitLine { get; set; }
 
@@ -74,6 +75,7 @@ namespace BMSPlayer
             NoteLong = new List<LongNote>();
             NoteBGM = new List<BGMNote>();
             NoteBGA = new List<BGANote>();
+            NoteLayer = new List<LayerNote>();
             NoteBPM = new List<BPMNote>();
             NoteStop = new List<StopNote>();
             SplitLine = new List<SplitLine>();

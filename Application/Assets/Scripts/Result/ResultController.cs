@@ -256,15 +256,12 @@ namespace BMSPlayer
                 cleared.sprite = failed;
             }
 
-            if (vmiss == 0)
+            if (vcb == 0 && Const.Auto == AutoPlayType.OFF)
             {
-                if (vok == 0)
+                if (vgd == 0)
                 {
-                    if (vgd == 0)
-                    {
-                        fcpfmark.SetActive(true);
-                        fcpfmark.GetComponent<Image>().sprite = pfmark;
-                    }
+                    fcpfmark.SetActive(true);
+                    fcpfmark.GetComponent<Image>().sprite = pfmark;
                 }
                 else
                 {
@@ -346,6 +343,11 @@ namespace BMSPlayer
                     {
                         njtype = prev.GaugeType;
                         nclear = prev.Clear;
+                    }
+                    // Auto Turntable은 무조건 Assist
+                    if(Const.Auto == AutoPlayType.TURNTABLE)
+                    {
+                        nclear = ClearType.ASSISTCLEAR;
                     }
 
                     // 3. 콤보

@@ -61,20 +61,37 @@ namespace BMSPlayer
         // PlaySide
         public Text txtPlaySide;
 
+        // Fast/Slow
+        public Text txtFastSlow;
+        public Text txtFastSlowDesc;
+
+        // Target Difference
+        public Text txtTargetDiff;
+        public Text txtTargetDiffDesc;
+
+        // Rate diff
+        public Text txtRateDiff;
+        public Text txtRateDiffDesc;
+
         public void Awake()
         {
             // 현재 값 가져오기
 
             // 오토 설정
-            if(Const.Auto == AutoPlayType.OFF)
+            switch(Const.Auto)
             {
-                txtAuto.text = "OFF";
-                txtAuto.color = Color.white;
-            }
-            else
-            {
-                txtAuto.text = "ON";
-                txtAuto.color = Color.red;
+                case AutoPlayType.OFF:
+                    txtAuto.text = "OFF";
+                    txtAuto.color = Color.white;
+                    break;
+                case AutoPlayType.TURNTABLE:
+                    txtAuto.text = "TURNTABLE";
+                    txtAuto.color = Color.magenta;
+                    break;
+                case AutoPlayType.ALL:
+                    txtAuto.text = "ALL";
+                    txtAuto.color = Color.red;
+                    break;
             }
 
             // 판정 표시 설정
@@ -278,6 +295,54 @@ namespace BMSPlayer
                     txtPlaySide.text = "2P";
                     break;
             }
+
+            // 패슬
+            switch(Const.FastSlow)
+            {
+                case DisplayPosType.OFF:
+                    txtFastSlow.text = "OFF";
+                    break;
+                case DisplayPosType.TYPEA:
+                    txtFastSlow.text = "TYPE A";
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtFastSlow.text = "TYPE B";
+                    break;
+            }
+            txtFastSlowDesc.text =
+                Const.FSDiffDisplayDesc[(int)Const.FastSlow, (int)Const.Language];
+
+            // 타겟 비교
+            switch (Const.TargetDiff)
+            {
+                case DisplayPosType.OFF:
+                    txtTargetDiff.text = "OFF";
+                    break;
+                case DisplayPosType.TYPEA:
+                    txtTargetDiff.text = "TYPE A";
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtTargetDiff.text = "TYPE B";
+                    break;
+            }
+            txtTargetDiffDesc.text =
+                Const.FSDiffDisplayDesc[(int)Const.TargetDiff, (int)Const.Language];
+
+            // 정확도
+            switch (Const.RateDiff)
+            {
+                case DisplayPosType.OFF:
+                    txtRateDiff.text = "OFF";
+                    break;
+                case DisplayPosType.TYPEA:
+                    txtRateDiff.text = "TYPE A";
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtRateDiff.text = "TYPE B";
+                    break;
+            }
+            txtRateDiffDesc.text =
+                Const.FSDiffDisplayDesc[(int)Const.RateDiff, (int)Const.Language];
         }
 
         public void Start()
@@ -376,6 +441,18 @@ namespace BMSPlayer
                 {
                     PlaySideChange();
                 }
+                else if (Input.GetKeyDown(KeyCode.F6))
+                {
+                    FastSlowChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F7))
+                {
+                    TargetDiffChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F8))
+                {
+                    RateDiffChange();
+                }
             }
         }
 
@@ -399,8 +476,13 @@ namespace BMSPlayer
         {
             if(speed < 2000) speed++;
             Const.SpeedFixed = speed;
-            speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
-            Const.SpeedFluid = speedfl;
+
+            // 폴더일 때는 변경 없이 처리
+            if (Const.selectedOnList.Type == ItemType.BMS)
+            {
+                speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
+                Const.SpeedFluid = speedfl;
+            }
 
             txtSpeed.text = ((float)speed/100).ToString("0.00") + "x";
             txtSpdAnother.text = "FLUID " + speedfl.ToString();
@@ -410,8 +492,13 @@ namespace BMSPlayer
         {
             if (speed > 50) speed--;
             Const.SpeedFixed = speed;
-            speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
-            Const.SpeedFluid = speedfl;
+
+            // 폴더일 때는 변경 없이 처리
+            if (Const.selectedOnList.Type == ItemType.BMS)
+            {
+                speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
+                Const.SpeedFluid = speedfl;
+            }
 
             txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
             txtSpdAnother.text = "FLUID " + speedfl.ToString();
@@ -421,8 +508,13 @@ namespace BMSPlayer
         {
             if (speedfl < 2000) speedfl++;
             Const.SpeedFluid = speedfl;
-            speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
-            Const.SpeedFixed = speed;
+
+            // 폴더일 때는 변경 없이 처리
+            if (Const.selectedOnList.Type == ItemType.BMS)
+            {
+                speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
+                Const.SpeedFixed = speed;
+            }
 
             txtSpeed.text = speedfl.ToString();
             txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
@@ -432,8 +524,13 @@ namespace BMSPlayer
         {
             if (speedfl > 100) speedfl--;
             Const.SpeedFluid = speedfl;
-            speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
-            Const.SpeedFixed = speed;
+
+            // 폴더일 때는 변경 없이 처리
+            if (Const.selectedOnList.Type == ItemType.BMS)
+            {
+                speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
+                Const.SpeedFixed = speed;
+            }
 
             txtSpeed.text = speedfl.ToString();
             txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
@@ -457,17 +554,23 @@ namespace BMSPlayer
 
         private void AutoOnOff()
         {
-            if(Const.Auto == AutoPlayType.OFF)
+            switch (Const.Auto)
             {
-                Const.Auto = AutoPlayType.ON;
-                txtAuto.text = "ON";
-                txtAuto.color = Color.red;
-            }
-            else
-            {
-                Const.Auto = AutoPlayType.OFF;
-                txtAuto.text = "OFF";
-                txtAuto.color = Color.white;
+                case AutoPlayType.OFF:
+                    txtAuto.text = "TURNTABLE";
+                    txtAuto.color = Color.magenta;
+                    Const.Auto = AutoPlayType.TURNTABLE;
+                    break;
+                case AutoPlayType.TURNTABLE:
+                    txtAuto.text = "ALL";
+                    txtAuto.color = Color.red;
+                    Const.Auto = AutoPlayType.ALL;
+                    break;
+                case AutoPlayType.ALL:
+                    txtAuto.text = "OFF";
+                    txtAuto.color = Color.white;
+                    Const.Auto = AutoPlayType.OFF;
+                    break;
             }
         }
 
@@ -651,7 +754,7 @@ namespace BMSPlayer
                     break;
                 case GraphType.MINI:
                     Const.GraphType = GraphType.OFFGEAR;
-                    txtGraphType.text = "OFF(2P)";
+                    txtGraphType.text = "OFF(GEAR)";
                     break;
                 case GraphType.OFFGEAR:
                     Const.GraphType = GraphType.OFFBGA;
@@ -709,6 +812,69 @@ namespace BMSPlayer
                     txtPlaySide.text = "1P";
                     break;
             }
+        }
+
+        private void FastSlowChange()
+        {
+            switch (Const.FastSlow)
+            {
+                case DisplayPosType.OFF:
+                    txtFastSlow.text = "TYPE A";
+                    Const.FastSlow = DisplayPosType.TYPEA;
+                    break;
+                case DisplayPosType.TYPEA:
+                    txtFastSlow.text = "TYPE B";
+                    Const.FastSlow = DisplayPosType.TYPEB;
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtFastSlow.text = "OFF";
+                    Const.FastSlow = DisplayPosType.OFF;
+                    break;
+            }
+            txtFastSlowDesc.text =
+                Const.FSDiffDisplayDesc[(int)Const.FastSlow, (int)Const.Language];
+        }
+
+        private void TargetDiffChange()
+        {
+            switch (Const.TargetDiff)
+            {
+                case DisplayPosType.OFF:
+                    txtTargetDiff.text = "TYPE A";
+                    Const.TargetDiff = DisplayPosType.TYPEA;
+                    break;
+                case DisplayPosType.TYPEA:
+                    txtTargetDiff.text = "TYPE B";
+                    Const.TargetDiff = DisplayPosType.TYPEB;
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtTargetDiff.text = "OFF";
+                    Const.TargetDiff = DisplayPosType.OFF;
+                    break;
+            }
+            txtTargetDiffDesc.text =
+                Const.FSDiffDisplayDesc[(int)Const.TargetDiff, (int)Const.Language];
+        }
+
+        private void RateDiffChange()
+        {
+            switch (Const.RateDiff)
+            {
+                case DisplayPosType.OFF:
+                    txtRateDiff.text = "TYPE A";
+                    Const.RateDiff = DisplayPosType.TYPEA;
+                    break;
+                case DisplayPosType.TYPEA:
+                    txtRateDiff.text = "TYPE B";
+                    Const.RateDiff = DisplayPosType.TYPEB;
+                    break;
+                case DisplayPosType.TYPEB:
+                    txtRateDiff.text = "OFF";
+                    Const.RateDiff = DisplayPosType.OFF;
+                    break;
+            }
+            txtRateDiffDesc.text =
+                Const.FSDiffDisplayDesc[(int)Const.RateDiff, (int)Const.Language];
         }
     }
 }
