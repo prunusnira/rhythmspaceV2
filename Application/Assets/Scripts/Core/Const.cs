@@ -34,7 +34,7 @@ namespace BMSPlayer
         public static ListItemNode selectedOnList = null;
         public static List<int> ListDepth = new List<int>();
         public static int ListPos = 0;
-        public static bool ChangeLayout = false;
+        public static bool ChangeLayout = true;
 
         public static int MyBestScore = 0;
         public static string MyBestRank = "";
