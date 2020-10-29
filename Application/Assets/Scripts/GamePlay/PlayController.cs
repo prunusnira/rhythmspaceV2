@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -34,6 +35,11 @@ namespace BMSPlayer {
         private bool isBMSReady = false;
         private bool isLoading = false;
         private bool isKeyInfo = true;
+        private bool isInfoDisplay = false;
+        private bool isPositionFixed = false;
+
+        // Data in thread
+        private int encoding = 939;
 
         // 시간 관리
         private double StartTime = 0;
@@ -50,6 +56,8 @@ namespace BMSPlayer {
         private bool firstrun = false;
         public bool isPlayAuto;
 
+        private int[] noteLayout;
+
 		void Awake() {
             // Note Generator에서 노트 데이터를 읽어들이고 Scroller에 보내는 과정 까지를 Awake에서 실행
             // Start에서 실행 할 경우 프레임 내에서 작업하게 되므로 좋지 않음
@@ -57,6 +65,8 @@ namespace BMSPlayer {
             // UI 가져오기
             UI = GetComponent<PlayUI>();
             Graph = GetComponent<Graph>();
+
+            encoding = Const.Encoding;
 
             // HP Controller
             hpController = GetComponent<HPController>();
@@ -66,6 +76,7 @@ namespace BMSPlayer {
 
             // 배치 변경 관련 작업
             randomizer = new Randomizer();
+            noteLayout = randomizer.GetNoteLayout();
 
             // BMS 파일 분석
             analyzer = new BMSAnalyzer();
@@ -75,7 +86,7 @@ namespace BMSPlayer {
             scroller.Init();
 
             // 분석된 데이터를 바탕으로 노트를 생성
-            generator = GetComponent<NoteGenerator>();
+            generator = new NoteGenerator();
 
             // 사운드 컨트롤러 초기화
             soundController = GetComponent<SoundControllerFMOD>();
@@ -121,6 +132,10 @@ namespace BMSPlayer {
         {
             try
             {
+                // 플레이 키 (최 우선 체크)
+                scroller.ButtonPushState();
+                scroller.SpeedChangeAndBeam();
+
                 // 게임 플레이와 독립적으로 조절 가능해야 하는 부분들
                 // 스피드 조절
                 if (Input.GetKey(KeyCode.Alpha1))
@@ -183,17 +198,65 @@ namespace BMSPlayer {
                 // 데이터 로딩
                 if (!isLoading)
                 {
-                    StartCoroutine("LoadBMS");
+                    isLoading = true;
+                    Thread loadingThread = new Thread(new ThreadStart(LoadBMS));
+                    loadingThread.Start();
                     return;
+                }
+
+                if(isInfoDisplay)
+                {
+                    // 곡 정보 출력
+                    UI.SetMusicInfo(Data.BMS);
+
+                    // 기어 BPM 표시
+                    UI.SetGearBPM(
+                        Data.BMS.BPMStart,
+                        Data.BMS.BPMMin,
+                        Data.BMS.BPMMax
+                    );
+                    isInfoDisplay = false;
+                    
+                    // BGA 준비
+                    if (analyzer.IsVideoExist())
+                    {
+                        isBGAMovieExist = true;
+                        UI.BGAVideoActivate();
+                        UI.BGAVideoPreload(Data.BMS.BGAVideoFile);
+                    }
+                    else
+                    {
+                        UI.BGAImageActivate();
+                    }
+
+                    if (Data.BMS.LayerNote.Count > 0)
+                    {
+                        UI.LayerImageActivate();
+                    }
+
+                    UI.UpdateSpeed();
+                }
+
+                if(isPositionFixed)
+                {
+                    if (Const.GraphType != GraphType.OFFBGA
+                        && Const.GraphType != GraphType.OFFGEAR)
+                        Graph.SetInitialGraph(Data.TotalNotes);
+
+                    scroller.PlaySetup(Data.TotalNotes, Data.BMS.Rank);
+
+                    UI.UpdateTimerTotal(Data.LastTiming);
+                    UI.UpdateHP(hpController.CurrentHP);
+
+                    isBMSReady = true;
+                    UI.DeactiveLoading();
+                    isPositionFixed = false;
                 }
 
                 if (!isBMSReady)
                 {
                     return;
                 }
-
-                // 플레이 키 (최 우선 체크)
-                scroller.ButtonPushState();
 
                 if (firstrun && !isPaused)
                 {
@@ -231,8 +294,6 @@ namespace BMSPlayer {
                     scroller.PlayBGM(Data.NoteBGM, Data.BMS, PlayTimePassed);
                     scroller.PlayBPM(Data, PlayTimePassed, ref bpm, ref bps);
                     scroller.PlayStop(Data, PlayTimePassed, bps);
-
-                    scroller.SpeedChangeAndBeam(bpm);
 
                     if (isPlayAuto)
                     {
@@ -417,20 +478,16 @@ namespace BMSPlayer {
             }
             catch (Exception e)
             {
-                ErrorHandler.LogError(
-                    e.StackTrace + " " + e.Message);
+                ErrorHandler.LogError(e.Message + " " + e.StackTrace);
             }
         }
 
-        IEnumerator LoadBMS()
+        private void LoadBMS()
         {
-            isLoading = true;
-            yield return null;
+            if(Const.selectedOnList != null)
+                scroller.UpdateBPM(Const.selectedOnList.Info.BPMstart);
 
-            scroller.UpdateBPM(Const.selectedOnList.Info.BPMstart);
-
-            yield return StartCoroutine(analyzer.FullAnalyzer(Data.BMS));
-            yield return null;
+            analyzer.FullAnalyzer(Data.BMS, encoding);
 
             // LNOBJ 타입이면 추가로 이식하는 작업을 수행함
             if (Data.BMS.LNType == LNType.Obj)
@@ -438,7 +495,6 @@ namespace BMSPlayer {
                 LNConverter = new LNObjConverter();
                 LNConverter.FixLongNoteLNOBJ(Data.BMS);
             }
-            yield return null;
 
             // 파일 분석 이후 기본 정보 분석
             Data.CurrentBPM = Data.BMS.BPMStart;
@@ -448,67 +504,19 @@ namespace BMSPlayer {
             // BPM = 분당 비트수, 1분에 1/4박자(bar 1개)의 개수
             // beat per second는 bpm/60, 여기에 4 bar = 1박이므로 4로 추가로 나눈다
             // 모든 시간은 ms 단위로 한다
-            yield return null;
 
-            // 곡 정보 출력
-            UI.SetMusicInfo(Data.BMS);
-            yield return null;
-
-            // 기어 BPM 표시
-            UI.SetGearBPM(
-                Data.BMS.BPMStart,
-                Data.BMS.BPMMin,
-                Data.BMS.BPMMax
-            );
-            yield return null;
-
-            if (analyzer.IsVideoExist())
-            {
-                isBGAMovieExist = true;
-                UI.BGAVideoActivate();
-                UI.BGAVideoPreload(Data.BMS.BGAVideoFile);
-            }
-            else
-            {
-                UI.BGAImageActivate();
-            }
-
-            if(Data.BMS.LayerNote.Count > 0)
-            {
-                UI.LayerImageActivate();
-            }
-            yield return null;
+            isInfoDisplay = true;
 
             // 사운드 정의
             soundController.PreloadSound(Data.BMS);
-            yield return null;
 
             // 노트 오브젝트(물리x) 생성
             // GetNoteLayout == null이면 SRAN
-            generator.AnalyzeNotes(Data, randomizer.GetNoteLayout());
-            yield return null;
+            generator.AnalyzeNotes(Data, noteLayout);
             generator.PositionToTiming(Data);
-            yield return null;
             generator.SortAllNotes(Data);
-            yield return null;
 
-            UI.UpdateSpeed();
-
-            if(Const.GraphType != GraphType.OFFBGA
-                && Const.GraphType != GraphType.OFFGEAR)
-                Graph.SetInitialGraph(Data.TotalNotes);
-            yield return null;
-
-            scroller.PlaySetup(Data.TotalNotes, Data.BMS.Rank);
-            yield return null;
-
-            UI.UpdateTimerTotal(Data.LastTiming);
-            UI.UpdateHP(hpController.CurrentHP);
-            yield return null;
-
-            isBMSReady = true;
-            UI.DeactiveLoading();
-            yield return null;
+            isPositionFixed = true;
         }
 
         IEnumerator GameOver()

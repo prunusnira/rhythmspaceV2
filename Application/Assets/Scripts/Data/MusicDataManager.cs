@@ -24,13 +24,13 @@ namespace BMSPlayer
             md5.Clear();
         }
 
-        public MusicListData LoadBMSFromFolder(string path, int index)
+        public MusicListData LoadBMSFromFolder(string path, int index, int encoding)
         {
             if (path != "")
             {
                 BMS bms = new BMS(path);
                 BMSAnalyzer analyzer = new BMSAnalyzer();
-                analyzer.HeaderAnalyzer(bms);
+                analyzer.HeaderAnalyzer(bms, encoding);
                 if (bms.Player != 1) return null;
 
                 MusicListData data = new MusicListData(

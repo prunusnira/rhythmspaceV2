@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 using BMSCore;
 using TMPro;
 using SimpleFileBrowser;
+using System.Threading;
 
 namespace BMSPlayer
 {
@@ -19,14 +20,24 @@ namespace BMSPlayer
         private List<MusicListData> musicList;
         private ListItemTree tree;
 
+        // BMS Path
         public Text txtPathTitle;
         public Text txtPathVar;
-        public Text txtBrowserDesc;
-        public string[] extensions;
         public Button btnChange;
         public Button btnRefresh;
+        private string bmsPath;
+        private Thread refreshThread = null;
+        private int encoding;
+        private bool refreshed = false;
+
+        // Browser
+        public Text txtBrowserDesc;
+        public string[] extensions;
+
+        // Loading
         public GameObject layerLoading;
         public TextMesh txtLoadingPath;
+        private string strLoading = "";
 
         // Lang changer
         public Button btnKor;
@@ -58,6 +69,7 @@ namespace BMSPlayer
         public Button btn932;
         public Button btn949;
         public Text curEncoding;
+        public Text encdesc;
 
         // Key Change
         public GameObject layerKeySetting;
@@ -66,11 +78,11 @@ namespace BMSPlayer
         // Reset All
         public Button btnResetAll;
 
-        public Text debugText;
-
         public override void Awake()
         {
             base.Awake();
+            encoding = Const.Encoding;
+            bmsPath = Const.BMSFolderPath;
 
             mlm = new MusicListManager();
             musicList = new List<MusicListData>();
@@ -210,6 +222,16 @@ namespace BMSPlayer
         public override void Update()
         {
             base.Update();
+
+            // Refresh 상황에 따라 메시지 변경
+            txtLoadingPath.text = strLoading;
+
+            if(layerLoading.activeSelf && refreshed)
+            {
+                Const.isRefreshDone = true;
+                layerLoading.SetActive(false);
+                refreshed = false;
+            }
         }
 
         public override void EncolorBtn(int row, int col)
@@ -364,6 +386,7 @@ namespace BMSPlayer
             showSync();
             changeEncoding(Const.Encoding);
             syncdesc.text = Const.settingSyncDesc[(int)lang];
+            encdesc.text = Const.settingEncodingDesc[(int)lang];
         }
 
         public void changePath()
@@ -381,8 +404,10 @@ namespace BMSPlayer
 
         public void pathRefresh()
         {
+            musicList.RemoveRange(0, musicList.Count);
             layerLoading.SetActive(true);
-            StartCoroutine("refresh");
+            refreshThread = new Thread(new ThreadStart(refresh));
+            refreshThread.Start();
         }
 
         public void pathCallback(string[] path)
@@ -392,26 +417,20 @@ namespace BMSPlayer
             string directory = Directory.GetDirectoryRoot(path[0]);
             txtPathVar.text = path[0];
 
-            layerLoading.SetActive(true);
-            StartCoroutine("refresh");
+            pathRefresh();
         }
 
-        IEnumerator refresh()
+        private void refresh()
         {
-            musicList.RemoveRange(0, musicList.Count);
-
             // Generate Folder Tree
-            txtLoadingPath.text = "Generate new file tree";
-            yield return new WaitForSeconds(0.0001f);
-            tree = new ListItemTree(Const.BMSFolderPath);
+            strLoading = "Generate new file tree";
+            tree = new ListItemTree(bmsPath);
 
-            txtLoadingPath.text = "Loading file and directories";
-            yield return new WaitForSeconds(0.0001f);
+            strLoading = "Loading file and directories";
             tree.Head = tree.CreateTree(tree.Head);
 
             // Save as JSON file
-            txtLoadingPath.text = "Saving JSON File";
-            yield return new WaitForSeconds(0.0001f);
+            strLoading = "Saving JSON File";
             if (!File.Exists(Const.JSONPath))
             {
                 Directory.CreateDirectory(Directory.GetParent(Const.JSONPath).FullName);
@@ -429,23 +448,19 @@ namespace BMSPlayer
             foreach(string file in tree.FileList)
             {
                 // 각 파일별로 돌면서 파일을 등록함
-                txtLoadingPath.text = "Loading " + file;
-                yield return new WaitForSeconds(0.0001f);
-                MusicListData bmsdata = mlm.LoadBMSFromFolder(file, index);
+                strLoading = "Loading " + file;
+                MusicListData bmsdata = mlm.LoadBMSFromFolder(file, index, encoding);
                 if(bmsdata != null) musicList.Add(bmsdata);
                 index++;
             }
-            yield return new WaitForSeconds(0.0001f);
 
             // 수집한 BMS 데이터를 DB에 등록
-            txtLoadingPath.text = "Registering into database";
-            yield return new WaitForSeconds(0.0001f);
+            strLoading = "Registering into database";
             mlm = new MusicListManager();
             mlm.AddDataToDB(musicList);
             mlm.Close();
 
-            layerLoading.SetActive(false);
-            Const.isRefreshDone = true;
+            refreshed = true;
         }
 
         public void SetAutoSync()
@@ -537,12 +552,6 @@ namespace BMSPlayer
             MusicListUI.SetNotOnTop();
             layerKeySetting.SetActive(true);
             GetComponent<PlayKeySetting>().EnableWindow();
-        }
-
-        IEnumerator LoadFile()
-        {
-
-            yield return null;
         }
     }
 }

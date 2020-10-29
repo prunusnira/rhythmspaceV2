@@ -84,6 +84,7 @@
     <Compile Include="Assets\Scripts\Data\RecordData.cs" />
     <Compile Include="Assets\Scripts\Data\RecordDataManager.cs" />
     <Compile Include="Assets\Scripts\Data\enum\ItemType.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\BMSRuntimeLoader.cs" />
     <Compile Include="Assets\Scripts\GamePlay\HPController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Note\NoteGenerator.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Note\NoteObjectAdder.cs" />

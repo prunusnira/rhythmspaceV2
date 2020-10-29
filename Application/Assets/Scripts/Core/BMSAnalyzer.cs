@@ -2,7 +2,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,16 +18,51 @@ namespace BMSCore
         private bool isVideoExist = false;
         private bool isRandom = false;
 
+        private Ude.CharsetDetector encDetect = new Ude.CharsetDetector();
+
+        public Encoding GetEncodingInfo(string detectedSet, int encoding)
+        {
+            Encoding charset = Encoding.Default;
+            if (detectedSet != null)
+            {
+                if (detectedSet == "windows-1252" || detectedSet == "ASCII")
+                {
+                    if (encoding == 932)
+                    {
+                        charset = Encoding.GetEncoding(932);
+                    }
+                    if (encoding == 949)
+                    {
+                        charset = Encoding.GetEncoding(949);
+                    }
+                }
+                else
+                {
+                    charset = Encoding.GetEncoding(detectedSet);
+                }
+            }
+            else
+            {
+                charset = Encoding.Default;
+            }
+            return charset;
+        }
+
         // 노래 선택창에서 선택한 BMS 파일의 헤더를 분석
-        public void HeaderAnalyzer(BMS bms)
+        public void HeaderAnalyzer(BMS bms, int encoding)
         {
             // input stream 열기 // 기본 Default, 일본어 932, 한국어 949
-            int encoding = Const.Encoding;
-
-            StreamReader bmsReader = new StreamReader(
+            /*StreamReader bmsReader = new StreamReader(
                 bms.FilePath, System.Text.Encoding.GetEncoding(encoding)
-            );
+            );*/
+            FileStream bmsFileStream = File.OpenRead(bms.FilePath);
+            encDetect.Feed(bmsFileStream);
+            encDetect.DataEnd();
 
+            Encoding charset = GetEncodingInfo(encDetect.Charset, encoding);
+            bmsFileStream.Seek(0, SeekOrigin.Begin);
+            StreamReader bmsReader = new StreamReader(bmsFileStream, charset);
+            Debug.Log(bms.FilePath + " " + charset);
             // 한 줄 씩 읽으면서 분석
             string buf = null;
             while ((buf = bmsReader.ReadLine()) != null)
@@ -156,10 +193,11 @@ namespace BMSCore
                 }
             }
             bmsReader.Close();
+            bmsFileStream.Close();
             
         }
 
-        public IEnumerator FullAnalyzer(BMS bms)
+        public void FullAnalyzer(BMS bms, int encoding)
         {
             // wav ogg 체크
             string[] wavfiles = Directory.GetFiles(bms.FolderPath, "*.wav");
@@ -174,16 +212,19 @@ namespace BMSCore
                 isOggExist = true;
 
             // input stream 열기 // 기본 Default, 일본어 932, 한국어 949
-            int encoding = Const.Encoding;
-            StreamReader bmsReader = new StreamReader(bms.FilePath, System.Text.Encoding.GetEncoding(encoding));
+            //StreamReader bmsReader = new StreamReader(bms.FilePath, System.Text.Encoding.GetEncoding(encoding));
+            FileStream bmsFileStream = File.OpenRead(bms.FilePath);
+            encDetect.Feed(bmsFileStream);
+            encDetect.DataEnd();
 
-            yield return null;
+            Encoding charset = GetEncodingInfo(encDetect.Charset, encoding);
+            bmsFileStream.Seek(0, SeekOrigin.Begin);
+            StreamReader bmsReader = new StreamReader(bmsFileStream, charset);
 
             // 한 줄 씩 읽으면서 분석
             string buf = null;
             while ((buf = bmsReader.ReadLine()) != null)
             {
-                yield return null;
                 try
                 {
                     string[] line = buf.Split(' ');
@@ -431,7 +472,6 @@ namespace BMSCore
                 }
             }
             bmsReader.Close();
-            yield return null;
 
             // 랜덤 처리
             AddRandomNotes(bms);

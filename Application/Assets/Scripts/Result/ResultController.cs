@@ -89,7 +89,7 @@ namespace BMSPlayer
             // 곡 정보
             PlayData Data = new PlayData();
             BMSAnalyzer analyzer = new BMSAnalyzer();
-            analyzer.HeaderAnalyzer(Data.BMS);
+            analyzer.HeaderAnalyzer(Data.BMS, Const.Encoding);
             title.text = Data.BMS.Title;
             subtitle.text = Data.BMS.SubTitle;
 

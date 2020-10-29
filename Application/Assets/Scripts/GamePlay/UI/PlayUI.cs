@@ -346,7 +346,6 @@ namespace BMSPlayer
 
         public void UpdateHP(int hp)
         {
-            Debug.Log(hp);
             float chp = (float)hp / hpController.HPMax;
             hpBar[Const.PlayerSide].material.SetFloat("_Progress", chp);
             HP.text = (chp * 100).ToString("0.00") + "%";

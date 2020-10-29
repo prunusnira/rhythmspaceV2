@@ -93,6 +93,13 @@ namespace BMSPlayer
         "Can not find the path"
         };
 
+        public static string[] settingEncodingDesc = new string[3]
+        {
+        "인코딩이 자동으로 인식되지 않는 곡에 대해 어떤 인코딩을 적용할지 고릅니다",
+        "インコーディングが認識されない曲に対してどの設定を利用するかを選択します",
+        "For the files encoding is not detected automatically, apply selected one"
+        };
+
         public static string[] settingSyncDesc = new string[3]
         {
         "1 변동시 마다 1ms씩 판정 위치가 변경됩니다.",

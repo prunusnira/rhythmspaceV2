@@ -783,7 +783,7 @@ namespace BMSPlayer
             }
         }
 
-        public void SpeedChangeAndBeam(double bpm)
+        public void SpeedChangeAndBeam()
         {
             // 버튼 푸시 상태에 따라 빔 표시 상태 변경
             for (int i = 0; i < btnPushState.Length; i++)
@@ -1051,14 +1051,16 @@ namespace BMSPlayer
                 if (Keys.btnAxisSet1[i])
                 {
                     // Axis 값일때
-                    if(Keys.GetAxisValue(Keys.btnSet1[i]) != 0)
+                    if(Math.Abs(Keys.GetAxisValue(Keys.btnSet1[i])) >= 0.5)
                     {
-                        if(i == 8
-                            && !isSet1Pushed[0]
-                            && !isSet2Pushed[0])
+                        if (i == 8)
                         {
-                            btnPushState[0] = true;
-                            isSet1Pushed[0] = true;
+                            if (!isSet1Pushed[0]
+                                && !isSet2Pushed[0])
+                            {
+                                btnPushState[0] = true;
+                                isSet1Pushed[0] = true;
+                            }
                         }
                         else if (!isSet1Pushed[i]
                             && !isSet2Pushed[i])
@@ -1068,14 +1070,17 @@ namespace BMSPlayer
                         }
                     }
 
-                    if(Keys.GetAxisValue(Keys.btnSet1[i]) == 0)
+                    if(Math.Abs(Keys.GetAxisValue(Keys.btnSet1[i])) < 0.5)
                     {
-                        if (i == 8 && isSet1Pushed[0])
+                        if (i == 8)
                         {
-                            btnPushState[0] = false;
-                            btnPushSound[0] = false;
-                            btnProcState[0] = false;
-                            isSet1Pushed[0] = false;
+                            if(isSet1Pushed[0])
+                            {
+                                btnPushState[0] = false;
+                                btnPushSound[0] = false;
+                                btnProcState[0] = false;
+                                isSet1Pushed[0] = false;
+                            }
                         }
                         else if (isSet1Pushed[i])
                         {
@@ -1092,12 +1097,14 @@ namespace BMSPlayer
                     if (Keys.GetKeyDown(Keys.btnSet1[i]))
                         
                     {
-                        if(i == 8
-                            && !isSet1Pushed[0]
-                            && !isSet2Pushed[0])
+                        if(i == 8)
                         {
-                            btnPushState[0] = true;
-                            isSet1Pushed[0] = true;
+                            if (!isSet1Pushed[0]
+                                && !isSet2Pushed[0])
+                            {
+                                btnPushState[0] = true;
+                                isSet1Pushed[0] = true;
+                            }
                         }
                         else if(!isSet1Pushed[i]
                             && !isSet2Pushed[i])
@@ -1109,13 +1116,15 @@ namespace BMSPlayer
 
                     if (Keys.GetKeyUp(Keys.btnSet1[i]))
                     {
-                        if(i == 8
-                            && isSet1Pushed[0])
+                        if(i == 8)
                         {
-                            btnPushState[0] = false;
-                            btnPushSound[0] = false;
-                            btnProcState[0] = false;
-                            isSet1Pushed[0] = false;
+                            if (isSet1Pushed[0])
+                            {
+                                btnPushState[0] = false;
+                                btnPushSound[0] = false;
+                                btnProcState[0] = false;
+                                isSet1Pushed[0] = false;
+                            }
                         }
                         else if (isSet1Pushed[i])
                         {
@@ -1130,14 +1139,16 @@ namespace BMSPlayer
                 if (Keys.btnAxisSet2[i])
                 {
                     // Axis 값일때
-                    if (Keys.GetAxisValue(Keys.btnSet2[i]) != 0)
+                    if (Math.Abs(Keys.GetAxisValue(Keys.btnSet2[i])) >= 0.5)
                     {
-                        if(i == 8
-                            && !isSet1Pushed[0]
-                            && !isSet2Pushed[0])
+                        if(i == 8)
                         {
-                            btnPushState[0] = true;
-                            isSet2Pushed[0] = true;
+                            if (!isSet1Pushed[0]
+                                && !isSet2Pushed[0])
+                            {
+                                btnPushState[0] = true;
+                                isSet2Pushed[0] = true;
+                            }
                         }
                         else if (!isSet1Pushed[i]
                             && !isSet2Pushed[i])
@@ -1147,15 +1158,17 @@ namespace BMSPlayer
                         }
                     }
 
-                    if (Keys.GetAxisValue(Keys.btnSet2[i]) == 0)
+                    if (Math.Abs(Keys.GetAxisValue(Keys.btnSet2[i])) < 0.5)
                     {
-                        if(i == 8
-                            && isSet2Pushed[0])
+                        if(i == 8)
                         {
-                            btnPushState[0] = false;
-                            btnPushSound[0] = false;
-                            btnProcState[0] = false;
-                            isSet2Pushed[0] = false;
+                            if(isSet2Pushed[0])
+                            {
+                                btnPushState[0] = false;
+                                btnPushSound[0] = false;
+                                btnProcState[0] = false;
+                                isSet2Pushed[0] = false;
+                            }
                         }
                         else if (isSet2Pushed[i])
                         {
@@ -1171,12 +1184,14 @@ namespace BMSPlayer
                     // 일반 버튼일때
                     if (Keys.GetKeyDown(Keys.btnSet2[i]))
                     {
-                        if(i == 8
-                            && !isSet1Pushed[0]
-                            && !isSet2Pushed[0])
+                        if(i == 8)
                         {
-                            btnPushState[0] = true;
-                            isSet2Pushed[0] = true;
+                            if (!isSet1Pushed[0]
+                                && !isSet2Pushed[0])
+                            {
+                                btnPushState[0] = true;
+                                isSet2Pushed[0] = true;
+                            }
                         }
                         else if (!isSet1Pushed[i]
                             && !isSet2Pushed[i])
@@ -1188,13 +1203,15 @@ namespace BMSPlayer
 
                     if (Keys.GetKeyUp(Keys.btnSet2[i]))
                     {
-                        if(i == 8
-                            && isSet2Pushed[0])
+                        if (i == 8)
                         {
-                            btnPushState[0] = false;
-                            btnPushSound[0] = false;
-                            btnProcState[0] = false;
-                            isSet2Pushed[0] = false;
+                            if (isSet2Pushed[0])
+                            {
+                                btnPushState[0] = false;
+                                btnPushSound[0] = false;
+                                btnProcState[0] = false;
+                                isSet2Pushed[0] = false;
+                            }
                         }
                         else if (isSet2Pushed[i])
                         {

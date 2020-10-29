@@ -111,11 +111,15 @@ namespace BMSPlayer
             }
             else if (key == "Axis6p") // axis 6
             {
-                return Input.GetAxis("axis6");
+                float val = Input.GetAxis("axis6");
+                if (val > 0.5)
+                    return val;
             }
             else if (key == "Axis6m") // axis 6
             {
-                return Input.GetAxis("axis6");
+                float val = Input.GetAxis("axis6");
+                if (val < -0.5)
+                    return val;
             }
             else if (key == "Axis7p") // axis 7
             {
