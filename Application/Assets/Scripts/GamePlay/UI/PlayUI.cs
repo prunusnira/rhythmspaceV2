@@ -181,7 +181,7 @@ namespace BMSPlayer
             SetInitialHPBar();
 
             // HP 기본 수치 설정
-            hpController = GetComponent<HPController>();
+            hpController = HPController.Instance;
 
             // 일시정지 메뉴
             btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
@@ -684,6 +684,16 @@ namespace BMSPlayer
                         rectHeight / height
                     );
             }
+        }
+
+        public void PauseBGAVideo()
+        {
+            bgaVideo.Pause();
+        }
+
+        public void ResumeBGAVideo()
+        {
+            bgaVideo.Play();
         }
 
         public void ShowPauseMenu()

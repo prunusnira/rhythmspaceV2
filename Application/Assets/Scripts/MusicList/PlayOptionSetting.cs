@@ -11,6 +11,7 @@ namespace BMSPlayer
     {
         // Page
         private int Page = 0;
+        public Button btnPageChanger;
         public GameObject PageSet0;
         public GameObject PageSet1;
 
@@ -73,10 +74,15 @@ namespace BMSPlayer
         public Text txtRateDiff;
         public Text txtRateDiffDesc;
 
+        // SFX Play
+        public AudioSource sfxPlay;
+        public AudioClip sfxSource;
+
         public void Awake()
         {
-            // 현재 값 가져오기
-
+            // 버튼 설정
+            btnPageChanger.onClick.AddListener(PageChange);
+            
             // 오토 설정
             switch(Const.Auto)
             {
@@ -470,6 +476,7 @@ namespace BMSPlayer
                 PageSet0.SetActive(true);
                 PageSet1.SetActive(false);
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void SpeedUpFixed()
@@ -550,6 +557,7 @@ namespace BMSPlayer
                 txtJudgePanel.text = "OFF";
                 txtJudgePanel.color = Color.white;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void AutoOnOff()
@@ -572,6 +580,7 @@ namespace BMSPlayer
                     Const.Auto = AutoPlayType.OFF;
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void GaugeTypeChange()
@@ -604,6 +613,7 @@ namespace BMSPlayer
                     Const.GaugeType = GaugeType.ASSISTED;
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void SpeedTypeChange()
@@ -624,6 +634,7 @@ namespace BMSPlayer
                 txtSpeed.text = ((float)speed/100).ToString("0.00");
                 txtSpdAnother.text = "FLUID " + speedfl.ToString();
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void GraphTargetChange()
@@ -657,6 +668,7 @@ namespace BMSPlayer
                     Const.GraphTarget = GraphTargetType.OFF;
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void NoteLayoutChange()
@@ -696,6 +708,7 @@ namespace BMSPlayer
                     Const.NoteLayout = NoteLayout.NORMAL;
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void JudgeTypeChange()
@@ -719,6 +732,7 @@ namespace BMSPlayer
                     Const.JudgeType = JudgeType.ARCADE;
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void SkinChange()
@@ -738,6 +752,7 @@ namespace BMSPlayer
                     Const.GearSkin = "black";
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void GraphSizeChange()
@@ -765,6 +780,7 @@ namespace BMSPlayer
                     txtGraphType.text = "NORMAL";
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void LayoutChange()
@@ -782,6 +798,7 @@ namespace BMSPlayer
                     txtLayoutDesc.text = Const.LayoutDesc[0, (int)Const.Language];
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void BGAChange()
@@ -797,6 +814,7 @@ namespace BMSPlayer
                     txtBGAOnOff.text = "OFF";
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void PlaySideChange()
@@ -812,6 +830,7 @@ namespace BMSPlayer
                     txtPlaySide.text = "1P";
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void FastSlowChange()
@@ -833,6 +852,7 @@ namespace BMSPlayer
             }
             txtFastSlowDesc.text =
                 Const.FSDiffDisplayDesc[(int)Const.FastSlow, (int)Const.Language];
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void TargetDiffChange()
@@ -854,6 +874,7 @@ namespace BMSPlayer
             }
             txtTargetDiffDesc.text =
                 Const.FSDiffDisplayDesc[(int)Const.TargetDiff, (int)Const.Language];
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         private void RateDiffChange()
@@ -875,6 +896,7 @@ namespace BMSPlayer
             }
             txtRateDiffDesc.text =
                 Const.FSDiffDisplayDesc[(int)Const.RateDiff, (int)Const.Language];
+            sfxPlay.PlayOneShot(sfxSource);
         }
     }
 }

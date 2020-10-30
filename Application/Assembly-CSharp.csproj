@@ -62,8 +62,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\ResonanceAudio\Scripts\FmodResonanceAudio.cs" />
-    <Compile Include="Assets\ResonanceAudio\Scripts\FmodResonanceAudioRoom.cs" />
     <Compile Include="Assets\Scripts\Core\BMPLoader.cs" />
     <Compile Include="Assets\Scripts\Core\BMS.cs" />
     <Compile Include="Assets\Scripts\Core\BMSAnalyzer.cs" />
@@ -836,6 +834,22 @@
     <ProjectReference Include="SimpleFileBrowser.Runtime.csproj">
       <Project>{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}</Project>
       <Name>SimpleFileBrowser.Runtime</Name>
+    </ProjectReference>
+    <ProjectReference Include="FMODUnity.csproj">
+      <Project>{ED454576-26AC-DA8F-4A5E-3CBB8C4512F1}</Project>
+      <Name>FMODUnity</Name>
+    </ProjectReference>
+    <ProjectReference Include="FMODUnityResonance.csproj">
+      <Project>{B5F69196-CFE6-C8D3-3298-B4825E56D8C9}</Project>
+      <Name>FMODUnityResonance</Name>
+    </ProjectReference>
+    <ProjectReference Include="FMODUnityResonanceEditor.csproj">
+      <Project>{AA977789-18C3-D0D7-2028-C08443EA6001}</Project>
+      <Name>FMODUnityResonanceEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="FMODUnityEditor.csproj">
+      <Project>{4189D496-1C27-961D-F93E-B52D8E12DDCA}</Project>
+      <Name>FMODUnityEditor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

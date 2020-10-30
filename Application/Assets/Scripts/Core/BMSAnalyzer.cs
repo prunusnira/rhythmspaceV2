@@ -22,10 +22,10 @@ namespace BMSCore
 
         public Encoding GetEncodingInfo(string detectedSet, int encoding)
         {
-            Encoding charset = Encoding.Default;
+            Encoding charset = Encoding.GetEncoding(encoding);
             if (detectedSet != null)
             {
-                if (detectedSet == "windows-1252" || detectedSet == "ASCII")
+                if (detectedSet != "Shift-JIS" && detectedSet != "EUC-KR")
                 {
                     if (encoding == 932)
                     {
@@ -62,7 +62,7 @@ namespace BMSCore
             Encoding charset = GetEncodingInfo(encDetect.Charset, encoding);
             bmsFileStream.Seek(0, SeekOrigin.Begin);
             StreamReader bmsReader = new StreamReader(bmsFileStream, charset);
-            Debug.Log(bms.FilePath + " " + charset);
+            
             // 한 줄 씩 읽으면서 분석
             string buf = null;
             while ((buf = bmsReader.ReadLine()) != null)
@@ -186,9 +186,9 @@ namespace BMSCore
                 }
                 catch (Exception e)
                 {
-                    ErrorHandler.LogError("===File Error===");
                     ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
                     ErrorHandler.LogError("from: " + bms.FilePath);
+                    ErrorHandler.LogError(e.Message+ " " +e.StackTrace);
                     continue;
                 }
             }
@@ -220,7 +220,7 @@ namespace BMSCore
             Encoding charset = GetEncodingInfo(encDetect.Charset, encoding);
             bmsFileStream.Seek(0, SeekOrigin.Begin);
             StreamReader bmsReader = new StreamReader(bmsFileStream, charset);
-
+            
             // 한 줄 씩 읽으면서 분석
             string buf = null;
             while ((buf = bmsReader.ReadLine()) != null)
@@ -418,7 +418,7 @@ namespace BMSCore
                                 else if (File.Exists(bms.FolderPath + filenameCheck + "jpeg")) filenameCheck += "jpeg";
                                 else if (File.Exists(bms.FolderPath + filenameCheck + "png")) filenameCheck += "png";
 
-                                bms.BGAImages.Add(tag.Substring(4, 2), Tools.createSpriteFromFile(bms.FolderPath + filenameCheck));
+                                bms.BGAPaths.Add(tag.Substring(4, 2), bms.FolderPath + filenameCheck);
                             }
                         }
                         else if (tag != "#BPM" && chkWav == "#BPM")
@@ -465,9 +465,9 @@ namespace BMSCore
                 }
                 catch (Exception e)
                 {
-                    ErrorHandler.LogError("===File Error===");
                     ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
                     ErrorHandler.LogError("from: " + bms.FilePath);
+                    ErrorHandler.LogError(e.Message + " " + e.StackTrace);
                     continue;
                 }
             }

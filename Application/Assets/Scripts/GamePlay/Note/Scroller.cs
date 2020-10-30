@@ -128,11 +128,11 @@ namespace BMSPlayer
             }
 
             // 초기 HP 지정
-            hpController = GetComponent<HPController>();
+            hpController = HPController.Instance;
             gaugeType = Const.GaugeType;
 
             // 사운드 컨트롤러 정의
-            soundController = GetComponent<SoundControllerFMOD>();
+            soundController = SoundControllerFMOD.Instance;
         }
 
         public void PlaySetup(int noteCount, int rank)
@@ -783,7 +783,7 @@ namespace BMSPlayer
             }
         }
 
-        public void SpeedChangeAndBeam()
+        public void Beam()
         {
             // 버튼 푸시 상태에 따라 빔 표시 상태 변경
             for (int i = 0; i < btnPushState.Length; i++)

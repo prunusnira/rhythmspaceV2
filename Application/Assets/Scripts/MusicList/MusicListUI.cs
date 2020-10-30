@@ -14,6 +14,13 @@ namespace BMSPlayer
 {
     public class MusicListUI : MonoBehaviour
     {
+        // Description
+        public TextMeshProUGUI txtDescMusicSel;
+        public TextMeshProUGUI txtDescSystemOp;
+        public TextMeshProUGUI txtDescPlay;
+        public TextMeshProUGUI txtDescUpperFolder;
+        public TextMeshProUGUI txtDescPage;
+
         // Data store
         private List<ListItemNode> bmslist;
         private MusicListManager mlm;
@@ -87,11 +94,13 @@ namespace BMSPlayer
         public AudioSource sfxChange;
         public AudioSource bgLoop;
         public AudioClip sfxChangeClip;
+        public AudioClip sfxSelect;
         public AudioClip[] loop;
 
         void Awake()
         {
             // Initialize
+            Application.targetFrameRate = 1000;
             bmslist = new List<ListItemNode>();
             mlm = new MusicListManager();
             rdm = new RecordDataManager();
@@ -108,6 +117,9 @@ namespace BMSPlayer
                 musicRect.AddItemBottom(ObjectSetup);
             }
 
+            // Description
+            UpdateDescription();
+
             // Search
             btnSearchSubmit.onClick.AddListener(SearchResult);
             searchMode = false;
@@ -115,14 +127,11 @@ namespace BMSPlayer
 
         public void Start()
         {
-            Application.targetFrameRate = Const.ScrRefresh;
-
             // 리프레시를 해줘야 standalone에서 배경이 재생됨
             Screen.SetResolution(
                 Const.ScrWidth,
                 Const.ScrHeight,
-                Const.ScreenMode,
-                Const.ScrRefresh
+                Const.ScreenMode
             );
 
             evtsystem = GetComponent<EventSystem>();
@@ -144,6 +153,12 @@ namespace BMSPlayer
 
         public void Update()
         {
+            if(Const.isLangChanged)
+            {
+                UpdateDescription();
+                Const.isLangChanged = false;
+            }
+
             // 곡 선택이 front인 경우에만 동작
             if(isTop)
             {
@@ -156,7 +171,8 @@ namespace BMSPlayer
                     sfxChange.PlayOneShot(sfxChangeClip);
                 }
 
-                if(Input.GetKey(KeyCode.DownArrow))
+                if(Input.GetKey(KeyCode.DownArrow) ||
+                    Input.mouseScrollDelta.y < 0)
                 {
                     if(DateTime.Now.Ticks / 1000 - pressedTime > 2000)
                     {
@@ -174,7 +190,8 @@ namespace BMSPlayer
                     sfxChange.PlayOneShot(sfxChangeClip);
                 }
 
-                if (Input.GetKey(KeyCode.UpArrow))
+                if (Input.GetKey(KeyCode.UpArrow) ||
+                    Input.mouseScrollDelta.y > 0)
                 {
                     if (DateTime.Now.Ticks / 1000 - pressedTime > 2000)
                     {
@@ -187,6 +204,7 @@ namespace BMSPlayer
                 if (Input.GetKeyDown(KeyCode.F12))
                 {
                     layerSysOpt.SetActive(true);
+                    sfxChange.PlayOneShot(sfxSelect);
                     SetNotOnTop();
                     GetComponent<SystemSetting>().EnableWindow();
                 }
@@ -202,9 +220,11 @@ namespace BMSPlayer
                         SelectListGenerator();
                         musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
                         showInfo(musicRect.GetCurrent());
+                        sfxChange.PlayOneShot(sfxSelect);
                     }
                     else if (Const.selectedOnList.Type == ItemType.BMS)
                     {
+                        sfxChange.PlayOneShot(sfxSelect);
                         StartGame();
                     }
                 }
@@ -231,6 +251,7 @@ namespace BMSPlayer
                         musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
                         showInfo(musicRect.GetCurrent());
                     }
+                    sfxChange.PlayOneShot(sfxSelect);
                 }
             }
             
@@ -651,6 +672,16 @@ namespace BMSPlayer
                     bmslist.Add(child);
                 }
             }
+        }
+
+        public void UpdateDescription()
+        {
+            LanguageType lang = Const.Language;
+            txtDescMusicSel.text = Const.listSelect[(int)lang];
+            txtDescSystemOp.text = Const.listSystemOp[(int)lang];
+            txtDescPlay.text = Const.listPlay[(int)lang];
+            txtDescUpperFolder.text = Const.listUpper[(int)lang];
+            txtDescPage.text = Const.playOpPage[(int)lang];
         }
 
         public void OnFinish()

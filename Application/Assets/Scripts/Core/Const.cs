@@ -26,6 +26,7 @@ namespace BMSPlayer
         public static bool DEBUG = true;
         public static bool isKeyChanged = false;
         public static bool isRefreshDone = false;
+        public static bool isLangChanged = false;
 
         public static List<RecordData> record = new List<RecordData>();
         public static int musiclistIdx = 0;
@@ -119,6 +120,41 @@ namespace BMSPlayer
             "Microsoft Store에서 MPEG-2 Video Extension을 설치해주세요",
             "Microsoft StoreからMPEG-2 Video Extensionをインストールしてください",
             "Please install MPEG-2 Video Extension from Microsoft Store"
+        };
+
+        public static string[] listSelect = new string[3]
+        {
+            "곡 선택",
+            "曲を選択",
+            "SELECT"
+        };
+
+        public static string[] listSystemOp = new string[3]
+        {
+            "시스템 옵션",
+            "システム設定",
+            "SYSTEM OPTION"
+        };
+
+        public static string[] listPlay = new string[3]
+        {
+            "플레이",
+            "プレイ",
+            "PLAY"
+        };
+
+        public static string[] listUpper = new string[3]
+        {
+            "상위 폴더로 이동 / 검색 취소",
+            "上位フォルダーへ移動 / 検索キャンセル",
+            "UPPER FOLDER / CANCEL SEARCH"
+        };
+
+        public static string[] playOpPage = new string[3]
+        {
+            "페이지 전환",
+            "ページ変更",
+            "PAGE SWAP"
         };
 
         public static string[] RandomDescNR = new string[3]
@@ -327,17 +363,6 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("scrHeight", value);
-            }
-        }
-        public static int ScrRefresh
-        {
-            get
-            {
-                return PlayerPrefs.GetInt("scrRefresh", 144);
-            }
-            set
-            {
-                PlayerPrefs.SetInt("scrRefresh", value);
             }
         }
 
@@ -852,7 +877,7 @@ namespace BMSPlayer
         #endregion
 
         // Position, Width, Height
-        #region
+        #region Skin Detail
         // 1P + (2P or GraphBig) or 2P + (1P or GraphBig)
         public static int BGA_Center_PosX = -453;
         public static int BGA_Center_PosY = -250;

@@ -5,11 +5,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{A11800F8-12B6-1372-7010-B06D6120A447}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FMODUnityResonance", "FMODUnityResonance.csproj", "{B5F69196-CFE6-C8D3-3298-B4825E56D8C9}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFileBrowser.Runtime", "SimpleFileBrowser.Runtime.csproj", "{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor-firstpass", "Assembly-CSharp-Editor-firstpass.csproj", "{D09DD91E-ABB6-43D3-F55B-5A878183077D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FMODUnity", "FMODUnity.csproj", "{ED454576-26AC-DA8F-4A5E-3CBB8C4512F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{7EC96CDD-D98E-7E6D-138E-CF8BA6CDD81D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FMODUnityResonanceEditor", "FMODUnityResonanceEditor.csproj", "{AA977789-18C3-D0D7-2028-C08443EA6001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FMODUnityEditor", "FMODUnityEditor.csproj", "{4189D496-1C27-961D-F93E-B52D8E12DDCA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,18 +29,26 @@ Global
 		{A11800F8-12B6-1372-7010-B06D6120A447}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A11800F8-12B6-1372-7010-B06D6120A447}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A11800F8-12B6-1372-7010-B06D6120A447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5F69196-CFE6-C8D3-3298-B4825E56D8C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5F69196-CFE6-C8D3-3298-B4825E56D8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5F69196-CFE6-C8D3-3298-B4825E56D8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5F69196-CFE6-C8D3-3298-B4825E56D8C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D09DD91E-ABB6-43D3-F55B-5A878183077D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D09DD91E-ABB6-43D3-F55B-5A878183077D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D09DD91E-ABB6-43D3-F55B-5A878183077D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D09DD91E-ABB6-43D3-F55B-5A878183077D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7EC96CDD-D98E-7E6D-138E-CF8BA6CDD81D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7EC96CDD-D98E-7E6D-138E-CF8BA6CDD81D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7EC96CDD-D98E-7E6D-138E-CF8BA6CDD81D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7EC96CDD-D98E-7E6D-138E-CF8BA6CDD81D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED454576-26AC-DA8F-4A5E-3CBB8C4512F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED454576-26AC-DA8F-4A5E-3CBB8C4512F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED454576-26AC-DA8F-4A5E-3CBB8C4512F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED454576-26AC-DA8F-4A5E-3CBB8C4512F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA977789-18C3-D0D7-2028-C08443EA6001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA977789-18C3-D0D7-2028-C08443EA6001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA977789-18C3-D0D7-2028-C08443EA6001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA977789-18C3-D0D7-2028-C08443EA6001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4189D496-1C27-961D-F93E-B52D8E12DDCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4189D496-1C27-961D-F93E-B52D8E12DDCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4189D496-1C27-961D-F93E-B52D8E12DDCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4189D496-1C27-961D-F93E-B52D8E12DDCA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

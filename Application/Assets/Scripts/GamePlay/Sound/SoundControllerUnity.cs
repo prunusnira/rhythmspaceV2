@@ -3,20 +3,29 @@ using UnityEngine;
 
 namespace BMSPlayer
 {
-    public class SoundControllerUnity : MonoBehaviour, ISoundController
+    public class SoundControllerUnity : ISoundController
     {
         private AudioSource[] audioSource;
 
-        public void Initialize()
+        private static SoundControllerUnity instance;
+        public static SoundControllerUnity Instance
         {
-            audioSource = new AudioSource[Const.CHANNEL];
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new SoundControllerUnity();
+                }
+                return instance;
+            }
         }
 
-        public void InitSoundChannels()
+        public SoundControllerUnity()
         {
+            audioSource = new AudioSource[Const.CHANNEL];
             for (int i = 0; i < Const.CHANNEL; i++)
             {
-                audioSource[i] = gameObject.GetComponent<AudioSource>();
+                //audioSource[i] = gameObject.GetComponent<AudioSource>();
             }
         }
 
@@ -41,7 +50,6 @@ namespace BMSPlayer
             try
             {
                 audioSource[line].PlayOneShot(bms.WavFilesAC[wavFile]);
-
             }
             catch (System.Exception e)
             {

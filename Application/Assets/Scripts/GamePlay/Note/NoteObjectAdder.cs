@@ -93,7 +93,7 @@ namespace BMSPlayer
              */
             GameObject noteObject = null;
 
-            Vector3 pos = new Vector3(GetXPos(clane), (float)timing, 0);
+            Vector3 pos = new Vector3(GetXPos(clane), (float)timing, -1);
             Vector3 deg90 = new Vector3(90f, 0f);
 
             switch (clane)
@@ -136,7 +136,7 @@ namespace BMSPlayer
              */
             GameObject noteObject = null;
 
-            Vector3 pos = new Vector3(GetXPos(clane), (float)timing, 0);
+            Vector3 pos = new Vector3(GetXPos(clane), (float)timing, -1);
             Vector3 deg90 = new Vector3(90f, 0f);
 
             noteObject = Instantiate(noteMine, pos, Quaternion.identity, parent);

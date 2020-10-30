@@ -33,7 +33,9 @@ namespace BMSPlayer {
         private bool isGameOver = false;
         private bool isBGAMovieExist = false;
         private bool isBMSReady = false;
-        private bool isLoading = false;
+        private bool isLoadingPhase1 = false;
+        private bool isLoadingPhase1Finish = false;
+        private bool isLoadingPhase2Ready = false;
         private bool isKeyInfo = true;
         private bool isInfoDisplay = false;
         private bool isPositionFixed = false;
@@ -69,7 +71,7 @@ namespace BMSPlayer {
             encoding = Const.Encoding;
 
             // HP Controller
-            hpController = GetComponent<HPController>();
+            hpController = HPController.Instance;
 
             // 배속, 라인 수, BMS 로드 등의 기본 데이터 가져오기를 생성자에서 수행
             Data = new PlayData();
@@ -89,10 +91,7 @@ namespace BMSPlayer {
             generator = new NoteGenerator();
 
             // 사운드 컨트롤러 초기화
-            soundController = GetComponent<SoundControllerFMOD>();
-
-            soundController.Initialize();
-            soundController.InitSoundChannels();
+            soundController = SoundControllerFMOD.Instance;
 
             if (Const.Auto == AutoPlayType.ALL)
                 isPlayAuto = true;
@@ -134,7 +133,7 @@ namespace BMSPlayer {
             {
                 // 플레이 키 (최 우선 체크)
                 scroller.ButtonPushState();
-                scroller.SpeedChangeAndBeam();
+                scroller.Beam();
 
                 // 게임 플레이와 독립적으로 조절 가능해야 하는 부분들
                 // 스피드 조절
@@ -196,10 +195,34 @@ namespace BMSPlayer {
                 }
 
                 // 데이터 로딩
-                if (!isLoading)
+                if (!isLoadingPhase1)
                 {
-                    isLoading = true;
-                    Thread loadingThread = new Thread(new ThreadStart(LoadBMS));
+                    isLoadingPhase1 = true;
+                    Thread loadingThread = new Thread(new ThreadStart(LoadBMSPhase1));
+                    loadingThread.Start();
+                    return;
+                }
+                else if(isLoadingPhase1Finish)
+                {
+                    isLoadingPhase1Finish = false;
+                    
+                    // 사운드 정의(Unity)
+                    //soundController.PreloadSound(Data.BMS);
+
+                    if (Data.BMS.BGAPaths.Count > 0)
+                    {
+                        foreach(string k in Data.BMS.BGAPaths.Keys)
+                        {
+                            Data.BMS.BGAImages.Add(k, Tools.createSpriteFromFile(Data.BMS.BGAPaths[k]));
+                        }
+                    }
+                    isLoadingPhase2Ready = true;
+                    return;
+                }
+                else if(isLoadingPhase2Ready)
+                {
+                    isLoadingPhase2Ready = false;
+                    Thread loadingThread = new Thread(new ThreadStart(LoadBMSPhase2));
                     loadingThread.Start();
                     return;
                 }
@@ -441,6 +464,8 @@ namespace BMSPlayer {
                                 RestartGame();
                                 break;
                             case 2:
+                                double currentTick = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
+                                StartTime += currentTick - PauseStartTime;
                                 Const.Clear = ClearType.FAIL;
                                 isGameOver = true;
                                 isPaused = false;
@@ -466,12 +491,14 @@ namespace BMSPlayer {
                     {
                         PauseStartTime = currentTick;
                         soundController.PauseAll();
+                        if(Data.BMS.BGAVideoFile != null) UI.PauseBGAVideo();
                         UI.ShowPauseMenu();
                     }
                     else
                     {
                         StartTime += currentTick - PauseStartTime;
                         soundController.ResumeAll();
+                        if (Data.BMS.BGAVideoFile != null) UI.ResumeBGAVideo();
                         UI.HidePauseMenu();
                     }
                 }
@@ -482,41 +509,60 @@ namespace BMSPlayer {
             }
         }
 
-        private void LoadBMS()
+        private void LoadBMSPhase1()
         {
-            if(Const.selectedOnList != null)
-                scroller.UpdateBPM(Const.selectedOnList.Info.BPMstart);
-
-            analyzer.FullAnalyzer(Data.BMS, encoding);
-
-            // LNOBJ 타입이면 추가로 이식하는 작업을 수행함
-            if (Data.BMS.LNType == LNType.Obj)
+            try
             {
-                LNConverter = new LNObjConverter();
-                LNConverter.FixLongNoteLNOBJ(Data.BMS);
+                if (Const.selectedOnList != null)
+                    scroller.UpdateBPM(Const.selectedOnList.Info.BPMstart);
+
+                analyzer.FullAnalyzer(Data.BMS, encoding);
+
+                // LNOBJ 타입이면 추가로 이식하는 작업을 수행함
+                if (Data.BMS.LNType == LNType.Obj)
+                {
+                    LNConverter = new LNObjConverter();
+                    LNConverter.FixLongNoteLNOBJ(Data.BMS);
+                }
+
+                // 파일 분석 이후 기본 정보 분석
+                Data.CurrentBPM = Data.BMS.BPMStart;
+                Data.BPS = Data.CurrentBPM / 240;
+                Data.SPB = (double)(240 * 1000) / Data.CurrentBPM;
+                scroller.UpdateBPM(Data.CurrentBPM);
+                // BPM = 분당 비트수, 1분에 1/4박자(bar 1개)의 개수
+                // beat per second는 bpm/60, 여기에 4 bar = 1박이므로 4로 추가로 나눈다
+                // 모든 시간은 ms 단위로 한다
+
+                isInfoDisplay = true;
+
+                // 사운드 정의(FMOD)
+                soundController.PreloadSound(Data.BMS);
+
+                isLoadingPhase1Finish = true;
             }
+            catch (Exception e)
+            {
+                ErrorHandler.LogError(e.Message + " " + e.StackTrace);
+            }
+        }
 
-            // 파일 분석 이후 기본 정보 분석
-            Data.CurrentBPM = Data.BMS.BPMStart;
-            Data.BPS = Data.CurrentBPM / 240;
-            Data.SPB = (double)(240 * 1000) / Data.CurrentBPM;
-            scroller.UpdateBPM(Data.CurrentBPM);
-            // BPM = 분당 비트수, 1분에 1/4박자(bar 1개)의 개수
-            // beat per second는 bpm/60, 여기에 4 bar = 1박이므로 4로 추가로 나눈다
-            // 모든 시간은 ms 단위로 한다
+        private void LoadBMSPhase2()
+        {
+            try
+            {
+                // 노트 오브젝트(물리x) 생성
+                // GetNoteLayout == null이면 SRAN
+                generator.AnalyzeNotes(Data, noteLayout);
+                generator.PositionToTiming(Data);
+                generator.SortAllNotes(Data);
 
-            isInfoDisplay = true;
-
-            // 사운드 정의
-            soundController.PreloadSound(Data.BMS);
-
-            // 노트 오브젝트(물리x) 생성
-            // GetNoteLayout == null이면 SRAN
-            generator.AnalyzeNotes(Data, noteLayout);
-            generator.PositionToTiming(Data);
-            generator.SortAllNotes(Data);
-
-            isPositionFixed = true;
+                isPositionFixed = true;
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.LogError(e.Message + " " + e.StackTrace);
+            }
         }
 
         IEnumerator GameOver()

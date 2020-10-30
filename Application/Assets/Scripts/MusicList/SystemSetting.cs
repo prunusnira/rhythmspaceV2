@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine.UI;
-using System;
-using UnityEngine.EventSystems;
 using BMSCore;
-using TMPro;
 using SimpleFileBrowser;
 using System.Threading;
 
@@ -15,6 +11,11 @@ namespace BMSPlayer
 {
     public class SystemSetting : Setting
     {
+        // SFX Play
+        public AudioSource sfxPlay;
+        public AudioClip sfxSource;
+        public AudioClip sfxMove;
+
         // Path changer
         private MusicListManager mlm;
         private List<MusicListData> musicList;
@@ -284,6 +285,7 @@ namespace BMSPlayer
                     ChangeSprite(btnResetAll);
                     break;
             }
+            sfxPlay.PlayOneShot(sfxMove);
         }
 
         public override void ExecuteOption(int row, int col)
@@ -400,6 +402,7 @@ namespace BMSPlayer
                 "Select BMS Folder",
                 "Select"
             );
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         public void pathRefresh()
@@ -408,11 +411,13 @@ namespace BMSPlayer
             layerLoading.SetActive(true);
             refreshThread = new Thread(new ThreadStart(refresh));
             refreshThread.Start();
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         public void pathCallback(string[] path)
         {
             Const.BMSFolderPath = path[0];
+            bmsPath = path[0];
             BinaryFormatter formatter = new BinaryFormatter();
             string directory = Directory.GetDirectoryRoot(path[0]);
             txtPathVar.text = path[0];
@@ -475,6 +480,7 @@ namespace BMSPlayer
                 Const.AutoSync = AutoSyncType.OFF;
                 btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync OFF";
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         public void changeSync(bool up)
@@ -488,6 +494,7 @@ namespace BMSPlayer
                 Const.Sync--;
             }
             showSync();
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         public void showSync()
@@ -506,6 +513,7 @@ namespace BMSPlayer
         public void changeLang(LanguageType lang)
         {
             Const.Language = lang;
+            Const.isLangChanged = true;
             switch (lang)
             {
                 case LanguageType.KO:
@@ -520,6 +528,7 @@ namespace BMSPlayer
             }
             Const.Language = lang;
             UpdateOption();
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         public void changeEncoding(int enc)
@@ -534,6 +543,7 @@ namespace BMSPlayer
                     curEncoding.text = "KR-Based";
                     break;
             }
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         public void changeVideoSetting()
@@ -541,9 +551,9 @@ namespace BMSPlayer
             Screen.SetResolution(
                 Const.ScrWidth,
                 Const.ScrHeight,
-                Const.ScreenMode,
-                Const.ScrRefresh
+                Const.ScreenMode
             );
+            sfxPlay.PlayOneShot(sfxSource);
         }
 
         public void ShowKeySetting()
@@ -552,6 +562,7 @@ namespace BMSPlayer
             MusicListUI.SetNotOnTop();
             layerKeySetting.SetActive(true);
             GetComponent<PlayKeySetting>().EnableWindow();
+            sfxPlay.PlayOneShot(sfxSource);
         }
     }
 }

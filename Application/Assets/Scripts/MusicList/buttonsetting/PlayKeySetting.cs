@@ -51,7 +51,7 @@ namespace BMSPlayer
                 Keys.setDS4Default();
                 UpdateButton();
             });
-            /*for(int i = 0; i < btnKeySet1.Length; i++)
+            for(int i = 0; i < btnKeySet1.Length; i++)
             {
                 btnKeySet1[i].onClick.AddListener(delegate
                 {
@@ -61,7 +61,7 @@ namespace BMSPlayer
                 {
                     ChangeKey(i + 20);
                 });
-            }*/
+            }
 
             keySettingDesc.text = Const.keySettingDesc[(int)Const.Language];
         }

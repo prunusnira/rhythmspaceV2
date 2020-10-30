@@ -15,6 +15,9 @@ namespace BMSPlayer
         public Sprite normalBtn;
         public Sprite selectedBtn;
 
+        // Title
+        public Button btnClose;
+
         protected int row;
         protected int col;
         protected int rows;
@@ -24,6 +27,7 @@ namespace BMSPlayer
         {
             row = 0;
             col = 0;
+            btnClose.onClick.AddListener(CloseSetting);
         }
 
         public virtual void Start()

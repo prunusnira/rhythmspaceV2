@@ -3,8 +3,21 @@ using UnityEngine;
 
 namespace BMSPlayer
 {
-    public class HPController : MonoBehaviour
+    public class HPController
     {
+        private static HPController instance;
+        public static HPController Instance
+        {
+            get
+            {
+                if(instance == null)
+                {
+                    instance = new HPController();
+                }
+                return instance;
+            }
+        }
+
         public int HPMin
         {
             get
@@ -22,12 +35,12 @@ namespace BMSPlayer
         }
 
         public int CurrentHP { get; set; }
-        public int HPPerfect { get; set; }
-        public int HPGreat { get; set; }
-        public int HPGood { get; set; }
-        public int HPBad { get; set; }
-        public int HPMiss { get; set; }
-        public int HPEPoor { get; set; }
+        private int HPPerfect { get; set; }
+        private int HPGreat { get; set; }
+        private int HPGood { get; set; }
+        private int HPBad { get; set; }
+        private int HPMiss { get; set; }
+        private int HPEPoor { get; set; }
 
         public void hpChangePerfect()
         {

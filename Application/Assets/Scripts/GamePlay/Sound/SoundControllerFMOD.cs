@@ -5,25 +5,28 @@ using UnityEngine;
 
 namespace BMSPlayer
 {
-    public class SoundControllerFMOD : MonoBehaviour, ISoundController
+    public class SoundControllerFMOD : ISoundController
     {
         private FMOD.ChannelGroup channelGroup;
         private List<FMOD.Channel> channels;
 
-        public void Initialize()
+        private static SoundControllerFMOD instance;
+        public static SoundControllerFMOD Instance
+        {
+            get
+            {
+                if(instance == null)
+                {
+                    instance = new SoundControllerFMOD();
+                }
+                return instance;
+            }
+        }
+
+        public SoundControllerFMOD()
         {
             channels = new List<FMOD.Channel>();
             channelGroup = new FMOD.ChannelGroup();
-        }
-
-        public void InitSoundChannels()
-        {
-            /*for (int i = 0; i < Const.CHANNEL; i++)
-            {
-                channel[i] = new FMOD.Channel();
-                channel[i].setLoopCount(0);
-                channel[i].setChannelGroup(channelGroup);
-            }*/
         }
 
         // Execute after BMSAnalyzer.FullAnalyzer worked
@@ -40,25 +43,16 @@ namespace BMSPlayer
 
         public void PlayKeySound(string wavFile, BMS bms, int line)
         {
-            FMOD.RESULT result = FMOD.RESULT.OK;
-            try
-            {
-                FMOD.Channel channel;
-                result = FMODUnity.RuntimeManager.CoreSystem.playSound(
-                    bms.WavFilesFM[wavFile],
-                    channelGroup,
-                    false,
-                    out channel
-                );
-                channel.setVolume(0.5f);
-                channel.setLoopCount(0);
-                channels.Add(channel);
-            }
-            catch(Exception e)
-            {
-                FMODErrorCheck(result);
-            }
-
+            FMOD.Channel channel;
+            FMODUnity.RuntimeManager.CoreSystem.playSound(
+                bms.WavFilesFM[wavFile],
+                channelGroup,
+                false,
+                out channel
+            );
+            channel.setVolume(0.5f);
+            channel.setLoopCount(0);
+            channels.Add(channel);
         }
 
         public bool CheckSoundPlaying()
@@ -77,17 +71,26 @@ namespace BMSPlayer
 
         public void StopAll()
         {
-            channelGroup.stop();
+            foreach (FMOD.Channel c in channels)
+            {
+                c.stop();
+            }
         }
 
         public void PauseAll()
         {
-            channelGroup.setPaused(true);
+            foreach (FMOD.Channel c in channels)
+            {
+                c.setPaused(true);
+            }
         }
 
         public void ResumeAll()
         {
-            channelGroup.setPaused(false);
+            foreach (FMOD.Channel c in channels)
+            {
+                c.setPaused(false);
+            }
         }
 
         public void FreeMemory(BMS bms)

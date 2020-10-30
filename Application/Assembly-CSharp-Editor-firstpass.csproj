@@ -82,8 +82,6 @@
     <Compile Include="Assets\Plugins\Editor\FMOD\StudioEventEmitterGizmoDrawer.cs" />
     <Compile Include="Assets\Plugins\Editor\FMOD\StudioListenerEditor.cs" />
     <Compile Include="Assets\Plugins\Editor\FMOD\StudioParameterTriggerEditor.cs" />
-    <Compile Include="Assets\Plugins\FMOD\src\Editor\StudioGlobalParameterTriggerEditor.cs" />
-    <Compile Include="Assets\Plugins\FMOD\src\Editor\Timeline\FMODEventPlayableEditor.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Unity2019.4.9f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

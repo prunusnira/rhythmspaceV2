@@ -121,6 +121,7 @@ namespace BMSCore
         public Dictionary<int, double> BarLength = new Dictionary<int, double>();
 
         // <BMP##, FileName>
+        public Dictionary<string, string> BGAPaths = new Dictionary<string, string>();
         public Dictionary<string, Sprite> BGAImages = new Dictionary<string, Sprite>();
 
         // <BAR#, Channel 04>

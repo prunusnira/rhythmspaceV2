@@ -727,10 +727,6 @@
       <Project>{8AA283A8-9326-6F1A-009C-C999A771F133}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
-    <ProjectReference Include="Assembly-CSharp-Editor-firstpass.csproj">
-      <Project>{D09DD91E-ABB6-43D3-F55B-5A878183077D}</Project>
-      <Name>Assembly-CSharp-Editor-firstpass</Name>
-    </ProjectReference>
     <ProjectReference Include="SimpleFileBrowser.Runtime.csproj">
       <Project>{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}</Project>
       <Name>SimpleFileBrowser.Runtime</Name>
