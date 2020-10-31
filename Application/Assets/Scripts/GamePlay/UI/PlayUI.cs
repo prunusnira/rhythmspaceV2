@@ -365,19 +365,22 @@ namespace BMSPlayer
         {
             Score.text = score.ToString();
 
-            int targetDiff = score - Const.ResultTarget;
+            if(txtInfoTarget != null)
+            {
+                int targetDiff = score - Const.ResultTarget;
 
-            if(targetDiff < 0)
-            {
-                txtInfoTarget.color = Color.red;
-                txtInfoTarget.text = targetDiff.ToString();
+                if (targetDiff < 0)
+                {
+                    txtInfoTarget.color = Color.red;
+                    txtInfoTarget.text = targetDiff.ToString();
+                }
+                else
+                {
+                    txtInfoTarget.color = Color.white;
+                    txtInfoTarget.text = "+" + targetDiff.ToString();
+                }
+                txtInfoTarget.gameObject.SetActive(true);
             }
-            else
-            {
-                txtInfoTarget.color = Color.white;
-                txtInfoTarget.text = "+" + targetDiff.ToString();
-            }
-            txtInfoTarget.gameObject.SetActive(true);
         }
 
         public string GetRank(int ex, int proc)
