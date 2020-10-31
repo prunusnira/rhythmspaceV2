@@ -139,22 +139,22 @@ namespace BMSPlayer {
                 // 스피드 조절
                 if (Input.GetKey(KeyCode.Alpha1))
                 {
-                    if (Const.SpdType == SpdType.FIXED)
+                    if (Const.SpdType == SpdType.STANDARD)
                     {
                         scroller.SpeedDownFixed();
                     }
-                    if (Const.SpdType == SpdType.FLUID)
+                    if (Const.SpdType == SpdType.CONSTANT)
                     {
                         scroller.SpeedDownFluid();
                     }
                 }
                 if (Input.GetKey(KeyCode.Alpha2))
                 {
-                    if (Const.SpdType == SpdType.FIXED)
+                    if (Const.SpdType == SpdType.STANDARD)
                     {
                         scroller.SpeedUpFixed();
                     }
-                    if (Const.SpdType == SpdType.FLUID)
+                    if (Const.SpdType == SpdType.CONSTANT)
                     {
                         scroller.SpeedUpFluid();
                     }

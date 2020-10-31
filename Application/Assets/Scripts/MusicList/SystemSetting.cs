@@ -22,7 +22,7 @@ namespace BMSPlayer
         private ListItemTree tree;
 
         // BMS Path
-        public Text txtPathTitle;
+        public Text titlePath;
         public Text txtPathVar;
         public Button btnChange;
         public Button btnRefresh;
@@ -41,12 +41,14 @@ namespace BMSPlayer
         private string strLoading = "";
 
         // Lang changer
+        public Text titleLang;
         public Button btnKor;
         public Button btnJpn;
         public Button btnEng;
         public Text curLang;
 
         // Resolution Change
+        public Text titleResol;
         public Button btn1080p;
         public Button btn900p;
         public Button btn768p;
@@ -54,12 +56,14 @@ namespace BMSPlayer
         public Text txtResol;
 
         // Screen mode Change
+        public Text titleScrMode;
         public Button btnWindowed;
         public Button btnFullScr;
         public Button btnBorderless;
         public Text txtScrMode;
 
         // Sync changer
+        public Text titleSync;
         public Button btnAutoSync;
         public Button btnSyncUp;
         public Button btnSyncDown;
@@ -67,16 +71,19 @@ namespace BMSPlayer
         public Text syncdesc;
 
         // Encoding
+        public Text titleEncoding;
         public Button btn932;
         public Button btn949;
         public Text curEncoding;
         public Text encdesc;
 
         // Key Change
+        public Text titleKey;
         public GameObject layerKeySetting;
         public Button btnKeySetting;
 
         // Reset All
+        public Text titleReset;
         public Button btnResetAll;
 
         public override void Awake()
@@ -204,7 +211,16 @@ namespace BMSPlayer
             }
             showSync();
 
-            switch(Const.ScreenMode)
+            if (Const.AutoSync == AutoSyncType.OFF)
+            {
+                btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync OFF"; 
+            }
+            else
+            {
+                btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync ON";
+            }
+
+            switch (Const.ScreenMode)
             {
                 case FullScreenMode.Windowed:
                     txtScrMode.text = "Windowed";
@@ -229,7 +245,7 @@ namespace BMSPlayer
 
             if(layerLoading.activeSelf && refreshed)
             {
-                Const.isRefreshDone = true;
+                MusicListUI.isRefreshDone = true;
                 layerLoading.SetActive(false);
                 refreshed = false;
             }
@@ -389,6 +405,15 @@ namespace BMSPlayer
             changeEncoding(Const.Encoding);
             syncdesc.text = Const.settingSyncDesc[(int)lang];
             encdesc.text = Const.settingEncodingDesc[(int)lang];
+
+            titlePath.text = Const.settingTitlePath[(int)lang];
+            titleResol.text = Const.settingTitleScrRes[(int)lang];
+            titleScrMode.text = Const.settingTitleScrMode[(int)lang];
+            titleLang.text = Const.settingTitleLang[(int)lang];
+            titleSync.text = Const.settingTitleSync[(int)lang];
+            titleEncoding.text = Const.settingTitleEncoding[(int)lang];
+            titleKey.text = Const.settingTitleKey[(int)lang];
+            titleReset.text = Const.settingTitleReset[(int)lang];
         }
 
         public void changePath()
@@ -513,7 +538,7 @@ namespace BMSPlayer
         public void changeLang(LanguageType lang)
         {
             Const.Language = lang;
-            Const.isLangChanged = true;
+            MusicListUI.isLangChanged = true;
             switch (lang)
             {
                 case LanguageType.KO:

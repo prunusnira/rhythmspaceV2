@@ -235,6 +235,17 @@ namespace BMSPlayer
             scorePrev.text = Const.MyBestScore.ToString();
             scoreNew.text = Const.ResultScore.ToString();
             missNew.text = vmiss.ToString();
+            targetScore.text = Const.ResultTarget.ToString();
+            int scorediff = Const.ResultScore - Const.ResultTarget;
+
+            if (scorediff > 0)
+            {
+                targetDiff.text = "+" + (scorediff).ToString();
+            }
+            else
+            {
+                targetDiff.text = scorediff.ToString();
+            }
 
             switch (isClear)
             {
@@ -363,7 +374,6 @@ namespace BMSPlayer
 
             if (isClear == ClearType.FAIL)
             {
-                rank.sprite = rankf;
                 cleared.sprite = failed;
             }
 
@@ -381,6 +391,7 @@ namespace BMSPlayer
                 }
             }
 
+            // 데이터 기록
             if(Const.Auto == AutoPlayType.OFF)
             {
                 rdm = new RecordDataManager();

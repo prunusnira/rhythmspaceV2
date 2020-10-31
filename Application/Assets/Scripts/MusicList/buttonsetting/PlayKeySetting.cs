@@ -12,6 +12,7 @@ namespace BMSPlayer
         public Button dfkbd;
         public Button dfds4;
         public Button dfxb;
+        public Button dflr2;
 
         public Button[] btnKeySet1;
         public Button[] btnKeySet2;
@@ -32,7 +33,7 @@ namespace BMSPlayer
             Keys.LoadButtonSetting();
 
             rows = 10;
-            btn = new int[] { 3, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+            btn = new int[] { 4, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
             EncolorBtn(0, 0);
 
             // 각 버튼 onclick 설정
@@ -51,17 +52,85 @@ namespace BMSPlayer
                 Keys.setDS4Default();
                 UpdateButton();
             });
-            for(int i = 0; i < btnKeySet1.Length; i++)
+            dflr2.onClick.AddListener(delegate
             {
-                btnKeySet1[i].onClick.AddListener(delegate
-                {
-                    ChangeKey(i + 10);
-                });
-                btnKeySet2[i].onClick.AddListener(delegate
-                {
-                    ChangeKey(i + 20);
-                });
-            }
+                Keys.setLR2Default();
+                UpdateButton();
+            });
+
+            btnKeySet1[0].onClick.AddListener(delegate
+            {
+                ChangeKey(10);
+            });
+            btnKeySet1[1].onClick.AddListener(delegate
+            {
+                ChangeKey(11);
+            });
+            btnKeySet1[2].onClick.AddListener(delegate
+            {
+                ChangeKey(12);
+            });
+            btnKeySet1[3].onClick.AddListener(delegate
+            {
+                ChangeKey(13);
+            });
+            btnKeySet1[4].onClick.AddListener(delegate
+            {
+                ChangeKey(14);
+            });
+            btnKeySet1[5].onClick.AddListener(delegate
+            {
+                ChangeKey(15);
+            });
+            btnKeySet1[6].onClick.AddListener(delegate
+            {
+                ChangeKey(16);
+            });
+            btnKeySet1[7].onClick.AddListener(delegate
+            {
+                ChangeKey(17);
+            });
+            btnKeySet1[8].onClick.AddListener(delegate
+            {
+                ChangeKey(18);
+            });
+
+            btnKeySet2[0].onClick.AddListener(delegate
+            {
+                ChangeKey(20);
+            });
+            btnKeySet2[1].onClick.AddListener(delegate
+            {
+                ChangeKey(21);
+            });
+            btnKeySet2[2].onClick.AddListener(delegate
+            {
+                ChangeKey(22);
+            });
+            btnKeySet2[3].onClick.AddListener(delegate
+            {
+                ChangeKey(23);
+            });
+            btnKeySet2[4].onClick.AddListener(delegate
+            {
+                ChangeKey(24);
+            });
+            btnKeySet2[5].onClick.AddListener(delegate
+            {
+                ChangeKey(25);
+            });
+            btnKeySet2[6].onClick.AddListener(delegate
+            {
+                ChangeKey(26);
+            });
+            btnKeySet2[7].onClick.AddListener(delegate
+            {
+                ChangeKey(27);
+            });
+            btnKeySet2[8].onClick.AddListener(delegate
+            {
+                ChangeKey(28);
+            });
 
             keySettingDesc.text = Const.keySettingDesc[(int)Const.Language];
         }
@@ -75,10 +144,10 @@ namespace BMSPlayer
         {
             base.Update();
 
-            if (Const.isKeyChanged)
+            if (MusicListUI.isKeyChanged)
             {
                 UpdateButton();
-                Const.isKeyChanged = false;
+                MusicListUI.isKeyChanged = false;
             }
         }
 

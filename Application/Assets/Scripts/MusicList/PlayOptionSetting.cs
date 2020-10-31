@@ -16,61 +16,79 @@ namespace BMSPlayer
         public GameObject PageSet1;
 
         // Speed
+        public Button btnSpdDown;
+        public Button btnSpdUp;
         public Text txtSpeed;
         public Text txtSpdAnother;
         private int speed;
         private int speedfl;
 
         // Speed Type
+        public Button btnSpdType;
         public Text txtSpdType;
 
         // Auto
+        public Button btnAuto;
         public Text txtAuto;
 
         // Judge
+        public Button btnJudgePanel;
         public Text txtJudgePanel;
 
         // Gauge Type
+        public Button btnGauge;
         public Text txtGauge;
 
         // Target Graph Type
+        public Button btnTarget;
         public Text txtTarget;
 
         // Note Layout
+        public Button btnNoteLayout;
         public Text txtNoteLayout;
         public Text txtNoteDesc;
 
-        // Judgement Type
-        public Text txtJudgeType;
-
         // Custom Random
+        public Button btnCustomRandom;
         public GameObject customRandom;
 
+        // Judgement Type
+        public Button btnJudgeType;
+        public Text txtJudgeType;
+
         // Skin
+        public Button btnSkin;
         public Text txtSkin;
 
         // GraphSize
+        public Button btnGraphType;
         public Text txtGraphType;
 
         // Layout
+        public Button btnLayoutType;
         public Text txtLayoutType;
         public Text txtLayoutDesc;
 
         // BGA ON/OFF
+        public Button btnBGA;
         public Text txtBGAOnOff;
 
         // PlaySide
+        public Button btnPlaySide;
         public Text txtPlaySide;
 
         // Fast/Slow
+        public Button btnFastSlow;
         public Text txtFastSlow;
         public Text txtFastSlowDesc;
 
         // Target Difference
+        public Button btnTargetDiff;
         public Text txtTargetDiff;
         public Text txtTargetDiffDesc;
 
         // Rate diff
+        public Button btnRate;
         public Text txtRateDiff;
         public Text txtRateDiffDesc;
 
@@ -82,9 +100,51 @@ namespace BMSPlayer
         {
             // 버튼 설정
             btnPageChanger.onClick.AddListener(PageChange);
-            
+
+            // Page 1
+            btnSpdDown.onClick.AddListener(delegate
+            {
+                if (Const.SpdType == SpdType.STANDARD)
+                {
+                    SpeedDownFixed();
+                }
+                else if (Const.SpdType == SpdType.CONSTANT)
+                {
+                    SpeedDownFluid();
+                }
+            });
+            btnSpdUp.onClick.AddListener(delegate
+            {
+                if (Const.SpdType == SpdType.STANDARD)
+                {
+                    SpeedUpFixed();
+                }
+                else if (Const.SpdType == SpdType.CONSTANT)
+                {
+                    SpeedUpFluid();
+                }
+            });
+            btnSpdType.onClick.AddListener(SpeedTypeChange);
+            btnAuto.onClick.AddListener(AutoOnOff);
+            btnJudgePanel.onClick.AddListener(JudgeUIOnOff);
+            btnGauge.onClick.AddListener(GaugeTypeChange);
+            btnTarget.onClick.AddListener(GraphTargetChange);
+            btnNoteLayout.onClick.AddListener(NoteLayoutChange);
+            btnCustomRandom.onClick.AddListener(OpenCustomRandom);
+            btnJudgeType.onClick.AddListener(JudgeTypeChange);
+
+            // Page 2
+            btnSkin.onClick.AddListener(SkinChange);
+            btnGraphType.onClick.AddListener(GraphSizeChange);
+            btnLayoutType.onClick.AddListener(LayoutChange);
+            btnBGA.onClick.AddListener(BGAChange);
+            btnPlaySide.onClick.AddListener(PlaySideChange);
+            btnFastSlow.onClick.AddListener(FastSlowChange);
+            btnTargetDiff.onClick.AddListener(TargetDiffChange);
+            btnRate.onClick.AddListener(RateChange);
+
             // 오토 설정
-            switch(Const.Auto)
+            switch (Const.Auto)
             {
                 case AutoPlayType.OFF:
                     txtAuto.text = "OFF";
@@ -113,17 +173,17 @@ namespace BMSPlayer
             }
 
             // 속도
-            if(Const.SpdType == SpdType.FIXED)
+            if(Const.SpdType == SpdType.STANDARD)
             {
-                speed = Const.SpeedFixed;
-                txtSpdType.text = "FIXED";
+                speed = Const.SpeedStd;
+                txtSpdType.text = "STANDARD";
                 txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
                 txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
             }
             else
             {
-                speedfl = Const.SpeedFluid;
-                txtSpdType.text = "FLUID";
+                speedfl = Const.SpeedCon;
+                txtSpdType.text = "CONSTANT";
                 txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
                 txtSpeed.text = speedfl.ToString();
             }
@@ -360,6 +420,13 @@ namespace BMSPlayer
 
         public void Update()
         {
+            if(MusicListUI.isCustomRandom)
+            {
+                MusicListUI.isCustomRandom = false;
+                Const.NoteLayout = NoteLayout.CRAN;
+                NoteLayoutChange();
+            }
+
             if(Input.GetKeyDown(KeyCode.Tab))
             {
                 PageChange();
@@ -370,22 +437,22 @@ namespace BMSPlayer
 
                 if (Input.GetKey(KeyCode.F1))
                 {
-                    if (Const.SpdType == SpdType.FIXED)
+                    if (Const.SpdType == SpdType.STANDARD)
                     {
                         SpeedDownFixed();
                     }
-                    else if (Const.SpdType == SpdType.FLUID)
+                    else if (Const.SpdType == SpdType.CONSTANT)
                     {
                         SpeedDownFluid();
                     }
                 }
                 else if (Input.GetKey(KeyCode.F2))
                 {
-                    if (Const.SpdType == SpdType.FIXED)
+                    if (Const.SpdType == SpdType.STANDARD)
                     {
                         SpeedUpFixed();
                     }
-                    else if (Const.SpdType == SpdType.FLUID)
+                    else if (Const.SpdType == SpdType.CONSTANT)
                     {
                         SpeedUpFluid();
                     }
@@ -416,13 +483,11 @@ namespace BMSPlayer
                 }
                 else if (Input.GetKeyDown(KeyCode.F9))
                 {
-                    JudgeTypeChange();
+                    OpenCustomRandom();
                 }
-                else if (Input.GetKeyDown(KeyCode.F11))
+                else if (Input.GetKeyDown(KeyCode.F10))
                 {
-                    MusicListUI.SetNotOnTop();
-                    customRandom.SetActive(true);
-                    GetComponent<CustomPattern>().EnableWindow();
+                    JudgeTypeChange();
                 }
             }
             else
@@ -457,7 +522,7 @@ namespace BMSPlayer
                 }
                 else if (Input.GetKeyDown(KeyCode.F8))
                 {
-                    RateDiffChange();
+                    RateChange();
                 }
             }
         }
@@ -482,65 +547,65 @@ namespace BMSPlayer
         private void SpeedUpFixed()
         {
             if(speed < 2000) speed++;
-            Const.SpeedFixed = speed;
+            Const.SpeedStd = speed;
 
             // 폴더일 때는 변경 없이 처리
             if (Const.selectedOnList.Type == ItemType.BMS)
             {
                 speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
-                Const.SpeedFluid = speedfl;
+                Const.SpeedCon = speedfl;
             }
 
             txtSpeed.text = ((float)speed/100).ToString("0.00") + "x";
-            txtSpdAnother.text = "FLUID " + speedfl.ToString();
+            txtSpdAnother.text = "CON " + speedfl.ToString();
         }
 
         private void SpeedDownFixed()
         {
             if (speed > 50) speed--;
-            Const.SpeedFixed = speed;
+            Const.SpeedStd = speed;
 
             // 폴더일 때는 변경 없이 처리
             if (Const.selectedOnList.Type == ItemType.BMS)
             {
                 speedfl = (int)(Const.selectedOnList.Info.BPMstart * speed / 100);
-                Const.SpeedFluid = speedfl;
+                Const.SpeedCon = speedfl;
             }
 
             txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
-            txtSpdAnother.text = "FLUID " + speedfl.ToString();
+            txtSpdAnother.text = "CON " + speedfl.ToString();
         }
 
         private void SpeedUpFluid()
         {
             if (speedfl < 2000) speedfl++;
-            Const.SpeedFluid = speedfl;
+            Const.SpeedCon = speedfl;
 
             // 폴더일 때는 변경 없이 처리
             if (Const.selectedOnList.Type == ItemType.BMS)
             {
                 speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
-                Const.SpeedFixed = speed;
+                Const.SpeedStd = speed;
             }
 
             txtSpeed.text = speedfl.ToString();
-            txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
+            txtSpdAnother.text = "STD " + ((float)speed / 100).ToString("0.00") + "x";
         }
 
         private void SpeedDownFluid()
         {
             if (speedfl > 100) speedfl--;
-            Const.SpeedFluid = speedfl;
+            Const.SpeedCon = speedfl;
 
             // 폴더일 때는 변경 없이 처리
             if (Const.selectedOnList.Type == ItemType.BMS)
             {
                 speed = (int)((double)speedfl / Const.selectedOnList.Info.BPMstart * 100);
-                Const.SpeedFixed = speed;
+                Const.SpeedStd = speed;
             }
 
             txtSpeed.text = speedfl.ToString();
-            txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
+            txtSpdAnother.text = "STD " + ((float)speed / 100).ToString("0.00") + "x";
         }
 
         private void JudgeUIOnOff()
@@ -618,21 +683,21 @@ namespace BMSPlayer
 
         private void SpeedTypeChange()
         {
-            if (Const.SpdType == SpdType.FIXED)
+            if (Const.SpdType == SpdType.STANDARD)
             {
-                txtSpdType.text = "FLUID";
+                txtSpdType.text = "CONSTANT";
                 txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
-                Const.SpdType = SpdType.FLUID;
+                Const.SpdType = SpdType.CONSTANT;
                 txtSpeed.text = speedfl.ToString();
-                txtSpdAnother.text = "FIXED " + ((float)speed / 100).ToString("0.00") + "x";
+                txtSpdAnother.text = "STD " + ((float)speed / 100).ToString("0.00") + "x";
             }
             else
             {
-                txtSpdType.text = "FIXED";
+                txtSpdType.text = "STANDARD";
                 txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
-                Const.SpdType = SpdType.FIXED;
+                Const.SpdType = SpdType.STANDARD;
                 txtSpeed.text = ((float)speed/100).ToString("0.00");
-                txtSpdAnother.text = "FLUID " + speedfl.ToString();
+                txtSpdAnother.text = "CON " + speedfl.ToString();
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
@@ -698,6 +763,7 @@ namespace BMSPlayer
                     break;
                 case NoteLayout.CRAN:
                     txtNoteLayout.text = "CUSTOM";
+                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
                     txtNoteDesc.text = Const.RandomDescCU[(int)Const.Language];
                     Const.NoteLayout = NoteLayout.CUSTOM;
                     break;
@@ -709,6 +775,13 @@ namespace BMSPlayer
                     break;
             }
             sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        private void OpenCustomRandom()
+        {
+            MusicListUI.SetNotOnTop();
+            customRandom.SetActive(true);
+            GetComponent<CustomPattern>().EnableWindow();
         }
 
         private void JudgeTypeChange()
@@ -877,7 +950,7 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void RateDiffChange()
+        private void RateChange()
         {
             switch (Const.RateDiff)
             {

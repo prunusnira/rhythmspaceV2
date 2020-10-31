@@ -13,7 +13,6 @@ namespace BMSPlayer
     {
         [SerializeField]
         public Image progressBar;
-        private static string next;
 
         public TextMeshPro gerne;
         public TextMeshPro title;
@@ -29,6 +28,7 @@ namespace BMSPlayer
         private bool FadeStart = false;
         private bool FadeReady = false;
         private bool FadeReadyStart = false;
+        private bool ESCPressed = false;
 
         void Start()
         {
@@ -42,13 +42,13 @@ namespace BMSPlayer
 
             if (music.BPMmin == music.BPMmax)
             {
-                bpm.text = "BPM " + music.BPMstart;
+                bpm.text = "BPM " + music.BPMstart.ToString("0.##");
             }
             else
             {
-                bpm.text = "BPM " + music.BPMmin +
-                    "~" + music.BPMmax +
-                    " (" + music.BPMstart + " start)";
+                bpm.text = "BPM " + music.BPMmin.ToString("0.##") +
+                    "~" + music.BPMmax.ToString("0.##") +
+                    " (" + music.BPMstart.ToString("0.##") + " start)";
             }
 
             switch (music.Difficulty)
@@ -91,11 +91,21 @@ namespace BMSPlayer
 
         public void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Escape) && !FadeReady)
+            {
+                ESCPressed = true;
+                if (!FadeDone && !FadeStart)
+                {
+                    StartCoroutine("FadeOut");
+                }
+            }
+
             if (!FadeReadyStart && !FadeReady)
             {
                 StartCoroutine("WaitFor5Sec");
             }
-            else if (FadeReady)
+
+            if (FadeReady && !ESCPressed)
             {
                 if (!FadeDone && !FadeStart)
                 {
@@ -105,6 +115,11 @@ namespace BMSPlayer
                 {
                     SceneManager.LoadScene("PlayScreen");
                 }
+            }
+
+            if (FadeDone && ESCPressed)
+            {
+                SceneManager.LoadScene("MusicSelect");
             }
         }
 

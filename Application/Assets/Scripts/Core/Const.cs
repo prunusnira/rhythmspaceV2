@@ -23,11 +23,6 @@ namespace BMSPlayer
         public static int DEFAULTPOS = 0;
         public static int LINE = 8;
 
-        public static bool DEBUG = true;
-        public static bool isKeyChanged = false;
-        public static bool isRefreshDone = false;
-        public static bool isLangChanged = false;
-
         public static List<RecordData> record = new List<RecordData>();
         public static int musiclistIdx = 0;
 
@@ -59,60 +54,110 @@ namespace BMSPlayer
 
         // Language
         #region Language
+        public static string[] settingTitlePath = new string[3]
+        {
+            "BMS 경로",
+            "BMS Path",
+            "BMS Path"
+        };
+        public static string[] settingTitleScrRes = new string[3]
+        {
+            "화면 해상도",
+            "画面解像度",
+            "Resolution"
+        };
+        public static string[] settingTitleScrMode = new string[3]
+        {
+            "화면 모드",
+            "画面モード",
+            "Screen Mode"
+        };
+        public static string[] settingTitleLang = new string[3]
+        {
+            "언어",
+            "言語",
+            "Language"
+        };
+        public static string[] settingTitleSync = new string[3]
+        {
+            "싱크 조절",
+            "シンクロ調整",
+            "Sync"
+        };
+        public static string[] settingTitleEncoding = new string[3]
+        {
+            "인코딩",
+            "インコーディング",
+            "Encoding"
+        };
+        public static string[] settingTitleKey = new string[3]
+        {
+            "조작 설정",
+            "操作設定",
+            "Control Setting"
+        };
+        public static string[] settingTitleReset = new string[3]
+        {
+            "설정 초기화",
+            "設定リセット",
+            "Reset All Setting"
+        };
+
+
         public static string[] settingDesc = new string[3]
         {
-        "게임 설정을 변경합니다",
-        "ゲームの設定を変更します",
-        "Change your game settings"
+            "게임 설정을 변경합니다",
+            "ゲームの設定を変更します",
+            "Change your game settings"
         };
 
         public static string[] settingPathTitle = new string[3]
         {
-        "BMS 경로 변경",
-        "BMS経路更新",
-        "BMS path"
+            "BMS 경로 변경",
+            "BMS経路更新",
+            "BMS path"
         };
 
         public static string[] settingPathCurrent = new string[3]
         {
-        "현재 경로",
-        "現在経路",
-        "Current path"
+            "현재 경로",
+            "現在経路",
+            "Current path"
         };
 
         public static string[] settingPathSelector = new string[3]
         {
-        "BMS 파일이 있는 경로를 선택해주세요",
-        "BMSの経路を選択してください",
-        "Select folder where BMS files exist"
+            "BMS 파일이 있는 경로를 선택해주세요",
+            "BMSの経路を選択してください",
+            "Select folder where BMS files exist"
         };
 
         public static string[] settingNoPathFound = new string[3]
         {
-        "경로가 설정되어 있지 않습니다",
-        "経路が設定してございません",
-        "Can not find the path"
+            "경로가 설정되어 있지 않습니다",
+            "経路が設定してございません",
+            "Can not find the path"
         };
 
         public static string[] settingEncodingDesc = new string[3]
         {
-        "인코딩이 자동으로 인식되지 않는 곡에 대해 어떤 인코딩을 적용할지 고릅니다",
-        "インコーディングが認識されない曲に対してどの設定を利用するかを選択します",
-        "For the files encoding is not detected automatically, apply selected one"
+            "인코딩이 자동으로 인식되지 않는 곡에 대해 어떤 인코딩을 적용할지 고릅니다",
+            "インコーディングが認識されない曲に対してどの設定を利用するかを選択します",
+            "For the files encoding is not detected automatically, apply selected one"
         };
 
         public static string[] settingSyncDesc = new string[3]
         {
-        "1 변동시 마다 1ms씩 판정 위치가 변경됩니다.",
-        "１変更について1msの判定変化があります",
-        "Judge timing changes by 1ms per 1"
+            "1 변동시 마다 1ms씩 판정 위치가 변경됩니다.",
+            "１変更について1msの判定変化があります",
+            "Judge timing changes by 1ms per 1"
         };
 
         public static string[] settingChangeWarning = new string[3]
         {
-        "경로 혹은 인코딩 변경 시 모든 BMS 파일을 새로 읽어들이므로\n로딩에 시간이 소요됩니다",
-        "経路やインコーディングの更新は全てのBMSファイルを\n読み直すことになりますので時間が掛ります",
-        "If you change path or encoding, it will load all BMS files from scratch\nwhich takes lots of time"
+            "경로 혹은 인코딩 변경 시 모든 BMS 파일을 새로 읽어들이므로\n로딩에 시간이 소요됩니다",
+            "経路やインコーディングの更新は全てのBMSファイルを\n読み直すことになりますので時間が掛ります",
+            "If you change path or encoding, it will load all BMS files from scratch\nwhich takes lots of time"
         };
 
         public static string[] videoCodecMsg = new string[3]
@@ -136,11 +181,18 @@ namespace BMSPlayer
             "SYSTEM OPTION"
         };
 
-        public static string[] listPlay = new string[3]
+        public static string[] listPlayEnter = new string[3]
         {
-            "플레이",
-            "プレイ",
-            "PLAY"
+            "플레이 / 폴더 진입",
+            "プレイ / フォルダーに入る",
+            "PLAY / INTO FOLDER"
+        };
+
+        public static string[] listPlayClick = new string[3]
+        {
+            "폴더클릭: 폴더 진입, 곡 1번 클릭: 곡 정보 표시, 곡 2번 클릭: 플레이",
+            "フォルダー選択：フォルダーに入る, 曲1回選択：曲選択, 曲2回選択：プレイ",
+            "CLICK FOLDER: INTO FOLDER, CLICK MUSIC: SHOW INFO, CLICK AGAIN: PLAY"
         };
 
         public static string[] listUpper = new string[3]
@@ -155,6 +207,13 @@ namespace BMSPlayer
             "페이지 전환",
             "ページ変更",
             "PAGE SWAP"
+        };
+
+        public static string[] listTip = new string[3]
+        {
+            "각 항목에 할당된 키보드 버튼을 누르거나 마우스로 클릭하세요",
+            "各項目のキーをキーボードから押すかあるいはマウスでクリックしてください",
+            "Press button on keyboard or click with mouse"
         };
 
         public static string[] RandomDescNR = new string[3]
@@ -194,9 +253,9 @@ namespace BMSPlayer
 
         public static string[] RandomDescCU = new string[3]
         {
-            "커스텀 라인 (F11으로 변경)",
-            "カスタムライン (F11で変更)",
-            "User custom (F11 to change)"
+            "유저 지정 랜덤 배치",
+            "カスタム配置",
+            "User custom random"
         };
 
         public static string[] KeyChangeDescription = new string[3]
@@ -222,9 +281,9 @@ namespace BMSPlayer
 
         public static string[] keySettingDesc = new string[3]
         {
-            "버그로 인하여 마우스를 이용할 수 없습니다",
-            "バグがありますのでキーボードを利用してください",
-            "Due to bug, you can not use mouse for now"
+            "변경할 버튼을 선택해주세요",
+            "更新するボタンを選択してください",
+            "Please select button to be changed"
         };
 
         public static string[,] LayoutDesc = new string[2, 3]
@@ -381,7 +440,7 @@ namespace BMSPlayer
 
         // Play Setting
         #region Play Setting
-        public static int SpeedFixed
+        public static int SpeedStd
         {
             get
             {
@@ -393,7 +452,7 @@ namespace BMSPlayer
             }
         }
 
-        public static int SpeedFluid
+        public static int SpeedCon
         {
             get
             {
@@ -409,7 +468,7 @@ namespace BMSPlayer
         {
             get
             {
-                return (SpdType)PlayerPrefs.GetInt("spdtype", (int)SpdType.FIXED);
+                return (SpdType)PlayerPrefs.GetInt("spdtype", (int)SpdType.CONSTANT);
             }
             set
             {
@@ -773,6 +832,18 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("rst_slow", value);
+            }
+        }
+
+        public static int ResultTarget
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("rst_target", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_target", value);
             }
         }
         #endregion

@@ -87,14 +87,14 @@ namespace BMSPlayer
             // 배속 조절시 속도 변경 적용
             if(isSpeedChanged)
             {
-                if(Const.SpdType == SpdType.FIXED)
+                if(Const.SpdType == SpdType.STANDARD)
                 {
-                    Const.SpeedFluid = (int)(speed * BPM / 100);
+                    Const.SpeedCon = (int)(speed * BPM / 100);
                 }
-                else if(Const.SpdType == SpdType.FLUID)
+                else if(Const.SpdType == SpdType.CONSTANT)
                 {
                     speed = (int)(speedfl / BPM * 100);
-                    Const.SpeedFixed = (int)(speedfl / BPM * 100);
+                    Const.SpeedStd = (int)(speedfl / BPM * 100);
                 }
                 ui.UpdateSpeed();
                 isSpeedChanged = false;
@@ -107,8 +107,8 @@ namespace BMSPlayer
             Graph = GetComponent<Graph>();
             NoteAdder = GetComponent<NoteObjectAdder>();
 
-            speed = Const.SpeedFixed;
-            speedfl = Const.SpeedFluid;
+            speed = Const.SpeedStd;
+            speedfl = Const.SpeedCon;
 
             isSet1Pushed = new bool[8] { false, false, false, false, false, false, false, false };
             isSet2Pushed = new bool[8] { false, false, false, false, false, false, false, false };
@@ -1347,7 +1347,7 @@ namespace BMSPlayer
                 sumRate += (1 - abstime / BAD) * 100;
 
                 combo += 1;
-                sumTimeDiff += time;
+                sumTimeDiff += (time - Const.Sync * 0.01);
 
                 if (combo > maxcombo)
                 {
@@ -1362,6 +1362,12 @@ namespace BMSPlayer
             avgTimeDiff = sumTimeDiff / processedNotes;
             ui.UpdateSideJudge(perfect, great, good, ok, miss, cb, fast, slow,
                 avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
+
+            if(Const.AutoSync == AutoSyncType.ON)
+            {
+                if(processedNotes > 20)
+                    Const.Sync = (int)(avgTimeDiff * -100);
+            }
         }
 
         IEnumerator AutoTurnoffBeam(int i)
@@ -1422,7 +1428,7 @@ namespace BMSPlayer
             if (speed < 2000)
             {
                 speed += 1;
-                Const.SpeedFixed = speed;
+                Const.SpeedStd = speed;
                 isSpeedChanged = true;
             }
         }
@@ -1432,7 +1438,7 @@ namespace BMSPlayer
             if (speed > 50)
             {
                 speed -= 1;
-                Const.SpeedFixed = speed;
+                Const.SpeedStd = speed;
                 isSpeedChanged = true;
             }
         }
@@ -1442,7 +1448,7 @@ namespace BMSPlayer
             if (speedfl < 2000)
             {
                 speedfl += 1;
-                Const.SpeedFluid = speedfl;
+                Const.SpeedCon = speedfl;
                 isSpeedChanged = true;
             }
         }
@@ -1452,7 +1458,7 @@ namespace BMSPlayer
             if (speedfl > 100)
             {
                 speedfl -= 1;
-                Const.SpeedFluid = speedfl;
+                Const.SpeedCon = speedfl;
                 isSpeedChanged = true;
             }
         }

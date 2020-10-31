@@ -97,6 +97,7 @@ namespace BMSPlayer
                     Const.Custom5 = int.Parse(button5.text);
                     Const.Custom6 = int.Parse(button6.text);
                     Const.Custom7 = int.Parse(button7.text);
+                    MusicListUI.isCustomRandom = true;
                     CloseSetting();
                     msg.text = "";
                 }

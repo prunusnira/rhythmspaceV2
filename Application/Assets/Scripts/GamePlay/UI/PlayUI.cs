@@ -158,54 +158,64 @@ namespace BMSPlayer
 
         public void Awake()
         {
-            // Dark Skin
-            if(Const.GearSkin == "dark")
+            try
             {
-                Upper.sprite = upperDark;
-                Lower.sprite = lowerDark;
+                // Dark Skin
+                if(Const.GearSkin == "dark")
+                {
+                    Upper.sprite = upperDark;
+                    Lower.sprite = lowerDark;
+                }
+
+                // Reset
+                Const.ResultTarget = 0;
+
+                // 사용자 설정에 따른 기어-BGA-그래프 위치 변경
+                ObjectPositionSetup();
+
+                for (int i = 0; i < 8; i++)
+                {
+                    effectCoroutine = new Coroutine[8];
+                    effectRotation[i] = 0f;
+                }
+
+                // 판정 패널 표시 설정
+                if (Const.DisplayJudge == 0) layerJudgeAll.SetActive(false);
+
+                // HP bar 설정
+                SetInitialHPBar();
+
+                // HP 기본 수치 설정
+                hpController = HPController.Instance;
+
+                // 일시정지 메뉴
+                btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
+                btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
+                btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
+
+                // 판정 표시 타입 변경
+                judgeTypeBM[Const.PlayerSide].SetActive(true);
+
+                // 오토 플레이 표기
+                if(Const.Auto == AutoPlayType.ALL)
+                {
+                    txtAutoPlay[Const.PlayerSide].gameObject.SetActive(true);
+                }
+
+                // 커버 포지션 변경
+                coverSudPos = Const.CoverSudPos;
+                coverHidPos = Const.CoverHidPos;
+                playAreaPos = Const.AreaLiftPos;
+
+                NoteOnScreen = new List<GameObject>();
+
+                // 기어에 표시하는 정보의 위치와 개수 확인
+                SideInfoDisplayPosition();
             }
-
-            // 사용자 설정에 따른 기어-BGA-그래프 위치 변경
-            ObjectPositionSetup();
-
-            for (int i = 0; i < 8; i++)
+            catch (Exception e)
             {
-                effectCoroutine = new Coroutine[8];
-                effectRotation[i] = 0f;
+                ErrorHandler.LogError(e.Message + " " + e.StackTrace);
             }
-
-            // 판정 패널 표시 설정
-            if (Const.DisplayJudge == 0) layerJudgeAll.SetActive(false);
-
-            // HP bar 설정
-            SetInitialHPBar();
-
-            // HP 기본 수치 설정
-            hpController = HPController.Instance;
-
-            // 일시정지 메뉴
-            btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
-            btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
-            btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
-
-            // 판정 표시 타입 변경
-            judgeTypeBM[Const.PlayerSide].SetActive(true);
-
-            // 오토 플레이 표기
-            if(Const.Auto == AutoPlayType.ALL)
-            {
-                txtAutoPlay[Const.PlayerSide].gameObject.SetActive(true);
-            }
-
-            // 커버 포지션 변경
-            coverSudPos = Const.CoverSudPos;
-            coverHidPos = Const.CoverHidPos;
-            playAreaPos = Const.AreaLiftPos;
-
-            NoteOnScreen = new List<GameObject>();
-
-            // 기어에 표시하는 정보의 위치와 개수 확인
-            SideInfoDisplayPosition();
         }
 
         private void Update()
@@ -262,15 +272,15 @@ namespace BMSPlayer
 
         public void SetGearBPM(double bpm, double min, double max)
         {
-            BPMcur.text = bpm.ToString("0.00");
-            BPMmin.text = min.ToString("0.00");
-            BPMmax.text = max.ToString("0.00");
+            BPMcur.text = bpm.ToString("0.##");
+            BPMmin.text = min.ToString("0.##");
+            BPMmax.text = max.ToString("0.##");
         }
 
         public void SetGearCurBPM(double bpm)
         {
-            BPMcur.text = bpm.ToString("0.00");
-            SpeedFluid.text = ((int)(bpm * Const.SpeedFixed / 100)).ToString();
+            BPMcur.text = bpm.ToString("0.##");
+            SpeedFluid.text = ((int)(bpm * Const.SpeedStd / 100)).ToString();
         }
 
         private void SetInitialHPBar()
@@ -340,8 +350,8 @@ namespace BMSPlayer
 
         public void UpdateSpeed()
         {
-            SpeedFixed.text = ((float)Const.SpeedFixed / 100).ToString("0.00") + "x";
-            SpeedFluid.text = Const.SpeedFluid.ToString();
+            SpeedFixed.text = ((float)Const.SpeedStd / 100).ToString("0.00") + "x";
+            SpeedFluid.text = Const.SpeedCon.ToString();
         }
 
         public void UpdateHP(int hp)
@@ -354,6 +364,20 @@ namespace BMSPlayer
         public void UpdateScore(int score)
         {
             Score.text = score.ToString();
+
+            int targetDiff = score - Const.ResultTarget;
+
+            if(targetDiff < 0)
+            {
+                txtInfoTarget.color = Color.red;
+                txtInfoTarget.text = targetDiff.ToString();
+            }
+            else
+            {
+                txtInfoTarget.color = Color.white;
+                txtInfoTarget.text = "+" + targetDiff.ToString();
+            }
+            txtInfoTarget.gameObject.SetActive(true);
         }
 
         public string GetRank(int ex, int proc)
@@ -528,7 +552,7 @@ namespace BMSPlayer
             noteEffects[pos].gameObject.SetActive(true);
             if (onoff)
             {
-                noteEffects[pos].transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                noteEffects[pos].transform.localScale = new Vector3(1f, 1f, 1f);
                 StartCoroutine(noteEffectLN(noteEffects[pos], pos));
             }
             else
@@ -540,24 +564,24 @@ namespace BMSPlayer
         // Note Effect Coroutine
         IEnumerator noteEffect(SpriteRenderer sprite)
         {
-            float x = 0.3f;
-            float y = 0.3f;
+            float x = 3f;
+            float y = 3f;
             sprite.transform.localScale = new Vector3(x, y, 1f);
             for(int i = 0; i < 12; i++)
             {
-                yield return new WaitForSeconds(0.02f);
+                yield return new WaitForSeconds(0.01f);
                 sprite.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 15f * i));
                 sprite.transform.localScale = new Vector3(x * 0.8f, y * 0.8f, 1f);
                 x *= 0.8f;
                 y *= 0.8f;
             }
-            yield return new WaitForSeconds(0.02f);
+            yield return new WaitForSeconds(0.01f);
             sprite.gameObject.SetActive(false);
         }
 
         IEnumerator noteEffectLN(SpriteRenderer sprite, int pos)
         {
-            yield return new WaitForSeconds(0.02f);
+            yield return new WaitForSeconds(0.01f);
             effectRotation[pos] += 15f;
             if (effectRotation[pos] % 360 == 0) effectRotation[pos] = 0f;
             sprite.transform.rotation = Quaternion.Euler(new Vector3(0f, effectRotation[pos], 0f));
@@ -817,7 +841,7 @@ namespace BMSPlayer
                     infoNumA++;
                     break;
                 case DisplayPosType.TYPEB:
-                    txtInfoFS = txtInfo3S[(int)Const.Language];
+                    txtInfoFS = txtInfo3S[(int)Const.PlayerSide];
                     break;
             }
             switch (Const.TargetDiff)
@@ -829,7 +853,7 @@ namespace BMSPlayer
                     infoNumA++;
                     break;
                 case DisplayPosType.TYPEB:
-                    txtInfoTarget = txtInfo2S[(int)Const.Language];
+                    txtInfoTarget = txtInfo2S[(int)Const.PlayerSide];
                     break;
             }
             switch (Const.RateDiff)
@@ -841,7 +865,7 @@ namespace BMSPlayer
                     infoNumA++;
                     break;
                 case DisplayPosType.TYPEB:
-                    txtInfoRate = txtInfo1S[(int)Const.Language];
+                    txtInfoRate = txtInfo1S[(int)Const.PlayerSide];
                     break;
             }
 
@@ -851,15 +875,15 @@ namespace BMSPlayer
                 case 1:
                     if (Const.FastSlow == DisplayPosType.TYPEA)
                     {
-                        txtInfoFS = txtInfo2C[(int)Const.Language];
+                        txtInfoFS = txtInfo2C[(int)Const.PlayerSide];
                     }
                     if (Const.RateDiff == DisplayPosType.TYPEA)
                     {
-                        txtInfoRate = txtInfo2C[(int)Const.Language];
+                        txtInfoRate = txtInfo2C[(int)Const.PlayerSide];
                     }
                     if (Const.TargetDiff == DisplayPosType.TYPEA)
                     {
-                        txtInfoTarget = txtInfo2C[(int)Const.Language];
+                        txtInfoTarget = txtInfo2C[(int)Const.PlayerSide];
                     }
                     break;
                 case 2:
@@ -867,28 +891,28 @@ namespace BMSPlayer
                     {
                         if(Const.RateDiff == DisplayPosType.TYPEA)
                         {
-                            txtInfoRate = txtInfo1C[(int)Const.Language];
-                            txtInfoFS = txtInfo3C[(int)Const.Language];
+                            txtInfoRate = txtInfo1C[(int)Const.PlayerSide];
+                            txtInfoFS = txtInfo3C[(int)Const.PlayerSide];
                         }
                         else if(Const.TargetDiff == DisplayPosType.TYPEA)
                         {
-                            txtInfoTarget = txtInfo1C[(int)Const.Language];
-                            txtInfoFS = txtInfo3C[(int)Const.Language];
+                            txtInfoTarget = txtInfo1C[(int)Const.PlayerSide];
+                            txtInfoFS = txtInfo3C[(int)Const.PlayerSide];
                         }
                     }
                     if (Const.RateDiff == DisplayPosType.TYPEA)
                     {
                         if (Const.TargetDiff == DisplayPosType.TYPEA)
                         {
-                            txtInfoRate = txtInfo1C[(int)Const.Language];
-                            txtInfoTarget = txtInfo3C[(int)Const.Language];
+                            txtInfoRate = txtInfo1C[(int)Const.PlayerSide];
+                            txtInfoTarget = txtInfo3C[(int)Const.PlayerSide];
                         }
                     }
                     break;
                 case 3:
-                    txtInfoTarget = txtInfo1C[(int)Const.Language];
-                    txtInfoRate = txtInfo2C[(int)Const.Language];
-                    txtInfoFS = txtInfo3C[(int)Const.Language];
+                    txtInfoTarget = txtInfo1C[(int)Const.PlayerSide];
+                    txtInfoRate = txtInfo2C[(int)Const.PlayerSide];
+                    txtInfoFS = txtInfo3C[(int)Const.PlayerSide];
                     break;
             }
         }
@@ -926,11 +950,23 @@ namespace BMSPlayer
             {
                 Gear1P.SetActive(true);
                 Area1P.SetActive(true);
+
+                if(Const.GraphType == GraphType.OFFGEAR)
+                {
+                    Gear2P.SetActive(true);
+                    Area2P.SetActive(true);
+                }
             }
             else
             {
                 Gear2P.SetActive(true);
                 Area2P.SetActive(true);
+
+                if (Const.GraphType == GraphType.OFFGEAR)
+                {
+                    Gear1P.SetActive(true);
+                    Area1P.SetActive(true);
+                }
 
                 InvertObjectX(HP.gameObject);
                 InvertObjectX(hpBarType.gameObject);

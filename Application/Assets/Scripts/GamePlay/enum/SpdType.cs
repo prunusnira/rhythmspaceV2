@@ -6,7 +6,7 @@ namespace BMSPlayer
 {
     public enum SpdType
     {
-        FIXED = 0,
-        FLUID = 1
+        STANDARD = 0,
+        CONSTANT = 1
     }
 }

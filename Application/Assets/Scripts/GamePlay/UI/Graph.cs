@@ -92,23 +92,19 @@ namespace BMSPlayer
             {
                 case GraphTargetType.A:
                     graSprTar[(int)Const.GraphType].material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 6 / 9);
-                    valTar[(int)Const.GraphType].text = (procNotes * 2 * 6 / 9).ToString();
-                    valTarDiff[(int)Const.GraphType].text = (ex - procNotes * 2 * 6 / 9).ToString();
+                    Const.ResultTarget = procNotes * 2 * 6 / 9;
                     break;
                 case GraphTargetType.AA:
                     graSprTar[(int)Const.GraphType].material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 7 / 9);
-                    valTar[(int)Const.GraphType].text = (procNotes * 2 * 7 / 9).ToString();
-                    valTarDiff[(int)Const.GraphType].text = (ex - procNotes * 2 * 7 / 9).ToString();
+                    Const.ResultTarget = procNotes * 2 * 7 / 9;
                     break;
                 case GraphTargetType.AAA:
                     graSprTar[(int)Const.GraphType].material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 8 / 9);
-                    valTar[(int)Const.GraphType].text = (procNotes * 2 * 8 / 9).ToString();
-                    valTarDiff[(int)Const.GraphType].text = (ex - procNotes * 2 * 8 / 9).ToString();
+                    Const.ResultTarget = procNotes * 2 * 8 / 9;
                     break;
                 case GraphTargetType.MAX:
                     graSprTar[(int)Const.GraphType].material.SetFloat("_Progress", ((float)procNotes) / totalNotes);
-                    valTar[(int)Const.GraphType].text = (procNotes * 2).ToString();
-                    valTarDiff[(int)Const.GraphType].text = (ex - procNotes * 2).ToString();
+                    Const.ResultTarget = procNotes * 2;
                     break;
             }
 
@@ -116,6 +112,9 @@ namespace BMSPlayer
             valBest[(int)Const.GraphType].text = (Const.MyBestScore * procNotes / totalNotes).ToString();
 
             valBestDiff[(int)Const.GraphType].text = (ex - (Const.MyBestScore * procNotes / totalNotes)).ToString();
+            valTar[(int)Const.GraphType].text = Const.ResultTarget.ToString();
+            valTarDiff[(int)Const.GraphType].text = (ex - Const.ResultTarget).ToString();
+
         }
 
         private void ObjectPositionSetup()

@@ -43,16 +43,19 @@ namespace BMSPlayer
 
         public void PlayKeySound(string wavFile, BMS bms, int line)
         {
-            FMOD.Channel channel;
-            FMODUnity.RuntimeManager.CoreSystem.playSound(
-                bms.WavFilesFM[wavFile],
-                channelGroup,
-                false,
-                out channel
-            );
-            channel.setVolume(0.5f);
-            channel.setLoopCount(0);
-            channels.Add(channel);
+            if(bms.WavFilesFM.ContainsKey(wavFile))
+            {
+                FMOD.Channel channel;
+                FMODUnity.RuntimeManager.CoreSystem.playSound(
+                    bms.WavFilesFM[wavFile],
+                    channelGroup,
+                    false,
+                    out channel
+                );
+                channel.setVolume(0.5f);
+                channel.setLoopCount(0);
+                channels.Add(channel);
+            }
         }
 
         public bool CheckSoundPlaying()

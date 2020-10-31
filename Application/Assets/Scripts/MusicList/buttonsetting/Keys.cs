@@ -39,6 +39,15 @@ namespace BMSPlayer
             "Joystick1Button7"
         };
 
+        public static string[] DEFAULT_LR2 =
+        {
+            "AxisXm",
+            "Joystick1Button0", "Joystick1Button1", "Joystick1Button2",
+            "Joystick1Button3", "Joystick1Button4", "Joystick1Button5",
+            "Joystick1Button6",
+            "AxisXp"
+        };
+
         public static bool[] DEFAULT_DPAD_DS4 =
         {
             false, false, true, true,
@@ -49,6 +58,12 @@ namespace BMSPlayer
         {
             false, true, true, true,
             false, false, false, false, false
+        };
+
+        public static bool[] DEFAULT_DPAD_LR2 =
+        {
+            true, false, false, false,
+            false, false, false, false, true
         };
 
         public static string[] btnSet1 = new string[9];
@@ -77,6 +92,14 @@ namespace BMSPlayer
             for (int i = 20; i < 29; i++)
             {
                 SaveButtonSetting(i, DEFAULT_DS4[i - 20], DEFAULT_DPAD_DS4[i - 20]);
+            }
+        }
+
+        public static void setLR2Default()
+        {
+            for (int i = 20; i < 29; i++)
+            {
+                SaveButtonSetting(i, DEFAULT_LR2[i - 20], DEFAULT_DPAD_LR2[i - 20]);
             }
         }
 
@@ -479,7 +502,7 @@ namespace BMSPlayer
                     break;
             }
             KeyMapping.keyAssigned = true;
-            Const.isKeyChanged = true;
+            MusicListUI.isKeyChanged = true;
         }
     }
 }

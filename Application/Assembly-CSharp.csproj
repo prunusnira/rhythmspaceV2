@@ -109,12 +109,11 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\SpdType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\TimingType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\UILayoutType.cs" />
-    <Compile Include="Assets\Scripts\Intro\Intro.cs" />
     <Compile Include="Assets\Scripts\Loading\Loading.cs" />
     <Compile Include="Assets\Scripts\MusicList\CustomPattern.cs" />
     <Compile Include="Assets\Scripts\MusicList\MusicListUI.cs" />
     <Compile Include="Assets\Scripts\MusicList\PlayOptionSetting.cs" />
-    <Compile Include="Assets\Scripts\MusicList\SelectedMusicInfo.cs" />
+    <Compile Include="Assets\Scripts\MusicList\SelectedInfo.cs" />
     <Compile Include="Assets\Scripts\MusicList\Setting.cs" />
     <Compile Include="Assets\Scripts\MusicList\SystemSetting.cs" />
     <Compile Include="Assets\Scripts\MusicList\buttonsetting\KeyMapping.cs" />
@@ -831,10 +830,6 @@
       <Project>{A11800F8-12B6-1372-7010-B06D6120A447}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
     </ProjectReference>
-    <ProjectReference Include="SimpleFileBrowser.Runtime.csproj">
-      <Project>{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}</Project>
-      <Name>SimpleFileBrowser.Runtime</Name>
-    </ProjectReference>
     <ProjectReference Include="FMODUnity.csproj">
       <Project>{ED454576-26AC-DA8F-4A5E-3CBB8C4512F1}</Project>
       <Name>FMODUnity</Name>
@@ -842,6 +837,10 @@
     <ProjectReference Include="FMODUnityResonance.csproj">
       <Project>{B5F69196-CFE6-C8D3-3298-B4825E56D8C9}</Project>
       <Name>FMODUnityResonance</Name>
+    </ProjectReference>
+    <ProjectReference Include="SimpleFileBrowser.Runtime.csproj">
+      <Project>{84A30E40-2559-43BF-BFC3-FCEFCAA40E65}</Project>
+      <Name>SimpleFileBrowser.Runtime</Name>
     </ProjectReference>
     <ProjectReference Include="FMODUnityResonanceEditor.csproj">
       <Project>{AA977789-18C3-D0D7-2028-C08443EA6001}</Project>

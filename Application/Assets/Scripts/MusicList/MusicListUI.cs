@@ -15,11 +15,14 @@ namespace BMSPlayer
     public class MusicListUI : MonoBehaviour
     {
         // Description
+        public Button btnDescSystemOp;
         public TextMeshProUGUI txtDescMusicSel;
         public TextMeshProUGUI txtDescSystemOp;
         public TextMeshProUGUI txtDescPlay;
+        public TextMeshProUGUI txtDescPlayClick;
         public TextMeshProUGUI txtDescUpperFolder;
         public TextMeshProUGUI txtDescPage;
+        public TextMeshProUGUI txtTip;
 
         // Data store
         private List<ListItemNode> bmslist;
@@ -34,6 +37,10 @@ namespace BMSPlayer
         private long pressedTime;
 
         public static bool isTop = true;
+        public static bool isLangChanged = false;
+        public static bool isKeyChanged = false;
+        public static bool isRefreshDone = false;
+        public static bool isCustomRandom = false;
 
         // Unity object
         public GameObject patternPrefab;
@@ -67,11 +74,30 @@ namespace BMSPlayer
         public TextMeshProUGUI infoBpm;
         public GameObject btnStart;
 
-        public Text diffBeg;
-        public Text diffNor;
-        public Text diffHyp;
-        public Text diffAno;
-        public Text diffIns;
+        // Difficulty
+        public SpriteRenderer diffBeg;
+        public SpriteRenderer diffNor;
+        public SpriteRenderer diffHyp;
+        public SpriteRenderer diffAno;
+        public SpriteRenderer diffIns;
+        public TextMeshProUGUI lvBeg;
+        public TextMeshProUGUI lvNor;
+        public TextMeshProUGUI lvHyp;
+        public TextMeshProUGUI lvAno;
+        public TextMeshProUGUI lvIns;
+
+        public Sprite begOn;
+        public Sprite begOff;
+        public Sprite norOn;
+        public Sprite norOff;
+        public Sprite hypOn;
+        public Sprite hypOff;
+        public Sprite anoOn;
+        public Sprite anoOff;
+        public Sprite insOn;
+        public Sprite insOff;
+        public Sprite unkOn;
+        public Sprite unkOff;
 
         public Text optSpdAppend;
 
@@ -97,10 +123,12 @@ namespace BMSPlayer
         public AudioClip sfxSelect;
         public AudioClip[] loop;
 
+        private int selectedIdx = 0;
+
         void Awake()
         {
             // Initialize
-            Application.targetFrameRate = 1000;
+            Application.targetFrameRate = 3000;
             bmslist = new List<ListItemNode>();
             mlm = new MusicListManager();
             rdm = new RecordDataManager();
@@ -118,6 +146,7 @@ namespace BMSPlayer
             }
 
             // Description
+            btnDescSystemOp.onClick.AddListener(OpenSystemOption);
             UpdateDescription();
 
             // Search
@@ -153,10 +182,10 @@ namespace BMSPlayer
 
         public void Update()
         {
-            if(Const.isLangChanged)
+            if(isLangChanged)
             {
                 UpdateDescription();
-                Const.isLangChanged = false;
+                isLangChanged = false;
             }
 
             // 곡 선택이 front인 경우에만 동작
@@ -203,24 +232,14 @@ namespace BMSPlayer
 
                 if (Input.GetKeyDown(KeyCode.F12))
                 {
-                    layerSysOpt.SetActive(true);
-                    sfxChange.PlayOneShot(sfxSelect);
-                    SetNotOnTop();
-                    GetComponent<SystemSetting>().EnableWindow();
+                    OpenSystemOption();
                 }
 
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
                     if(Const.selectedOnList.Type == ItemType.DIRECTORY)
                     {
-                        Const.ListDepth.Add(musicRect.GetCurrentIdx());
-                        Const.ListPos = 0;
-                        musicRect.Clear();
-                        musicRect.ResetIndex();
-                        SelectListGenerator();
-                        musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-                        showInfo(musicRect.GetCurrent());
-                        sfxChange.PlayOneShot(sfxSelect);
+                        MoveIntoFolder();
                     }
                     else if (Const.selectedOnList.Type == ItemType.BMS)
                     {
@@ -229,7 +248,8 @@ namespace BMSPlayer
                     }
                 }
 
-                if(Input.GetKeyDown(KeyCode.Backspace))
+                if(Input.GetKeyDown(KeyCode.Backspace)
+                    || Input.GetMouseButtonDown(1))
                 {
                     if(searchMode)
                     {
@@ -255,9 +275,9 @@ namespace BMSPlayer
                 }
             }
             
-            if(Const.isRefreshDone)
+            if(isRefreshDone)
             {
-                Const.isRefreshDone = false;
+                isRefreshDone = false;
                 // 목록을 리셋하고 새로 리프레시
                 musicRect.Clear();
                 bmslist.Clear();
@@ -270,6 +290,14 @@ namespace BMSPlayer
 
                 showInfo(musicRect.GetCurrent());
             }
+        }
+
+        public void OpenSystemOption()
+        {
+            layerSysOpt.SetActive(true);
+            sfxChange.PlayOneShot(sfxSelect);
+            SetNotOnTop();
+            GetComponent<SystemSetting>().EnableWindow();
         }
 
         public void SearchResult()
@@ -347,66 +375,110 @@ namespace BMSPlayer
                 // BPM 표시 설정
                 if (bms.BPMmin == bms.BPMmax)
                 {
-                    infoBpm.text = "BPM " + bms.BPMstart;
+                    infoBpm.text = "BPM " + bms.BPMstart.ToString("0.##");
                 }
                 else
                 {
-                    infoBpm.text = "BPM " + bms.BPMmin +
-                        "~" + bms.BPMmax +
-                        " (" + bms.BPMstart + " start)";
+                    infoBpm.text = "BPM " + bms.BPMmin.ToString("0.##") +
+                        "~" + bms.BPMmax.ToString("0.##") +
+                        " (" + bms.BPMstart.ToString("0.##") + " start)";
                 }
 
-                if (Const.SpdType == SpdType.FIXED)
+                if (Const.SpdType == SpdType.STANDARD)
                 {
-                    int spdfl = (int)(bms.BPMstart * Const.SpeedFixed / 100);
-                    Const.SpeedFluid = spdfl;
-                    optSpdAppend.text = "FLUID " + spdfl.ToString("0");
+                    int spdfl = (int)(bms.BPMstart * Const.SpeedStd / 100);
+                    Const.SpeedCon = spdfl;
+                    optSpdAppend.text = "CON " + spdfl.ToString("0");
                 }
                 else
                 {
-                    int spd = (int)(Const.SpeedFluid / bms.BPMstart * 100);
-                    Const.SpeedFixed = spd;
-                    optSpdAppend.text = "FIXED " + ((float)spd / 100).ToString("0.00") + "x";
+                    int spd = (int)(Const.SpeedCon / bms.BPMstart * 100);
+                    Const.SpeedStd = spd;
+                    optSpdAppend.text = "STD " + ((float)spd / 100).ToString("0.00") + "x";
                 }
 
                 // 난이도 숫자 표기
                 switch(bms.Difficulty)
                 {
                     case 1:
-                        diffBeg.text = bms.Level.ToString("00");
-                        diffNor.text = "00";
-                        diffHyp.text = "00";
-                        diffAno.text = "00";
-                        diffIns.text = "00";
+                        diffBeg.sprite = begOn;
+                        diffNor.sprite = norOff;
+                        diffHyp.sprite = hypOff;
+                        diffAno.sprite = anoOff;
+                        diffIns.sprite = insOff;
+
+                        lvBeg.text = bms.Level.ToString("00");
+                        lvNor.text = "00";
+                        lvHyp.text = "00";
+                        lvAno.text = "00";
+                        lvIns.text = "00";
                         break;
                     case 2:
-                        diffBeg.text = "00";
-                        diffNor.text = bms.Level.ToString("00");
-                        diffHyp.text = "00";
-                        diffAno.text = "00";
-                        diffIns.text = "00";
+                        diffBeg.sprite = begOff;
+                        diffNor.sprite = norOn;
+                        diffHyp.sprite = hypOff;
+                        diffAno.sprite = anoOff;
+                        diffIns.sprite = insOff;
+
+                        lvBeg.text = "00";
+                        lvNor.text = bms.Level.ToString("00");
+                        lvHyp.text = "00";
+                        lvAno.text = "00";
+                        lvIns.text = "00";
                         break;
                     case 3:
-                        diffBeg.text = "00";
-                        diffNor.text = "00";
-                        diffHyp.text = bms.Level.ToString("00");
-                        diffAno.text = "00";
-                        diffIns.text = "00";
+                        diffBeg.sprite = begOff;
+                        diffNor.sprite = norOff;
+                        diffHyp.sprite = hypOn;
+                        diffAno.sprite = anoOff;
+                        diffIns.sprite = insOff;
+
+                        lvBeg.text = "00";
+                        lvNor.text = "00";
+                        lvHyp.text = bms.Level.ToString("00");
+                        lvAno.text = "00";
+                        lvIns.text = "00";
                         break;
                     case 4:
-                        diffBeg.text = "00";
-                        diffNor.text = "00";
-                        diffHyp.text = "00";
-                        diffAno.text = bms.Level.ToString("00");
-                        diffIns.text = "00";
+                        diffBeg.sprite = begOff;
+                        diffNor.sprite = norOff;
+                        diffHyp.sprite = hypOff;
+                        diffAno.sprite = anoOn;
+                        diffIns.sprite = insOff;
+
+                        lvBeg.text = "00";
+                        lvNor.text = "00";
+                        lvHyp.text = "00";
+                        lvAno.text = bms.Level.ToString("00");
+                        lvIns.text = "00";
                         break;
                     case 5:
+                        diffBeg.sprite = begOff;
+                        diffNor.sprite = norOff;
+                        diffHyp.sprite = hypOff;
+                        diffAno.sprite = anoOff;
+                        diffIns.sprite = insOn;
+
+                        lvBeg.text = "00";
+                        lvNor.text = "00";
+                        lvHyp.text = "00";
+                        lvAno.text = "00";
+                        lvIns.text = bms.Level.ToString("00");
+                        lvIns.color = new Color(127f / 256, 46f / 256, 178f / 256);
+                        break;
                     default:
-                        diffBeg.text = "00";
-                        diffNor.text = "00";
-                        diffHyp.text = "00";
-                        diffAno.text = "00";
-                        diffIns.text = bms.Level.ToString("00");
+                        diffBeg.sprite = begOff;
+                        diffNor.sprite = norOff;
+                        diffHyp.sprite = hypOff;
+                        diffAno.sprite = anoOff;
+                        diffIns.sprite = unkOn;
+
+                        lvBeg.text = "00";
+                        lvNor.text = "00";
+                        lvHyp.text = "00";
+                        lvAno.text = "00";
+                        lvIns.text = bms.Level.ToString("00");
+                        lvIns.color = Color.white;
                         break;
                 }
 
@@ -494,13 +566,33 @@ namespace BMSPlayer
             }
         }
 
-        public GameObject ObjectSetup(ListItemNode n)
+        public GameObject ObjectSetup(ListItemNode n, int i)
         {
             if (n.Type == ItemType.BMS)
             {
                 MusicListData d = n.Info;
                 GameObject music = Instantiate(patternPrefab) as GameObject;
+
+                SelectedInfo info = music.GetComponent<SelectedInfo>();
+                info.index = i;
+                info.musicData = d;
+
                 Transform c = music.transform;
+                Button btn = c.GetComponent<Button>();
+                btn.onClick.AddListener(delegate
+                {
+                    if(selectedIdx == i)
+                    {
+                        StartGame();
+                    }
+                    else
+                    {
+                        selectedIdx = i;
+                        Const.selectedOnList = n;
+                        showInfo(n);
+                    }
+                });
+
                 TextMeshProUGUI level = c.GetChild(0).GetComponent<TextMeshProUGUI>();
                 TextMeshProUGUI title = c.GetChild(1).GetComponent<TextMeshProUGUI>();
                 Image ramp = c.GetChild(2).GetComponent<Image>();
@@ -566,13 +658,34 @@ namespace BMSPlayer
             else if (n.Type == ItemType.DIRECTORY)
             {
                 GameObject folder = Instantiate(folderPrefab) as GameObject;
+
+                SelectedInfo info = folder.GetComponent<SelectedInfo>();
+                info.index = i;
+
                 Transform c = folder.transform;
+                Button btn = c.GetComponent<Button>();
+                btn.onClick.AddListener(delegate {
+                    musicRect.ChangeCurrentIdx(i);
+                    MoveIntoFolder();
+                });
                 TextMeshProUGUI title = c.GetChild(0).GetComponent<TextMeshProUGUI>();
                 title.text = n.Display;
 
                 return folder;
             }
             else return null;
+        }
+
+        public void MoveIntoFolder()
+        {
+            Const.ListDepth.Add(musicRect.GetCurrentIdx());
+            Const.ListPos = 0;
+            musicRect.Clear();
+            musicRect.ResetIndex();
+            SelectListGenerator();
+            musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+            showInfo(musicRect.GetCurrent());
+            sfxChange.PlayOneShot(sfxSelect);
         }
 
         public void StartGame()
@@ -679,9 +792,11 @@ namespace BMSPlayer
             LanguageType lang = Const.Language;
             txtDescMusicSel.text = Const.listSelect[(int)lang];
             txtDescSystemOp.text = Const.listSystemOp[(int)lang];
-            txtDescPlay.text = Const.listPlay[(int)lang];
+            txtDescPlay.text = Const.listPlayEnter[(int)lang];
+            txtDescPlayClick.text = Const.listPlayClick[(int)lang];
             txtDescUpperFolder.text = Const.listUpper[(int)lang];
             txtDescPage.text = Const.playOpPage[(int)lang];
+            txtTip.text = "* TIP: "+Const.listTip[(int)lang];
         }
 
         public void OnFinish()

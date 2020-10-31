@@ -11,7 +11,7 @@ namespace BMSPlayer
     public class ScrollRectInfinite : ScrollRect
     {
         public GameObject prefab;
-        public delegate GameObject ObjectSetup(ListItemNode data);
+        public delegate GameObject ObjectSetup(ListItemNode data, int i);
 
         private Dictionary<int, ListItemNode> itemList;
         private RectTransform objRect;
@@ -90,7 +90,7 @@ namespace BMSPlayer
         {
             foreach(int i in itemidx)
             {
-                GameObject obj = f(itemList[i]);
+                GameObject obj = f(itemList[i], i);
                 obj.transform.SetParent(content.transform, false);
             }
         }
@@ -160,6 +160,11 @@ namespace BMSPlayer
         public int GetCurrentIdx()
         {
             return currentIdx;
+        }
+
+        public void ChangeCurrentIdx(int idx)
+        {
+            currentIdx = idx;
         }
 
         public void ResetIndex()
