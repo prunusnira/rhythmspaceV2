@@ -93,7 +93,12 @@
     <Compile Include="Assets\Scripts\GamePlay\Sound\ISoundController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Sound\SoundControllerFMOD.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Sound\SoundControllerUnity.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\UI\BGAControl.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\UI\BeamUI.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\UI\CoverLiftControl.cs" />
     <Compile Include="Assets\Scripts\GamePlay\UI\Graph.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\UI\HPBarUI.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\UI\JudgeUIProcess.cs" />
     <Compile Include="Assets\Scripts\GamePlay\UI\PlayUI.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\AutoPlayType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\AutoSyncType.cs" />
@@ -105,7 +110,9 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\JudgeType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\LanguageType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\NoteLayout.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enum\NoteSkin.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\ScreenModeType.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enum\SkinType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\SpdType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\TimingType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\UILayoutType.cs" />
@@ -826,10 +833,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{A11800F8-12B6-1372-7010-B06D6120A447}</Project>
-      <Name>Assembly-CSharp-firstpass</Name>
-    </ProjectReference>
     <ProjectReference Include="FMODUnity.csproj">
       <Project>{ED454576-26AC-DA8F-4A5E-3CBB8C4512F1}</Project>
       <Name>FMODUnity</Name>

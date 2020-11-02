@@ -130,7 +130,7 @@ namespace BMSPlayer
             // Initialize
             Application.targetFrameRate = 3000;
             bmslist = new List<ListItemNode>();
-            mlm = new MusicListManager();
+            mlm = MusicListManager.Instance;
             rdm = new RecordDataManager();
             if(File.Exists(Const.JSONPath))
             {
@@ -281,8 +281,6 @@ namespace BMSPlayer
                 // 목록을 리셋하고 새로 리프레시
                 musicRect.Clear();
                 bmslist.Clear();
-
-                mlm = new MusicListManager();
 
                 ListTreeGenerator();
                 SelectListGenerator();

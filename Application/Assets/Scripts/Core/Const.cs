@@ -22,6 +22,7 @@ namespace BMSPlayer
         public static int SPEEDMULTIPLIER = 5;
         public static int DEFAULTPOS = 0;
         public static int LINE = 8;
+        public static float NoteSizeCalc = 7.5f;
 
         public static List<RecordData> record = new List<RecordData>();
         public static int musiclistIdx = 0;
@@ -141,9 +142,9 @@ namespace BMSPlayer
 
         public static string[] settingEncodingDesc = new string[3]
         {
-            "인코딩이 자동으로 인식되지 않는 곡에 대해 어떤 인코딩을 적용할지 고릅니다",
-            "インコーディングが認識されない曲に対してどの設定を利用するかを選択します",
-            "For the files encoding is not detected automatically, apply selected one"
+            "BMS 파일을 읽어올 때 적용할 인코딩을 선택합니다",
+            "BMSファイルを読む時適用するインコーディングを設定します",
+            "Set encoding for parsing BMS"
         };
 
         public static string[] settingSyncDesc = new string[3]
@@ -850,15 +851,51 @@ namespace BMSPlayer
 
         // Play Skin Setting
         #region Play Skin
-        public static string GearSkin
+        public static SkinType GearSkin
         {
             get
             {
-                return PlayerPrefs.GetString("skin", "");
+                return (SkinType)PlayerPrefs.GetInt("gearskin", (int)SkinType.NORMAL);
             }
             set
             {
-                PlayerPrefs.SetString("skin", value);
+                PlayerPrefs.SetInt("gearskin", (int)value);
+            }
+        }
+
+        public static SkinSize GearSize
+        {
+            get
+            {
+                return (SkinSize)PlayerPrefs.GetInt("gearsize", (int)SkinSize.STANDARD);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("gearsize", (int)value);
+            }
+        }
+
+        public static NoteSkin NoteSkin
+        {
+            get
+            {
+                return (NoteSkin)PlayerPrefs.GetInt("noteskin", (int)NoteSkin.NORMAL);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("noteskin", (int)value);
+            }
+        }
+
+        public static NoteSize NoteSize
+        {
+            get
+            {
+                return (NoteSize)PlayerPrefs.GetInt("notesize", (int)NoteSize.NORMAL);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("notesize", (int)value);
             }
         }
 
@@ -949,75 +986,245 @@ namespace BMSPlayer
 
         // Position, Width, Height
         #region Skin Detail
-        // 1P + (2P or GraphBig) or 2P + (1P or GraphBig)
-        public static int BGA_Center_PosX = -453;
-        public static int BGA_Center_PosY = -250;
-        public static int BGA_Center_Wid = 910;
-        public static int BGA_Center_Hei = 683;
+        // 1P + GraphBig
+        public static int[] BGA_1P_GraphBig_Left_PosX = new int[3] {
+            -453, -352, -244
+        };
+        public static int[] BGA_1P_GraphBig_Left_PosY = new int[3] {
+            -250, -174, -93
+        };
 
-        public static int BGA_1P_GraphBig_Right_PosX = 48;
-        public static int BGA_1P_GraphBig_Right_PosY = -250;
-        public static int BGA_1P_GraphBig_Right_Wid = 910;
-        public static int BGA_1P_GraphBig_Right_Hei = 683;
+        public static int[] BGA_1P_GraphBig_Right_PosX = new int[3] {
+            48, 151, 258
+        };
+        public static int[] BGA_1P_GraphBig_Right_PosY = new int[3] {
+            -250, -174, -93
+        };
 
-        public static int BGA_1P_GraphSm_Left_PosX = -448;
-        public static int BGA_1P_GraphSm_Left_PosY = -344;
-        public static int BGA_1P_GraphSm_Left_Wid = 1035;
-        public static int BGA_1P_GraphSm_Left_Hei = 777;
+        public static int[] BGA_1P_GraphSm_Left_PosX = new int[3] {
+            -448, -352, -245
+        };
+        public static int[] BGA_1P_GraphSm_Left_PosY = new int[3] {
+            -344, -278, -198
+        };
 
-        public static int BGA_1P_GraphSm_Right_PosX = -84;
-        public static int BGA_1P_GraphSm_Right_PosY = -344;
-        public static int BGA_1P_GraphSm_Right_Wid = 1035;
-        public static int BGA_1P_GraphSm_Right_Hei = 777;
+        public static int[] BGA_1P_GraphSm_Right_PosX = new int[3] {
+            -84, 12, 118
+        };
+        public static int[] BGA_1P_GraphSm_Right_PosY = new int[3] {
+            -344, -278, -198
+        };
 
-        public static int BGA_1P_GraphMini_PosX = -140;
-        public static int BGA_1P_GraphMini_PosY = -344;
-        public static int BGA_1P_GraphMini_Wid = 1035;
-        public static int BGA_1P_GraphMini_Hei = 777;
+        public static int[] BGA_1P_GraphMini_PosX = new int[3] {
+            -140, -90, 8
+        };
+        public static int[] BGA_1P_GraphMini_PosY = new int[3] {
+            -344, -344, -282
+        };
 
-        public static int BGA_1P_GraphOff_PosX = -240;
-        public static int BGA_1P_GraphOff_PosY = -344;
-        public static int BGA_1P_GraphOff_Wid = 1035;
-        public static int BGA_1P_GraphOff_Hei = 777;
+        public static int[] BGA_1P_GraphOff_PosX = new int[3] {
+            -240, -200, -160
+        };
+        public static int[] BGA_1P_GraphOff_PosY = new int[3] {
+            -344, -344, -344
+        };
 
-        public static int BGA_2P_GraphBig_Left_PosX = -958;
-        public static int BGA_2P_GraphBig_Left_PosY = -250;
-        public static int BGA_2P_GraphBig_Left_Wid = 910;
-        public static int BGA_2P_GraphBig_Left_Hei = 683;
+        public static int[] BGA_2P_GraphBig_Left_PosX = new int[3] {
+            -958, -961, -960
+        };
+        public static int[] BGA_2P_GraphBig_Left_PosY = new int[3] {
+            -250, -174, -93
+        };
 
-        public static int BGA_2P_GraphSm_Left_PosX = -949;
-        public static int BGA_2P_GraphSm_Left_PosY = -344;
-        public static int BGA_2P_GraphSm_Left_Wid = 1035;
-        public static int BGA_2P_GraphSm_Left_Hei = 777;
+        public static int[] BGA_2P_GraphBig_Right_PosX = new int[3] {
+            -453, -457, -456
+        };
+        public static int[] BGA_2P_GraphBig_Right_PosY = new int[3] {
+            -250, -174, -93
+        };
 
-        public static int BGA_2P_GraphSm_Right_PosX = -590;
-        public static int BGA_2P_GraphSm_Right_PosY = -344;
-        public static int BGA_2P_GraphSm_Right_Wid = 1035;
-        public static int BGA_2P_GraphSm_Right_Hei = 777;
+        public static int[] BGA_2P_GraphSm_Left_PosX = new int[3] {
+            -949, -961, -960
+        };
+        public static int[] BGA_2P_GraphSm_Left_PosY = new int[3] {
+            -344, -278, -198
+        };
 
-        public static int BGA_2P_GraphMini_PosX = -885;
-        public static int BGA_2P_GraphMini_PosY = -344;
-        public static int BGA_2P_GraphMini_Wid = 1035;
-        public static int BGA_2P_GraphMini_Hei = 777;
+        public static int[] BGA_2P_GraphSm_Right_PosX = new int[3] {
+            -590, -597, -596
+        };
+        public static int[] BGA_2P_GraphSm_Right_PosY = new int[3] {
+            -344, -278, -198
+        };
 
-        public static int BGA_2P_GraphOff_PosX = -765;
-        public static int BGA_2P_GraphOff_PosY = -344;
-        public static int BGA_2P_GraphOff_Wid = 1035;
-        public static int BGA_2P_GraphOff_Hei = 777;
+        public static int[] BGA_2P_GraphMini_PosX = new int[3] {
+            -885, -946, -960
+        };
+        public static int[] BGA_2P_GraphMini_PosY = new int[3] {
+            -344, -344, -282
+        };
+
+        public static int[] BGA_2P_GraphOff_PosX = new int[3] {
+            -765, -800, -870
+        };
+        public static int[] BGA_2P_GraphOff_PosY = new int[3] {
+            -344, -344, -344
+        };
+
+        // Off Gear: 가운데 고정
+        public static int[] BGA_GraphOffGear_PosX = new int[3] {
+            -453, -351, -244
+        };
+        public static int[] BGA_GraphOffGear_PosY = new int[3] {
+            -250, -93, 66
+        };
+        public static int[] BGA_GraphOffGear_Wid = new int[3] {
+            910, 701, 489
+        };
+        public static int[] BGA_GraphOffGear_Hei = new int[3] {
+            683, 525, 366
+        };
+
+        // BGA Size (Width, Height)
+        public static int[] BGA_GraphBig_Wid = new int[3] {
+            910, 809, 701
+        };
+        public static int[] BGA_GraphBig_Hei = new int[3] {
+            683, 607, 525
+        };
+        public static int[] BGA_GraphSm_Wid = new int[3] {
+            1035, 948, 841
+        };
+        public static int[] BGA_GraphSm_Hei = new int[3] {
+            777, 711, 630
+        };
+        public static int[] BGA_GraphMini_Wid = new int[3] {
+            1035, 1035, 952
+        };
+        public static int[] BGA_GraphMini_Hei = new int[3] {
+            777, 777, 714
+        };
+        public static int[] BGA_GraphOff_Wid = new int[3] {
+            1035, 1035, 1035
+        };
+        public static int[] BGA_GraphOff_Hei = new int[3] {
+            777, 777, 777
+        };
 
         // 1P Right = 0
-        public static int Graph_1P_Big_Left_PosX = -913;
-        public static int Graph_2P_Big_Left_PosX = -1417;
-        public static int Graph_2P_Big_Right_PosX = -503;
+        public static int[] Graph_1P_Big_Left_PosX = new int[3] {
+            -913, -809, -703
+        };
+        public static int[] Graph_2P_Big_Left_PosX = new int[3] {
+            -1417, -1417, -1417
+        };
+        public static int[] Graph_2P_Big_Right_PosX = new int[3] {
+            -503, -610, -716
+        };
 
         // 1P Right = 0
-        public static int Graph_1P_Small_Left_PosX = -1052;
-        public static int Graph_2P_Small_Left_PosX = -1556;
-        public static int Graph_2P_Small_Right_PosX = -503;
+        public static int[] Graph_1P_Small_Left_PosX = new int[3] {
+            -1052, -949, -841
+        };
+        public static int[] Graph_2P_Small_Left_PosX = new int[3] {
+            -1556, -1556, -1556
+        };
+        public static int[] Graph_2P_Small_Right_PosX = new int[3] {
+            -503, -609, -714
+        };
 
-        public static int Graph_1P_Mini_PosX = -1038;
-        public static int Graph_2P_Mini_PosX = -379;
+        public static int[] Graph_1P_Mini_PosX = new int[3] {
+            -1038, -935, -828
+        };
+        public static int[] Graph_2P_Mini_PosX = new int[3] {
+            -379, -485, -590
+        };
 
+        // Text Position
+        public static int[] HPTextPosX = new int[3]
+        {
+            -539, -470, -343
+        };
+        public static int[] HPTextPosY = new int[3]
+        {
+            -317, -317, -413
+        };
+        public static int[] GaugeTypeTextPosX = new int[3]
+        {
+            -694, -613, -679
+        };
+        public static int[] GaugeTypeTextPosY = new int[3]
+        {
+            -330, -330, -382
+        };
+        public static int[] DiffTextPosX = new int[3]
+        {
+            -856, -816, -853
+        };
+        public static int[] DiffTextPosY = new int[3]
+        {
+            -446, -446, -489
+        };
+        public static int[] LvTextPosX = new int[3]
+        {
+            -747, -707, -744
+        };
+        public static int[] LvTextPosY = new int[3]
+        {
+            -446, -446, -489
+        };
+        public static int[] SpdStdTextPosX = new int[3]
+        {
+            -517, -450, -527
+        };
+        public static int[] SpdStdTextPosY = new int[3]
+        {
+            -449, -449, -489
+        };
+        public static int[] SpdConTextPosX = new int[3]
+        {
+            -516, -449, -306
+        };
+        public static int[] SpdConTextPosY = new int[3]
+        {
+            -486, -486, -489
+        };
+
+        // 2P Big Type B
+        public static int[] UpperLeftPosX = new int[3]
+        {
+            -500, -500, -500
+        };
+        public static int[] LowerLeftPosX = new int[3]
+        {
+            -300, -400, -500
+        };
+        // 1P Big Type B
+        public static int[] UpperRightPosX = new int[3]
+        {
+            500, 600, 710
+        };
+        public static int[] LowerRightPosX = new int[3]
+        {
+            300, 400, 500
+        };
+        // Others
+        public static int[] UpperCenter_1PPosX = new int[3]
+        {
+            0, 100, 200
+        };
+        public static int[] LowerCenter_1PPosX = new int[3]
+        {
+            -200, -100, 0
+        };
+        public static int[] UpperCenter_2PPosX = new int[3]
+        {
+            0, -100, -200
+        };
+        public static int[] LowerCenter_2PPosX = new int[3]
+        {
+            200, 100, 0
+        };
         #endregion
 
         // Custom Key

@@ -15,9 +15,15 @@ namespace BMSPlayer {
 	 3. 버튼 동작은 여기에서 처리
 	 */
 	public class PlayController : MonoBehaviour {
+        // UI Related
 		private PlayData Data;
 		private PlayUI UI;
+        private HPBarUI HPUI;
+        private BGAControl BGAControl;
         private Graph Graph;
+        private CoverLiftControl Cover;
+
+        // Data Related
 		private NoteGenerator generator;
         private Scroller scroller;
         private LNObjConverter LNConverter;
@@ -66,7 +72,10 @@ namespace BMSPlayer {
 
             // UI 가져오기
             UI = GetComponent<PlayUI>();
+            HPUI = GetComponent<HPBarUI>();
+            BGAControl = GetComponent<BGAControl>();
             Graph = GetComponent<Graph>();
+            Cover = GetComponent<CoverLiftControl>();
 
             encoding = Const.Encoding;
 
@@ -119,12 +128,12 @@ namespace BMSPlayer {
             );
 
             // 저장된 커버 이동 수치만큼 이동
-            UI.CoverHiddenUp();
-            UI.CoverHiddenDown();
-            UI.CoverSuddenDown();
-            UI.CoverSuddenUp();
-            UI.CoverLiftUp();
-            UI.CoverLiftDown();
+            Cover.CoverHiddenUp();
+            Cover.CoverHiddenDown();
+            Cover.CoverSuddenDown();
+            Cover.CoverSuddenUp();
+            Cover.CoverLiftUp();
+            Cover.CoverLiftDown();
         }
 
         private void Update ()
@@ -164,34 +173,34 @@ namespace BMSPlayer {
                 // SUD down
                 if (Input.GetKey(KeyCode.Alpha3))
                 {
-                    UI.CoverSuddenDown();
+                    Cover.CoverSuddenDown();
                 }
                 // SUD up
                 else if (Input.GetKey(KeyCode.Alpha4))
                 {
-                    UI.CoverSuddenUp();
+                    Cover.CoverSuddenUp();
                 }
 
                 // LIFT down
                 if (Input.GetKey(KeyCode.Alpha5))
                 {
-                    UI.CoverLiftDown();
+                    Cover.CoverLiftDown();
                 }
                 // LIFT up
                 else if (Input.GetKey(KeyCode.Alpha6))
                 {
-                    UI.CoverLiftUp();
+                    Cover.CoverLiftUp();
                 }
 
                 // HID down
                 if (Input.GetKey(KeyCode.Alpha7))
                 {
-                    UI.CoverHiddenDown();
+                    Cover.CoverHiddenDown();
                 }
                 // HID up
                 else if (Input.GetKey(KeyCode.Alpha8))
                 {
-                    UI.CoverHiddenUp();
+                    Cover.CoverHiddenUp();
                 }
 
                 // 데이터 로딩
@@ -244,17 +253,17 @@ namespace BMSPlayer {
                     if (analyzer.IsVideoExist())
                     {
                         isBGAMovieExist = true;
-                        UI.BGAVideoActivate();
-                        UI.BGAVideoPreload(Data.BMS.BGAVideoFile);
+                        BGAControl.BGAVideoActivate();
+                        BGAControl.BGAVideoPreload(Data.BMS.BGAVideoFile);
                     }
                     else
                     {
-                        UI.BGAImageActivate();
+                        BGAControl.BGAImageActivate();
                     }
 
                     if (Data.BMS.LayerNote.Count > 0)
                     {
-                        UI.LayerImageActivate();
+                        BGAControl.LayerImageActivate();
                     }
 
                     UI.UpdateSpeed();
@@ -269,7 +278,7 @@ namespace BMSPlayer {
                     scroller.PlaySetup(Data.TotalNotes, Data.BMS.Rank);
 
                     UI.UpdateTimerTotal(Data.LastTiming);
-                    UI.UpdateHP(hpController.CurrentHP);
+                    HPUI.UpdateHP(hpController.CurrentHP);
 
                     isBMSReady = true;
                     UI.DeactiveLoading();
@@ -391,7 +400,7 @@ namespace BMSPlayer {
 
                         if (isBGAMovieExist)
                         {
-                            isPlayingBGA = UI.isBGAPlaying();
+                            isPlayingBGA = BGAControl.isBGAPlaying();
                         }
 
                         if (!isPlayingMusic && !isPlayingBGA)
@@ -491,14 +500,14 @@ namespace BMSPlayer {
                     {
                         PauseStartTime = currentTick;
                         soundController.PauseAll();
-                        if(Data.BMS.BGAVideoFile != null) UI.PauseBGAVideo();
+                        if(Data.BMS.BGAVideoFile != null) BGAControl.PauseBGAVideo();
                         UI.ShowPauseMenu();
                     }
                     else
                     {
                         StartTime += currentTick - PauseStartTime;
                         soundController.ResumeAll();
-                        if (Data.BMS.BGAVideoFile != null) UI.ResumeBGAVideo();
+                        if (Data.BMS.BGAVideoFile != null) BGAControl.ResumeBGAVideo();
                         UI.HidePauseMenu();
                     }
                 }

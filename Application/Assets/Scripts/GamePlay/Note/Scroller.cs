@@ -78,8 +78,12 @@ namespace BMSPlayer
         private ISoundController soundController;
 
         // 외부 클래스 연계
-        private PlayUI ui;
+        private PlayUI UI;
+        private HPBarUI HPUI;
         private Graph Graph;
+        private BGAControl BGAControl;
+        private JudgeUIProcess JudgeUI;
+        private BeamUI BeamUI;
         private NoteObjectAdder NoteAdder;
 
         public void Update()
@@ -96,15 +100,19 @@ namespace BMSPlayer
                     speed = (int)(speedfl / BPM * 100);
                     Const.SpeedStd = (int)(speedfl / BPM * 100);
                 }
-                ui.UpdateSpeed();
+                UI.UpdateSpeed();
                 isSpeedChanged = false;
             }
         }
 
         public void Init()
         {
-            ui = GetComponent<PlayUI>();
+            UI = GetComponent<PlayUI>();
+            HPUI = GetComponent<HPBarUI>();
             Graph = GetComponent<Graph>();
+            BGAControl = GetComponent<BGAControl>();
+            JudgeUI = GetComponent<JudgeUIProcess>();
+            BeamUI = GetComponent<BeamUI>();
             NoteAdder = GetComponent<NoteObjectAdder>();
 
             speed = Const.SpeedStd;
@@ -320,7 +328,7 @@ namespace BMSPlayer
                     GameObject noteobj = current.NoteObject;
                     noteobj.transform.localPosition = new Vector3(
                         noteobj.transform.localPosition.x,
-                        (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER),
+                        (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER) - Const.NoteSizeCalc,
                         noteobj.transform.localPosition.z);
                 }
 
@@ -452,7 +460,7 @@ namespace BMSPlayer
                         // 스케일 변경
                         Vector3 scale = ln.Mid.NoteObject.transform.localScale;
                         ln.Mid.NoteObject.transform.localScale = new Vector3(
-                            scale.x, scale.y, (float)(endRealPos - startRealPos));
+                            scale.x, (float)(endRealPos - startRealPos), scale.z);
 
                         // 위치 변경
                         Vector3 pos = ln.Mid.NoteObject.transform.localPosition;
@@ -495,7 +503,7 @@ namespace BMSPlayer
                             }
                             processedNotes++;
                             current.Used = true;
-                            ui.UpdateHP(hpController.CurrentHP);
+                            HPUI.UpdateHP(hpController.CurrentHP);
 
                             // 타이밍 윈도우에서 없애야 함
                             notesInTimingWindow--;
@@ -562,11 +570,11 @@ namespace BMSPlayer
                     // 비디오 파일이 아닐 경우
                     if(current.VideoFile == null)
                     {
-                        ui.BGAImageSetting(current.BGASprite);
+                        BGAControl.BGAImageSetting(current.BGASprite);
                     }
                     else
                     {
-                        ui.BGAVideoPlay();
+                        BGAControl.BGAVideoPlay();
                     }
                     current.Used = true;
                     removeCandidate.Add(current);
@@ -590,7 +598,7 @@ namespace BMSPlayer
                 if (current.Timing <= time && !current.Used)
                 {
                     // 비디오 파일이 아닐 경우
-                    ui.LayerImageSetting(current.BGASprite);
+                    BGAControl.LayerImageSetting(current.BGASprite);
                     current.Used = true;
                     removeCandidate.Add(current);
                 }
@@ -638,7 +646,7 @@ namespace BMSPlayer
                     bps = bpm / 240;
                     current.Used = true;
                     removeCandidate.Add(current);
-                    ui.SetGearCurBPM(bpm);
+                    UI.SetGearCurBPM(bpm);
                     Data.BPMNum++;
                     addStopTiming = 0;
                 }
@@ -732,7 +740,7 @@ namespace BMSPlayer
                         // btnPushState false를 여기서 수행함
 
                         // 노트 이펙트 켜기
-                        ui.TurnOnNoteEffect(i);
+                        UI.TurnOnNoteEffect(i);
                         btnPushSound[i] = false;
                     }
                     // 롱노트 시작 처리
@@ -748,7 +756,7 @@ namespace BMSPlayer
                         ProcessLNStartNote(cnote, lnlist, time, i);
 
                         // 노트 이펙트 켜기
-                        ui.TurnOnNoteEffectLN(i, true);
+                        UI.TurnOnNoteEffectLN(i, true);
 
                         // InProgress 값은 중간에 미스가 나도 true로 유지하고
                         // 마지막 노트가 지나야 false로 변경한다
@@ -762,7 +770,7 @@ namespace BMSPlayer
                         AfterTouchLongEnd(endtiming);
 
                         // 노트 이펙트 켜기
-                        ui.TurnOnNoteEffectLN(i, false);
+                        UI.TurnOnNoteEffectLN(i, false);
 
                         btnPushState[i] = false;
                         isLnWorking[i] = false;
@@ -908,7 +916,7 @@ namespace BMSPlayer
                                         ProcessLNStartNote(cnote, lnlist, time, i);
 
                                         // 노트 이펙트 켜기
-                                        ui.TurnOnNoteEffectLN(i, true);
+                                        UI.TurnOnNoteEffectLN(i, true);
                                     }
                                     else
                                     {
@@ -925,7 +933,7 @@ namespace BMSPlayer
                                     notesInTimingWindow--;
 
                                     // 노트 이펙트 켜기
-                                    ui.TurnOnNoteEffect(i % 8);
+                                    UI.TurnOnNoteEffect(i % 8);
                                     cnote.Used = true;
                                 }
                             }
@@ -978,7 +986,7 @@ namespace BMSPlayer
                                     AfterTouchLongEnd(time);
 
                                     // 노트 이펙트 켜기
-                                    ui.TurnOnNoteEffectLN(i, false);
+                                    UI.TurnOnNoteEffectLN(i, false);
 
                                     cnote.Used = true;
                                     isLnWorking[i] = false;
@@ -993,7 +1001,7 @@ namespace BMSPlayer
                                 {
                                     // 노트 이펙트 켜기
                                     processedNotes++;
-                                    ui.TurnOnNoteEffectLN(i, false);
+                                    UI.TurnOnNoteEffectLN(i, false);
 
                                 }
                             }
@@ -1261,7 +1269,7 @@ namespace BMSPlayer
                     break;
             }
 
-            ui.UpdateHP(hpController.CurrentHP);
+            HPUI.UpdateHP(hpController.CurrentHP);
             processedNotes++;
             UpdateTiming(time, true);
             UpdateScore();
@@ -1274,8 +1282,8 @@ namespace BMSPlayer
             // cb나 콤보 초기화 없이 miss 개수만 늘림
             miss++;
             hpController.hpChangeEPoor();
-            ui.UpdateHP(hpController.CurrentHP);
-            ui.UpdateJudge(TimingType.EPOOR, combo, "0.00%", 0);
+            HPUI.UpdateHP(hpController.CurrentHP);
+            JudgeUI.UpdateJudge(TimingType.EPOOR, combo, "0.00%", 0, score);
         }
 
         // 롱노트의 끝 노트 타이밍을 처리하는 메소드
@@ -1311,7 +1319,7 @@ namespace BMSPlayer
             processedNotes++;
             UpdateTiming(time, true);
             UpdateScore();
-            ui.UpdateHP(hpController.CurrentHP);
+            HPUI.UpdateHP(hpController.CurrentHP);
         }
 
         private void UpdateTiming(double time, bool rateadd)
@@ -1334,13 +1342,13 @@ namespace BMSPlayer
             if(timingType == TimingType.POOR)
             {
                 combo = 0;
-                ui.UpdateJudge(timingType, combo, "0.00%", 0);
+                JudgeUI.UpdateJudge(timingType, combo, "0.00%", 0, score);
             }
             else if(timingType == TimingType.BAD)
             {
                 sumRate += (1 - abstime / BAD) * 100;
                 combo = 0;
-                ui.UpdateJudge(timingType, combo, "0.00%", 0);
+                JudgeUI.UpdateJudge(timingType, combo, "0.00%", 0, score);
             }
             else if(rateadd)
             {
@@ -1352,15 +1360,15 @@ namespace BMSPlayer
                 if (combo > maxcombo)
                 {
                     maxcombo = combo;
-                    ui.UpdateMaxCombo(maxcombo);
+                    UI.UpdateMaxCombo(maxcombo);
                 }
 
-                ui.UpdateJudge(timingType, combo, ((1 - abstime / BAD) * 100).ToString("0.00") + "%", (int)Math.Round(timefs*100));
+                JudgeUI.UpdateJudge(timingType, combo, ((1 - abstime / BAD) * 100).ToString("0.00") + "%", (int)Math.Round(timefs*100), score);
             }
 
             avgRate = Math.Round(sumRate * 100 / processedNotes) / 100;
             avgTimeDiff = sumTimeDiff / processedNotes;
-            ui.UpdateSideJudge(perfect, great, good, ok, miss, cb, fast, slow,
+            UI.UpdateSideJudge(perfect, great, good, ok, miss, cb, fast, slow,
                 avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
 
             if(Const.AutoSync == AutoSyncType.ON)
@@ -1395,7 +1403,7 @@ namespace BMSPlayer
 
         private void UpdateScore()
         {
-            ui.UpdateScore(score);
+            UI.UpdateScore(score);
             if (Const.GraphType != GraphType.OFFBGA
                 && Const.GraphType != GraphType.OFFGEAR)
                 Graph.UpdateGraph(score, processedNotes, noteCount);
@@ -1403,7 +1411,7 @@ namespace BMSPlayer
 
         private void ShowBeam(int lane, bool onoff)
         {
-            ui.ShowAndHideBeam(lane, onoff);
+            BeamUI.ShowAndHideBeam(lane, onoff);
         }
 
         public void GetResultData(int totalNotes)
@@ -1420,7 +1428,7 @@ namespace BMSPlayer
             Const.ResultTimeDiff = (float)avgTimeDiff;
             Const.ResultScore = score;
             Const.ResultMaxCombo = maxcombo;
-            Const.ResultRank = ui.GetRank(score, processedNotes);
+            Const.ResultRank = GetRank(score, processedNotes);
         }
 
         public void SpeedUpFixed()
@@ -1472,6 +1480,47 @@ namespace BMSPlayer
         {
             BPM = bpm;
             isSpeedChanged = true;
+        }
+
+        private string GetRank(int ex, int proc)
+        {
+            string rank = "f";
+            float currentRankState = (float)ex / (proc * 2);
+
+            if (currentRankState >= 8f / 9)
+            {
+                rank = "aaa";
+            }
+            else if (currentRankState >= 7f / 9)
+            {
+                rank = "aa";
+            }
+            else if (currentRankState >= 6f / 9)
+            {
+                rank = "a";
+            }
+            else if (currentRankState >= 5f / 9)
+            {
+                rank = "b";
+            }
+            else if (currentRankState >= 4f / 9)
+            {
+                rank = "c";
+            }
+            else if (currentRankState >= 3f / 9)
+            {
+                rank = "d";
+            }
+            else if (currentRankState >= 2f / 9)
+            {
+                rank = "e";
+            }
+            else
+            {
+                rank = "f";
+            }
+
+            return rank;
         }
     }
 }

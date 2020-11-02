@@ -14,6 +14,7 @@ namespace BMSPlayer
         public Button btnPageChanger;
         public GameObject PageSet0;
         public GameObject PageSet1;
+        public GameObject PageSet2;
 
         // Speed
         public Button btnSpdDown;
@@ -56,9 +57,21 @@ namespace BMSPlayer
         public Button btnJudgeType;
         public Text txtJudgeType;
 
-        // Skin
-        public Button btnSkin;
-        public Text txtSkin;
+        // GearSkin
+        public Button btnGearSkin;
+        public Text txtGearSkin;
+
+        // GearSize
+        public Button btnGearSize;
+        public Text txtGearSize;
+
+        // NoteSkin
+        public Button btnNoteSkin;
+        public Text txtNoteSkin;
+
+        // NoteSize
+        public Button btnNoteSize;
+        public Text txtNoteSize;
 
         // GraphSize
         public Button btnGraphType;
@@ -134,10 +147,15 @@ namespace BMSPlayer
             btnJudgeType.onClick.AddListener(JudgeTypeChange);
 
             // Page 2
-            btnSkin.onClick.AddListener(SkinChange);
+            btnGearSkin.onClick.AddListener(GearSkinChange);
+            btnGearSize.onClick.AddListener(GearSizeChange);
+            btnNoteSkin.onClick.AddListener(NoteSkinChange);
+            btnNoteSize.onClick.AddListener(NoteSizeChange);
             btnGraphType.onClick.AddListener(GraphSizeChange);
             btnLayoutType.onClick.AddListener(LayoutChange);
             btnBGA.onClick.AddListener(BGAChange);
+
+            // Page 3
             btnPlaySide.onClick.AddListener(PlaySideChange);
             btnFastSlow.onClick.AddListener(FastSlowChange);
             btnTargetDiff.onClick.AddListener(TargetDiffChange);
@@ -292,18 +310,53 @@ namespace BMSPlayer
                     break;
             }
 
-            // 스킨
-            if (Const.GearSkin == "") Const.GearSkin = "black";
+            // 기어 스킨
             switch (Const.GearSkin)
             {
-                case "black":
-                    txtSkin.text = "BLACK";
+                case SkinType.NORMAL:
+                    txtGearSkin.text = "NORMAL";
                     break;
-                case "white":
-                    txtSkin.text = "WHITE";
+                case SkinType.DARK:
+                    txtGearSkin.text = "DARK";
                     break;
-                case "dark":
-                    txtSkin.text = "DARK";
+            }
+
+            // 기어 사이즈
+            switch (Const.GearSize)
+            {
+                case SkinSize.STANDARD:
+                    txtGearSize.text = "STANDARD";
+                    break;
+                case SkinSize.WIDE125:
+                    txtGearSize.text = "WIDE(1.25)";
+                    break;
+                case SkinSize.WIDE150:
+                    txtGearSize.text = "WIDE(1.50)";
+                    break;
+            }
+
+            // 노트 스킨
+            switch (Const.NoteSkin)
+            {
+                case NoteSkin.NORMAL:
+                    txtNoteSkin.text = "NORMAL";
+                    break;
+                case NoteSkin.PASTEL:
+                    txtNoteSkin.text = "PASTEL";
+                    break;
+            }
+
+            // 노트 사이즈
+            switch (Const.NoteSize)
+            {
+                case NoteSize.NORMAL:
+                    txtNoteSize.text = "NORMAL";
+                    break;
+                case NoteSize.SLIM:
+                    txtNoteSize.text = "SLIM";
+                    break;
+                case NoteSize.FAT:
+                    txtNoteSize.text = "FAT";
                     break;
             }
 
@@ -490,11 +543,11 @@ namespace BMSPlayer
                     JudgeTypeChange();
                 }
             }
-            else
+            else if(Page == 1)
             {
                 if (Input.GetKeyDown(KeyCode.F1))
                 {
-                    SkinChange();
+                    GearSkinChange();
                 }
                 else if (Input.GetKeyDown(KeyCode.F2))
                 {
@@ -502,25 +555,40 @@ namespace BMSPlayer
                 }
                 else if (Input.GetKeyDown(KeyCode.F3))
                 {
-                    LayoutChange();
+                    NoteSkinChange();
                 }
                 else if (Input.GetKeyDown(KeyCode.F4))
                 {
-                    BGAChange();
+                    NoteSizeChange();
                 }
                 else if (Input.GetKeyDown(KeyCode.F5))
                 {
-                    PlaySideChange();
+                    GraphSizeChange();
                 }
                 else if (Input.GetKeyDown(KeyCode.F6))
                 {
-                    FastSlowChange();
+                    LayoutChange();
                 }
                 else if (Input.GetKeyDown(KeyCode.F7))
                 {
+                    BGAChange();
+                }
+            }
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.F1))
+                {
+                    PlaySideChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F2))
+                {
+                    FastSlowChange();
+                }
+                else if (Input.GetKeyDown(KeyCode.F3))
+                {
                     TargetDiffChange();
                 }
-                else if (Input.GetKeyDown(KeyCode.F8))
+                else if (Input.GetKeyDown(KeyCode.F4))
                 {
                     RateChange();
                 }
@@ -534,12 +602,21 @@ namespace BMSPlayer
                 Page = 1;
                 PageSet0.SetActive(false);
                 PageSet1.SetActive(true);
+                PageSet2.SetActive(false);
             }
-            else
+            else if(Page == 1)
+            {
+                Page = 2;
+                PageSet0.SetActive(false);
+                PageSet1.SetActive(false);
+                PageSet2.SetActive(true);
+            }
+            else if(Page == 2)
             {
                 Page = 0;
                 PageSet0.SetActive(true);
                 PageSet1.SetActive(false);
+                PageSet2.SetActive(false);
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
@@ -808,21 +885,75 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void SkinChange()
+        private void GearSkinChange()
         {
             switch (Const.GearSkin)
             {
-                case "black":
-                    txtSkin.text = "WHITE";
-                    Const.GearSkin = "white";
+                case SkinType.NORMAL:
+                    Const.GearSkin = SkinType.DARK;
+                    txtGearSkin.text = "DARK";
                     break;
-                case "white":
-                    txtSkin.text = "DARK";
-                    Const.GearSkin = "dark";
+                case SkinType.DARK:
+                    Const.GearSkin = SkinType.NORMAL;
+                    txtGearSkin.text = "NORMAL";
                     break;
-                case "dark":
-                    txtSkin.text = "BLACK";
-                    Const.GearSkin = "black";
+            }
+            sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        private void GearSizeChange()
+        {
+            switch (Const.GearSize)
+            {
+                case SkinSize.STANDARD:
+                    Const.GearSize = SkinSize.WIDE125;
+                    txtGearSize.text = "WIDE(1.25)";
+                    break;
+                case SkinSize.WIDE125:
+                    Const.GearSize = SkinSize.WIDE150;
+                    txtGearSize.text = "WIDE(1.50)";
+                    break;
+                case SkinSize.WIDE150:
+                    Const.GearSize = SkinSize.STANDARD;
+                    txtGearSize.text = "STANDARD";
+                    break;
+            }
+            sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        private void NoteSkinChange()
+        {
+            // 노트 스킨
+            switch (Const.NoteSkin)
+            {
+                case NoteSkin.NORMAL:
+                    Const.NoteSkin = NoteSkin.PASTEL;
+                    txtNoteSkin.text = "PASTEL";
+                    break;
+                case NoteSkin.PASTEL:
+                    Const.NoteSkin = NoteSkin.NORMAL;
+                    txtNoteSkin.text = "NORMAL";
+                    break;
+            }
+            sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        private void NoteSizeChange()
+        {
+            // 노트 사이즈
+            switch (Const.NoteSize)
+            {
+                case NoteSize.NORMAL:
+                    Const.NoteSize = NoteSize.SLIM;
+                    txtNoteSize.text = "SLIM";
+                    break;
+                case NoteSize.SLIM:
+                    Const.NoteSize = NoteSize.FAT;
+                    txtNoteSize.text = "FAT";
+                    break;
+                case NoteSize.FAT:
+                    Const.NoteSize = NoteSize.NORMAL;
+                    txtNoteSize.text = "NORMAL";
                     break;
             }
             sfxPlay.PlayOneShot(sfxSource);

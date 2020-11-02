@@ -17,7 +17,6 @@ namespace BMSPlayer
         public AudioClip sfxMove;
 
         // Path changer
-        private MusicListManager mlm;
         private List<MusicListData> musicList;
         private ListItemTree tree;
 
@@ -91,8 +90,6 @@ namespace BMSPlayer
             base.Awake();
             encoding = Const.Encoding;
             bmsPath = Const.BMSFolderPath;
-
-            mlm = new MusicListManager();
             musicList = new List<MusicListData>();
 
             rows = 8;
@@ -457,7 +454,8 @@ namespace BMSPlayer
             tree = new ListItemTree(bmsPath);
 
             strLoading = "Loading file and directories";
-            tree.Head = tree.CreateTree(tree.Head);
+            tree.Head = tree.CreateTree(
+                tree.Head, ref strLoading, musicList, encoding);
 
             // Save as JSON file
             strLoading = "Saving JSON File";
@@ -474,22 +472,20 @@ namespace BMSPlayer
 
             // 실제 파일을 DB에 등록
             // Load each file
-            int index = 0;
+            /*int index = 0;
             foreach(string file in tree.FileList)
             {
                 // 각 파일별로 돌면서 파일을 등록함
                 strLoading = "Loading " + file;
-                MusicListData bmsdata = mlm.LoadBMSFromFolder(file, index, encoding);
+                MusicListData bmsdata = mlm.LoadBMSFromPath(file, index, encoding);
                 if(bmsdata != null) musicList.Add(bmsdata);
                 index++;
-            }
+            }*/
 
             // 수집한 BMS 데이터를 DB에 등록
             strLoading = "Registering into database";
-            mlm = new MusicListManager();
-            mlm.AddDataToDB(musicList);
-            mlm.Close();
-
+            MusicListManager.Instance.AddDataToDB(musicList);
+            
             refreshed = true;
         }
 

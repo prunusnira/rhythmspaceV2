@@ -44,7 +44,7 @@ namespace BMSPlayer
                     break;
             }
 
-            if(Const.GearSkin == "dark")
+            if(Const.GearSkin == SkinType.DARK)
             {
                 GraphBigBody.sprite = GraphBigDark;
                 GraphSmallBody.sprite = GraphSmallDark;
@@ -145,9 +145,10 @@ namespace BMSPlayer
                         {
                             // 2P Right BGA
                             GraphSmall.transform.localPosition =
-                                new Vector2(
-                                    Const.Graph_2P_Small_Left_PosX,
-                                    GraphSmall.transform.localPosition.y
+                                new Vector3(
+                                    Const.Graph_2P_Small_Left_PosX[(int)Const.GearSize],
+                                    GraphSmall.transform.localPosition.y,
+                                    GraphSmall.transform.localPosition.z
                                 );
                         }
                     }
@@ -157,18 +158,20 @@ namespace BMSPlayer
                         {
                             // 1P Right BGA
                             GraphSmall.transform.localPosition =
-                                new Vector2(
-                                    Const.Graph_1P_Small_Left_PosX,
-                                    GraphSmall.transform.localPosition.y
+                                new Vector3(
+                                    Const.Graph_1P_Small_Left_PosX[(int)Const.GearSize],
+                                    GraphSmall.transform.localPosition.y,
+                                    GraphSmall.transform.localPosition.z
                                 );
                         }
                         else
                         {
                             // 2P Left BGA
                             GraphSmall.transform.localPosition =
-                                new Vector2(
-                                    Const.Graph_2P_Small_Right_PosX,
-                                    GraphSmall.transform.localPosition.y
+                                new Vector3(
+                                    Const.Graph_2P_Small_Right_PosX[(int)Const.GearSize],
+                                    GraphSmall.transform.localPosition.y,
+                                    GraphSmall.transform.localPosition.z
                                 );
                         }
                     }
@@ -179,18 +182,20 @@ namespace BMSPlayer
                     {
                         // 1P BGA
                         GraphMini.transform.localPosition =
-                            new Vector2(
-                                Const.Graph_1P_Mini_PosX,
-                                GraphSmall.transform.localPosition.y
+                            new Vector3(
+                                Const.Graph_1P_Mini_PosX[(int)Const.GearSize],
+                                GraphSmall.transform.localPosition.y,
+                                GraphSmall.transform.localPosition.z
                             );
                     }
                     else
                     {
                         // 2P BGA
                         GraphMini.transform.localPosition =
-                            new Vector2(
-                                Const.Graph_2P_Mini_PosX,
-                                GraphSmall.transform.localPosition.y
+                            new Vector3(
+                                Const.Graph_2P_Mini_PosX[(int)Const.GearSize],
+                                GraphSmall.transform.localPosition.y,
+                                GraphSmall.transform.localPosition.z
                             );
                     }
                     break;
@@ -211,9 +216,10 @@ namespace BMSPlayer
                         {
                             // 2P Left BGA
                             GraphBig.transform.localPosition =
-                                new Vector2(
-                                    Const.Graph_2P_Big_Left_PosX,
-                                    GraphSmall.transform.localPosition.y
+                                new Vector3(
+                                    Const.Graph_2P_Big_Left_PosX[(int)Const.GearSize],
+                                    GraphSmall.transform.localPosition.y,
+                                    GraphSmall.transform.localPosition.z
                                 );
                         }
                     }
@@ -223,18 +229,20 @@ namespace BMSPlayer
                         {
                             // 1P Right BGA
                             GraphBig.transform.localPosition =
-                                new Vector2(
-                                    Const.Graph_1P_Big_Left_PosX,
-                                    GraphSmall.transform.localPosition.y
+                                new Vector3(
+                                    Const.Graph_1P_Big_Left_PosX[(int)Const.GearSize],
+                                    GraphSmall.transform.localPosition.y,
+                                    GraphSmall.transform.localPosition.z
                                 );
                         }
                         else
                         {
                             // 2P Left BGA
                             GraphBig.transform.localPosition =
-                                new Vector2(
-                                    Const.Graph_2P_Big_Right_PosX,
-                                    GraphSmall.transform.localPosition.y
+                                new Vector3(
+                                    Const.Graph_2P_Big_Right_PosX[(int)Const.GearSize],
+                                    GraphSmall.transform.localPosition.y,
+                                    GraphSmall.transform.localPosition.z
                                 );
                         }
                     }

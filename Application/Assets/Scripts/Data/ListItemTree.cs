@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BMSCore;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -30,10 +31,14 @@ namespace BMSPlayer
             Head = JSONtoFolderNode(json, new List<int>());
         }
 
-        public ListItemNode CreateTree(ListItemNode current)
+        public ListItemNode CreateTree(
+            ListItemNode current, ref string strLoading,
+            List<MusicListData> musicList, int encoding)
         {
             JSONStr += "{\n\"Path\":\"" + current.Path.Replace("\\", "/") + "\",\n" +
-                "\"BMS\":\"" + HasBMS(current).ToString() + "\",\n" +
+                "\"BMS\":\"" +
+                HasBMS(current, ref strLoading, musicList, encoding).ToString() +
+                "\",\n" +
                 "\"Children\":[\n";
 
             string[] dirs = GetSubFolders(current);
@@ -60,7 +65,13 @@ namespace BMSPlayer
                     // Depth 추가
                     List<int> cdepth = DepthClone(depth);
                     cdepth.Add(i);
-                    AddChild(current, CreateTree(GenerateFolderNode(dirs[i], cdepth)));
+                    AddChild(
+                        current,
+                        CreateTree(
+                            GenerateFolderNode(dirs[i], cdepth), ref strLoading,
+                            musicList, encoding
+                        )
+                    );
 
                     if (i == dirs.Length - 1)
                     {
@@ -123,7 +134,9 @@ namespace BMSPlayer
             return node.Children.Count > 0 ? true : false;
         }
 
-        public bool HasBMS(ListItemNode node)
+        public bool HasBMS(
+            ListItemNode node, ref string strLoading,
+            List<MusicListData> musicList, int encoding)
         {
             string[] bmsfiles = Directory.GetFiles(node.Path, "*.*", SearchOption.TopDirectoryOnly)
                         .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")
@@ -133,7 +146,10 @@ namespace BMSPlayer
             {
                 foreach (string bms in bmsfiles)
                 {
-                    FileList.Add(bms);
+                    //FileList.Add(bms);
+                    strLoading = "Loading " + bms;
+                    MusicListData bmsdata = MusicListManager.Instance.LoadBMSFromPath(bms, musicList.Count, encoding);
+                    if (bmsdata != null) musicList.Add(bmsdata);
                 }
                 return true;
             }

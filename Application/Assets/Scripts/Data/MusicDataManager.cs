@@ -12,7 +12,20 @@ namespace BMSPlayer
         SQLiteExecutor executor;
         MD5 md5;
 
-        public MusicListManager()
+        private static MusicListManager instance;
+        public static MusicListManager Instance
+        {
+            get
+            {
+                if(instance == null)
+                {
+                    instance = new MusicListManager();
+                }
+                return instance;
+            }
+        }
+
+        private MusicListManager()
         {
             executor = SQLiteExecutor.getInstance();
             md5 = MD5.Create();
@@ -24,7 +37,7 @@ namespace BMSPlayer
             md5.Clear();
         }
 
-        public MusicListData LoadBMSFromFolder(string path, int index, int encoding)
+        public MusicListData LoadBMSFromPath(string path, int index, int encoding)
         {
             if (path != "")
             {

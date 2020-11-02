@@ -18,36 +18,6 @@ namespace BMSCore
         private bool isVideoExist = false;
         private bool isRandom = false;
 
-        private Ude.CharsetDetector encDetect = new Ude.CharsetDetector();
-
-        public Encoding GetEncodingInfo(string detectedSet, int encoding)
-        {
-            Encoding charset = Encoding.GetEncoding(encoding);
-            if (detectedSet != null)
-            {
-                if (detectedSet != "Shift-JIS" && detectedSet != "EUC-KR")
-                {
-                    if (encoding == 932)
-                    {
-                        charset = Encoding.GetEncoding(932);
-                    }
-                    if (encoding == 949)
-                    {
-                        charset = Encoding.GetEncoding(949);
-                    }
-                }
-                else
-                {
-                    charset = Encoding.GetEncoding(detectedSet);
-                }
-            }
-            else
-            {
-                charset = Encoding.Default;
-            }
-            return charset;
-        }
-
         // 노래 선택창에서 선택한 BMS 파일의 헤더를 분석
         public void HeaderAnalyzer(BMS bms, int encoding)
         {
@@ -56,11 +26,7 @@ namespace BMSCore
                 bms.FilePath, System.Text.Encoding.GetEncoding(encoding)
             );*/
             FileStream bmsFileStream = File.OpenRead(bms.FilePath);
-            encDetect.Feed(bmsFileStream);
-            encDetect.DataEnd();
-
-            Encoding charset = GetEncodingInfo(encDetect.Charset, encoding);
-            bmsFileStream.Seek(0, SeekOrigin.Begin);
+            Encoding charset = Encoding.GetEncoding(encoding);
             StreamReader bmsReader = new StreamReader(bmsFileStream, charset);
             
             // 한 줄 씩 읽으면서 분석
@@ -86,7 +52,11 @@ namespace BMSCore
                             left += etc;
                         }
 
-                        string chkWav = tag.Substring(0, 4).ToUpper();
+                        string chkWav = "";
+                        if (tag.Length > 4)
+                        {
+                            chkWav = tag.Substring(0, 4).ToUpper();
+                        }
 
                         // For BPM Check
                         int parsedTag = 0;
@@ -124,7 +94,9 @@ namespace BMSCore
                         }
                         else if(tag == "#DIFFICULTY")
                         {
-                            bms.Difficulty = int.Parse(left);
+                            int diff = 2;
+                            bool parse = int.TryParse(left, out diff);
+                            bms.Difficulty = diff;
                         }
                         else if (tag == "#BPM")
                         {
@@ -175,8 +147,8 @@ namespace BMSCore
                             leftNote += noteTok[1];
 
                             int bar = int.Parse(noteBuf.Substring(1, 3));
-                            int ch = int.Parse(noteBuf.Substring(4, 2));
-                            if (ch == 3 && leftNote != "00")
+                            string ch = noteBuf.Substring(4, 2);
+                            if (ch == "03" && leftNote != "00")
                             {
                                 // BPM
                                 GetBPMInfo(leftNote, ref bms);
@@ -214,11 +186,7 @@ namespace BMSCore
             // input stream 열기 // 기본 Default, 일본어 932, 한국어 949
             //StreamReader bmsReader = new StreamReader(bms.FilePath, System.Text.Encoding.GetEncoding(encoding));
             FileStream bmsFileStream = File.OpenRead(bms.FilePath);
-            encDetect.Feed(bmsFileStream);
-            encDetect.DataEnd();
-
-            Encoding charset = GetEncodingInfo(encDetect.Charset, encoding);
-            bmsFileStream.Seek(0, SeekOrigin.Begin);
+            Encoding charset = Encoding.GetEncoding(encoding);
             StreamReader bmsReader = new StreamReader(bmsFileStream, charset);
             
             // 한 줄 씩 읽으면서 분석

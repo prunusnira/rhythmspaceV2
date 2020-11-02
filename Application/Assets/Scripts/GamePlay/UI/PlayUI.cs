@@ -23,26 +23,6 @@ namespace BMSPlayer
         public Button btnRestartSame;
         public Button btnExit;
 
-        // Judge sprite
-        private TimingType currentJudge = TimingType.NONE;
-
-        // Judge type BM
-        public GameObject[] judgeTypeBM;
-        public TextMesh[] txtInfo1C;
-        public TextMesh[] txtInfo2C;
-        public TextMesh[] txtInfo3C;
-        public TextMesh[] txtInfo1S;
-        public TextMesh[] txtInfo2S;
-        public TextMesh[] txtInfo3S;
-        private TextMesh txtInfoFS;
-        private TextMesh txtInfoTarget;
-        private TextMesh txtInfoRate;
-        public TextMeshPro[] txtJudgeBM;
-        private int infoNumA = 0;
-
-        private double timeLastComboPopup;
-        private double timeLastTimingPopup;
-
         // Side judge
         public Text txtAvgDiff;
         public Text txtAvgRate;
@@ -60,71 +40,47 @@ namespace BMSPlayer
         public TextMesh txtTotalTime;
 
         // Gear and Area
-        public GameObject Gear1P;
-        public GameObject Gear2P;
-        public GameObject Area1P;
-        public GameObject Area2P;
+        public GameObject[] Gear1P;
+        public GameObject[] Gear2P;
+        public GameObject[] Area1P;
+        public GameObject[] Area2P;
 
         // Text display
         public TextMesh Combo;
         public TextMesh Score;
-        public TextMesh SpeedFixed;
-        public TextMesh SpeedFluid;
+        public TextMesh SpeedStandard;
+        public TextMesh SpeedConstant;
         public TextMesh HP;
         public TextMesh BPMcur;
         public TextMesh BPMmin;
         public TextMesh BPMmax;
         public TextMesh Difficulty;
         public TextMesh Level;
+        public TextMesh GaugeType;
 
-        public TextMesh[] txtAutoPlay;
-        public TextMesh[] txtLoading;
-        public GameObject[] gearBtnPress1P;
-        public GameObject[] gearBtnPress2P;
+        public TextMesh[] txtAutoPlayNr;
+        public TextMesh[] txtAutoPlayW125;
+        public TextMesh[] txtAutoPlayW150;
+        public TextMesh[] txtLoadingNr;
+        public TextMesh[] txtLoadingW125;
+        public TextMesh[] txtLoadingW150;
+        private TextMesh txtAutoPlay;
+        private TextMesh txtLoading;
 
         // Skin
         public SpriteRenderer[] skinGear;
-        public Sprite[] skinGearBlack;
-        public Sprite[] skinGearWhite;
+        public Sprite[] skinGearNormal;
         public Sprite[] skinGearDark;
-
-        // Cover
-        public GameObject coverSud;
-        public GameObject coverHid;
-        public GameObject playArea;
-        private int coverSudPos;
-        private int coverHidPos;
-        private int playAreaPos;
-
-        // Beam
-        public GameObject[] beam1P;
-        public GameObject[] beam2P;
 
         // Note Effect
         private Coroutine[] effectCoroutine;
         public SpriteRenderer[] noteEffects;
-        public GameObject[] touches;
         private float[] effectRotation = new float[8];
 
-        // HPBar
-        private HPController hpController;
-        public TextMesh hpBarType;
-        public SpriteRenderer[] hpBar;
-        public Sprite hpBarAssisted;
-        public Sprite hpBarEasy;
-        public Sprite hpBarNormal;
-        public Sprite hpBarHard;
-        public Sprite hpBarExHard;
-
         // BGA
-        public SpriteRenderer bgaImage;
         public RectTransform bgaRect;
-        public SpriteRenderer layerImage;
         public RectTransform layerRect;
-        public VideoPlayer bgaVideo;
-        public GameObject bgaVideoLayer;
         public RectTransform bgaVideoRect;
-        public GameObject bgaErrorLayer;
         public RectTransform bgaFollowingObj;
 
         // Fader
@@ -155,13 +111,12 @@ namespace BMSPlayer
         public Sprite upperDark;
         public Sprite lowerDark;
 
-
         public void Awake()
         {
             try
             {
                 // Dark Skin
-                if(Const.GearSkin == "dark")
+                if(Const.GearSkin == SkinType.DARK)
                 {
                     Upper.sprite = upperDark;
                     Lower.sprite = lowerDark;
@@ -172,6 +127,7 @@ namespace BMSPlayer
 
                 // 사용자 설정에 따른 기어-BGA-그래프 위치 변경
                 ObjectPositionSetup();
+                FrameMove();
 
                 for (int i = 0; i < 8; i++)
                 {
@@ -182,35 +138,21 @@ namespace BMSPlayer
                 // 판정 패널 표시 설정
                 if (Const.DisplayJudge == 0) layerJudgeAll.SetActive(false);
 
-                // HP bar 설정
-                SetInitialHPBar();
-
-                // HP 기본 수치 설정
-                hpController = HPController.Instance;
-
                 // 일시정지 메뉴
                 btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
                 btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
                 btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
 
-                // 판정 표시 타입 변경
-                judgeTypeBM[Const.PlayerSide].SetActive(true);
-
                 // 오토 플레이 표기
                 if(Const.Auto == AutoPlayType.ALL)
                 {
-                    txtAutoPlay[Const.PlayerSide].gameObject.SetActive(true);
+                    txtAutoPlay.gameObject.SetActive(true);
                 }
-
-                // 커버 포지션 변경
-                coverSudPos = Const.CoverSudPos;
-                coverHidPos = Const.CoverHidPos;
-                playAreaPos = Const.AreaLiftPos;
 
                 NoteOnScreen = new List<GameObject>();
 
                 // 기어에 표시하는 정보의 위치와 개수 확인
-                SideInfoDisplayPosition();
+                //SideInfoDisplayPosition();
             }
             catch (Exception e)
             {
@@ -221,24 +163,7 @@ namespace BMSPlayer
         private void Update()
         {
             FPSCounter.text = "FPS " + ((int)(1f / Time.unscaledDeltaTime)).ToString();
-            double timing = (double)DateTime.Now.Ticks / 1000000 - timeLastComboPopup;
-            if (timing > 10)
-            {
-                txtJudgeBM[Const.PlayerSide].gameObject.SetActive(false);
-                if (txtInfoFS != null)
-                    txtInfoFS.gameObject.SetActive(false);
-                if (txtInfoRate != null)
-                    txtInfoRate.gameObject.SetActive(false);
-                if (txtInfoTarget != null)
-                    txtInfoTarget.gameObject.SetActive(false);
-            }
-
-            if (txtJudgeBM[Const.PlayerSide].gameObject.activeSelf && timing % 1.5 < 0.1)
-            {
-                // 판정별 색상 변경 처리
-                StartCoroutine(comboChangeBM(currentJudge));
-            }
-
+            
             if(FadeReady && !FadeStart)
             {
                 StartCoroutine("FadeOut");
@@ -280,44 +205,7 @@ namespace BMSPlayer
         public void SetGearCurBPM(double bpm)
         {
             BPMcur.text = bpm.ToString("0.##");
-            SpeedFluid.text = ((int)(bpm * Const.SpeedStd / 100)).ToString();
-        }
-
-        private void SetInitialHPBar()
-        {
-            switch (Const.GaugeType)
-            {
-                case GaugeType.ASSISTED:
-                    hpBarType.text = "ASSISTED";
-                    hpBarType.color = new Color(206f / 255, 159f / 255, 1f);
-                    hpBar[Const.PlayerSide].sprite = hpBarAssisted;
-                    break;
-                case GaugeType.EASY:
-                    hpBarType.text = "EASY";
-                    hpBarType.color = new Color(159f / 255, 1f, 180f / 255);
-                    hpBar[Const.PlayerSide].sprite = hpBarEasy;
-                    break;
-                case GaugeType.NORMAL:
-                    hpBarType.text = "NORMAL";
-                    hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
-                    hpBar[Const.PlayerSide].sprite = hpBarNormal;
-                    break;
-                case GaugeType.HARD:
-                    hpBarType.text = "HARD";
-                    hpBarType.color = new Color(1f, 159f / 255, 159f / 255);
-                    hpBar[Const.PlayerSide].sprite = hpBarHard;
-                    break;
-                case GaugeType.EXHARD:
-                    hpBarType.text = "EX-HARD";
-                    hpBarType.color = new Color(246f / 255, 1f, 159f / 255);
-                    hpBar[Const.PlayerSide].sprite = hpBarExHard;
-                    break;
-                default:
-                    hpBarType.text = "NORMAL";
-                    hpBarType.color = new Color(159f / 255, 215f / 255, 1f);
-                    hpBar[Const.PlayerSide].sprite = hpBarNormal;
-                    break;
-            }
+            SpeedConstant.text = ((int)(bpm * Const.SpeedStd / 100)).ToString();
         }
 
         public void SetMusicInfo(BMS bms)
@@ -350,148 +238,18 @@ namespace BMSPlayer
 
         public void UpdateSpeed()
         {
-            SpeedFixed.text = ((float)Const.SpeedStd / 100).ToString("0.00") + "x";
-            SpeedFluid.text = Const.SpeedCon.ToString();
-        }
-
-        public void UpdateHP(int hp)
-        {
-            float chp = (float)hp / hpController.HPMax;
-            hpBar[Const.PlayerSide].material.SetFloat("_Progress", chp);
-            HP.text = (chp * 100).ToString("0.00") + "%";
+            SpeedStandard.text = ((float)Const.SpeedStd / 100).ToString("0.00") + "x";
+            SpeedConstant.text = Const.SpeedCon.ToString();
         }
 
         public void UpdateScore(int score)
         {
             Score.text = score.ToString();
-
-            if(txtInfoTarget != null)
-            {
-                int targetDiff = score - Const.ResultTarget;
-
-                if (targetDiff < 0)
-                {
-                    txtInfoTarget.color = Color.red;
-                    txtInfoTarget.text = targetDiff.ToString();
-                }
-                else
-                {
-                    txtInfoTarget.color = Color.white;
-                    txtInfoTarget.text = "+" + targetDiff.ToString();
-                }
-                txtInfoTarget.gameObject.SetActive(true);
-            }
-        }
-
-        public string GetRank(int ex, int proc)
-        {
-            string rank = "f";
-            float currentRankState = (float)ex / (proc * 2);
-
-            if (currentRankState >= 8f / 9)
-            {
-                rank = "aaa";
-            }
-            else if (currentRankState >= 7f / 9)
-            {
-                rank = "aa";
-            }
-            else if (currentRankState >= 6f / 9)
-            {
-                rank = "a";
-            }
-            else if (currentRankState >= 5f / 9)
-            {
-                rank = "b";
-            }
-            else if (currentRankState >= 4f / 9)
-            {
-                rank = "c";
-            }
-            else if (currentRankState >= 3f / 9)
-            {
-                rank = "d";
-            }
-            else if (currentRankState >= 2f / 9)
-            {
-                rank = "e";
-            }
-            else
-            {
-                rank = "f";
-            }
-
-            return rank;
         }
 
         public void UpdateMaxCombo(int combo)
         {
             Combo.text = combo.ToString();
-        }
-
-        public void UpdateJudge(TimingType judgetype, int combo, string accuracy, int ms)
-        {
-            string judgeStr = "";
-            currentJudge = judgetype;
-            // Judge update
-            switch(judgetype)
-            {
-                case TimingType.PERFECT:
-                    judgeStr = "GREAT";
-                    break;
-                case TimingType.GREAT:
-                    judgeStr = "GREAT";
-                    break;
-                case TimingType.GOOD:
-                    judgeStr = "GOOD";
-                    break;
-                case TimingType.BAD:
-                    judgeStr = "BAD";
-                    break;
-                case TimingType.POOR:
-                case TimingType.EPOOR:
-                    judgeStr = "POOR";
-                    break;
-            }
-
-            // Combo update
-            if (judgetype == TimingType.BAD || judgetype == TimingType.POOR)
-            {
-                txtJudgeBM[Const.PlayerSide].text = judgeStr;
-            }
-            else
-            {
-                txtJudgeBM[Const.PlayerSide].text = judgeStr + " " + combo;
-            }
-            txtJudgeBM[Const.PlayerSide].gameObject.SetActive(true);
-
-            if (txtInfoRate != null)
-            {
-                txtInfoRate.text = accuracy;
-                txtInfoRate.gameObject.SetActive(true);
-            }
-
-            if(txtInfoFS != null)
-            {
-                if (ms > 0)
-                {
-                    txtInfoFS.color = new Color(135f / 255, 206f / 255, 235f / 255);
-                    txtInfoFS.text = "FAST " + ms.ToString() + "ms";
-                }
-                else if (ms < 0)
-                {
-                    txtInfoFS.color = Color.red;
-                    txtInfoFS.text = "SLOW " + Math.Abs(ms).ToString() + "ms";
-                }
-                else
-                {
-                    txtInfoFS.text = "";
-                }
-                txtInfoFS.gameObject.SetActive(true);
-            }
-
-            timeLastComboPopup = (double)DateTime.Now.Ticks / 1000000;
-            timeLastTimingPopup = (double)DateTime.Now.Ticks / 1000000;
         }
 
         public void UpdateSideJudge(
@@ -508,37 +266,6 @@ namespace BMSPlayer
             txtAvgDiff.text = d;
             txtFast.text = fast.ToString();
             txtSlow.text = slow.ToString();
-        }
-
-        // Beam 보이기
-        public void ShowAndHideBeam(int line, bool onoff)
-        {
-            if (onoff)
-            {
-                if(Const.PlayerSide == 0)
-                {
-                    beam1P[line].SetActive(true);
-                    gearBtnPress1P[line].SetActive(true);
-                }
-                else
-                {
-                    beam2P[line].SetActive(true);
-                    gearBtnPress2P[line].SetActive(true);
-                }
-            }
-            else
-            {
-                if (Const.PlayerSide == 0)
-                {
-                    beam1P[line].SetActive(false);
-                    gearBtnPress1P[line].SetActive(false);
-                }
-                else
-                {
-                    beam2P[line].SetActive(false);
-                    gearBtnPress2P[line].SetActive(false);
-                }
-            }
         }
 
         public void TurnOnNoteEffect(int pos)
@@ -587,140 +314,7 @@ namespace BMSPlayer
             yield return new WaitForSeconds(0.01f);
             effectRotation[pos] += 15f;
             if (effectRotation[pos] % 360 == 0) effectRotation[pos] = 0f;
-            sprite.transform.rotation = Quaternion.Euler(new Vector3(0f, effectRotation[pos], 0f));
-        }
-
-        IEnumerator comboChangeBM(TimingType type)
-        {
-            if(type == TimingType.PERFECT)
-            {
-                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
-                    new Color(56f / 255, 122f / 255, 208f / 255),
-                    new Color(56f / 255, 122f / 255, 208f / 255),
-                    new Color(183f / 255, 196f / 255, 255f / 255),
-                    new Color(183f / 255, 196f / 255, 255f / 255)
-                    );
-                yield return new WaitForSeconds(0.05f);
-                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
-                    new Color(232f / 255, 86f / 255, 155f / 255),
-                    new Color(232f / 255, 86f / 255, 155f / 255),
-                    new Color(234f / 255, 164f / 255, 179f / 255),
-                    new Color(234f / 255, 164f / 255, 179f / 255)
-                    );
-                yield return new WaitForSeconds(0.05f);
-                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
-                    new Color(175f / 255, 232f / 255, 197f / 255)
-                    );
-                yield return new WaitForSeconds(0.05f);
-            }
-            else
-            {
-                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
-                    new Color(217f / 255, 150f / 255, 0f),
-                    new Color(217f / 255, 150f / 255, 0f),
-                    new Color(255f / 255, 225f / 255, 196f / 255),
-                    new Color(255f / 255, 225f / 255, 196f / 255)
-                    );
-                yield return new WaitForSeconds(0.1f);
-                txtJudgeBM[Const.PlayerSide].colorGradient = new VertexGradient(
-                    new Color(0f, 0f, 0f, 0f)
-                    );
-                yield return new WaitForSeconds(0.05f);
-            }
-        }
-
-        public void BGAVideoActivate()
-        {
-            bgaVideoLayer.SetActive(true);
-        }
-
-        public void BGAVideoPreload(string file)
-        {
-            bgaVideo.url = "file://" + file;
-            bgaVideo.errorReceived += BGAErrorLayer;
-            bgaVideo.Prepare();
-        }
-
-        public void BGAImageActivate()
-        {
-            bgaImage.gameObject.SetActive(true);
-        }
-
-        public void LayerImageActivate()
-        {
-            layerImage.gameObject.SetActive(true);
-        }
-
-        // BGA Control
-        public void BGAVideoPlay()
-        {
-            bgaVideo.Play();
-        }
-
-        public bool isBGAPlaying()
-        {
-            return bgaVideo.isPlaying;
-        }
-
-        public void BGAErrorLayer(VideoPlayer source, string msg)
-        {
-            // 메모리 릭 방지
-            bgaVideo.errorReceived -= BGAErrorLayer;
-
-            // 레이어 띄우기
-            bgaErrorLayer.SetActive(true);
-            bgaErrorLayer.GetComponentsInChildren<TextMeshPro>()[0].text =
-                Const.videoCodecMsg[(int)Const.Language];
-        }
-
-        public void BGAImageSetting(Sprite img)
-        {
-            if(img != null)
-            {
-                bgaImage.sprite = img;
-
-                float width = bgaImage.sprite.bounds.size.x;
-                float height = bgaImage.sprite.bounds.size.y;
-
-                float rectWidth = bgaRect.sizeDelta.x;
-                float rectHeight = bgaRect.sizeDelta.y;
-
-                bgaImage.gameObject.transform.localScale =
-                    new Vector3(
-                        rectWidth / width,
-                        rectHeight / height
-                    );
-            }
-        }
-
-        public void LayerImageSetting(Sprite img)
-        {
-            if (img != null)
-            {
-                layerImage.sprite = img;
-
-                float width = layerImage.sprite.bounds.size.x;
-                float height = layerImage.sprite.bounds.size.y;
-
-                float rectWidth = layerRect.sizeDelta.x;
-                float rectHeight = layerRect.sizeDelta.y;
-
-                layerImage.gameObject.transform.localScale =
-                    new Vector3(
-                        rectWidth / width,
-                        rectHeight / height
-                    );
-            }
-        }
-
-        public void PauseBGAVideo()
-        {
-            bgaVideo.Pause();
-        }
-
-        public void ResumeBGAVideo()
-        {
-            bgaVideo.Play();
+            sprite.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, effectRotation[pos]));
         }
 
         public void ShowPauseMenu()
@@ -795,7 +389,7 @@ namespace BMSPlayer
 
         public void DeactiveLoading()
         {
-            txtLoading[Const.PlayerSide].gameObject.SetActive(false);
+            txtLoading.gameObject.SetActive(false);
             stagePanel.SetActive(false);
         }
 
@@ -831,97 +425,7 @@ namespace BMSPlayer
             txtTotalTime.text = min + ":" + sec;
         }
 
-        #region Combo/Side Info Display Position
-        private void SideInfoDisplayPosition()
-        {
-            // 각 포지션 개수 확인
-            switch (Const.FastSlow)
-            {
-                case DisplayPosType.OFF:
-                    txtInfoFS = null;
-                    break;
-                case DisplayPosType.TYPEA:
-                    infoNumA++;
-                    break;
-                case DisplayPosType.TYPEB:
-                    txtInfoFS = txtInfo3S[(int)Const.PlayerSide];
-                    break;
-            }
-            switch (Const.TargetDiff)
-            {
-                case DisplayPosType.OFF:
-                    txtInfoTarget = null;
-                    break;
-                case DisplayPosType.TYPEA:
-                    infoNumA++;
-                    break;
-                case DisplayPosType.TYPEB:
-                    txtInfoTarget = txtInfo2S[(int)Const.PlayerSide];
-                    break;
-            }
-            switch (Const.RateDiff)
-            {
-                case DisplayPosType.OFF:
-                    txtInfoRate = null;
-                    break;
-                case DisplayPosType.TYPEA:
-                    infoNumA++;
-                    break;
-                case DisplayPosType.TYPEB:
-                    txtInfoRate = txtInfo1S[(int)Const.PlayerSide];
-                    break;
-            }
-
-            // 개수 별 스타일 처리
-            switch (infoNumA)
-            {
-                case 1:
-                    if (Const.FastSlow == DisplayPosType.TYPEA)
-                    {
-                        txtInfoFS = txtInfo2C[(int)Const.PlayerSide];
-                    }
-                    if (Const.RateDiff == DisplayPosType.TYPEA)
-                    {
-                        txtInfoRate = txtInfo2C[(int)Const.PlayerSide];
-                    }
-                    if (Const.TargetDiff == DisplayPosType.TYPEA)
-                    {
-                        txtInfoTarget = txtInfo2C[(int)Const.PlayerSide];
-                    }
-                    break;
-                case 2:
-                    if (Const.FastSlow == DisplayPosType.TYPEA)
-                    {
-                        if(Const.RateDiff == DisplayPosType.TYPEA)
-                        {
-                            txtInfoRate = txtInfo1C[(int)Const.PlayerSide];
-                            txtInfoFS = txtInfo3C[(int)Const.PlayerSide];
-                        }
-                        else if(Const.TargetDiff == DisplayPosType.TYPEA)
-                        {
-                            txtInfoTarget = txtInfo1C[(int)Const.PlayerSide];
-                            txtInfoFS = txtInfo3C[(int)Const.PlayerSide];
-                        }
-                    }
-                    if (Const.RateDiff == DisplayPosType.TYPEA)
-                    {
-                        if (Const.TargetDiff == DisplayPosType.TYPEA)
-                        {
-                            txtInfoRate = txtInfo1C[(int)Const.PlayerSide];
-                            txtInfoTarget = txtInfo3C[(int)Const.PlayerSide];
-                        }
-                    }
-                    break;
-                case 3:
-                    txtInfoTarget = txtInfo1C[(int)Const.PlayerSide];
-                    txtInfoRate = txtInfo2C[(int)Const.PlayerSide];
-                    txtInfoFS = txtInfo3C[(int)Const.PlayerSide];
-                    break;
-            }
-        }
-        #endregion
-
-        #region Gear/BGA/Graph/Frame Position
+        #region Gear/BGA/Graph/Frame/Text Position
         private void ObjectPositionSetup()
         {
             bool isTypeA = true;
@@ -935,15 +439,27 @@ namespace BMSPlayer
                     break;
             }
 
-            if (Const.GearSkin == "" || Const.GearSkin == "black")
+            switch(Const.GearSize)
             {
-                skinGear[Const.PlayerSide].sprite = skinGearBlack[Const.PlayerSide];
+                case SkinSize.STANDARD:
+                    txtLoading = txtLoadingNr[Const.PlayerSide];
+                    txtAutoPlay = txtAutoPlayNr[Const.PlayerSide];
+                    break;
+                case SkinSize.WIDE125:
+                    txtLoading = txtLoadingW125[Const.PlayerSide];
+                    txtAutoPlay = txtAutoPlayW125[Const.PlayerSide];
+                    break;
+                case SkinSize.WIDE150:
+                    txtLoading = txtLoadingW150[Const.PlayerSide];
+                    txtAutoPlay = txtAutoPlayW150[Const.PlayerSide];
+                    break;
             }
-            else if (Const.GearSkin == "white")
+
+            if (Const.GearSkin == SkinType.NORMAL)
             {
-                skinGear[Const.PlayerSide].sprite = skinGearWhite[Const.PlayerSide];
+                skinGear[Const.PlayerSide].sprite = skinGearNormal[Const.PlayerSide];
             }
-            else if (Const.GearSkin == "dark")
+            else if (Const.GearSkin == SkinType.DARK)
             {
                 skinGear[Const.PlayerSide].sprite = skinGearDark[Const.PlayerSide];
             }
@@ -951,33 +467,59 @@ namespace BMSPlayer
             int PlaySide = Const.PlayerSide;
             if(PlaySide == 0)
             {
-                Gear1P.SetActive(true);
-                Area1P.SetActive(true);
+                Gear1P[(int)Const.GearSize].SetActive(true);
+                Area1P[(int)Const.GearSize].SetActive(true);
 
                 if(Const.GraphType == GraphType.OFFGEAR)
                 {
-                    Gear2P.SetActive(true);
-                    Area2P.SetActive(true);
+                    Gear2P[(int)Const.GearSize].SetActive(true);
+                    Area2P[(int)Const.GearSize].SetActive(true);
                 }
             }
             else
             {
-                Gear2P.SetActive(true);
-                Area2P.SetActive(true);
+                Gear2P[(int)Const.GearSize].SetActive(true);
+                Area2P[(int)Const.GearSize].SetActive(true);
 
                 if (Const.GraphType == GraphType.OFFGEAR)
                 {
-                    Gear1P.SetActive(true);
-                    Area1P.SetActive(true);
+                    Gear1P[(int)Const.GearSize].SetActive(true);
+                    Area1P[(int)Const.GearSize].SetActive(true);
                 }
-
-                InvertObjectX(HP.gameObject);
-                InvertObjectX(hpBarType.gameObject);
-                InvertObjectX(SpeedFixed.gameObject);
-                InvertObjectX(SpeedFluid.gameObject);
-                InvertObjectX(Difficulty.gameObject);
-                InvertObjectX(Level.gameObject);
             }
+
+            int invert = Const.PlayerSide == 0 ? 1 : -1;
+
+            HP.transform.localPosition =
+                new Vector3(
+                    Const.HPTextPosX[(int)Const.GearSize] * invert,
+                    Const.HPTextPosY[(int)Const.GearSize],
+                    HP.transform.localPosition.z);
+            GaugeType.transform.localPosition =
+                new Vector3(
+                    Const.GaugeTypeTextPosX[(int)Const.GearSize] * invert,
+                    Const.GaugeTypeTextPosY[(int)Const.GearSize],
+                    GaugeType.transform.localPosition.z);
+            SpeedStandard.transform.localPosition =
+                new Vector3(
+                    Const.SpdStdTextPosX[(int)Const.GearSize] * invert,
+                    Const.SpdStdTextPosY[(int)Const.GearSize],
+                    SpeedStandard.transform.localPosition.z);
+            SpeedConstant.transform.localPosition =
+                new Vector3(
+                    Const.SpdConTextPosX[(int)Const.GearSize] * invert,
+                    Const.SpdConTextPosY[(int)Const.GearSize],
+                    SpeedStandard.transform.localPosition.z);
+            Difficulty.transform.localPosition =
+                new Vector3(
+                    Const.DiffTextPosX[(int)Const.GearSize] * invert,
+                    Const.DiffTextPosY[(int)Const.GearSize],
+                    Difficulty.transform.localPosition.z);
+            Level.transform.localPosition =
+                new Vector3(
+                    Const.LvTextPosX[(int)Const.GearSize] * invert,
+                    Const.LvTextPosY[(int)Const.GearSize],
+                    Level.transform.localPosition.z);
 
             switch (Const.GraphType)
             {
@@ -988,64 +530,72 @@ namespace BMSPlayer
                         {
                             // 1P Left BGA
                             bgaRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphSm_Left_Wid,
-                                Const.BGA_1P_GraphSm_Left_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaRect.localPosition = new Vector2(
-                                Const.BGA_1P_GraphSm_Left_PosX,
-                                Const.BGA_1P_GraphSm_Left_PosY
+                            bgaRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphSm_Left_PosY[(int)Const.GearSize],
+                                bgaRect.localPosition.z
                             );
                             layerRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphSm_Left_Wid,
-                                Const.BGA_1P_GraphSm_Left_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
                             layerRect.localPosition = new Vector3(
-                                Const.BGA_1P_GraphSm_Left_PosX,
-                                Const.BGA_1P_GraphSm_Left_PosY, -1
+                                Const.BGA_1P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphSm_Left_PosY[(int)Const.GearSize],
+                                layerRect.localPosition.z
                             );
                             bgaVideoRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphSm_Left_Wid,
-                                Const.BGA_1P_GraphSm_Left_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector2(
-                                Const.BGA_1P_GraphSm_Left_PosX,
-                                Const.BGA_1P_GraphSm_Left_PosY
+                            bgaVideoRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphSm_Left_PosY[(int)Const.GearSize],
+                                bgaVideoRect.localPosition.z
                             );
-                            bgaFollowingObj.localPosition = new Vector2(
-                                Const.BGA_1P_GraphSm_Left_PosX,
-                                bgaFollowingObj.localPosition.y
+                            bgaFollowingObj.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                bgaFollowingObj.localPosition.y,
+                                bgaFollowingObj.localPosition.z
                             );
                         }
                         else
                         {
                             // 2P Right BGA
                             bgaRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphSm_Right_Wid,
-                                Const.BGA_2P_GraphSm_Right_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaRect.localPosition = new Vector2(
-                                Const.BGA_2P_GraphSm_Right_PosX,
-                                Const.BGA_2P_GraphSm_Right_PosY
+                            bgaRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphSm_Right_PosY[(int)Const.GearSize],
+                                bgaRect.localPosition.z
                             );
                             layerRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphSm_Right_Wid,
-                                Const.BGA_2P_GraphSm_Right_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
                             layerRect.localPosition = new Vector3(
-                                Const.BGA_2P_GraphSm_Right_PosX,
-                                Const.BGA_2P_GraphSm_Right_PosY, -1
+                                Const.BGA_2P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphSm_Right_PosY[(int)Const.GearSize],
+                                layerRect.localPosition.z
                             );
                             bgaVideoRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphSm_Right_Wid,
-                                Const.BGA_2P_GraphSm_Right_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector2(
-                                Const.BGA_2P_GraphSm_Right_PosX,
-                                Const.BGA_2P_GraphSm_Right_PosY
+                            bgaVideoRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphSm_Right_PosY[(int)Const.GearSize],
+                                bgaVideoRect.localPosition.z
                             );
-                            bgaFollowingObj.localPosition = new Vector2(
-                                Const.BGA_2P_GraphSm_Right_PosX,
-                                bgaFollowingObj.localPosition.y
+                            bgaFollowingObj.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                bgaFollowingObj.localPosition.y,
+                                bgaFollowingObj.localPosition.z
                             );
                         }
                     }
@@ -1055,64 +605,72 @@ namespace BMSPlayer
                         {
                             // 1P Right BGA
                             bgaRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphSm_Right_Wid,
-                                Const.BGA_1P_GraphSm_Right_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaRect.localPosition = new Vector2(
-                                Const.BGA_1P_GraphSm_Right_PosX,
-                                Const.BGA_1P_GraphSm_Right_PosY
+                            bgaRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphSm_Right_PosY[(int)Const.GearSize],
+                                bgaRect.localPosition.z
                             );
                             layerRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphSm_Right_Wid,
-                                Const.BGA_1P_GraphSm_Right_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
                             layerRect.localPosition = new Vector3(
-                                Const.BGA_1P_GraphSm_Right_PosX,
-                                Const.BGA_1P_GraphSm_Right_PosY, -1
+                                Const.BGA_1P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphSm_Right_PosY[(int)Const.GearSize],
+                                layerRect.localPosition.z
                             );
                             bgaVideoRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphSm_Right_Wid,
-                                Const.BGA_1P_GraphSm_Right_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector2(
-                                Const.BGA_1P_GraphSm_Right_PosX,
-                                Const.BGA_1P_GraphSm_Right_PosY
+                            bgaVideoRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphSm_Right_PosY[(int)Const.GearSize],
+                                bgaVideoRect.localPosition.z
                             );
-                            bgaFollowingObj.localPosition = new Vector2(
-                                Const.BGA_1P_GraphSm_Right_PosX,
-                                bgaFollowingObj.localPosition.y
+                            bgaFollowingObj.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                bgaFollowingObj.localPosition.y,
+                                bgaFollowingObj.localPosition.z
                             );
                         }
                         else
                         {
                             // 2P Left BGA
                             bgaRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphSm_Left_Wid,
-                                Const.BGA_2P_GraphSm_Left_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaRect.localPosition = new Vector2(
-                                Const.BGA_2P_GraphSm_Left_PosX,
-                                Const.BGA_2P_GraphSm_Left_PosY
+                            bgaRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphSm_Left_PosY[(int)Const.GearSize],
+                                bgaRect.localPosition.z
                             );
                             layerRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphSm_Left_Wid,
-                                Const.BGA_2P_GraphSm_Left_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
                             layerRect.localPosition = new Vector3(
-                                Const.BGA_2P_GraphSm_Left_PosX,
-                                Const.BGA_2P_GraphSm_Left_PosY, -1
+                                Const.BGA_2P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphSm_Left_PosY[(int)Const.GearSize],
+                                layerRect.localPosition.z
                             );
                             bgaVideoRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphSm_Left_Wid,
-                                Const.BGA_2P_GraphSm_Left_Hei
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector2(
-                                Const.BGA_2P_GraphSm_Left_PosX,
-                                Const.BGA_2P_GraphSm_Left_PosY
+                            bgaVideoRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphSm_Left_PosY[(int)Const.GearSize],
+                                bgaVideoRect.localPosition.z
                             );
-                            bgaFollowingObj.localPosition = new Vector2(
-                                Const.BGA_2P_GraphSm_Left_PosX,
-                                bgaFollowingObj.localPosition.y
+                            bgaFollowingObj.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                bgaFollowingObj.localPosition.y,
+                                bgaFollowingObj.localPosition.z
                             );
                         }
                     }
@@ -1123,64 +681,72 @@ namespace BMSPlayer
                     {
                         // 1P BGA
                         bgaRect.sizeDelta = new Vector2(
-                            Const.BGA_1P_GraphMini_Wid,
-                            Const.BGA_1P_GraphMini_Hei
+                            Const.BGA_GraphMini_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphMini_Hei[(int)Const.GearSize]
                         );
-                        bgaRect.localPosition = new Vector2(
-                            Const.BGA_1P_GraphMini_PosX,
-                            Const.BGA_1P_GraphMini_PosY
+                        bgaRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphMini_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphMini_PosY[(int)Const.GearSize],
+                            bgaRect.localPosition.z
                         );
                         layerRect.sizeDelta = new Vector2(
-                            Const.BGA_1P_GraphMini_Wid,
-                            Const.BGA_1P_GraphMini_Hei
+                            Const.BGA_GraphMini_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphMini_Hei[(int)Const.GearSize]
                         );
                         layerRect.localPosition = new Vector3(
-                            Const.BGA_1P_GraphMini_PosX,
-                            Const.BGA_1P_GraphMini_PosY, -1
+                            Const.BGA_1P_GraphMini_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphMini_PosY[(int)Const.GearSize],
+                            layerRect.localPosition.z
                         );
                         bgaVideoRect.sizeDelta = new Vector2(
-                            Const.BGA_1P_GraphMini_Wid,
-                            Const.BGA_1P_GraphMini_Hei
+                            Const.BGA_GraphMini_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphMini_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector2(
-                            Const.BGA_1P_GraphMini_PosX,
-                            Const.BGA_1P_GraphMini_PosY
+                        bgaVideoRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphMini_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphMini_PosY[(int)Const.GearSize],
+                            bgaVideoRect.localPosition.z
                         );
-                        bgaFollowingObj.localPosition = new Vector2(
-                            Const.BGA_1P_GraphMini_PosX,
-                            bgaFollowingObj.localPosition.y
+                        bgaFollowingObj.localPosition = new Vector3(
+                            Const.BGA_1P_GraphMini_PosX[(int)Const.GearSize],
+                            bgaFollowingObj.localPosition.y,
+                            bgaFollowingObj.localPosition.z
                         );
                     }
                     else
                     {
                         // 2P BGA
                         bgaRect.sizeDelta = new Vector2(
-                            Const.BGA_2P_GraphMini_Wid,
-                            Const.BGA_2P_GraphMini_Hei
+                            Const.BGA_GraphMini_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphMini_Hei[(int)Const.GearSize]
                         );
-                        bgaRect.localPosition = new Vector2(
-                            Const.BGA_2P_GraphMini_PosX,
-                            Const.BGA_2P_GraphMini_PosY
+                        bgaRect.localPosition = new Vector3(
+                            Const.BGA_2P_GraphMini_PosX[(int)Const.GearSize],
+                            Const.BGA_2P_GraphMini_PosY[(int)Const.GearSize],
+                            bgaRect.localPosition.z
                         );
                         layerRect.sizeDelta = new Vector2(
-                            Const.BGA_2P_GraphMini_Wid,
-                            Const.BGA_2P_GraphMini_Hei
+                            Const.BGA_GraphMini_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphMini_Hei[(int)Const.GearSize]
                         );
                         layerRect.localPosition = new Vector3(
-                            Const.BGA_2P_GraphMini_PosX,
-                            Const.BGA_2P_GraphMini_PosY, -1
+                            Const.BGA_2P_GraphMini_PosX[(int)Const.GearSize],
+                            Const.BGA_2P_GraphMini_PosY[(int)Const.GearSize],
+                            layerRect.localPosition.z
                         );
                         bgaVideoRect.sizeDelta = new Vector2(
-                            Const.BGA_2P_GraphMini_Wid,
-                            Const.BGA_2P_GraphMini_Hei
+                            Const.BGA_GraphMini_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphMini_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector2(
-                            Const.BGA_2P_GraphMini_PosX,
-                            Const.BGA_2P_GraphMini_PosY
+                        bgaVideoRect.localPosition = new Vector3(
+                            Const.BGA_2P_GraphMini_PosX[(int)Const.GearSize],
+                            Const.BGA_2P_GraphMini_PosY[(int)Const.GearSize],
+                            bgaVideoRect.localPosition.z
                         );
-                        bgaFollowingObj.localPosition = new Vector2(
-                            Const.BGA_2P_GraphMini_PosX,
-                            bgaFollowingObj.localPosition.y
+                        bgaFollowingObj.localPosition = new Vector3(
+                            Const.BGA_2P_GraphMini_PosX[(int)Const.GearSize],
+                            bgaFollowingObj.localPosition.y,
+                            bgaFollowingObj.localPosition.z
                         );
                     }
                     break;
@@ -1189,64 +755,72 @@ namespace BMSPlayer
                     {
                         // 1P BGA
                         bgaRect.sizeDelta = new Vector2(
-                            Const.BGA_1P_GraphOff_Wid,
-                            Const.BGA_1P_GraphOff_Hei
+                            Const.BGA_GraphOff_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphOff_Hei[(int)Const.GearSize]
                         );
-                        bgaRect.localPosition = new Vector2(
-                            Const.BGA_1P_GraphOff_PosX,
-                            Const.BGA_1P_GraphOff_PosY
+                        bgaRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphOff_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphOff_PosY[(int)Const.GearSize],
+                            bgaRect.localPosition.z
                         );
                         layerRect.sizeDelta = new Vector2(
-                            Const.BGA_1P_GraphOff_Wid,
-                            Const.BGA_1P_GraphOff_Hei
+                            Const.BGA_GraphOff_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphOff_Hei[(int)Const.GearSize]
                         );
                         layerRect.localPosition = new Vector3(
-                            Const.BGA_1P_GraphOff_PosX,
-                            Const.BGA_1P_GraphOff_PosY, -1
+                            Const.BGA_1P_GraphOff_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphOff_PosY[(int)Const.GearSize],
+                            layerRect.localPosition.z
                         );
                         bgaVideoRect.sizeDelta = new Vector2(
-                            Const.BGA_1P_GraphOff_Wid,
-                            Const.BGA_1P_GraphOff_Hei
+                            Const.BGA_GraphOff_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphOff_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector2(
-                            Const.BGA_1P_GraphOff_PosX,
-                            Const.BGA_1P_GraphOff_PosY
+                        bgaVideoRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphOff_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphOff_PosY[(int)Const.GearSize],
+                            bgaVideoRect.localPosition.z
                         );
-                        bgaFollowingObj.localPosition = new Vector2(
-                            Const.BGA_1P_GraphOff_PosX,
-                            bgaFollowingObj.localPosition.y
+                        bgaFollowingObj.localPosition = new Vector3(
+                            Const.BGA_1P_GraphOff_PosX[(int)Const.GearSize],
+                            bgaFollowingObj.localPosition.y,
+                            bgaFollowingObj.localPosition.z
                         );
                     }
                     else
                     {
                         // 2P BGA
                         bgaRect.sizeDelta = new Vector2(
-                            Const.BGA_2P_GraphOff_Wid,
-                            Const.BGA_2P_GraphOff_Hei
+                            Const.BGA_GraphOff_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphOff_Hei[(int)Const.GearSize]
                         );
-                        bgaRect.localPosition = new Vector2(
-                            Const.BGA_2P_GraphOff_PosX,
-                            Const.BGA_2P_GraphOff_PosY
+                        bgaRect.localPosition = new Vector3(
+                            Const.BGA_2P_GraphOff_PosX[(int)Const.GearSize],
+                            Const.BGA_2P_GraphOff_PosY[(int)Const.GearSize],
+                            bgaRect.localPosition.z
                         );
                         layerRect.sizeDelta = new Vector2(
-                            Const.BGA_2P_GraphOff_Wid,
-                            Const.BGA_2P_GraphOff_Hei
+                            Const.BGA_GraphOff_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphOff_Hei[(int)Const.GearSize]
                         );
                         layerRect.localPosition = new Vector3(
-                            Const.BGA_2P_GraphOff_PosX,
-                            Const.BGA_2P_GraphOff_PosY, -1
+                            Const.BGA_2P_GraphOff_PosX[(int)Const.GearSize],
+                            Const.BGA_2P_GraphOff_PosY[(int)Const.GearSize],
+                            layerRect.localPosition.z
                         );
                         bgaVideoRect.sizeDelta = new Vector2(
-                            Const.BGA_2P_GraphOff_Wid,
-                            Const.BGA_2P_GraphOff_Hei
+                            Const.BGA_GraphOff_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphOff_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector2(
-                            Const.BGA_2P_GraphOff_PosX,
-                            Const.BGA_2P_GraphOff_PosY
+                        bgaVideoRect.localPosition = new Vector3(
+                            Const.BGA_2P_GraphOff_PosX[(int)Const.GearSize],
+                            Const.BGA_2P_GraphOff_PosY[(int)Const.GearSize],
+                            bgaVideoRect.localPosition.z
                         );
-                        bgaFollowingObj.localPosition = new Vector2(
-                            Const.BGA_2P_GraphOff_PosX,
-                            bgaFollowingObj.localPosition.y
+                        bgaFollowingObj.localPosition = new Vector3(
+                            Const.BGA_2P_GraphOff_PosX[(int)Const.GearSize],
+                            bgaFollowingObj.localPosition.y,
+                            bgaFollowingObj.localPosition.z
                         );
                     }
                     break;
@@ -1260,276 +834,173 @@ namespace BMSPlayer
                         {
                             // 1P Right BGA
                             bgaRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphBig_Right_Wid,
-                                Const.BGA_1P_GraphBig_Right_Hei
+                                Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                             );
-                            bgaRect.localPosition = new Vector2(
-                                Const.BGA_1P_GraphBig_Right_PosX,
-                                Const.BGA_1P_GraphBig_Right_PosY
+                            bgaRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphBig_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphBig_Right_PosY[(int)Const.GearSize],
+                                bgaRect.localPosition.z
                             );
                             layerRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphBig_Right_Wid,
-                                Const.BGA_1P_GraphBig_Right_Hei
+                                Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                             );
                             layerRect.localPosition = new Vector3(
-                                Const.BGA_1P_GraphBig_Right_PosX,
-                                Const.BGA_1P_GraphBig_Right_PosY, -1
+                                Const.BGA_1P_GraphBig_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphBig_Right_PosY[(int)Const.GearSize],
+                                layerRect.localPosition.z
                             );
                             bgaVideoRect.sizeDelta = new Vector2(
-                                Const.BGA_1P_GraphBig_Right_Wid,
-                                Const.BGA_1P_GraphBig_Right_Hei
+                                Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector2(
-                                Const.BGA_1P_GraphBig_Right_PosX,
-                                Const.BGA_1P_GraphBig_Right_PosY
+                            bgaVideoRect.localPosition = new Vector3(
+                                Const.BGA_1P_GraphBig_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphBig_Right_PosY[(int)Const.GearSize],
+                                bgaVideoRect.localPosition.z
                             );
-                            bgaFollowingObj.localPosition = new Vector2(
-                                Const.BGA_1P_GraphBig_Right_PosX,
-                                bgaFollowingObj.localPosition.y
+                            bgaFollowingObj.localPosition = new Vector3(
+                                Const.BGA_1P_GraphBig_Right_PosX[(int)Const.GearSize],
+                                bgaFollowingObj.localPosition.y,
+                                bgaFollowingObj.localPosition.z
                             );
-
-                            FrameMoveRight();
                         }
                         else
                         {
                             // 2P Left BGA
                             bgaRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphBig_Left_Wid,
-                                Const.BGA_2P_GraphBig_Left_Hei
+                                Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                             );
-                            bgaRect.localPosition = new Vector2(
-                                Const.BGA_2P_GraphBig_Left_PosX,
-                                Const.BGA_2P_GraphBig_Left_PosY
+                            bgaRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphBig_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphBig_Left_PosY[(int)Const.GearSize],
+                                bgaRect.localPosition.z
                             );
                             layerRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphBig_Left_Wid,
-                                Const.BGA_2P_GraphBig_Left_Hei
+                                Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                             );
                             layerRect.localPosition = new Vector3(
-                                Const.BGA_2P_GraphBig_Left_PosX,
-                                Const.BGA_2P_GraphBig_Left_PosY, -1
+                                Const.BGA_2P_GraphBig_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphBig_Left_PosY[(int)Const.GearSize],
+                                layerRect.localPosition.z
                             );
                             bgaVideoRect.sizeDelta = new Vector2(
-                                Const.BGA_2P_GraphBig_Left_Wid,
-                                Const.BGA_2P_GraphBig_Left_Hei
+                                Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector2(
-                                Const.BGA_2P_GraphBig_Left_PosX,
-                                Const.BGA_2P_GraphBig_Left_PosY
+                            bgaVideoRect.localPosition = new Vector3(
+                                Const.BGA_2P_GraphBig_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphBig_Left_PosY[(int)Const.GearSize],
+                                bgaVideoRect.localPosition.z
                             );
-                            bgaFollowingObj.localPosition = new Vector2(
-                                Const.BGA_2P_GraphBig_Left_PosX,
-                                bgaFollowingObj.localPosition.y
+                            bgaFollowingObj.localPosition = new Vector3(
+                                Const.BGA_2P_GraphBig_Left_PosX[(int)Const.GearSize],
+                                bgaFollowingObj.localPosition.y,
+                                bgaFollowingObj.localPosition.z
                             );
-
-                            FrameMoveLeft();
                         }
                     }
                     break;
             }
         }
 
-        public void InvertObjectX(GameObject obj)
+        private void FrameMove()
         {
-            obj.transform.localPosition = new Vector3(
-                obj.transform.localPosition.x * -1,
-                obj.transform.localPosition.y,
-                obj.transform.localPosition.z
-            );
-        }
+            int UpperMove = 0;
+            int LowerMove = 0;
+            if (Const.PlayerSide == 0)
+            {
+                if (Const.LayoutType == UILayoutType.TYPEB)
+                {
+                    if (Const.GraphType == GraphType.NORMAL)
+                    {
+                        UpperMove = Const.UpperRightPosX[(int)Const.GearSize];
+                        LowerMove = Const.LowerRightPosX[(int)Const.GearSize];
+                    }
+                    else
+                    {
+                        UpperMove = Const.UpperCenter_1PPosX[(int)Const.GearSize];
+                        LowerMove = Const.LowerCenter_1PPosX[(int)Const.GearSize];
+                    }
+                }
+                else
+                {
+                    UpperMove = Const.UpperCenter_1PPosX[(int)Const.GearSize];
+                    LowerMove = Const.LowerCenter_1PPosX[(int)Const.GearSize];
+                }
+            }
+            else
+            {
+                if (Const.LayoutType == UILayoutType.TYPEB)
+                {
+                    if (Const.GraphType == GraphType.NORMAL)
+                    {
+                        UpperMove = Const.UpperLeftPosX[(int)Const.GearSize];
+                        LowerMove = Const.LowerLeftPosX[(int)Const.GearSize];
+                    }
+                    else
+                    {
+                        UpperMove = Const.UpperCenter_2PPosX[(int)Const.GearSize];
+                        LowerMove = Const.LowerCenter_2PPosX[(int)Const.GearSize];
+                    }
+                }
+                else
+                {
+                    UpperMove = Const.UpperCenter_2PPosX[(int)Const.GearSize];
+                    LowerMove = Const.LowerCenter_2PPosX[(int)Const.GearSize];
+                }
+            }
 
-        public void FrameMoveLeft()
-        {
-            Upper.transform.localPosition = new Vector2(
-                Upper.transform.localPosition.x - 503,
-                Upper.transform.localPosition.y
+            Upper.transform.localPosition = new Vector3(
+                Upper.transform.localPosition.x + UpperMove,
+                Upper.transform.localPosition.y,
+                Upper.transform.localPosition.z
             );
+            UpperTitle.transform.localPosition = new Vector3(
+                UpperTitle.transform.localPosition.x + UpperMove,
+                UpperTitle.transform.localPosition.y,
+                UpperTitle.transform.localPosition.z
+            );
+
             Lower.transform.localPosition = new Vector2(
-                Lower.transform.localPosition.x - 503,
+                Lower.transform.localPosition.x + LowerMove,
                 Lower.transform.localPosition.y
             );
             Score.transform.localPosition = new Vector2(
-                Score.transform.localPosition.x - 503,
+                Score.transform.localPosition.x + LowerMove,
                 Score.transform.localPosition.y
             );
             Combo.transform.localPosition = new Vector2(
-                Combo.transform.localPosition.x - 503,
+                Combo.transform.localPosition.x + LowerMove,
                 Combo.transform.localPosition.y
             );
             BPMcur.transform.localPosition = new Vector2(
-                BPMcur.transform.localPosition.x - 503,
+                BPMcur.transform.localPosition.x + LowerMove,
                 BPMcur.transform.localPosition.y
             );
             BPMmin.transform.localPosition = new Vector2(
-                BPMmin.transform.localPosition.x - 503,
+                BPMmin.transform.localPosition.x + LowerMove,
                 BPMmin.transform.localPosition.y
             );
             BPMmax.transform.localPosition = new Vector2(
-                BPMmax.transform.localPosition.x - 503,
+                BPMmax.transform.localPosition.x + LowerMove,
                 BPMmax.transform.localPosition.y
             );
-            UpperTitle.transform.localPosition = new Vector2(
-                UpperTitle.transform.localPosition.x - 503,
-                UpperTitle.transform.localPosition.y
-            );
             txtCurrentTime.transform.localPosition = new Vector2(
-                txtCurrentTime.transform.localPosition.x - 503,
+                txtCurrentTime.transform.localPosition.x + LowerMove,
                 txtCurrentTime.transform.localPosition.y
             );
             txtTotalTime.transform.localPosition = new Vector2(
-                txtTotalTime.transform.localPosition.x - 503,
+                txtTotalTime.transform.localPosition.x + LowerMove,
                 txtTotalTime.transform.localPosition.y
             );
             FPSCounter.transform.localPosition = new Vector2(
-                FPSCounter.transform.localPosition.x - 503,
+                FPSCounter.transform.localPosition.x + LowerMove,
                 FPSCounter.transform.localPosition.y
             );
-        }
-
-        public void FrameMoveRight()
-        {
-            Upper.transform.localPosition = new Vector2(
-                Upper.transform.localPosition.x + 503,
-                Upper.transform.localPosition.y
-            );
-            Lower.transform.localPosition = new Vector2(
-                Lower.transform.localPosition.x + 503,
-                Lower.transform.localPosition.y
-            );
-            Score.transform.localPosition = new Vector2(
-                Score.transform.localPosition.x + 503,
-                Score.transform.localPosition.y
-            );
-            Combo.transform.localPosition = new Vector2(
-                Combo.transform.localPosition.x + 503,
-                Combo.transform.localPosition.y
-            );
-            BPMcur.transform.localPosition = new Vector2(
-                BPMcur.transform.localPosition.x + 503,
-                BPMcur.transform.localPosition.y
-            );
-            BPMmin.transform.localPosition = new Vector2(
-                BPMmin.transform.localPosition.x + 503,
-                BPMmin.transform.localPosition.y
-            );
-            BPMmax.transform.localPosition = new Vector2(
-                BPMmax.transform.localPosition.x + 503,
-                BPMmax.transform.localPosition.y
-            );
-            UpperTitle.transform.localPosition = new Vector2(
-                UpperTitle.transform.localPosition.x + 503,
-                UpperTitle.transform.localPosition.y
-            );
-            txtCurrentTime.transform.localPosition = new Vector2(
-                txtCurrentTime.transform.localPosition.x + 503,
-                txtCurrentTime.transform.localPosition.y
-            );
-            txtTotalTime.transform.localPosition = new Vector2(
-                txtTotalTime.transform.localPosition.x + 503,
-                txtTotalTime.transform.localPosition.y
-            );
-            FPSCounter.transform.localPosition = new Vector2(
-                FPSCounter.transform.localPosition.x + 503,
-                FPSCounter.transform.localPosition.y
-            );
-        }
-        #endregion
-
-        #region Play Area Cover
-        public void CoverSuddenDown()
-        {
-            float posx = coverSud.transform.localPosition.x;
-            float posz = coverSud.transform.localPosition.z;
-
-            coverSudPos -= 1;
-            if(coverSudPos < 0)
-            {
-                coverSudPos = 0;
-            }
-
-            coverSud.transform.localPosition = new Vector3(posx, coverSudPos, posz);
-
-            Const.CoverSudPos = coverSudPos;
-        }
-
-        public void CoverSuddenUp()
-        {
-            float posx = coverSud.transform.localPosition.x;
-            float posz = coverSud.transform.localPosition.z;
-
-            coverSudPos += 1;
-            if (coverSudPos > 725)
-            {
-                coverSudPos = 725;
-            }
-
-            coverSud.transform.localPosition = new Vector3(posx, coverSudPos, posz);
-
-            Const.CoverSudPos = coverSudPos;
-        }
-
-        public void CoverHiddenDown()
-        {
-            float posx = coverHid.transform.localPosition.x;
-            float posz = coverHid.transform.localPosition.z;
-
-            coverHidPos += 1;
-            if (coverHidPos > 725)
-            {
-                coverHidPos = 725;
-            }
-
-            coverHid.transform.localPosition = new Vector3(posx, -1f * coverHidPos, posz);
-
-            Const.CoverHidPos = coverHidPos;
-        }
-
-        public void CoverHiddenUp()
-        {
-            float posx = coverHid.transform.localPosition.x;
-            float posz = coverHid.transform.localPosition.z;
-
-            coverHidPos -= 1;
-            if (coverHidPos < 0)
-            {
-                coverHidPos = 0;
-            }
-
-            coverHid.transform.localPosition = new Vector3(posx, -1f * coverHidPos, posz);
-
-            Const.CoverHidPos = coverHidPos;
-        }
-
-        public void CoverLiftDown()
-        {
-            float posx = playArea.transform.localPosition.x;
-            float posz = playArea.transform.localPosition.z;
-
-            playAreaPos -= 1;
-            if (playAreaPos < 0)
-            {
-                playAreaPos = 0;
-            }
-
-            playArea.transform.localPosition = new Vector3(posx, playAreaPos, posz);
-
-            Const.AreaLiftPos = playAreaPos;
-        }
-
-        public void CoverLiftUp()
-        {
-            float posx = playArea.transform.localPosition.x;
-            float posz = playArea.transform.localPosition.z;
-
-            playAreaPos += 1;
-            if (playAreaPos > 725)
-            {
-                playAreaPos = 725;
-            }
-
-            playArea.transform.localPosition = new Vector3(posx, playAreaPos, posz);
-
-            Const.AreaLiftPos = playAreaPos;
         }
         #endregion
     }
