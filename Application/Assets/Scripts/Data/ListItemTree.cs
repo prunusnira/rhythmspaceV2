@@ -146,7 +146,6 @@ namespace BMSPlayer
             {
                 foreach (string bms in bmsfiles)
                 {
-                    //FileList.Add(bms);
                     strLoading = "Loading " + bms;
                     MusicListData bmsdata = MusicListManager.Instance.LoadBMSFromPath(bms, musicList.Count, encoding);
                     if (bmsdata != null) musicList.Add(bmsdata);

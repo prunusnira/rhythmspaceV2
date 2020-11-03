@@ -22,7 +22,7 @@ namespace BMSPlayer
 
         private int[] itemidx = new int[18];
 
-        public void Init(List<ListItemNode> list, int listpos, ObjectSetup f)
+        public void Init(List<ListItemNode> list, ObjectSetup f)
         {
             objRect = GetComponent<RectTransform>();
             itemList = new Dictionary<int, ListItemNode>();

@@ -16,24 +16,27 @@ namespace DatabaseManager
         public IDbCommand dbcommand;
         public IDataReader dbreader;
 
-        public static SQLiteExecutor Instance;
+        private static SQLiteExecutor instance;
 
-        public static SQLiteExecutor getInstance()
+        public static SQLiteExecutor Instance
         {
-            if (Instance == null)
+            get
             {
-                Instance = new SQLiteExecutor();
-                if (!Instance.CheckListTableExist()) Instance.InitListTable();
-                if (!Instance.CheckRecordTableExist()) Instance.InitRecordTable();
-            }
-            else
-            {
-                if(!Instance.checkDBConn())
+                if (instance == null)
                 {
-                    Instance = new SQLiteExecutor();
+                    instance = new SQLiteExecutor();
+                    if (!instance.CheckListTableExist()) instance.InitListTable();
+                    if (!instance.CheckRecordTableExist()) instance.InitRecordTable();
                 }
+                else
+                {
+                    if (!instance.checkDBConn())
+                    {
+                        instance = new SQLiteExecutor();
+                    }
+                }
+                return instance;
             }
-            return Instance;
         }
 
         private SQLiteExecutor()
@@ -90,7 +93,8 @@ namespace DatabaseManager
                 level integer not null,
                 diff integer default 2,
                 fname varchar (100) not null,
-                jacket varchar (100))";
+                jacket varchar (100),
+                totalnotes integer not null)";
 
             dbcommand.CommandText = list;
             dbcommand.ExecuteNonQuery();
@@ -113,7 +117,8 @@ namespace DatabaseManager
                 ok integer(5) not null,
                 pr integer(5) not null,
                 combo integer(5) not null,
-                cb integer(5) not null)";
+                cb integer(5) not null,
+                playcnt integer not null)";
 
             dbcommand.CommandText = record;
             dbcommand.ExecuteNonQuery();
@@ -158,7 +163,7 @@ namespace DatabaseManager
                     (title, subtitle, artist, subartist, gerne,
                     bpmstart, bpmmin, bpmmax,
                     path, md5hash, level, diff,
-                    fname, jacket)
+                    fname, jacket, totalnotes)
                     values";
 
             foreach(string[] param in paramList)
@@ -167,7 +172,7 @@ namespace DatabaseManager
                         param[0] + "','" + param[1] + "','" + param[2] + "','" + param[3] + "','" + param[4] + "'," +
                         param[5] + "," + param[6] + "," + param[7] + ",'" +
                         param[8] + "', '" + param[9] + "','" + param[10] + "','" + param[11] + "','" +
-                        param[12] + "','" + param[13] + "')";
+                        param[12] + "','" + param[13] + "', " + param[14] + ")";
 
                 if(paramList.IndexOf(param) != paramList.Count - 1)
                 {
@@ -183,7 +188,7 @@ namespace DatabaseManager
             string hash, string rank,
             int score, int judge,
             int clear, int pf, int gr, int gd,
-            int ok, int pr, int combo, int cb
+            int ok, int pr, int combo, int cb, int playcnt
             )
         {
             dbcommand = dbconn.CreateCommand();
@@ -191,7 +196,7 @@ namespace DatabaseManager
             string query =
                 @"insert into record
                     (md5hash, rank, score, judge,
-                        clear, pf, gr, gd, ok, pr, combo, cb) values
+                        clear, pf, gr, gd, ok, pr, combo, cb, playcnt) values
                     ('" + hash + "','" +
                         rank + "'," +
                         score + "," +
@@ -203,7 +208,8 @@ namespace DatabaseManager
                         ok + "," +
                         pr + "," +
                         combo + "," +
-                        cb + ") " +
+                        cb + "," +
+                        playcnt + ") " +
                     " on conflict(md5hash) do update set"+
                         " rank='" + rank + "'," +
                         " score=" + score + "," +
@@ -215,7 +221,8 @@ namespace DatabaseManager
                         " ok=" + ok + "," +
                         " pr=" + pr + "," +
                         " combo=" + combo + "," +
-                        " cb=" + cb;
+                        " cb=" + cb + "," +
+                        " playcnt=" + playcnt;
 
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
@@ -289,11 +296,12 @@ namespace DatabaseManager
                 int ldiff = dbreader.GetInt32(12);
                 string lfname = dbreader.GetString(13);
                 string ljacket = dbreader.GetString(14);
+                int ltotalnotes = dbreader.GetInt32(15);
 
                 MusicListData data = new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
-                    lpath, lmd5, llv, ldiff, lfname, ljacket);
+                    lpath, lmd5, llv, ldiff, lfname, ljacket, ltotalnotes);
 
                 musiclist.Add(data);
             }
@@ -331,11 +339,12 @@ namespace DatabaseManager
                 int ldiff = dbreader.GetInt32(12);
                 string lfname = dbreader.GetString(13);
                 string ljacket = dbreader.GetString(14);
+                int ltotalnotes = dbreader.GetInt32(15);
 
                 MusicListData data = new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
-                    lpath, lmd5, llv, ldiff, lfname, ljacket);
+                    lpath, lmd5, llv, ldiff, lfname, ljacket, ltotalnotes);
 
                 musiclist.Add(data);
             }
@@ -372,10 +381,12 @@ namespace DatabaseManager
                 int recpr = dbreader.GetInt32(10);
                 int reccombo = dbreader.GetInt32(11);
                 int reccb = dbreader.GetInt32(12);
+                int recplaycnt = dbreader.GetInt32(13);
 
                 return new RecordData(recmd5, recrank,
                     recscore, recjudge,
-                    recclear, recpf, recgr, recgd, recok, recpr, reccombo, reccb);
+                    recclear, recpf, recgr, recgd, recok, recpr,
+                    reccombo, reccb, recplaycnt);
             }
             else
             {
@@ -401,6 +412,27 @@ namespace DatabaseManager
             else
             {
                 return -1;
+            }
+        }
+
+        public int SelectRecordPlayCnt(string param)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            string query = "select playcnt from record";
+            query += " where md5hash='" + param + "'";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            bool resultExist = dbreader.Read();
+            if (resultExist)
+            {
+                return dbreader.GetInt32(0);
+            }
+            else
+            {
+                return 0;
             }
         }
     }

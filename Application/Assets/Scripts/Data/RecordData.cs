@@ -14,12 +14,13 @@
         public int Poor { get; set; }
         public int MaxCombo { get; set; }
         public int CBreak { get; set; }
+        public int PlayCnt { get; set; }
 
         public RecordData(
             string md5hash, string rank,
             int score, int judge,
             int clear, int pf, int gr, int gd, int ok,
-            int pr, int combo, int cb)
+            int pr, int combo, int cb, int playcnt)
         {
             MD5Hash = md5hash;
             Rank = rank;
@@ -33,6 +34,7 @@
             Poor = pr;
             MaxCombo = combo;
             CBreak = cb;
+            PlayCnt = playcnt;
         }
     }
 }

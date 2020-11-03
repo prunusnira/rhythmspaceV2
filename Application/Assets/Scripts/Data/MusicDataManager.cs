@@ -9,7 +9,6 @@ namespace BMSPlayer
 {
     public class MusicListManager
     {
-        SQLiteExecutor executor;
         MD5 md5;
 
         private static MusicListManager instance;
@@ -21,19 +20,28 @@ namespace BMSPlayer
                 {
                     instance = new MusicListManager();
                 }
+                if(instance.isExecutorNull())
+                {
+                    instance.Close();
+                    instance = new MusicListManager();
+                }
                 return instance;
             }
         }
 
         private MusicListManager()
         {
-            executor = SQLiteExecutor.getInstance();
             md5 = MD5.Create();
+        }
+
+        private bool isExecutorNull()
+        {
+            return (SQLiteExecutor.Instance == null);
         }
 
         public void Close()
         {
-            executor.closeDB();
+            SQLiteExecutor.Instance.closeDB();
             md5.Clear();
         }
 
@@ -43,7 +51,7 @@ namespace BMSPlayer
             {
                 BMS bms = new BMS(path);
                 BMSAnalyzer analyzer = new BMSAnalyzer();
-                analyzer.HeaderAnalyzer(bms, encoding);
+                analyzer.FullAnalyzer(bms, encoding);
                 if (bms.Player != 1) return null;
 
                 MusicListData data = new MusicListData(
@@ -51,7 +59,7 @@ namespace BMSPlayer
                         bms.Artist, bms.SubArtist, bms.Gerne,
                         bms.BPMStart, bms.BPMMin, bms.BPMMax,
                         bms.FolderPath, bms.Level, bms.Difficulty,
-                        bms.FileName, bms.StageFile
+                        bms.FileName, bms.StageFile, bms.TotalNotes
                     );
 
                 return data;
@@ -61,24 +69,24 @@ namespace BMSPlayer
 
         public List<MusicListData> LoadBMSFromDBOverall()
         {
-            return executor.SelectMusicList();
+            return SQLiteExecutor.Instance.SelectMusicList();
         }
 
         public List<MusicListData> LoadBMSFromFolder(string path)
         {
-            return executor.SelectMusicList(path);
+            return SQLiteExecutor.Instance.SelectMusicList(path);
         }
 
         public List<MusicListData> FindBMSWithName(string text)
         {
-            return executor.FindMusicList(text);
+            return SQLiteExecutor.Instance.FindMusicList(text);
         }
 
         public void AddDataToDB(List<MusicListData> list)
         {
             if (list.Count != 0)
             {
-                executor.DropList();
+                SQLiteExecutor.Instance.DropList();
                 List<string[]> paramList = new List<string[]>();
                 // 리스트의 각 파일을 DB에 등록(이 때 MD5 Hash값도 계산)
                 foreach (MusicListData d in list)
@@ -94,12 +102,12 @@ namespace BMSPlayer
                         d.Title, d.SubTitle, d.Artist, d.SubArtist, d.Gerne,
                         d.BPMstart.ToString(), d.BPMmin.ToString(), d.BPMmax.ToString(),
                         d.Path, hash, d.Level.ToString(), d.Difficulty.ToString(),
-                        d.FileName, d.Jacket
+                        d.FileName, d.Jacket, d.TotalNotes.ToString()
                     };
                     paramList.Add(param);
                     fstream.Close();
                 }
-                executor.InsertBMS(paramList);
+                SQLiteExecutor.Instance.InsertBMS(paramList);
             }
         }
     }

@@ -92,6 +92,7 @@ namespace BMSCore
         public string LNObj { get; set; } // Only used for LNOBJ
         public int LastBar { get; set; } // last number of bar
         public string BGAVideoFile { get; set; }
+        public int TotalValue { get; set; }
 
         // <WAV##, WavFileName>
         public Dictionary<string, string> WavList = new Dictionary<string, string>();
@@ -166,6 +167,7 @@ namespace BMSCore
             LNObj = "";
             LastBar = 0;
             BGAVideoFile = "";
+            TotalValue = 0;
         }
 
         private string SetFolderPath(string path)

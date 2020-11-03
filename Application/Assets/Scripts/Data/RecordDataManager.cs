@@ -8,34 +8,32 @@ namespace BMSPlayer
 {
     public class RecordDataManager
     {
-        SQLiteExecutor executor;
         MD5 md5;
 
         public RecordDataManager()
         {
-            executor = SQLiteExecutor.getInstance();
             md5 = MD5.Create();
         }
 
         public void Close()
         {
-            executor.closeDB();
+            SQLiteExecutor.Instance.closeDB();
             md5.Clear();
         }
 
         public void CreateNewTable()
         {
-            executor.InitRecordTable();
+            SQLiteExecutor.Instance.InitRecordTable();
         }
 
         public void DropTable()
         {
-            executor.DropRecord();
+            SQLiteExecutor.Instance.DropRecord();
         }
 
         public void RegisterRecord(RecordData data)
         {
-            executor.InsertRecord(
+            SQLiteExecutor.Instance.InsertRecord(
                 data.MD5Hash,
                 data.Rank,
                 data.Score,
@@ -47,18 +45,24 @@ namespace BMSPlayer
                 data.OK,
                 data.Poor,
                 data.MaxCombo,
-                data.CBreak
+                data.CBreak,
+                data.PlayCnt
             );
         }
 
         public int GetClearStat(string hash)
         {
-            return executor.SelectRecordClear(hash);
+            return SQLiteExecutor.Instance.SelectRecordClear(hash);
+        }
+
+        public int GetPlayCnt(string hash)
+        {
+            return SQLiteExecutor.Instance.SelectRecordPlayCnt(hash);
         }
 
         public RecordData GetFullClearStat(string hash)
         {
-            return executor.SelectRecord(hash);
+            return SQLiteExecutor.Instance.SelectRecord(hash);
         }
     }
 }

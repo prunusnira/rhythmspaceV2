@@ -16,6 +16,7 @@
         public string FileName { get; set; }
         public string Jacket { get; set; }
         public string Gerne { get; set; }
+        public int TotalNotes { get; set; }
 
         public MusicListData() { }
 
@@ -23,7 +24,7 @@
             string artist, string subartist, string gerne,
             double bpmstart, double bpmmin, double bpmmax,
             string path, string md5hash, int level, int diff,
-            string fileName, string jacket)
+            string fileName, string jacket, int totalNotes)
         {
             Id = id;
             Title = title;
@@ -40,12 +41,14 @@
             FileName = fileName;
             Jacket = jacket;
             Gerne = gerne;
+            TotalNotes = totalNotes;
         }
 
         public MusicListData(int id, string title, string subtitle,
             string artist, string subartist, string gerne,
             double bpmstart, double bpmmin, double bpmmax,
-            string path, int level, int diff, string fileName, string jacket)
+            string path, int level, int diff, string fileName,
+            string jacket, int totalNotes)
         {
             Id = id;
             Title = title;
@@ -61,6 +64,7 @@
             FileName = fileName;
             Jacket = jacket;
             Gerne = gerne;
+            TotalNotes = totalNotes;
         }
     }
 }

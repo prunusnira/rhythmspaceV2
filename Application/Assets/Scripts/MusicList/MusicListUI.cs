@@ -26,7 +26,6 @@ namespace BMSPlayer
 
         // Data store
         private List<ListItemNode> bmslist;
-        private MusicListManager mlm;
         private RecordDataManager rdm;
         private List<int> listDepth;
         private int listPosition;
@@ -130,7 +129,6 @@ namespace BMSPlayer
             // Initialize
             Application.targetFrameRate = 3000;
             bmslist = new List<ListItemNode>();
-            mlm = MusicListManager.Instance;
             rdm = new RecordDataManager();
             if(File.Exists(Const.JSONPath))
             {
@@ -138,9 +136,10 @@ namespace BMSPlayer
                 SelectListGenerator();
             }
 
-            musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+            musicRect.Init(bmslist, ObjectSetup);
 
-            for (int i = 0; i < Const.ListPos; i++)
+            int cnt = Const.ListPos;
+            for (int i = 0; i < cnt; i++)
             {
                 musicRect.AddItemBottom(ObjectSetup);
             }
@@ -258,7 +257,7 @@ namespace BMSPlayer
                         musicRect.Clear();
                         musicRect.ResetIndex();
                         SelectListGenerator();
-                        musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+                        musicRect.Init(bmslist, ObjectSetup);
                         showInfo(musicRect.GetCurrent());
                     }
                     if(Const.ListDepth.Count > 0)
@@ -268,7 +267,7 @@ namespace BMSPlayer
                         musicRect.Clear();
                         musicRect.ResetIndex();
                         SelectListGenerator();
-                        musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+                        musicRect.Init(bmslist, ObjectSetup);
                         showInfo(musicRect.GetCurrent());
                     }
                     sfxChange.PlayOneShot(sfxSelect);
@@ -284,7 +283,7 @@ namespace BMSPlayer
 
                 ListTreeGenerator();
                 SelectListGenerator();
-                musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+                musicRect.Init(bmslist, ObjectSetup);
 
                 showInfo(musicRect.GetCurrent());
             }
@@ -303,7 +302,7 @@ namespace BMSPlayer
             if (inputSearch.text != "")
             {
                 string text = inputSearch.text;
-                List<MusicListData> searchResult = mlm.FindBMSWithName(text);
+                List<MusicListData> searchResult = MusicListManager.Instance.FindBMSWithName(text);
                 if (searchResult.Count > 0)
                 {
                     musicRect.Clear();
@@ -319,7 +318,7 @@ namespace BMSPlayer
                         };
                         bmslist.Add(bmsNode);
                     }
-                    musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+                    musicRect.Init(bmslist, ObjectSetup);
                     showInfo(musicRect.GetCurrent());
                     searchMode = true;
                 }
@@ -581,6 +580,7 @@ namespace BMSPlayer
                 {
                     if(selectedIdx == i)
                     {
+                        Const.ListPos = i;
                         StartGame();
                     }
                     else
@@ -681,7 +681,7 @@ namespace BMSPlayer
             musicRect.Clear();
             musicRect.ResetIndex();
             SelectListGenerator();
-            musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+            musicRect.Init(bmslist, ObjectSetup);
             showInfo(musicRect.GetCurrent());
             sfxChange.PlayOneShot(sfxSelect);
         }
@@ -759,7 +759,7 @@ namespace BMSPlayer
                 {
                     // child의 children에서 BMS 정보 가져오기
                     // 해당 폴더의 서브폴더는 신경쓰지 않음
-                    List<MusicListData> list = mlm.LoadBMSFromFolder(child.Path);
+                    List<MusicListData> list = MusicListManager.Instance.LoadBMSFromFolder(child.Path);
                     for (int j = 0; j < list.Count; j++)
                     {
                         MusicListData d = list[j];
@@ -799,7 +799,7 @@ namespace BMSPlayer
 
         public void OnFinish()
         {
-            mlm.Close();
+            MusicListManager.Instance.Close();
             rdm.Close();
         }
     }

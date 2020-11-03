@@ -411,6 +411,7 @@ namespace BMSPlayer
                 int npr;
                 int ncombo;
                 int ncb;
+                int ncnt;
 
                 // 기존 등록된 스코어와 비교 수행
                 // 1. 스코어가 높다면 - 스코어와 판정을 갱신
@@ -430,6 +431,7 @@ namespace BMSPlayer
 
                 if(prev != null)
                 {
+                    ncnt = prev.PlayCnt + 1;
                     // 1. 스코어 비교
                     if (Const.ResultScore > prev.Score)
                     {
@@ -496,13 +498,14 @@ namespace BMSPlayer
                     ncb = Const.ResultComboBreak;
                     njtype = Const.GaugeType;
                     nclear = Const.Clear;
+                    ncnt = 0;
                 }
                 
 
                 record = new RecordData(
                     hash,
                     nrank, nscore, (int)njtype, (int)nclear,
-                    npf, ngr, ngd, nok, npr, ncombo, ncb
+                    npf, ngr, ngd, nok, npr, ncombo, ncb, ncnt
                 );
 
                 rdm.RegisterRecord(record);
