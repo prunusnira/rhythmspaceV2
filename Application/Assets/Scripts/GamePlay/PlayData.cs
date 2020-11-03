@@ -9,7 +9,6 @@ namespace BMSPlayer
     {
         // BMS 관련 데이터
         public BMS BMS { get; set; }
-        public int PlayLine { get; set; }
         public double CurrentBPM { get; set; }
         public double BPS { get; set; }
         public double SPB { get; set; }
@@ -48,13 +47,9 @@ namespace BMSPlayer
         // 그래프 제작용
         public List<int> HPGraph { get; set; }
 
-        public PlayData()
+        public PlayData(string bmsPath)
         {
-            // Preference 값 가져오기
-            PlayLine = Const.Playline;
-
-            string bmsPath = Const.PlayingBMSPath;
-            if (!bmsPath.Equals(""))
+            if (bmsPath != null)
                 BMS = new BMS(bmsPath);
 
             // 데이터 초기화

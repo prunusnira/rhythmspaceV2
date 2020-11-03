@@ -22,7 +22,7 @@ namespace BMSPlayer
 
         private int[] itemidx = new int[18];
 
-        public void Init(List<ListItemNode> list, ObjectSetup f)
+        public void Init(List<ListItemNode> list, int centpos, ObjectSetup f)
         {
             objRect = GetComponent<RectTransform>();
             itemList = new Dictionary<int, ListItemNode>();
@@ -70,14 +70,41 @@ namespace BMSPlayer
                 }
                 else
                 {
-                    for (int i = itemList.Count - 8; i < itemList.Count; i++)
+                    int idxmin = centpos - 8;
+                    int idxmax = centpos + 10;
+
+                    if (idxmin < 0) idxmin = itemList.Count + idxmin - 1;
+                    if (idxmax > itemList.Count - 1) idxmax = idxmax - itemList.Count - 1;
+
+                    if (idxmax > idxmin)
+                    {
+                        for (int i = idxmin; i < idxmax; i++)
+                        {
+                            itemidx[i - idxmin] = i;
+                        }
+                    }
+                    else
+                    {
+                        int cnt = 0;
+                        for (int i = idxmin; i < itemList.Count; i++)
+                        {
+                            itemidx[i - idxmin] = i;
+                            cnt++;
+                        }
+                        for (int i = 0; i < idxmax - 1; i++)
+                        {
+                            itemidx[cnt + i] = i;
+                        }
+                    }
+
+                    /*for (int i = itemList.Count - 8; i < itemList.Count; i++)
                     {
                         itemidx[i - (itemList.Count - 8)] = i;
                     }
                     for (int i = 0; i < 10; i++)
                     {
                         itemidx[i + 8] = i;
-                    }
+                    }*/
                 }
 
                 // 리스트에 아이템 채우기
@@ -88,7 +115,7 @@ namespace BMSPlayer
         // 초기 아이템 추가
         public void AddItem(ObjectSetup f)
         {
-            foreach(int i in itemidx)
+            foreach (int i in itemidx)
             {
                 GameObject obj = f(itemList[i], i);
                 obj.transform.SetParent(content.transform, false);

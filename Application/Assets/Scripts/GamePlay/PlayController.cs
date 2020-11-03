@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace BMSPlayer {
 	// 게임 전체를 컨트롤하는 클래스
@@ -23,15 +24,23 @@ namespace BMSPlayer {
         private Graph Graph;
         private CoverLiftControl Cover;
 
+        // Pause Menu: 편의성을 위해 컨트롤러에서 관리
+        public GameObject layerPauseMenu;
+        public Button btnRestart;
+        public Button btnRestartSame;
+        public Button btnExit;
+
+        // Menu btn
+        public Sprite normalBtn;
+        public Sprite selectBtn;
+
         // Data Related
-		private NoteGenerator generator;
+        private NoteGenerator generator;
         private Scroller scroller;
         private LNObjConverter LNConverter;
         private HPController hpController;
         private BMSAnalyzer analyzer;
         private Randomizer randomizer;
-
-        public GameObject startLine; // 노트가 생성되는 위치
 
         // Scene 관리
         private bool gameOverTriggered = false;
@@ -62,7 +71,7 @@ namespace BMSPlayer {
         private ISoundController soundController;
 
         private bool firstrun = false;
-        public bool isPlayAuto;
+        private bool isPlayAuto;
 
         private int[] noteLayout;
 
@@ -83,7 +92,7 @@ namespace BMSPlayer {
             hpController = HPController.Instance;
 
             // 배속, 라인 수, BMS 로드 등의 기본 데이터 가져오기를 생성자에서 수행
-            Data = new PlayData();
+            Data = new PlayData(Const.PlayingBMSPath);
 
             // 배치 변경 관련 작업
             randomizer = new Randomizer();
@@ -114,6 +123,31 @@ namespace BMSPlayer {
             {
                 lnadd[i] = false;
             }
+
+            // 일시정지 메뉴
+            btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
+            btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
+            btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
+
+            btnRestart.onClick.AddListener(delegate
+            {
+                Const.ChangeLayout = true;
+                RestartGame();
+            });
+            btnRestartSame.onClick.AddListener(delegate
+            {
+                Const.ChangeLayout = true;
+                RestartGame();
+            });
+            btnExit.onClick.AddListener(delegate
+            {
+                double currentTick = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
+                StartTime += currentTick - PauseStartTime;
+                Const.Clear = ClearType.FAIL;
+                isGameOver = true;
+                isPaused = false;
+                HidePauseMenu();
+            });
         }
 
         private void Start()
@@ -454,11 +488,11 @@ namespace BMSPlayer {
                     // 위 아래 버튼 이동시 메뉴 변경
                     if (Input.GetKeyDown(KeyCode.UpArrow))
                     {
-                        UI.PauseMenuMove(ref pauseSel, false);
+                        PauseMenuMove(ref pauseSel, false);
                     }
                     if (Input.GetKeyDown(KeyCode.DownArrow))
                     {
-                        UI.PauseMenuMove(ref pauseSel, true);
+                        PauseMenuMove(ref pauseSel, true);
                     }
                     if (Input.GetKeyDown(KeyCode.Return))
                     {
@@ -478,7 +512,7 @@ namespace BMSPlayer {
                                 Const.Clear = ClearType.FAIL;
                                 isGameOver = true;
                                 isPaused = false;
-                                UI.HidePauseMenu();
+                                HidePauseMenu();
                                 break;
                         }
                     }
@@ -501,14 +535,14 @@ namespace BMSPlayer {
                         PauseStartTime = currentTick;
                         soundController.PauseAll();
                         if(Data.BMS.BGAVideoFile != null) BGAControl.PauseBGAVideo();
-                        UI.ShowPauseMenu();
+                        ShowPauseMenu();
                     }
                     else
                     {
                         StartTime += currentTick - PauseStartTime;
                         soundController.ResumeAll();
                         if (Data.BMS.BGAVideoFile != null) BGAControl.ResumeBGAVideo();
-                        UI.HidePauseMenu();
+                        HidePauseMenu();
                     }
                 }
             }
@@ -594,6 +628,76 @@ namespace BMSPlayer {
                     return true;
                 default:
                     return false;
+            }
+        }
+
+        public void ShowPauseMenu()
+        {
+            layerPauseMenu.SetActive(true);
+        }
+
+        public void HidePauseMenu()
+        {
+            layerPauseMenu.SetActive(false);
+        }
+
+        public void PauseMenuMove(ref int pauseSel, bool down)
+        {
+            if (pauseSel == 0)
+            {
+                if (down)
+                {
+                    pauseSel = 1;
+                }
+                else
+                {
+                    pauseSel = 2;
+                }
+            }
+            else if (pauseSel == 1)
+            {
+                if (down)
+                {
+                    pauseSel = 2;
+                }
+                else
+                {
+                    pauseSel = 0;
+                }
+            }
+            else
+            {
+                if (down)
+                {
+                    pauseSel = 0;
+                }
+                else
+                {
+                    pauseSel = 1;
+                }
+            }
+            SetPauseMenu(pauseSel);
+        }
+
+        public void SetPauseMenu(int newsel)
+        {
+            switch (newsel)
+            {
+                case 0:
+                    btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
+                    btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    break;
+                case 1:
+                    btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    btnRestartSame.gameObject.GetComponent<Image>().sprite = selectBtn;
+                    btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    break;
+                case 2:
+                    btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
+                    btnExit.gameObject.GetComponent<Image>().sprite = selectBtn;
+                    break;
             }
         }
 

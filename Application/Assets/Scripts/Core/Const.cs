@@ -445,7 +445,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("speed", 200);
+                return PlayerPrefs.GetInt("speed", 300);
             }
             set
             {
@@ -457,7 +457,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("speedfl", 200);
+                return PlayerPrefs.GetInt("speedfl", 400);
             }
             set
             {
@@ -474,18 +474,6 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("spdtype", (int)value);
-            }
-        }
-
-        public static int Playline
-        {
-            get
-            {
-                return PlayerPrefs.GetInt("playline", 8);
-            }
-            set
-            {
-                PlayerPrefs.SetInt("playline", value);
             }
         }
 
@@ -951,7 +939,7 @@ namespace BMSPlayer
         {
             get
             {
-                return (DisplayPosType)PlayerPrefs.GetInt("fastslow", (int)DisplayPosType.OFF);
+                return (DisplayPosType)PlayerPrefs.GetInt("fastslow", (int)DisplayPosType.TYPEA);
             }
             set
             {
@@ -963,7 +951,7 @@ namespace BMSPlayer
         {
             get
             {
-                return (DisplayPosType)PlayerPrefs.GetInt("targetdiff", (int)DisplayPosType.OFF);
+                return (DisplayPosType)PlayerPrefs.GetInt("targetdiff", (int)DisplayPosType.TYPEB);
             }
             set
             {
@@ -975,7 +963,7 @@ namespace BMSPlayer
         {
             get
             {
-                return (DisplayPosType)PlayerPrefs.GetInt("ratediff", (int)DisplayPosType.OFF);
+                return (DisplayPosType)PlayerPrefs.GetInt("ratediff", (int)DisplayPosType.TYPEB);
             }
             set
             {

@@ -15,13 +15,7 @@ namespace BMSPlayer
         // UI Object
         private List<GameObject> NoteOnScreen;
         public GameObject layerJudgeAll;
-        public GameObject layerPauseMenu;
         public TextMesh FPSCounter;
-
-        // Pause Menu
-        public Button btnRestart;
-        public Button btnRestartSame;
-        public Button btnExit;
 
         // Side judge
         public Text txtAvgDiff;
@@ -89,10 +83,6 @@ namespace BMSPlayer
         private bool FadeStart = false;
         private bool FadeReady = false;
 
-        // Menu btn
-        public Sprite normalBtn;
-        public Sprite selectBtn;
-
         // Key info
         public GameObject keyInfo;
 
@@ -138,13 +128,8 @@ namespace BMSPlayer
                 // 판정 패널 표시 설정
                 if (Const.DisplayJudge == 0) layerJudgeAll.SetActive(false);
 
-                // 일시정지 메뉴
-                btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
-                btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
-                btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
-
                 // 오토 플레이 표기
-                if(Const.Auto == AutoPlayType.ALL)
+                if (Const.Auto == AutoPlayType.ALL)
                 {
                     txtAutoPlay.gameObject.SetActive(true);
                 }
@@ -315,76 +300,6 @@ namespace BMSPlayer
             effectRotation[pos] += 15f;
             if (effectRotation[pos] % 360 == 0) effectRotation[pos] = 0f;
             sprite.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, effectRotation[pos]));
-        }
-
-        public void ShowPauseMenu()
-        {
-            layerPauseMenu.SetActive(true);
-        }
-        
-        public void HidePauseMenu()
-        {
-            layerPauseMenu.SetActive(false);
-        }
-
-        public void PauseMenuMove(ref int pauseSel, bool down)
-        {
-            if(pauseSel == 0)
-            {
-                if (down)
-                {
-                    pauseSel = 1;
-                }
-                else
-                {
-                    pauseSel = 2;
-                }
-            }
-            else if(pauseSel == 1)
-            {
-                if (down)
-                {
-                    pauseSel = 2;
-                }
-                else
-                {
-                    pauseSel = 0;
-                }
-            }
-            else
-            {
-                if (down)
-                {
-                    pauseSel = 0;
-                }
-                else
-                {
-                    pauseSel = 1;
-                }
-            }
-            SetPauseMenu(pauseSel);
-        }
-
-        public void SetPauseMenu(int newsel)
-        {
-            switch(newsel)
-            {
-                case 0:
-                    btnRestart.gameObject.GetComponent<Image>().sprite = selectBtn;
-                    btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
-                    btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
-                    break;
-                case 1:
-                    btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
-                    btnRestartSame.gameObject.GetComponent<Image>().sprite = selectBtn;
-                    btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
-                    break;
-                case 2:
-                    btnRestart.gameObject.GetComponent<Image>().sprite = normalBtn;
-                    btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
-                    btnExit.gameObject.GetComponent<Image>().sprite = selectBtn;
-                    break;
-            }
         }
 
         public void DeactiveLoading()

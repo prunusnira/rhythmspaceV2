@@ -85,7 +85,6 @@ namespace BMSCore
         public double BPMMax { get; set; }
         public int Level { get; set; }
         public int Rank { get; set; }
-        public int TotalNotes { get; set; }
         public int Difficulty { get; set; }
         public string StageFile { get; set; }
         public LNType LNType { get; set; } // default = LNType1
@@ -160,7 +159,6 @@ namespace BMSCore
             BPMMax = 0;
             Level = 0;
             Rank = 2;
-            TotalNotes = 0;
             Difficulty = 0;
             StageFile = "";
             LNType = LNType.Type1;

@@ -29,6 +29,7 @@ namespace BMSPlayer
         private Thread refreshThread = null;
         private int encoding;
         private bool refreshed = false;
+        private bool isRefreshing = false;
 
         // Browser
         public Text txtBrowserDesc;
@@ -415,25 +416,32 @@ namespace BMSPlayer
 
         public void changePath()
         {
-            FileBrowser.ShowLoadDialog(
-                (path) => pathCallback(path),
-                null,
-                true,
-                false,
-                Const.BMSFolderPath,
-                "Select BMS Folder",
-                "Select"
-            );
-            sfxPlay.PlayOneShot(sfxSource);
+            if(!isRefreshing)
+            {
+                FileBrowser.ShowLoadDialog(
+                    (path) => pathCallback(path),
+                    null,
+                    true,
+                    false,
+                    Const.BMSFolderPath,
+                    "Select BMS Folder",
+                    "Select"
+                );
+                sfxPlay.PlayOneShot(sfxSource);
+            }
         }
 
         public void pathRefresh()
         {
-            musicList.RemoveRange(0, musicList.Count);
-            layerLoading.SetActive(true);
-            refreshThread = new Thread(new ThreadStart(refresh));
-            refreshThread.Start();
-            sfxPlay.PlayOneShot(sfxSource);
+            if (!isRefreshing)
+            {
+                isRefreshing = true;
+                musicList.RemoveRange(0, musicList.Count);
+                layerLoading.SetActive(true);
+                refreshThread = new Thread(new ThreadStart(refresh));
+                refreshThread.Start();
+                sfxPlay.PlayOneShot(sfxSource);
+            }
         }
 
         public void pathCallback(string[] path)
@@ -470,23 +478,12 @@ namespace BMSPlayer
             File.Create(Const.JSONPath).Close();
             File.WriteAllText(Const.JSONPath, tree.JSONStr);
 
-            // 실제 파일을 DB에 등록
-            // Load each file
-            /*int index = 0;
-            foreach(string file in tree.FileList)
-            {
-                // 각 파일별로 돌면서 파일을 등록함
-                strLoading = "Loading " + file;
-                MusicListData bmsdata = mlm.LoadBMSFromPath(file, index, encoding);
-                if(bmsdata != null) musicList.Add(bmsdata);
-                index++;
-            }*/
-
             // 수집한 BMS 데이터를 DB에 등록
             strLoading = "Registering into database";
             MusicListManager.Instance.AddDataToDB(musicList);
             
             refreshed = true;
+            isRefreshing = false;
         }
 
         public void SetAutoSync()

@@ -13,8 +13,6 @@ namespace BMSCore
 {
     public class BMSAnalyzer
     {
-        private bool isWavExist = false;
-        private bool isOggExist = false;
         private bool isVideoExist = false;
         private bool isRandom = false;
 
@@ -171,17 +169,8 @@ namespace BMSCore
 
         public void FullAnalyzer(BMS bms, int encoding)
         {
-            // wav ogg 체크
-            string[] wavfiles = Directory.GetFiles(bms.FolderPath, "*.wav");
-            string[] oggfiles = Directory.GetFiles(bms.FolderPath, "*.ogg");
-
             int ifCount = 0;
             int randSize = 0;
-
-            if (wavfiles.Length > 0)
-                isWavExist = true;
-            if (oggfiles.Length > 0)
-                isOggExist = true;
 
             // input stream 열기 // 기본 Default, 일본어 932, 한국어 949
             //StreamReader bmsReader = new StreamReader(bms.FilePath, System.Text.Encoding.GetEncoding(encoding));
@@ -274,9 +263,9 @@ namespace BMSCore
                         }
                         else if (tag == "#TOTAL")
                         {
-                            int note;
-                            int.TryParse(left, out note);
-                            bms.TotalNotes = note;
+                            int total;
+                            int.TryParse(left, out total);
+                            bms.TotalValue = total;
                         }
                         else if (tag == "#STAGEFILE")
                         {
@@ -343,21 +332,19 @@ namespace BMSCore
                             {
                                 filename += name[i] + '.';
                             }
-                            if (isWavExist && !isOggExist)
-                                filename += "wav";
-                            else if (!isWavExist && isOggExist)
-                                filename += "ogg";
-                            else
+
+                            // 각각의 파일 확장자에 대해서 직접 검사
+                            if(File.Exists(bms.FolderPath + filename + "wav"))
                             {
-                                // 각각의 파일에 대해서 직접 검사 할 수 밖에 없음
-                                if(File.Exists(bms.FolderPath + filename + "wav"))
-                                {
-                                    filename = filename + "wav";
-                                }
-                                else
-                                {
-                                    filename = filename + "ogg";
-                                }
+                                filename = filename + "wav";
+                            }
+                            else if(File.Exists(bms.FolderPath + filename + "ogg"))
+                            {
+                                filename = filename + "ogg";
+                            }
+                            else if (File.Exists(bms.FolderPath + filename + "mp3"))
+                            {
+                                filename = filename + "mp3";
                             }
 
                             bms.WavList.Add(tag.Substring(4, 2), filename);

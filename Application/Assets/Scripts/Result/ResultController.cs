@@ -87,7 +87,7 @@ namespace BMSPlayer
         void Awake()
         {
             // 곡 정보
-            PlayData Data = new PlayData();
+            PlayData Data = new PlayData(Const.PlayingBMSPath);
             BMSAnalyzer analyzer = new BMSAnalyzer();
             analyzer.HeaderAnalyzer(Data.BMS, Const.Encoding);
             title.text = Data.BMS.Title;

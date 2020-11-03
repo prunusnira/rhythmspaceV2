@@ -71,6 +71,8 @@ namespace BMSPlayer
         public TextMeshProUGUI infoArtist;
         public TextMeshProUGUI infoSubArtist;
         public TextMeshProUGUI infoBpm;
+        public TextMeshProUGUI infoTotalNote;
+        public TextMeshProUGUI infoPlayTime;
         public GameObject btnStart;
 
         // Difficulty
@@ -136,13 +138,8 @@ namespace BMSPlayer
                 SelectListGenerator();
             }
 
-            musicRect.Init(bmslist, ObjectSetup);
-
-            int cnt = Const.ListPos;
-            for (int i = 0; i < cnt; i++)
-            {
-                musicRect.AddItemBottom(ObjectSetup);
-            }
+            musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+            musicRect.ChangeCurrentIdx(Const.ListPos);
 
             // Description
             btnDescSystemOp.onClick.AddListener(OpenSystemOption);
@@ -257,7 +254,7 @@ namespace BMSPlayer
                         musicRect.Clear();
                         musicRect.ResetIndex();
                         SelectListGenerator();
-                        musicRect.Init(bmslist, ObjectSetup);
+                        musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
                         showInfo(musicRect.GetCurrent());
                     }
                     if(Const.ListDepth.Count > 0)
@@ -267,7 +264,7 @@ namespace BMSPlayer
                         musicRect.Clear();
                         musicRect.ResetIndex();
                         SelectListGenerator();
-                        musicRect.Init(bmslist, ObjectSetup);
+                        musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
                         showInfo(musicRect.GetCurrent());
                     }
                     sfxChange.PlayOneShot(sfxSelect);
@@ -283,7 +280,7 @@ namespace BMSPlayer
 
                 ListTreeGenerator();
                 SelectListGenerator();
-                musicRect.Init(bmslist, ObjectSetup);
+                musicRect.Init(bmslist, 0, ObjectSetup);
 
                 showInfo(musicRect.GetCurrent());
             }
@@ -318,7 +315,7 @@ namespace BMSPlayer
                         };
                         bmslist.Add(bmsNode);
                     }
-                    musicRect.Init(bmslist, ObjectSetup);
+                    musicRect.Init(bmslist, 0, ObjectSetup);
                     showInfo(musicRect.GetCurrent());
                     searchMode = true;
                 }
@@ -368,6 +365,11 @@ namespace BMSPlayer
                 infoSubTitle.text = bms.SubTitle;
                 infoArtist.text = bms.Artist;
                 infoSubArtist.text = bms.SubArtist;
+                infoTotalNote.text = "Total Notes "+bms.TotalNotes.ToString();
+                int time = bms.PlayTime;
+                string min = (Convert.ToInt32(time) / 600).ToString("00");
+                string sec = (Convert.ToInt32(time) % 600 / 10).ToString("00");
+                infoPlayTime.text = "Play Time " + min + ":" + sec;
 
                 // BPM 표시 설정
                 if (bms.BPMmin == bms.BPMmax)
@@ -549,6 +551,8 @@ namespace BMSPlayer
                 infoArtist.text = "";
                 infoSubArtist.text = "";
                 infoBpm.text = "";
+                infoTotalNote.text = "";
+                infoPlayTime.text = "";
 
                 recordScore.text = "0";
                 recordPerfect.text = "0";
@@ -681,7 +685,7 @@ namespace BMSPlayer
             musicRect.Clear();
             musicRect.ResetIndex();
             SelectListGenerator();
-            musicRect.Init(bmslist, ObjectSetup);
+            musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
             showInfo(musicRect.GetCurrent());
             sfxChange.PlayOneShot(sfxSelect);
         }

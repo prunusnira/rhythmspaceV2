@@ -49,17 +49,32 @@ namespace BMSPlayer
         {
             if (path != "")
             {
-                BMS bms = new BMS(path);
+                PlayData Data = new PlayData(path);
                 BMSAnalyzer analyzer = new BMSAnalyzer();
-                analyzer.FullAnalyzer(bms, encoding);
-                if (bms.Player != 1) return null;
+                analyzer.FullAnalyzer(Data.BMS, encoding);
+                if (Data.BMS.Player != 1) return null;
+                
+                NoteGenerator generator = new NoteGenerator();
+                generator.AnalyzeNotes(Data, null);
+                generator.PositionToTiming(Data);
 
                 MusicListData data = new MusicListData(
-                        index, bms.Title, bms.SubTitle,
-                        bms.Artist, bms.SubArtist, bms.Gerne,
-                        bms.BPMStart, bms.BPMMin, bms.BPMMax,
-                        bms.FolderPath, bms.Level, bms.Difficulty,
-                        bms.FileName, bms.StageFile, bms.TotalNotes
+                        index,
+                        Data.BMS.Title,
+                        Data.BMS.SubTitle,
+                        Data.BMS.Artist,
+                        Data.BMS.SubArtist,
+                        Data.BMS.Gerne,
+                        Data.BMS.BPMStart,
+                        Data.BMS.BPMMin,
+                        Data.BMS.BPMMax,
+                        Data.BMS.FolderPath,
+                        Data.BMS.Level,
+                        Data.BMS.Difficulty,
+                        Data.BMS.FileName,
+                        Data.BMS.StageFile,
+                        Data.TotalNotes,
+                        Convert.ToInt32(Data.LastTiming)
                     );
 
                 return data;
@@ -87,7 +102,7 @@ namespace BMSPlayer
             if (list.Count != 0)
             {
                 SQLiteExecutor.Instance.DropList();
-                List<string[]> paramList = new List<string[]>();
+                List<MusicListData> dataList = new List<MusicListData>();
                 // 리스트의 각 파일을 DB에 등록(이 때 MD5 Hash값도 계산)
                 foreach (MusicListData d in list)
                 {
@@ -96,18 +111,11 @@ namespace BMSPlayer
                     fstream.Close();
 
                     string hash = BitConverter.ToString(bytehash);
-
-                    string[] param =
-                    {
-                        d.Title, d.SubTitle, d.Artist, d.SubArtist, d.Gerne,
-                        d.BPMstart.ToString(), d.BPMmin.ToString(), d.BPMmax.ToString(),
-                        d.Path, hash, d.Level.ToString(), d.Difficulty.ToString(),
-                        d.FileName, d.Jacket, d.TotalNotes.ToString()
-                    };
-                    paramList.Add(param);
+                    d.MD5Hash = hash;
+                    dataList.Add(d);
                     fstream.Close();
                 }
-                SQLiteExecutor.Instance.InsertBMS(paramList);
+                SQLiteExecutor.Instance.InsertBMS(dataList);
             }
         }
     }
