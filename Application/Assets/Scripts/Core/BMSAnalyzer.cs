@@ -19,10 +19,6 @@ namespace BMSCore
         // 노래 선택창에서 선택한 BMS 파일의 헤더를 분석
         public void HeaderAnalyzer(BMS bms, int encoding)
         {
-            // input stream 열기 // 기본 Default, 일본어 932, 한국어 949
-            /*StreamReader bmsReader = new StreamReader(
-                bms.FilePath, System.Text.Encoding.GetEncoding(encoding)
-            );*/
             FileStream bmsFileStream = File.OpenRead(bms.FilePath);
             Encoding charset = Encoding.GetEncoding(encoding);
             StreamReader bmsReader = new StreamReader(bmsFileStream, charset);
@@ -156,9 +152,10 @@ namespace BMSCore
                 }
                 catch (Exception e)
                 {
-                    ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
-                    ErrorHandler.LogError("from: " + bms.FilePath);
-                    ErrorHandler.LogError(e.Message+ " " +e.StackTrace);
+                    /*ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
+                    ErrorHandler.LogError("File: " + bms.FilePath);
+                    ErrorHandler.LogError("Line: " + buf);
+                    ErrorHandler.LogError(e.Message+ " " +e.StackTrace);*/
                     continue;
                 }
             }
@@ -420,10 +417,10 @@ namespace BMSCore
                 }
                 catch (Exception e)
                 {
-                    ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
+                    /*ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
                     ErrorHandler.LogError("File: " + bms.FilePath);
                     ErrorHandler.LogError("Line: " + buf);
-                    ErrorHandler.LogError(e.Message + " " + e.StackTrace);
+                    ErrorHandler.LogError(e.Message + " " + e.StackTrace);*/
                     continue;
                 }
             }
@@ -608,10 +605,10 @@ namespace BMSCore
             }
             catch (Exception e)
             {
-                ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
+                /*ErrorHandler.LogError("Unexpected BMS sentence found, but ignore");
                 ErrorHandler.LogError("File: " + bms.FilePath);
                 ErrorHandler.LogError("Line: #" + bar+ch+":"+leftNote);
-                ErrorHandler.LogError(e.Message + " " + e.StackTrace);
+                ErrorHandler.LogError(e.Message + " " + e.StackTrace);*/
             }
         }
 

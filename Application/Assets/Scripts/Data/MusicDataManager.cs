@@ -55,7 +55,7 @@ namespace BMSPlayer
                 if (Data.BMS.Player != 1) return null;
                 
                 NoteGenerator generator = new NoteGenerator();
-                generator.AnalyzeNotes(Data, null);
+                generator.AnalyzeNotes(Data, new int[] { 1, 2, 3, 4, 5, 6, 7 });
                 generator.PositionToTiming(Data);
 
                 MusicListData data = new MusicListData(

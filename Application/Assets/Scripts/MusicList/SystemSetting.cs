@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using BMSCore;
 using SimpleFileBrowser;
 using System.Threading;
+using TMPro;
 
 namespace BMSPlayer
 {
@@ -37,7 +38,7 @@ namespace BMSPlayer
 
         // Loading
         public GameObject layerLoading;
-        public TextMesh txtLoadingPath;
+        public TextMeshProUGUI txtLoadingPath;
         private string strLoading = "";
 
         // Lang changer
