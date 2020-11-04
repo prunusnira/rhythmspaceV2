@@ -74,7 +74,7 @@ namespace BMSPlayer
                         Data.BMS.FileName,
                         Data.BMS.StageFile,
                         Data.TotalNotes,
-                        Convert.ToInt32(Data.LastTiming)
+                        (int)Data.LastTiming
                     );
 
                 return data;

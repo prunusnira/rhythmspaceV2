@@ -539,7 +539,10 @@ namespace BMSPlayer
                         }   
                         else if(type == BPMNoteType.Type2)
                         {
-                            note.BPMValue = data.BMS.BPMNum[noteStr];
+                            if(data.BMS.BPMNum.ContainsKey(noteStr))
+                            {
+                                note.BPMValue = data.BMS.BPMNum[noteStr];
+                            }
                         }
 
                         data.NoteBPM.Add(note);
@@ -593,37 +596,40 @@ namespace BMSPlayer
                 string noteStr = data.BMS.BGANote[cbar].Substring(n * 2, 2);
                 if (noteStr != "00")
                 {
-                    double position = (double)n / size;
-
-                    if (data.BMS.BarLength.ContainsKey(cbar))
+                    if (data.BMS.BGAImages.ContainsKey(noteStr))
                     {
-                        position *= data.BMS.BarLength[cbar];
-                    }
+                        double position = (double)n / size;
 
-                    double realpos = (data.TotalLength + position);
-
-                    BGANote note = new BGANote
-                    {
-                        Position = realpos,
-                        Bar = cbar,
-                        ObjType = ObjectType.BGA
-                    };
-
-                    if (data.BMS.BGAVideoFile != "")
-                    {
-                        note.VideoFile = data.BMS.BGAVideoFile;
-                    }
-                    
-                    if(data.BMS.BGAImages.Count > 0)
-                    {
-                        if(data.BMS.BGAImages.ContainsKey(noteStr))
+                        if (data.BMS.BarLength.ContainsKey(cbar))
                         {
-                            note.BGASprite = data.BMS.BGAImages[noteStr];
+                            position *= data.BMS.BarLength[cbar];
                         }
-                    }
 
-                    data.NoteBGA.Add(note);
-                    data.NoteCount++;
+                        double realpos = (data.TotalLength + position);
+
+                        BGANote note = new BGANote
+                        {
+                            Position = realpos,
+                            Bar = cbar,
+                            ObjType = ObjectType.BGA
+                        };
+
+                        if (data.BMS.BGAVideoFile != "")
+                        {
+                            note.VideoFile = data.BMS.BGAVideoFile;
+                        }
+
+                        if (data.BMS.BGAImages.Count > 0)
+                        {
+                            if (data.BMS.BGAImages.ContainsKey(noteStr))
+                            {
+                                note.BGASprite = data.BMS.BGAImages[noteStr];
+                            }
+                        }
+
+                        data.NoteBGA.Add(note);
+                        data.NoteCount++;
+                    }
                 }
             }
         }
@@ -637,32 +643,35 @@ namespace BMSPlayer
                 string noteStr = data.BMS.LayerNote[cbar].Substring(n * 2, 2);
                 if (noteStr != "00")
                 {
-                    double position = (double)n / size;
-
-                    if (data.BMS.BarLength.ContainsKey(cbar))
+                    if(data.BMS.BGAImages.ContainsKey(noteStr))
                     {
-                        position *= data.BMS.BarLength[cbar];
-                    }
+                        double position = (double)n / size;
 
-                    double realpos = (data.TotalLength + position);
-
-                    LayerNote note = new LayerNote
-                    {
-                        Position = realpos,
-                        Bar = cbar,
-                        ObjType = ObjectType.LAYER
-                    };
-
-                    if (data.BMS.BGAImages.Count > 0)
-                    {
-                        if (data.BMS.BGAImages.ContainsKey(noteStr))
+                        if (data.BMS.BarLength.ContainsKey(cbar))
                         {
-                            note.BGASprite = data.BMS.BGAImages[noteStr];
+                            position *= data.BMS.BarLength[cbar];
                         }
-                    }
 
-                    data.NoteLayer.Add(note);
-                    data.NoteCount++;
+                        double realpos = (data.TotalLength + position);
+
+                        LayerNote note = new LayerNote
+                        {
+                            Position = realpos,
+                            Bar = cbar,
+                            ObjType = ObjectType.LAYER
+                        };
+
+                        if (data.BMS.BGAImages.Count > 0)
+                        {
+                            if (data.BMS.BGAImages.ContainsKey(noteStr))
+                            {
+                                note.BGASprite = data.BMS.BGAImages[noteStr];
+                            }
+                        }
+
+                        data.NoteLayer.Add(note);
+                        data.NoteCount++;
+                    }
                 }
             }
         }
@@ -676,25 +685,28 @@ namespace BMSPlayer
                 string noteStr = data.BMS.StopNote[cbar].Substring(n * 2, 2);
                 if (noteStr != "00")
                 {
-                    double position = (double)n / size;
-
-                    if (data.BMS.BarLength.ContainsKey(cbar))
+                    if(data.BMS.StopList.ContainsKey(noteStr))
                     {
-                        position *= data.BMS.BarLength[cbar];
+                        double position = (double)n / size;
+
+                        if (data.BMS.BarLength.ContainsKey(cbar))
+                        {
+                            position *= data.BMS.BarLength[cbar];
+                        }
+
+                        double realpos = (data.TotalLength + position);
+
+                        StopNote note = new StopNote
+                        {
+                            Position = realpos,
+                            Bar = cbar,
+                            ObjType = ObjectType.STOP,
+                            StopDuration = (double)data.BMS.StopList[noteStr] / 192
+                            // 나중에 실시간으로 멈출 때 bps로 나누어야 함
+                        };
+                        data.NoteStop.Add(note);
+                        data.NoteCount++;
                     }
-
-                    double realpos = (data.TotalLength + position);
-
-                    StopNote note = new StopNote
-                    {
-                        Position = realpos,
-                        Bar = cbar,
-                        ObjType = ObjectType.STOP,
-                        StopDuration = (double)data.BMS.StopList[noteStr] / 192
-                        // 나중에 실시간으로 멈출 때 bps로 나누어야 함
-                    };
-                    data.NoteStop.Add(note);
-                    data.NoteCount++;
                 }
             }
         }

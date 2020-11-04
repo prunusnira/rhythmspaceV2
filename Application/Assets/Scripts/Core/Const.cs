@@ -40,17 +40,6 @@ namespace BMSPlayer
 
         public static int NoteStartPos = 1100;
 
-        public static int[] CustomRandom =
-        {
-            Custom1,
-            Custom2,
-            Custom3,
-            Custom4,
-            Custom5,
-            Custom6,
-            Custom7,
-        };
-
         public static int[] CurrentLayout = { 1, 2, 3, 4, 5, 6, 7 };
 
         // Language

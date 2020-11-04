@@ -34,7 +34,7 @@ namespace BMSPlayer
                         layout = CreateCRan(layout);
                         break;
                     case NoteLayout.CUSTOM:
-                        layout = Const.CustomRandom;
+                        layout = CustomRandom();
                         break;
                     case NoteLayout.SRAN:
                         layout = null;
@@ -82,6 +82,21 @@ namespace BMSPlayer
             };
 
             return result;
+        }
+
+        private int[] CustomRandom()
+        {
+            int[] layout =
+            {
+                Const.Custom1,
+                Const.Custom2,
+                Const.Custom3,
+                Const.Custom4,
+                Const.Custom5,
+                Const.Custom6,
+                Const.Custom7
+            };
+            return layout;
         }
 
         private void FisherYates(int[] data)

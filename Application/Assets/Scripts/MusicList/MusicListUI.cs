@@ -281,6 +281,7 @@ namespace BMSPlayer
                 ListTreeGenerator();
                 SelectListGenerator();
                 musicRect.Init(bmslist, 0, ObjectSetup);
+                musicRect.ChangeCurrentIdx(0);
 
                 showInfo(musicRect.GetCurrent());
             }
@@ -753,6 +754,23 @@ namespace BMSPlayer
             foreach(int d in depth)
             {
                 current = current.Children[d];
+            }
+
+            if(current.HasBMS)
+            {
+                List<MusicListData> list = MusicListManager.Instance.LoadBMSFromFolder(current.Path);
+                for (int j = 0; j < list.Count; j++)
+                {
+                    MusicListData d = list[j];
+                    ListItemNode bmsNode = new ListItemNode
+                    {
+                        Display = d.Title,
+                        Info = d,
+                        Type = ItemType.BMS,
+                        Path = d.Path
+                    };
+                    bmslist.Add(bmsNode);
+                }
             }
 
             for (int i = 0; i < current.Children.Count; i++)

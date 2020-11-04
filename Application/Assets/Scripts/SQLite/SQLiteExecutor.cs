@@ -152,11 +152,14 @@ namespace DatabaseManager
             for(int i = 0; i < paramList.Count; i++)
             {
                 MusicListData param = paramList[i];
-                param.Title = param.Title.Replace("'", "''").Replace("\"", "\"\"");
-                param.SubTitle = param.SubTitle.Replace("'", "''").Replace("\"", "\"\"");
-                param.Artist = param.Artist.Replace("'", "''").Replace("\"", "\"\"");
-                param.SubArtist = param.SubArtist.Replace("'", "''").Replace("\"", "\"\"");
-                param.Gerne = param.Gerne.Replace("'", "''").Replace("\"", "\"\"");
+                param.Title = param.Title.Replace("'", "''");
+                param.SubTitle = param.SubTitle.Replace("'", "''");
+                param.Artist = param.Artist.Replace("'", "''");
+                param.SubArtist = param.SubArtist.Replace("'", "''");
+                param.Gerne = param.Gerne.Replace("'", "''");
+                param.FileName = param.FileName.Replace("'", "''");
+                param.Path = param.Path.Replace("'", "''");
+                param.Jacket = param.Jacket.Replace("'", "''");
             }
 
             string query =
@@ -179,9 +182,9 @@ namespace DatabaseManager
                         param.BPMmin + "," +
                         param.BPMmax + ",'" +
                         param.Path + "', '" +
-                        param.MD5Hash + "','" +
-                        param.Level + "','" +
-                        param.Difficulty + "','" +
+                        param.MD5Hash + "'," +
+                        param.Level + "," +
+                        param.Difficulty + ",'" +
                         param.FileName + "','" +
                         param.Jacket + "', " +
                         param.TotalNotes + ", " +
