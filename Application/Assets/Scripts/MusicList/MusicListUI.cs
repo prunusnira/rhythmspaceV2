@@ -110,13 +110,27 @@ namespace BMSPlayer
         public TextMeshProUGUI recordPoor;
         public TextMeshProUGUI recordCombo;
         public TextMeshProUGUI recordCBreak;
-        public TextMeshProUGUI recordClearStat;
-        public TextMeshProUGUI recordRank;
+        public Image recordRank;
+        public Image recordClearStat;
+        public Sprite clearNP;
+        public Sprite clearAC;
+        public Sprite clearEC;
+        public Sprite clearNC;
+        public Sprite clearHC;
+        public Sprite clearEXC;
+        public Sprite clearFC;
+        public Sprite clearPF;
+        public Sprite clearFail;
+        public Sprite rankaaa;
+        public Sprite rankaa;
+        public Sprite ranka;
+        public Sprite rankb;
+        public Sprite rankc;
+        public Sprite rankd;
+        public Sprite ranke;
+        public Sprite rankf;
 
         public Sprite empty;
-
-        // data
-        public Text debugText;
 
         public AudioSource sfxChange;
         public AudioSource bgLoop;
@@ -497,33 +511,60 @@ namespace BMSPlayer
                     recordPoor.text = data.Poor.ToString();
                     recordCombo.text = data.MaxCombo.ToString();
                     recordCBreak.text = data.CBreak.ToString();
-                    recordRank.text = data.Rank.ToUpper();
+
+                    switch (data.Rank)
+                    {
+                        case "aaa":
+                            recordRank.sprite = rankaaa;
+                            break;
+                        case "aa":
+                            recordRank.sprite = rankaa;
+                            break;
+                        case "a":
+                            recordRank.sprite = ranka;
+                            break;
+                        case "b":
+                            recordRank.sprite = rankb;
+                            break;
+                        case "c":
+                            recordRank.sprite = rankc;
+                            break;
+                        case "d":
+                            recordRank.sprite = rankd;
+                            break;
+                        case "e":
+                            recordRank.sprite = ranke;
+                            break;
+                        case "f":
+                            recordRank.sprite = rankf;
+                            break;
+                    }
 
                     switch (data.Clear)
                     {
                         case ClearType.ASSISTCLEAR:
-                            recordClearStat.text = "ASSISTED CLEAR";
+                            recordClearStat.sprite = clearAC;
                             break;
                         case ClearType.EASYCLEAR:
-                            recordClearStat.text = "EASY CLEAR";
+                            recordClearStat.sprite = clearEC;
                             break;
                         case ClearType.NORMALCLEAR:
-                            recordClearStat.text = "NORMAL CLEAR";
+                            recordClearStat.sprite = clearNC;
                             break;
                         case ClearType.HARDCLEAR:
-                            recordClearStat.text = "HARD CLEAR";
+                            recordClearStat.sprite = clearHC;
                             break;
                         case ClearType.EXCLEAR:
-                            recordClearStat.text = "EX CLEAR";
+                            recordClearStat.sprite = clearEXC;
                             break;
                         case ClearType.FULLCB:
-                            recordClearStat.text = "FULLCOMBO";
+                            recordClearStat.sprite = clearFC;
                             break;
                         case ClearType.PERFECT:
-                            recordClearStat.text = "PERFECT";
+                            recordClearStat.sprite = clearPF;
                             break;
                         case ClearType.FAIL:
-                            recordClearStat.text = "FAILED";
+                            recordClearStat.sprite = clearFail;
                             break;
                     }
                 }
@@ -539,8 +580,8 @@ namespace BMSPlayer
                     recordPoor.text = "0";
                     recordCombo.text = "0";
                     recordCBreak.text = "0";
-                    recordClearStat.text = "NO PLAY";
-                    recordRank.text = "";
+                    recordClearStat.sprite = clearNP;
+                    recordRank.sprite = empty;
                 }
             }
             else if(node.Type == ItemType.DIRECTORY)
@@ -563,8 +604,8 @@ namespace BMSPlayer
                 recordPoor.text = "0";
                 recordCombo.text = "0";
                 recordCBreak.text = "0";
-                recordClearStat.text = "NO PLAY";
-                recordRank.text = "";
+                recordClearStat.sprite = clearNP;
+                recordRank.sprite = empty;
             }
         }
 

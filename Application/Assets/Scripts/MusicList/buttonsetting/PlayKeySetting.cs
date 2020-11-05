@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 using System.IO;
+using BMSCore;
 
 namespace BMSPlayer
 {
@@ -17,15 +18,11 @@ namespace BMSPlayer
         public Button[] btnKeySet1;
         public Button[] btnKeySet2;
 
-        public GameObject presetLoad;
-        public GameObject presetSave;
-        public GameObject presetSaveInput;
         public GameObject keyPopup;
 
         public Text keySettingDesc;
 
-        public InputField presetSaveInputField;
-        public GameObject presetSaveInputError;
+        public static bool KeySettingON = false;
 
         public override void Awake()
         {
@@ -149,6 +146,17 @@ namespace BMSPlayer
                 UpdateButton();
                 MusicListUI.isKeyChanged = false;
             }
+
+            if(KeySettingON)
+            {
+                ErrorHandler.LogError("Axis X Value: "+Input.GetAxis("axisX"));
+            }
+        }
+
+        public override void CloseSetting()
+        {
+            base.CloseSetting();
+            KeySettingON = false;
         }
 
         public override void EncolorBtn(int row, int col)
@@ -247,6 +255,23 @@ namespace BMSPlayer
 
         public void ChangeKey(int keypos)
         {
+            if(keypos == 10)
+            {
+                ErrorHandler.LogError("Set1 Turntable1 Change");
+            }
+            else if (keypos == 18)
+            {
+                ErrorHandler.LogError("Set1 Turntable2 Change");
+            }
+            else if (keypos == 20)
+            {
+                ErrorHandler.LogError("Set2 Turntable1 Change");
+            }
+            else if (keypos == 28)
+            {
+                ErrorHandler.LogError("Set1 Turntable2 Change");
+            }
+
             KeyMapping.keyAssigned = false;
             Const.KeyToChange = keypos;
             keyPopup.SetActive(true);

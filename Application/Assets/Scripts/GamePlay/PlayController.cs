@@ -129,6 +129,10 @@ namespace BMSPlayer {
             btnRestartSame.gameObject.GetComponent<Image>().sprite = normalBtn;
             btnExit.gameObject.GetComponent<Image>().sprite = normalBtn;
 
+            btnRestart.GetComponentInChildren<Text>().text = Const.ResultTxtRetry[(int)Const.Language];
+            btnRestartSame.GetComponentInChildren<Text>().text = Const.ResultTxtRetrySame[(int)Const.Language];
+            btnExit.GetComponentInChildren<Text>().text = Const.ResultTxtNext[(int)Const.Language];
+
             btnRestart.onClick.AddListener(delegate
             {
                 Const.ChangeLayout = true;

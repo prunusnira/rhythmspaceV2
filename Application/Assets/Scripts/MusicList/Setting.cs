@@ -109,7 +109,7 @@ namespace BMSPlayer
 
         }
 
-        public void CloseSetting()
+        public virtual void CloseSetting()
         {
             settingAll.SetActive(false);
             MusicListUI.SetOnTop();

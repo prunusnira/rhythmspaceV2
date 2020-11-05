@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 namespace BMSPlayer
 {
     public class MappingChanger : MonoBehaviour
     {
         public GameObject self;
-        public TextMesh desc;
-        public TextMesh changeableKey;
+        public Text desc;
+        public Text changeableKey;
 
         void Update()
         {

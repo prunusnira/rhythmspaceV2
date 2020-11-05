@@ -577,6 +577,7 @@ namespace BMSPlayer
 
         public void ShowKeySetting()
         {
+            PlayKeySetting.KeySettingON = true;
             CloseSetting();
             MusicListUI.SetNotOnTop();
             layerKeySetting.SetActive(true);

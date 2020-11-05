@@ -818,6 +818,42 @@ namespace BMSPlayer
                             );
                         }
                     }
+                    else
+                    {
+                        // 1P Right BGA && 2P Left BGA
+                        bgaRect.sizeDelta = new Vector2(
+                            Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphBig_Hei[(int)Const.GearSize]
+                        );
+                        bgaRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphBig_Left_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphBig_Left_PosY[(int)Const.GearSize],
+                            bgaRect.localPosition.z
+                        );
+                        layerRect.sizeDelta = new Vector2(
+                            Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphBig_Hei[(int)Const.GearSize]
+                        );
+                        layerRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphBig_Left_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphBig_Left_PosY[(int)Const.GearSize],
+                            layerRect.localPosition.z
+                        );
+                        bgaVideoRect.sizeDelta = new Vector2(
+                            Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphBig_Hei[(int)Const.GearSize]
+                        );
+                        bgaVideoRect.localPosition = new Vector3(
+                            Const.BGA_1P_GraphBig_Left_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphBig_Left_PosY[(int)Const.GearSize],
+                            bgaVideoRect.localPosition.z
+                        );
+                        bgaFollowingObj.localPosition = new Vector3(
+                            Const.BGA_1P_GraphBig_Left_PosX[(int)Const.GearSize],
+                            bgaFollowingObj.localPosition.y,
+                            bgaFollowingObj.localPosition.z
+                        );
+                    }
                     break;
             }
         }

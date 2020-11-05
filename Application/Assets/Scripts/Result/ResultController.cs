@@ -17,6 +17,12 @@ namespace BMSPlayer
         public TextMeshProUGUI title;
         public TextMeshProUGUI subtitle;
 
+        // UI
+        public Text txtRetry;
+        public Text txtRetrySame;
+        public Text txtNext;
+        public Text txtRetrySameDesc;
+
         // Judgement data
         public Text perfect;
         public Text great;
@@ -30,10 +36,8 @@ namespace BMSPlayer
         public Text fast;
         public Text slow;
 
-        public GameObject fcpfmark;
-        public Material failMaterial;
-        public Image rank;
-        public Image cleared;
+        public SpriteRenderer rank;
+        public SpriteRenderer fcpfmark;
 
         // Difference
         public TextMeshProUGUI scorePrev;
@@ -42,12 +46,23 @@ namespace BMSPlayer
         public TextMeshProUGUI missPrev;
         public TextMeshProUGUI missNew;
         public TextMeshProUGUI missDiff;
-        public TextMeshProUGUI clearPrev;
-        public TextMeshProUGUI clearNew;
         public TextMeshProUGUI rankPrev;
         public TextMeshProUGUI rankNew;
         public TextMeshProUGUI targetScore;
         public TextMeshProUGUI targetDiff;
+        public Image clearPrev;
+        public Image clearNew;
+
+        // Clear Sprite
+        public Sprite clearNP;
+        public Sprite clearAC;
+        public Sprite clearEC;
+        public Sprite clearNC;
+        public Sprite clearHC;
+        public Sprite clearEXC;
+        public Sprite clearFC;
+        public Sprite clearPF;
+        public Sprite clearFail;
 
         // Rank Sprite
         public Sprite rankaaa;
@@ -86,6 +101,12 @@ namespace BMSPlayer
 
         void Awake()
         {
+            // UI
+            txtRetry.text = Const.ResultTxtRetry[(int)Const.Language];
+            txtRetrySame.text = Const.ResultTxtRetrySame[(int)Const.Language];
+            txtNext.text = Const.ResultTxtNext[(int)Const.Language];
+            txtRetrySameDesc.text = Const.ResultTxtRetrySameDesc[(int)Const.Language];
+
             // 곡 정보
             PlayData Data = new PlayData(Const.PlayingBMSPath);
             BMSAnalyzer analyzer = new BMSAnalyzer();
@@ -250,28 +271,28 @@ namespace BMSPlayer
             switch (isClear)
             {
                 case ClearType.ASSISTCLEAR:
-                    clearNew.text = "ASSIST CLEAR";
+                    clearNew.sprite = clearAC;
                     break;
                 case ClearType.EASYCLEAR:
-                    clearNew.text = "EASY CLEAR";
+                    clearNew.sprite = clearEC;
                     break;
                 case ClearType.NORMALCLEAR:
-                    clearNew.text = "CLEAR";
+                    clearNew.sprite = clearNC;
                     break;
                 case ClearType.HARDCLEAR:
-                    clearNew.text = "HARD CLEAR";
+                    clearNew.sprite = clearHC;
                     break;
                 case ClearType.EXCLEAR:
-                    clearNew.text = "EX CLEAR";
+                    clearNew.sprite = clearEXC;
                     break;
                 case ClearType.FULLCB:
-                    clearNew.text = "FULL COMBO";
+                    clearNew.sprite = clearFC;
                     break;
                 case ClearType.PERFECT:
-                    clearNew.text = "PERFECT";
+                    clearNew.sprite = clearPF;
                     break;
                 case ClearType.FAIL:
-                    clearNew.text = "FAILED";
+                    clearNew.sprite = clearFail;
                     break;
             }
 
@@ -282,28 +303,28 @@ namespace BMSPlayer
                 switch (Const.MyBestPrev.Clear)
                 {
                     case ClearType.ASSISTCLEAR:
-                        clearPrev.text = "ASSIST CLEAR";
+                        clearPrev.sprite = clearAC;
                         break;
                     case ClearType.EASYCLEAR:
-                        clearPrev.text = "EASY CLEAR";
+                        clearPrev.sprite = clearEC;
                         break;
                     case ClearType.NORMALCLEAR:
-                        clearPrev.text = "CLEAR";
+                        clearPrev.sprite = clearNC;
                         break;
                     case ClearType.HARDCLEAR:
-                        clearPrev.text = "HARD CLEAR";
+                        clearPrev.sprite = clearHC;
                         break;
                     case ClearType.EXCLEAR:
-                        clearPrev.text = "EX CLEAR";
+                        clearPrev.sprite = clearEXC;
                         break;
                     case ClearType.FULLCB:
-                        clearPrev.text = "FULL COMBO";
+                        clearPrev.sprite = clearFC;
                         break;
                     case ClearType.PERFECT:
-                        clearPrev.text = "PERFECT";
+                        clearPrev.sprite = clearPF;
                         break;
                     case ClearType.FAIL:
-                        clearPrev.text = "FAILED";
+                        clearPrev.sprite = clearFail;
                         break;
                 }
 
@@ -330,7 +351,7 @@ namespace BMSPlayer
             else
             {
                 missPrev.text = "-";
-                clearPrev.text = "NO PLAY";
+                clearPrev.sprite = clearNP;
                 rankPrev.text = "-";
                 missDiff.text = "+" + vmiss.ToString();
                 scoreDiff.text = "+" + Const.ResultScore.ToString();
@@ -372,22 +393,17 @@ namespace BMSPlayer
                     break;
             }
 
-            if (isClear == ClearType.FAIL)
-            {
-                cleared.sprite = failed;
-            }
-
             if (vcb == 0 && Const.Auto == AutoPlayType.OFF)
             {
                 if (vgd == 0)
                 {
-                    fcpfmark.SetActive(true);
-                    fcpfmark.GetComponent<Image>().sprite = pfmark;
+                    fcpfmark.gameObject.SetActive(true);
+                    fcpfmark.sprite = pfmark;
                 }
                 else
                 {
-                    fcpfmark.SetActive(true);
-                    fcpfmark.GetComponent<Image>().sprite = fcmark;
+                    fcpfmark.gameObject.SetActive(true);
+                    fcpfmark.sprite = fcmark;
                 }
             }
 

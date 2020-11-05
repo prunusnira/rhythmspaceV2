@@ -304,6 +304,34 @@ namespace BMSPlayer
                 "Gear side"
             }
         };
+
+        public static string[] ResultTxtRetry = new string[3]
+        {
+            "재시도",
+            "リトライ",
+            "Retry"
+        };
+
+        public static string[] ResultTxtRetrySame = new string[3]
+        {
+            "재시도(동일패턴)",
+            "リトライ(同じ譜面)",
+            "Retry(Same Pattern)"
+        };
+
+        public static string[] ResultTxtNext = new string[3]
+        {
+            "곡 선택으로",
+            "曲選択に移動",
+            "Go Music Select"
+        };
+
+        public static string[] ResultTxtRetrySameDesc = new string[3]
+        {
+            "* RAMDOM에서만 동일 패턴이 적용됩니다",
+            "* RANDOMのみ同じ譜面になります",
+            "* Same pattern in RAMDOM only"
+        };
         #endregion
 
         // System Setting Values
