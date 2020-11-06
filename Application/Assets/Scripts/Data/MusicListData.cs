@@ -18,6 +18,7 @@
         public string Gerne { get; set; }
         public int TotalNotes { get; set; }
         public int PlayTime { get; set; }
+        public int Rank { get; set; }
 
         public MusicListData() { }
 
@@ -25,7 +26,8 @@
             string artist, string subartist, string gerne,
             double bpmstart, double bpmmin, double bpmmax,
             string path, string md5hash, int level, int diff,
-            string fileName, string jacket, int totalNotes, int playtime)
+            string fileName, string jacket, int totalNotes, int playtime,
+            int rank)
         {
             Id = id;
             Title = title;
@@ -44,13 +46,14 @@
             Gerne = gerne;
             TotalNotes = totalNotes;
             PlayTime = playtime;
+            Rank = rank;
         }
 
         public MusicListData(int id, string title, string subtitle,
             string artist, string subartist, string gerne,
             double bpmstart, double bpmmin, double bpmmax,
             string path, int level, int diff, string fileName,
-            string jacket, int totalNotes, int playtime)
+            string jacket, int totalNotes, int playtime, int rank)
         {
             Id = id;
             Title = title;
@@ -68,6 +71,7 @@
             Gerne = gerne;
             TotalNotes = totalNotes;
             PlayTime = playtime;
+            Rank = rank;
         }
     }
 }

@@ -73,6 +73,7 @@ namespace BMSPlayer
         public TextMeshProUGUI infoBpm;
         public TextMeshProUGUI infoTotalNote;
         public TextMeshProUGUI infoPlayTime;
+        public TextMeshProUGUI infoJudgeRank;
         public GameObject btnStart;
 
         // Difficulty
@@ -380,11 +381,29 @@ namespace BMSPlayer
                 infoSubTitle.text = bms.SubTitle;
                 infoArtist.text = bms.Artist;
                 infoSubArtist.text = bms.SubArtist;
-                infoTotalNote.text = "Total Notes "+bms.TotalNotes.ToString();
+                infoTotalNote.text = bms.TotalNotes.ToString();
+
+                switch (bms.Rank)
+                {
+                    case 0:
+                        infoJudgeRank.text = "VERY HARD";
+                        break;
+                    case 1:
+                        infoJudgeRank.text = "HARD";
+                        break;
+                    case 3:
+                        infoJudgeRank.text = "EASY";
+                        break;
+                    case 2:
+                    default:
+                        infoJudgeRank.text = "NORMAL";
+                        break;
+                }
+
                 int time = bms.PlayTime;
                 string min = (Convert.ToInt32(time) / 600).ToString("00");
                 string sec = (Convert.ToInt32(time) % 600 / 10).ToString("00");
-                infoPlayTime.text = "Play Time " + min + ":" + sec;
+                infoPlayTime.text = min + ":" + sec;
 
                 // BPM 표시 설정
                 if (bms.BPMmin == bms.BPMmax)
@@ -595,6 +614,7 @@ namespace BMSPlayer
                 infoBpm.text = "";
                 infoTotalNote.text = "";
                 infoPlayTime.text = "";
+                infoJudgeRank.text = "";
 
                 recordScore.text = "0";
                 recordPerfect.text = "0";

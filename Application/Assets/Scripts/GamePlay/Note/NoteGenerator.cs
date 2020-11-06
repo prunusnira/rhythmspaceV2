@@ -596,29 +596,24 @@ namespace BMSPlayer
                 string noteStr = data.BMS.BGANote[cbar].Substring(n * 2, 2);
                 if (noteStr != "00")
                 {
+                    double position = (double)n / size;
+
+                    if (data.BMS.BarLength.ContainsKey(cbar))
+                    {
+                        position *= data.BMS.BarLength[cbar];
+                    }
+
+                    double realpos = (data.TotalLength + position);
+
+                    BGANote note = new BGANote
+                    {
+                        Position = realpos,
+                        Bar = cbar,
+                        ObjType = ObjectType.BGA
+                    };
+
                     if (data.BMS.BGAImages.ContainsKey(noteStr))
                     {
-                        double position = (double)n / size;
-
-                        if (data.BMS.BarLength.ContainsKey(cbar))
-                        {
-                            position *= data.BMS.BarLength[cbar];
-                        }
-
-                        double realpos = (data.TotalLength + position);
-
-                        BGANote note = new BGANote
-                        {
-                            Position = realpos,
-                            Bar = cbar,
-                            ObjType = ObjectType.BGA
-                        };
-
-                        if (data.BMS.BGAVideoFile != "")
-                        {
-                            note.VideoFile = data.BMS.BGAVideoFile;
-                        }
-
                         if (data.BMS.BGAImages.Count > 0)
                         {
                             if (data.BMS.BGAImages.ContainsKey(noteStr))
@@ -626,10 +621,17 @@ namespace BMSPlayer
                                 note.BGASprite = data.BMS.BGAImages[noteStr];
                             }
                         }
-
-                        data.NoteBGA.Add(note);
-                        data.NoteCount++;
                     }
+                    else
+                    {
+                        if (data.BMS.BGAVideoFile != "")
+                        {
+                            note.VideoFile = data.BMS.BGAVideoFile;
+                        }
+                    }
+
+                    data.NoteBGA.Add(note);
+                    data.NoteCount++;
                 }
             }
         }

@@ -74,7 +74,8 @@ namespace BMSPlayer
                         Data.BMS.FileName,
                         Data.BMS.StageFile,
                         Data.TotalNotes,
-                        (int)Data.LastTiming
+                        (int)Data.LastTiming,
+                        Data.BMS.Rank
                     );
 
                 return data;

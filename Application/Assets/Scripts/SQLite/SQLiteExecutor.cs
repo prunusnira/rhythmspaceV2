@@ -95,7 +95,8 @@ namespace DatabaseManager
                 fname varchar (100) not null,
                 jacket varchar (100),
                 totalnotes integer not null,
-                time integer not null)";
+                time integer not null,
+                rank integer default 2)";
 
             dbcommand.CommandText = list;
             dbcommand.ExecuteNonQuery();
@@ -167,7 +168,7 @@ namespace DatabaseManager
                     (title, subtitle, artist, subartist, gerne,
                     bpmstart, bpmmin, bpmmax,
                     path, md5hash, level, diff,
-                    fname, jacket, totalnotes, time)
+                    fname, jacket, totalnotes, time, rank)
                     values";
 
             foreach(MusicListData param in paramList)
@@ -188,7 +189,8 @@ namespace DatabaseManager
                         param.FileName + "','" +
                         param.Jacket + "', " +
                         param.TotalNotes + ", " +
-                        param.PlayTime + ")";
+                        param.PlayTime + ", "+
+                        param.Rank + ")";
 
                 if(paramList.IndexOf(param) != paramList.Count - 1)
                 {
@@ -314,12 +316,13 @@ namespace DatabaseManager
                 string ljacket = dbreader.GetString(14);
                 int ltotalnotes = dbreader.GetInt32(15);
                 int ltime = dbreader.GetInt32(16);
+                int lrank = dbreader.GetInt32(17);
 
                 MusicListData data = new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
                     lpath, lmd5, llv, ldiff, lfname,
-                    ljacket, ltotalnotes, ltime);
+                    ljacket, ltotalnotes, ltime, lrank);
 
                 musiclist.Add(data);
             }
@@ -359,12 +362,13 @@ namespace DatabaseManager
                 string ljacket = dbreader.GetString(14);
                 int ltotalnotes = dbreader.GetInt32(15);
                 int ltime = dbreader.GetInt32(16);
+                int lrank = dbreader.GetInt32(17);
 
                 MusicListData data = new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
                     lpath, lmd5, llv, ldiff, lfname,
-                    ljacket, ltotalnotes, ltime);
+                    ljacket, ltotalnotes, ltime, lrank);
 
                 musiclist.Add(data);
             }
