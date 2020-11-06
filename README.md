@@ -1,5 +1,4 @@
-# rhythmspace
-* Title will be changed
+# Rhythm Tracers (Temp)
 
 ## About
 * Unity based BMS Player (currently using Unity 2019.4.9f1)
