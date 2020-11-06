@@ -161,6 +161,13 @@ namespace BMSPlayer
             UpdateDescription();
 
             // Search
+            inputSearch.onEndEdit.AddListener(delegate
+            {
+                if(inputSearch.text != "")
+                {
+                    SearchResult();
+                }
+            });
             btnSearchSubmit.onClick.AddListener(SearchResult);
             searchMode = false;
         }
