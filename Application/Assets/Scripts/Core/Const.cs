@@ -152,9 +152,18 @@ namespace BMSPlayer
 
         public static string[] videoCodecMsg = new string[3]
         {
-            "Microsoft Store에서 MPEG-2 Video Extension을 설치해주세요",
-            "Microsoft StoreからMPEG-2 Video Extensionをインストールしてください",
-            "Please install MPEG-2 Video Extension from Microsoft Store"
+            "Microsoft Store에서 MPEG-2 Video Extension을 설치해주세요\n" +
+            "설치 후에도 일부 BGA는 나오지 않을 수 있습니다\n\n" +
+            "p.s. 현재 VLC-Unity 라이브러리에 에러가 있어 영상 표시에 문제가 있습니다.\n" +
+            "문제가 해결되면 영상 재생 문제는 해결됩니다",
+            "Microsoft StoreからMPEG-2 Video Extensionをインストールしてください\n" +
+            "インストール後も一部のBGAは表示されません\n\n" +
+            "p.s. 現在VLC-Unityライブラリのエラーがあり、映像表示に問題があります。\n" +
+            "エラーが解決すると再生問題も解決になります",
+            "Please install MPEG-2 Video Extension from Microsoft Store\n" +
+            "Some BGAs will not displayed after installation.\n\n" +
+            "p.s. Currently, VLC-Unity library has error for now.\n" +
+            "It will be fixed after VLC-Unity library is fixed"
         };
 
         public static string[] listSelect = new string[3]

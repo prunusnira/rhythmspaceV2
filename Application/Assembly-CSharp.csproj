@@ -167,6 +167,8 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
+    <Compile Include="Assets\VLCUnity\Demos\Scripts\MinimalPlayback.cs" />
+    <Compile Include="Assets\VLCUnity\Demos\Scripts\ThreeSixty.cs" />
     <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Bangers - OFL.txt" />
     <None Include="Assets\ReadMe.Demo.txt" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
@@ -181,6 +183,7 @@
     <None Include="Assets\BMSProjectFiles\Shader\BlackChromaKey.shader" />
     <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Oswald Bold - OFL.txt" />
     <None Include="Assets\BMSProjectFiles\PlayObjects\blurShader.shader" />
+    <None Include="Assets\VLCUnity\documentation.txt" />
     <None Include="Assets\Font\kjefull.txt" />
     <None Include="Assets\EmptyFmodProj\Metadata\SnapshotGroup\{e8cb56df-815d-4a7d-8cf3-eb005d7d816a}.xml" />
     <None Include="Assets\EmptyFmodProj\Metadata\Mixer.xml" />
@@ -413,6 +416,9 @@
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/PackageCache/com.unity.analytics@3.3.5/AnalyticsStandardEvents/Unity.Analytics.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="LibVLCSharp">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/VLCUnity/Plugins/x86_64/LibVLCSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>C:/Program Files/Unity/Unity2019.4.9f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>

@@ -47,5 +47,10 @@ namespace BMSCore
             }
             return null;                     // Return null if load failed
         }
+
+        public static Sprite TextureToSprite(Texture2D tex, int width, int height, Vector2 pivot)
+        {
+            return Sprite.Create(tex, new Rect(0, 0, width, height), pivot, 1f);
+        }
     }
 }

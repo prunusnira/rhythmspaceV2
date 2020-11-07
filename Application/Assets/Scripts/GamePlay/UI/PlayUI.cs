@@ -589,6 +589,8 @@ namespace BMSPlayer
                             );
                         }
                     }
+                    BGAControl.playerWidth = Const.BGA_GraphSm_Wid[(int)Const.GearSize];
+                    BGAControl.playerHeight = Const.BGA_GraphSm_Hei[(int)Const.GearSize];
                     break;
                 case GraphType.MINI:
                     // Mini는 타입 상관없이 고정
@@ -664,6 +666,8 @@ namespace BMSPlayer
                             bgaFollowingObj.localPosition.z
                         );
                     }
+                    BGAControl.playerWidth = Const.BGA_GraphMini_Wid[(int)Const.GearSize];
+                    BGAControl.playerHeight = Const.BGA_GraphMini_Hei[(int)Const.GearSize];
                     break;
                 case GraphType.OFFBGA:
                     if (PlaySide == 0)
@@ -738,6 +742,8 @@ namespace BMSPlayer
                             bgaFollowingObj.localPosition.z
                         );
                     }
+                    BGAControl.playerWidth = Const.BGA_GraphOff_Wid[(int)Const.GearSize];
+                    BGAControl.playerHeight = Const.BGA_GraphOff_Hei[(int)Const.GearSize];
                     break;
                 case GraphType.NORMAL:
                 case GraphType.OFFGEAR:
@@ -854,6 +860,8 @@ namespace BMSPlayer
                             bgaFollowingObj.localPosition.z
                         );
                     }
+                    BGAControl.playerWidth = Const.BGA_GraphBig_Wid[(int)Const.GearSize];
+                    BGAControl.playerHeight = Const.BGA_GraphBig_Hei[(int)Const.GearSize];
                     break;
             }
         }

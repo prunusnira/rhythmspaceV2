@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using BMSCore;
+using LibVLCSharp;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -16,6 +19,74 @@ namespace BMSPlayer
         public GameObject bgaVideoLayer;
         public GameObject bgaErrorLayer;
 
+        // VLC Player
+        public Renderer bgaVideoRenderer;
+        /*private LibVLC libVLC;
+        private MediaPlayer mediaPlayer;
+        private Texture2D tex = null;
+        private bool play = false;*/
+
+        public static int playerWidth = 0;
+        public static int playerHeight = 0;
+
+        /*private void Awake()
+        {
+            Core.Initialize(Application.dataPath);
+            libVLC = new LibVLC("--no-osd", "--verbose=2");
+            mediaPlayer = new MediaPlayer(libVLC);
+        }
+
+        private void Update()
+        {
+            if(play)
+            {
+                if(tex == null)
+                {
+                    uint width = 0;
+                    uint height = 0;
+                    mediaPlayer.Size(0, ref width, ref height);
+                    IntPtr texptr = mediaPlayer.GetTexture(out bool updated);
+                    if (width != 0 && height != 0 && updated && texptr != IntPtr.Zero)
+                    {
+                        tex = Texture2D.CreateExternalTexture(
+                            (int)width, (int)height,
+                            TextureFormat.RGBA32,
+                            false,
+                            true,
+                            texptr
+                        );
+                        ((SpriteRenderer)bgaVideoRenderer).sprite =
+                            Tools.TextureToSprite(
+                                tex,
+                                (int)width,
+                                (int)height,
+                                bgaVideoRenderer.GetComponent<RectTransform>().pivot);
+                        bgaVideoRenderer.material.mainTexture = tex;
+                        ((SpriteRenderer)bgaVideoRenderer).drawMode = SpriteDrawMode.Sliced;
+                        ((SpriteRenderer)bgaVideoRenderer).size = new Vector2(playerWidth, playerHeight);
+                    }
+                }
+                else
+                {
+                    IntPtr texptr = mediaPlayer.GetTexture(out bool updated);
+                    if (updated)
+                    {
+                        tex.UpdateExternalTexture(texptr);
+                    }
+                }
+            }
+        }
+
+        private void OnDisable()
+        {
+            mediaPlayer.Stop();
+            mediaPlayer.Dispose();
+            mediaPlayer = null;
+
+            libVLC.Dispose();
+            libVLC = null;
+        }*/
+
         public void BGAVideoActivate()
         {
             bgaVideoLayer.SetActive(true);
@@ -26,6 +97,15 @@ namespace BMSPlayer
             bgaVideo.url = "file://" + file;
             bgaVideo.errorReceived += BGAErrorLayer;
             bgaVideo.Prepare();
+
+            /*mediaPlayer.Media = new Media(
+                libVLC,
+                new Uri("file://" + file)
+            );
+            mediaPlayer.SetLogoInt(VideoLogoOption.Opacity, 0);
+            mediaPlayer.Play();
+
+            play = true;*/
         }
 
         public void BGAImageActivate()
@@ -41,11 +121,13 @@ namespace BMSPlayer
         public void BGAVideoPlay()
         {
             bgaVideo.Play();
+            //mediaPlayer.Play();
         }
 
         public bool isBGAPlaying()
         {
             return bgaVideo.isPlaying;
+            //return mediaPlayer.IsPlaying;
         }
 
         public void BGAErrorLayer(VideoPlayer source, string msg)
@@ -102,11 +184,13 @@ namespace BMSPlayer
         public void PauseBGAVideo()
         {
             bgaVideo.Pause();
+            //mediaPlayer.Pause();
         }
 
         public void ResumeBGAVideo()
         {
             bgaVideo.Play();
+            //mediaPlayer.Play();
         }
     }
 }

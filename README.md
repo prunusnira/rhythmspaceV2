@@ -8,6 +8,7 @@
 ## Currently Supported
 * BMS/BME/BML file with 1 player mode
 * BGA with BMP or MPEG (MPEG-1 & 2 Codec for Windows is needed [User install])
+	+ VLC-Unity will be added later (after bug on standalone build fixed)
 * Key sound playing with FMOD Engine
 * LNTYPE 1 and LNOBJ supported (Not for LNTYPE 2)
 * Custom Random (user defined random)

@@ -291,6 +291,9 @@
     <Reference Include="UnityEditor.Purchasing">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/PackageCache/com.unity.purchasing@2.0.6/Editor/UnityEditor.Purchasing.dll</HintPath>
     </Reference>
+    <Reference Include="LibVLCSharp">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/VLCUnity/Plugins/x86_64/LibVLCSharp.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
