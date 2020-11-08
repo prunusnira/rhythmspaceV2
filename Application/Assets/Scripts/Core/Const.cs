@@ -11,11 +11,11 @@ namespace BMSPlayer
         static Const()
         {
 #if(UNITY_EDITOR)
-            DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db.sqlite";
-            JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\structure.json";
+            DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db.sqlite";
+            JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\structure.json";
 #elif(UNITY_STANDALONE)
-            DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\db.sqlite";
-            JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\config\\structure.json";
+            DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db.sqlite";
+            JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\structure.json";
 #endif
         }
         public static int CHANNEL = 320;
@@ -180,18 +180,11 @@ namespace BMSPlayer
             "SYSTEM OPTION"
         };
 
-        public static string[] listPlayEnter = new string[3]
+        public static string[] listPlay = new string[3]
         {
-            "플레이 / 폴더 진입",
-            "プレイ / フォルダーに入る",
-            "PLAY / INTO FOLDER"
-        };
-
-        public static string[] listPlayClick = new string[3]
-        {
-            "폴더클릭: 폴더 진입, 곡 1번 클릭: 곡 정보 표시, 곡 2번 클릭: 플레이",
-            "フォルダー選択：フォルダーに入る, 曲1回選択：曲選択, 曲2回選択：プレイ",
-            "CLICK FOLDER: INTO FOLDER, CLICK MUSIC: SHOW INFO, CLICK AGAIN: PLAY"
+            "폴더 진입, 곡 선택, 플레이 (2번 클릭)",
+            "フォルダーに入る, 曲選択, プレイ(2回選択)",
+            "INTO FOLDER, SHOW INFO, PLAY (CLICK TWICE)"
         };
 
         public static string[] listUpper = new string[3]

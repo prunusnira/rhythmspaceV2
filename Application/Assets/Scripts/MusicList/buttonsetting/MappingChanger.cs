@@ -139,40 +139,48 @@ namespace BMSPlayer
             switch (keypos)
             {
                 case 10:
-                case 20:
-                    changeableKey.text = "TurnTable 1";
+                case 30:
+                    changeableKey.text = "TurnTable Left(Up)";
                     break;
                 case 11:
-                case 21:
+                case 31:
                     changeableKey.text = "Button 1";
                     break;
                 case 12:
-                case 22:
+                case 32:
                     changeableKey.text = "Button 2";
                     break;
                 case 13:
-                case 23:
+                case 33:
                     changeableKey.text = "Button 3";
                     break;
                 case 14:
-                case 24:
+                case 34:
                     changeableKey.text = "Button 4";
                     break;
                 case 15:
-                case 25:
+                case 35:
                     changeableKey.text = "Button 5";
                     break;
                 case 16:
-                case 26:
+                case 36:
                     changeableKey.text = "Button 6";
                     break;
                 case 17:
-                case 27:
+                case 37:
                     changeableKey.text = "Button 7";
                     break;
                 case 18:
-                case 28:
-                    changeableKey.text = "TurnTable 2";
+                case 38:
+                    changeableKey.text = "TurnTable Right(Down)";
+                    break;
+                case 19:
+                case 39:
+                    changeableKey.text = "Function 1";
+                    break;
+                case 20:
+                case 40:
+                    changeableKey.text = "Function 2";
                     break;
             }
         }

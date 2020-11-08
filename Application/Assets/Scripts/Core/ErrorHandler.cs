@@ -8,7 +8,7 @@ namespace BMSCore
 {
     public class ErrorHandler
     {
-        private static string errorPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\rhythmspace\\error\\";
+        private static string errorPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\error\\";
 
         public static void LogError(string errorStr)
         {

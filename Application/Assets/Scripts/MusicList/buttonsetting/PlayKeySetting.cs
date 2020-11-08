@@ -13,6 +13,7 @@ namespace BMSPlayer
         public Button dfkbd;
         public Button dfds4;
         public Button dfxb;
+        public Button dfpitch;
         public Button dflr2;
 
         public Button[] btnKeySet1;
@@ -31,7 +32,7 @@ namespace BMSPlayer
 
             rows = 10;
             btn = new int[] { 4, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-            EncolorBtn(0, 0);
+            //EncolorBtn(0, 0);
 
             // 각 버튼 onclick 설정
             dfkbd.onClick.AddListener(delegate
@@ -47,6 +48,11 @@ namespace BMSPlayer
             dfds4.onClick.AddListener(delegate
             {
                 Keys.setDS4Default();
+                UpdateButton();
+            });
+            dfpitch.onClick.AddListener(delegate
+            {
+                Keys.setPITCHDefault();
                 UpdateButton();
             });
             dflr2.onClick.AddListener(delegate
@@ -91,42 +97,58 @@ namespace BMSPlayer
             {
                 ChangeKey(18);
             });
-
-            btnKeySet2[0].onClick.AddListener(delegate
+            btnKeySet1[9].onClick.AddListener(delegate
+            {
+                ChangeKey(19);
+            });
+            btnKeySet1[10].onClick.AddListener(delegate
             {
                 ChangeKey(20);
             });
+
+            btnKeySet2[0].onClick.AddListener(delegate
+            {
+                ChangeKey(30);
+            });
             btnKeySet2[1].onClick.AddListener(delegate
             {
-                ChangeKey(21);
+                ChangeKey(31);
             });
             btnKeySet2[2].onClick.AddListener(delegate
             {
-                ChangeKey(22);
+                ChangeKey(32);
             });
             btnKeySet2[3].onClick.AddListener(delegate
             {
-                ChangeKey(23);
+                ChangeKey(33);
             });
             btnKeySet2[4].onClick.AddListener(delegate
             {
-                ChangeKey(24);
+                ChangeKey(34);
             });
             btnKeySet2[5].onClick.AddListener(delegate
             {
-                ChangeKey(25);
+                ChangeKey(35);
             });
             btnKeySet2[6].onClick.AddListener(delegate
             {
-                ChangeKey(26);
+                ChangeKey(36);
             });
             btnKeySet2[7].onClick.AddListener(delegate
             {
-                ChangeKey(27);
+                ChangeKey(37);
             });
             btnKeySet2[8].onClick.AddListener(delegate
             {
-                ChangeKey(28);
+                ChangeKey(38);
+            });
+            btnKeySet2[9].onClick.AddListener(delegate
+            {
+                ChangeKey(39);
+            });
+            btnKeySet2[10].onClick.AddListener(delegate
+            {
+                ChangeKey(40);
             });
 
             keySettingDesc.text = Const.keySettingDesc[(int)Const.Language];
@@ -149,7 +171,7 @@ namespace BMSPlayer
 
             if(KeySettingON)
             {
-                ErrorHandler.LogError("Axis X Value: "+Input.GetAxis("axisX"));
+                ErrorHandler.LogError("Axis Y Value: "+Input.GetAxis("axisY"));
             }
         }
 
@@ -159,89 +181,9 @@ namespace BMSPlayer
             KeySettingON = false;
         }
 
-        public override void EncolorBtn(int row, int col)
-        {
-            // 1. 모든 버튼의 색상 리셋
-            Button[] btnlist = settingAll.GetComponentsInChildren<Button>();
-            foreach (Button b in btnlist)
-            {
-                b.GetComponent<Image>().sprite = normalBtn;
-            }
-
-            // 2. 현재 버튼 색상 변경
-            switch (row)
-            {
-                case 0:
-                    if (col == 0) ChangeSprite(dfkbd);
-                    else if (col == 1) ChangeSprite(dfds4);
-                    else if (col == 2) ChangeSprite(dfxb);
-                    break;
-                case 1:
-                    if (col == 0) ChangeSprite(btnKeySet1[0]);
-                    else if (col == 1) ChangeSprite(btnKeySet2[0]);
-                    break;
-                case 2:
-                    if (col == 0) ChangeSprite(btnKeySet1[8]);
-                    else if (col == 1) ChangeSprite(btnKeySet2[8]);
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                    if (col == 0) ChangeSprite(btnKeySet1[row - 2]);
-                    else if (col == 1) ChangeSprite(btnKeySet2[row - 2]);
-                    break;
-            }
-        }
-
-        public override void ExecuteOption(int row, int col)
-        {
-            switch (row)
-            {
-                case 0:
-                    if (col == 0)
-                    {
-                        Keys.setKBDefault();
-                        UpdateButton();
-                    }
-                    else if (col == 1)
-                    {
-                        Keys.setDS4Default();
-                        UpdateButton();
-                    }
-                    else if (col == 2)
-                    {
-                        Keys.setXBDefault();
-                        UpdateButton();
-                    }
-                    break;
-                case 1:
-                    if (col == 0) ChangeKey(10);
-                    else if (col == 1) ChangeKey(20);
-                    break;
-                case 2:
-                    if (col == 0) ChangeKey(18);
-                    else if (col == 1) ChangeKey(28);
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                    if (col == 0) ChangeKey(10+row-2);
-                    else if (col == 1) ChangeKey(20+row-2);
-                    break;
-            }
-        }
-
         public void UpdateButton()
         {
-            for(int i = 0; i < 9; i++)
+            for(int i = 0; i < 11; i++)
             {
                 UpdateButtonText(btnKeySet1[i], Keys.btnSet1[i]);
                 UpdateButtonText(btnKeySet2[i], Keys.btnSet2[i]);
@@ -255,23 +197,6 @@ namespace BMSPlayer
 
         public void ChangeKey(int keypos)
         {
-            if(keypos == 10)
-            {
-                ErrorHandler.LogError("Set1 Turntable1 Change");
-            }
-            else if (keypos == 18)
-            {
-                ErrorHandler.LogError("Set1 Turntable2 Change");
-            }
-            else if (keypos == 20)
-            {
-                ErrorHandler.LogError("Set2 Turntable1 Change");
-            }
-            else if (keypos == 28)
-            {
-                ErrorHandler.LogError("Set1 Turntable2 Change");
-            }
-
             KeyMapping.keyAssigned = false;
             Const.KeyToChange = keypos;
             keyPopup.SetActive(true);

@@ -77,7 +77,6 @@ namespace BMSPlayer
         public Sprite fcmark;
 
         public Sprite failed;
-        private ClearType isClear;
 
         // BG Sound
         public AudioSource bgLoop;
@@ -101,6 +100,8 @@ namespace BMSPlayer
 
         void Awake()
         {
+            Keys.LoadButtonSetting();
+
             // UI
             txtRetry.text = Const.ResultTxtRetry[(int)Const.Language];
             txtRetrySame.text = Const.ResultTxtRetrySame[(int)Const.Language];
@@ -229,6 +230,7 @@ namespace BMSPlayer
             }
 
             // 판정
+            int vgr = Const.ResultGreat;
             int vgd = Const.ResultGood;
             int vok = Const.ResultOk;
             int vmiss = Const.ResultMiss;
@@ -250,8 +252,6 @@ namespace BMSPlayer
             combo.text = Const.ResultMaxCombo.ToString();
             timediff.text = (vdiff * 100).ToString("0.00") + "ms";
 
-            isClear = Const.Clear;
-
             // 차이
             scorePrev.text = Const.MyBestScore.ToString();
             scoreNew.text = Const.ResultScore.ToString();
@@ -268,7 +268,23 @@ namespace BMSPlayer
                 targetDiff.text = scorediff.ToString();
             }
 
-            switch (isClear)
+            if (vcb == 0 && Const.Auto == AutoPlayType.OFF)
+            {
+                if (vgd == 0 && vgr == 0)
+                {
+                    fcpfmark.gameObject.SetActive(true);
+                    fcpfmark.sprite = pfmark;
+                    Const.Clear = ClearType.PERFECT;
+                }
+                else
+                {
+                    fcpfmark.gameObject.SetActive(true);
+                    fcpfmark.sprite = fcmark;
+                    Const.Clear = ClearType.FULLCB;
+                }
+            }
+
+            switch (Const.Clear)
             {
                 case ClearType.ASSISTCLEAR:
                     clearNew.sprite = clearAC;
@@ -391,20 +407,6 @@ namespace BMSPlayer
                     rank.sprite = rankf;
                     rankNew.text = "F";
                     break;
-            }
-
-            if (vcb == 0 && Const.Auto == AutoPlayType.OFF)
-            {
-                if (vgd == 0)
-                {
-                    fcpfmark.gameObject.SetActive(true);
-                    fcpfmark.sprite = pfmark;
-                }
-                else
-                {
-                    fcpfmark.gameObject.SetActive(true);
-                    fcpfmark.sprite = fcmark;
-                }
             }
 
             // 데이터 기록
@@ -565,49 +567,46 @@ namespace BMSPlayer
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(KeyCode.R) || GetBtnDown(2))
             {
                 Const.ChangeLayout = true;
                 SceneManager.LoadScene("PlayScreen", LoadSceneMode.Single);
             }
 
-            if (Input.GetKeyDown(KeyCode.T))
+            if (Input.GetKeyDown(KeyCode.T) || GetBtnDown(6))
             {
                 Const.ChangeLayout = false;
                 SceneManager.LoadScene("PlayScreen", LoadSceneMode.Single);
             }
 
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetKeyDown(KeyCode.Return) || GetBtnWhite())
             {
                 SceneManager.LoadScene("MusicSelect", LoadSceneMode.Single);
             }
         }
 
-        public GameObject fadeCube;
-        private bool isFading = false;
-
-        private void OnGUI()
+        private bool GetBtnWhite()
         {
-            if (isFading)
-            {
-                StartCoroutine("FadeOut");
-            }
+            return
+                GetBtnDown(1) ||
+                GetBtnDown(3) ||
+                GetBtnDown(5) ||
+                GetBtnDown(7);
         }
 
-        IEnumerator FadeOut()
+        private bool GetBtnDown(int i)
         {
-            if (fadeCube.GetComponent<Renderer>().material.color.a < 1.0f)
-            {
-                Color c = fadeCube.GetComponent<Renderer>().material.color;
-                c.a += 0.05f;
-                fadeCube.GetComponent<Renderer>().material.color = c;
-                yield return new WaitForSeconds(0.2f);
-            }
-            else
-            {
-                isFading = false;
-                yield return null;
-            }
+            return
+                (Keys.btnAxisSet1[i] && Keys.btnSet1[i].EndsWith("p") &&
+                    Keys.GetAxisValue(Keys.btnSet1[i]) > 0.5) ||
+                (Keys.btnAxisSet1[i] && Keys.btnSet1[i].EndsWith("m") &&
+                    Keys.GetAxisValue(Keys.btnSet1[i]) < -0.5) ||
+                (Keys.btnAxisSet2[i] && Keys.btnSet2[i].EndsWith("p") &&
+                    Keys.GetAxisValue(Keys.btnSet2[i]) > 0.5) ||
+                (Keys.btnAxisSet2[i] && Keys.btnSet2[i].EndsWith("m") &&
+                    Keys.GetAxisValue(Keys.btnSet2[i]) < -0.5) ||
+                (!Keys.btnAxisSet1[i] && Keys.GetKeyDown(Keys.btnSet1[i])) ||
+                (!Keys.btnAxisSet2[i] && Keys.GetKeyDown(Keys.btnSet2[i]));
         }
     }
 }

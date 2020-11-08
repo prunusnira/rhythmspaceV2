@@ -78,6 +78,7 @@ namespace BMSPlayer {
 		void Awake() {
             // Note Generator에서 노트 데이터를 읽어들이고 Scroller에 보내는 과정 까지를 Awake에서 실행
             // Start에서 실행 할 경우 프레임 내에서 작업하게 되므로 좋지 않음
+            Keys.LoadButtonSetting();
 
             // UI 가져오기
             UI = GetComponent<PlayUI>();
@@ -184,7 +185,8 @@ namespace BMSPlayer {
 
                 // 게임 플레이와 독립적으로 조절 가능해야 하는 부분들
                 // 스피드 조절
-                if (Input.GetKey(KeyCode.Alpha1))
+                if (Input.GetKey(KeyCode.Alpha1) ||
+                    (Keys.GetBtn(9) && Keys.GetBtn(1)))
                 {
                     if (Const.SpdType == SpdType.STANDARD)
                     {
@@ -195,7 +197,8 @@ namespace BMSPlayer {
                         scroller.SpeedDownFluid();
                     }
                 }
-                if (Input.GetKey(KeyCode.Alpha2))
+                if (Input.GetKey(KeyCode.Alpha2) ||
+                    (Keys.GetBtn(9) && Keys.GetBtn(2)))
                 {
                     if (Const.SpdType == SpdType.STANDARD)
                     {
@@ -209,34 +212,40 @@ namespace BMSPlayer {
 
                 // 셔터 조정
                 // SUD down
-                if (Input.GetKey(KeyCode.Alpha3))
+                if (Input.GetKey(KeyCode.Alpha3) ||
+                    (Keys.GetBtn(9) && Keys.GetBtn(3)))
                 {
                     Cover.CoverSuddenDown();
                 }
                 // SUD up
-                else if (Input.GetKey(KeyCode.Alpha4))
+                if (Input.GetKey(KeyCode.Alpha4) ||
+                    (Keys.GetBtn(9) && Keys.GetBtn(4)))
                 {
                     Cover.CoverSuddenUp();
                 }
 
                 // LIFT down
-                if (Input.GetKey(KeyCode.Alpha5))
+                if (Input.GetKey(KeyCode.Alpha5) ||
+                    (Keys.GetBtn(9) && Keys.GetBtn(5)))
                 {
                     Cover.CoverLiftDown();
                 }
                 // LIFT up
-                else if (Input.GetKey(KeyCode.Alpha6))
+                if (Input.GetKey(KeyCode.Alpha6) ||
+                    (Keys.GetBtn(9) && Keys.GetBtn(6)))
                 {
                     Cover.CoverLiftUp();
                 }
 
                 // HID down
-                if (Input.GetKey(KeyCode.Alpha7))
+                if (Input.GetKey(KeyCode.Alpha7) ||
+                    (Keys.GetBtn(9) && Keys.GetBtn(7)))
                 {
                     Cover.CoverHiddenDown();
                 }
                 // HID up
-                else if (Input.GetKey(KeyCode.Alpha8))
+                if (Input.GetKey(KeyCode.Alpha8) ||
+                    (Keys.GetBtn(9) && Keys.GetBtn(10)))
                 {
                     Cover.CoverHiddenUp();
                 }

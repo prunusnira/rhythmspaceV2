@@ -116,6 +116,30 @@ namespace BMSPlayer
                 PlayerPrefs.SetString("btnSet1Key9", value);
             }
         }
+
+        public static string Set1key10
+        {
+            get
+            {
+                return PlayerPrefs.GetString("btnSet1Key10", "");
+            }
+            set
+            {
+                PlayerPrefs.SetString("btnSet1Key10", value);
+            }
+        }
+
+        public static string Set1key11
+        {
+            get
+            {
+                return PlayerPrefs.GetString("btnSet1Key11", "");
+            }
+            set
+            {
+                PlayerPrefs.SetString("btnSet1Key11", value);
+            }
+        }
         #endregion
 
         #region Key Set 2
@@ -224,6 +248,30 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetString("btnSet2Key9", value);
+            }
+        }
+
+        public static string Set2key10
+        {
+            get
+            {
+                return PlayerPrefs.GetString("btnSet2Key10", "");
+            }
+            set
+            {
+                PlayerPrefs.SetString("btnSet2Key10", value);
+            }
+        }
+
+        public static string Set2key11
+        {
+            get
+            {
+                return PlayerPrefs.GetString("btnSet2Key11", "");
+            }
+            set
+            {
+                PlayerPrefs.SetString("btnSet2Key11", value);
             }
         }
         #endregion
@@ -336,6 +384,30 @@ namespace BMSPlayer
                 PlayerPrefs.SetInt("btnSet1Axis9", value ? 1 : 0);
             }
         }
+
+        public static bool Set1Axis10
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("btnSet1Axis10", 0) == 1 ? true : false;
+            }
+            set
+            {
+                PlayerPrefs.SetInt("btnSet1Axis10", value ? 1 : 0);
+            }
+        }
+
+        public static bool Set1Axis11
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("btnSet1Axis11", 0) == 1 ? true : false;
+            }
+            set
+            {
+                PlayerPrefs.SetInt("btnSet1Axis11", value ? 1 : 0);
+            }
+        }
         #endregion
 
         #region Axis Set 2
@@ -444,6 +516,30 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("btnSet2Axis9", value ? 1 : 0);
+            }
+        }
+
+        public static bool Set2Axis10
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("btnSet2Axis10", 0) == 1 ? true : false;
+            }
+            set
+            {
+                PlayerPrefs.SetInt("btnSet2Axis10", value ? 1 : 0);
+            }
+        }
+
+        public static bool Set2Axis11
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("btnSet2Axis11", 0) == 1 ? true : false;
+            }
+            set
+            {
+                PlayerPrefs.SetInt("btnSet2Axis11", value ? 1 : 0);
             }
         }
         #endregion

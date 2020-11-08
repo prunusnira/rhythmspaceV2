@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System;
 using TMPro;
+using System.Threading;
 
 namespace BMSPlayer
 {
@@ -19,10 +20,13 @@ namespace BMSPlayer
         public TextMeshProUGUI txtDescMusicSel;
         public TextMeshProUGUI txtDescSystemOp;
         public TextMeshProUGUI txtDescPlay;
-        public TextMeshProUGUI txtDescPlayClick;
         public TextMeshProUGUI txtDescUpperFolder;
         public TextMeshProUGUI txtDescPage;
         public TextMeshProUGUI txtTip;
+
+        public GameObject[] DescSet;
+        private int curDesc = 0;
+        private float DescDeltaTime = 0;
 
         // Data store
         private List<ListItemNode> bmslist;
@@ -140,6 +144,9 @@ namespace BMSPlayer
         public AudioClip[] loop;
 
         private int selectedIdx = 0;
+        private Thread listLoadThread = null;
+        private bool isLoadingFinish = false;
+        public GameObject loadingList;
 
         void Awake()
         {
@@ -150,11 +157,12 @@ namespace BMSPlayer
             if(File.Exists(Const.JSONPath))
             {
                 ListTreeGenerator();
-                SelectListGenerator();
             }
 
+            ListLoadThread();
+            /*SelectListGenerator();
             musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-            musicRect.ChangeCurrentIdx(Const.ListPos);
+            musicRect.ChangeCurrentIdx(Const.ListPos);*/
 
             // Description
             btnDescSystemOp.onClick.AddListener(OpenSystemOption);
@@ -184,10 +192,10 @@ namespace BMSPlayer
             evtsystem = GetComponent<EventSystem>();
             raycast = GetComponent<GraphicRaycaster>();
 
-            if(musicRect.GetItemCount() > 0)
+            /*if(musicRect.GetItemCount() > 0)
             {
                 showInfo(musicRect.GetCurrent());
-            }
+            }*/
 
             // MusicLoop on
             System.Random rand = new System.Random();
@@ -200,6 +208,15 @@ namespace BMSPlayer
 
         public void Update()
         {
+            if(DescDeltaTime > 3)
+            {
+                SwitchDesc();
+            }
+            else
+            {
+                DescDeltaTime += Time.deltaTime;
+            }
+
             if(isLangChanged)
             {
                 UpdateDescription();
@@ -210,7 +227,8 @@ namespace BMSPlayer
             if(isTop)
             {
                 // 키보드를 움직였을 때 메뉴가 움직이도록 설정
-                if (Input.GetKeyDown(KeyCode.DownArrow))
+                if (Input.GetKeyDown(KeyCode.DownArrow) ||
+                    Keys.GetTurnTableLeftDown())
                 {
                     pressedTime = DateTime.Now.Ticks / 1000;
                     musicRect.AddItemBottom(ObjectSetup);
@@ -219,9 +237,10 @@ namespace BMSPlayer
                 }
 
                 if(Input.GetKey(KeyCode.DownArrow) ||
-                    Input.mouseScrollDelta.y < 0)
+                    Input.mouseScrollDelta.y < 0 ||
+                    Keys.GetTurnTableLeftKeep())
                 {
-                    if(DateTime.Now.Ticks / 1000 - pressedTime > 2000)
+                    if(DateTime.Now.Ticks / 1000 - pressedTime > 5000)
                     {
                         musicRect.AddItemBottom(ObjectSetup);
                         showInfo(musicRect.GetCurrent());
@@ -229,7 +248,8 @@ namespace BMSPlayer
                     }
                 }
 
-                if (Input.GetKeyDown(KeyCode.UpArrow))
+                if (Input.GetKeyDown(KeyCode.UpArrow) ||
+                    Keys.GetTurnTableRightDown())
                 {
                     pressedTime = DateTime.Now.Ticks / 1000;
                     musicRect.AddItemTop(ObjectSetup);
@@ -238,9 +258,10 @@ namespace BMSPlayer
                 }
 
                 if (Input.GetKey(KeyCode.UpArrow) ||
-                    Input.mouseScrollDelta.y > 0)
+                    Input.mouseScrollDelta.y > 0 ||
+                    Keys.GetTurnTableRightKeep())
                 {
-                    if (DateTime.Now.Ticks / 1000 - pressedTime > 2000)
+                    if (DateTime.Now.Ticks / 1000 - pressedTime > 5000)
                     {
                         musicRect.AddItemTop(ObjectSetup);
                         showInfo(musicRect.GetCurrent());
@@ -253,7 +274,8 @@ namespace BMSPlayer
                     OpenSystemOption();
                 }
 
-                if (Input.GetKeyDown(KeyCode.Return))
+                if (Input.GetKeyDown(KeyCode.Return) ||
+                    Keys.GetBtnWhite())
                 {
                     if(Const.selectedOnList.Type == ItemType.DIRECTORY)
                     {
@@ -266,8 +288,9 @@ namespace BMSPlayer
                     }
                 }
 
-                if(Input.GetKeyDown(KeyCode.Backspace)
-                    || Input.GetMouseButtonDown(1))
+                if(Input.GetKeyDown(KeyCode.Backspace) ||
+                    Input.GetMouseButtonDown(1) ||
+                    Keys.GetBtnBlue())
                 {
                     if(searchMode)
                     {
@@ -275,9 +298,10 @@ namespace BMSPlayer
                         searchMode = false;
                         musicRect.Clear();
                         musicRect.ResetIndex();
-                        SelectListGenerator();
+                        ListLoadThread();
+                        /*SelectListGenerator();
                         musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-                        showInfo(musicRect.GetCurrent());
+                        showInfo(musicRect.GetCurrent());*/
                     }
                     if(Const.ListDepth.Count > 0)
                     {
@@ -285,9 +309,10 @@ namespace BMSPlayer
                         Const.ListPos = 0;
                         musicRect.Clear();
                         musicRect.ResetIndex();
-                        SelectListGenerator();
+                        ListLoadThread();
+                        /*SelectListGenerator();
                         musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-                        showInfo(musicRect.GetCurrent());
+                        showInfo(musicRect.GetCurrent());*/
                     }
                     sfxChange.PlayOneShot(sfxSelect);
                 }
@@ -301,11 +326,24 @@ namespace BMSPlayer
                 bmslist.Clear();
 
                 ListTreeGenerator();
-                SelectListGenerator();
+                Const.ListPos = 0;
+                ListLoadThread();
+                /*SelectListGenerator();
                 musicRect.Init(bmslist, 0, ObjectSetup);
                 musicRect.ChangeCurrentIdx(0);
 
-                showInfo(musicRect.GetCurrent());
+                showInfo(musicRect.GetCurrent());*/
+            }
+
+            if(isLoadingFinish)
+            {
+                isLoadingFinish = false;
+                musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
+                if (musicRect.GetItemCount() > 0)
+                {
+                    showInfo(musicRect.GetCurrent());
+                }
+                loadingList.SetActive(false);
             }
         }
 
@@ -753,9 +791,10 @@ namespace BMSPlayer
             Const.ListPos = 0;
             musicRect.Clear();
             musicRect.ResetIndex();
-            SelectListGenerator();
+            ListLoadThread();
+            /*SelectListGenerator();
             musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
-            showInfo(musicRect.GetCurrent());
+            showInfo(musicRect.GetCurrent());*/
             sfxChange.PlayOneShot(sfxSelect);
         }
 
@@ -880,11 +919,46 @@ namespace BMSPlayer
             LanguageType lang = Const.Language;
             txtDescMusicSel.text = Const.listSelect[(int)lang];
             txtDescSystemOp.text = Const.listSystemOp[(int)lang];
-            txtDescPlay.text = Const.listPlayEnter[(int)lang];
-            txtDescPlayClick.text = Const.listPlayClick[(int)lang];
+            txtDescPlay.text = Const.listPlay[(int)lang];
             txtDescUpperFolder.text = Const.listUpper[(int)lang];
             txtDescPage.text = Const.playOpPage[(int)lang];
             txtTip.text = "* TIP: "+Const.listTip[(int)lang];
+        }
+
+        private void SwitchDesc()
+        {
+            if(curDesc == 2)
+            {
+                curDesc = 0;
+            }
+            else
+            {
+                curDesc++;
+            }
+
+            for(int i = 0; i < DescSet.Length; i++)
+            {
+                if(i == curDesc)
+                {
+                    DescSet[i].SetActive(true);
+                }
+                else
+                {
+                    DescSet[i].SetActive(false);
+                }
+            }
+            DescDeltaTime = 0;
+        }
+
+        public void ListLoadThread()
+        {
+            loadingList.SetActive(true);
+            listLoadThread = new Thread(new ThreadStart(delegate
+            {
+                SelectListGenerator();
+                isLoadingFinish = true;
+            }));
+            listLoadThread.Start();
         }
 
         public void OnFinish()

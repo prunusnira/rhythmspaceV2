@@ -1118,7 +1118,10 @@ namespace BMSPlayer
                 if (Keys.btnAxisSet1[i])
                 {
                     // Axis 값일때
-                    if(Math.Abs(Keys.GetAxisValue(Keys.btnSet1[i])) >= 0.5)
+                    if((Keys.btnSet1[i].EndsWith("p") &&
+                        Keys.GetAxisValue(Keys.btnSet1[i]) > 0.5) ||
+                        (Keys.btnSet1[i].EndsWith("m") &&
+                        Keys.GetAxisValue(Keys.btnSet1[i]) < -0.5))
                     {
                         if (!isSet1Pushed[i]
                             && !isSet2Pushed[i])
@@ -1128,7 +1131,10 @@ namespace BMSPlayer
                         }
                     }
 
-                    if(Math.Abs(Keys.GetAxisValue(Keys.btnSet1[i])) < 0.5)
+                    if((Keys.btnSet1[i].EndsWith("p") &&
+                        Keys.GetAxisValue(Keys.btnSet1[i]) <= 0.5) ||
+                        (Keys.btnSet1[i].EndsWith("m") &&
+                        Keys.GetAxisValue(Keys.btnSet1[i]) >= -0.5))
                     {
                         if (isSet1Pushed[i])
                         {
@@ -1167,7 +1173,10 @@ namespace BMSPlayer
                 if (Keys.btnAxisSet2[i])
                 {
                     // Axis 값일때
-                    if (Math.Abs(Keys.GetAxisValue(Keys.btnSet2[i])) >= 0.5)
+                    if ((Keys.btnSet2[i].EndsWith("p") &&
+                        Keys.GetAxisValue(Keys.btnSet2[i]) > 0.5) ||
+                        (Keys.btnSet2[i].EndsWith("m") &&
+                        Keys.GetAxisValue(Keys.btnSet2[i]) < -0.5))
                     {
                         if (!isSet1Pushed[i]
                             && !isSet2Pushed[i])
@@ -1176,8 +1185,11 @@ namespace BMSPlayer
                             isSet2Pushed[i] = true;
                         }
                     }
-
-                    if (Math.Abs(Keys.GetAxisValue(Keys.btnSet2[i])) < 0.5)
+                    
+                    if((Keys.btnSet2[i].EndsWith("p") &&
+                        Keys.GetAxisValue(Keys.btnSet2[i]) <= 0.5) ||
+                        (Keys.btnSet2[i].EndsWith("m") &&
+                        Keys.GetAxisValue(Keys.btnSet2[i]) >= -0.5))
                     {
                         if (isSet2Pushed[i])
                         {
