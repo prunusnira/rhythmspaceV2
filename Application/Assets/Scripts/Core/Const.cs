@@ -194,18 +194,25 @@ namespace BMSPlayer
             "UPPER FOLDER / CANCEL SEARCH"
         };
 
+        public static string[] listTip = new string[3]
+        {
+            "TIP: 각 항목에 할당된 키보드 버튼을 누르거나 마우스로 클릭하세요",
+            "TIP: 各項目のキーをキーボードから押すかあるいはマウスでクリックしてください",
+            "TIP: Press button on keyboard or click with mouse"
+        };
+
+        public static string[] listTip2 = new string[3]
+        {
+            "TIP: 컨트롤러 Axis로 등록된 버튼은 선택/취소에 이용할 수 없습니다",
+            "TIP: コントローラーのAxisから登録されたボタンは選択・キャンセルに利用できません",
+            "TIP: Axis buttons can not be used as select/cancel"
+        };
+
         public static string[] playOpPage = new string[3]
         {
             "페이지 전환",
             "ページ変更",
             "PAGE SWAP"
-        };
-
-        public static string[] listTip = new string[3]
-        {
-            "각 항목에 할당된 키보드 버튼을 누르거나 마우스로 클릭하세요",
-            "各項目のキーをキーボードから押すかあるいはマウスでクリックしてください",
-            "Press button on keyboard or click with mouse"
         };
 
         public static string[] RandomDescNR = new string[3]
@@ -333,6 +340,13 @@ namespace BMSPlayer
             "* RAMDOM에서만 동일 패턴이 적용됩니다",
             "* RANDOMのみ同じ譜面になります",
             "* Same pattern in RAMDOM only"
+        };
+
+        public static string[] StageCancel = new string[3]
+        {
+            "로 스테이지 취소",
+            "でステージをキャンセル",
+            "to cancel stage"
         };
         #endregion
 

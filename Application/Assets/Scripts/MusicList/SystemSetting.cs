@@ -480,8 +480,8 @@ namespace BMSPlayer
             File.WriteAllText(Const.JSONPath, tree.JSONStr);
 
             // 수집한 BMS 데이터를 DB에 등록
-            strLoading = "Registering into database";
-            MusicListManager.Instance.AddDataToDB(musicList);
+            strLoading = "Database process...";
+            MusicListManager.Instance.AddDataToDB(musicList, ref strLoading);
             
             refreshed = true;
             isRefreshing = false;

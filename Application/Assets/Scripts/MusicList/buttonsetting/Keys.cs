@@ -22,46 +22,46 @@ namespace BMSPlayer
         };
 
         public static string[] DEFAULT_XB = {
-            "Joystick1Button4",
+            "Axis9p",
             "Axis6m", "Axis7p", "Axis6p",
-            "Joystick1Button2",
-            "Joystick1Button3",
-            "Joystick1Button1",
-            "Joystick1Button5",
-            "Joystick1Button0",
-            "Joystick1Button6",
-            "Joystick1Button7"
+            "JoystickButton2",
+            "JoystickButton3",
+            "JoystickButton1",
+            "JoystickButton5",
+            "Axis10p",
+            "JoystickButton6",
+            "JoystickButton7"
         };
 
         public static string[] DEFAULT_DS4 =
         {
-            "Joystick1Button6",
-            "Joystick1Button4",
-            "Axis8p", "Axis7p", "Joystick1Button0",
-            "Joystick1Button3", "Joystick1Button1", "Joystick1Button5",
-            "Joystick1Button7",
-            "Joystick1Button8",
-            "Joystick1Button9"
+            "JoystickButton6",
+            "JoystickButton4",
+            "Axis8p", "Axis7p", "JoystickButton0",
+            "JoystickButton3", "JoystickButton1", "JoystickButton5",
+            "JoystickButton7",
+            "JoystickButton8",
+            "JoystickButton9"
         };
 
         public static string[] DEFAULT_PITCH =
         {
             "AxisYp",
-            "Joystick1Button7",
-            "Joystick1Button2", "Joystick1Button1", "Joystick1Button5",
-            "Joystick1Button0", "Joystick1Button4", "AxisXm",
+            "JoystickButton7",
+            "JoystickButton2", "JoystickButton1", "JoystickButton5",
+            "JoystickButton0", "JoystickButton4", "AxisXm",
             "AxisYm",
-            "Joystick1Button9", "Joystick1Button8"
+            "JoystickButton9", "JoystickButton8"
         };
 
         public static string[] DEFAULT_LR2 =
         {
             "AxisXm",
-            "Joystick1Button0", "Joystick1Button1", "Joystick1Button2",
-            "Joystick1Button3", "Joystick1Button4", "Joystick1Button5",
-            "Joystick1Button6",
+            "JoystickButton0", "JoystickButton1", "JoystickButton2",
+            "JoystickButton3", "JoystickButton4", "JoystickButton5",
+            "JoystickButton6",
             "AxisXp",
-            "Joystick1Button8", "Joystick1Button9"
+            "JoystickButton8", "JoystickButton9"
         };
 
         public static bool[] DEFAULT_DPAD_DS4 =
@@ -73,8 +73,8 @@ namespace BMSPlayer
 
         public static bool[] DEFAULT_DPAD_XB =
         {
-            false, true, true, true,
-            false, false, false, false, false,
+            true, true, true, true,
+            false, false, false, false, true,
             false, false
         };
 

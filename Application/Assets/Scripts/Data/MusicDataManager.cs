@@ -98,15 +98,17 @@ namespace BMSPlayer
             return SQLiteExecutor.Instance.FindMusicList(text);
         }
 
-        public void AddDataToDB(List<MusicListData> list)
+        public void AddDataToDB(List<MusicListData> list, ref string strLoading)
         {
             if (list.Count != 0)
             {
                 SQLiteExecutor.Instance.DropList();
                 List<MusicListData> dataList = new List<MusicListData>();
                 // 리스트의 각 파일을 DB에 등록(이 때 MD5 Hash값도 계산)
-                foreach (MusicListData d in list)
+                for (int i = 0; i < list.Count; i++)
                 {
+                    strLoading = "Gathering data to register to database (" + (i + 1) + "/" + list.Count + ")";
+                    MusicListData d = list[i];
                     FileStream fstream = File.OpenRead(d.Path + d.FileName);
                     var bytehash = md5.ComputeHash(fstream);
                     fstream.Close();
@@ -116,6 +118,7 @@ namespace BMSPlayer
                     dataList.Add(d);
                     fstream.Close();
                 }
+                strLoading = "Registering into Database";
                 SQLiteExecutor.Instance.InsertBMS(dataList);
             }
         }

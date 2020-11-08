@@ -67,6 +67,11 @@ namespace BMSPlayer
                     {
                         itemidx[upperSize + i + itemList.Count * bottomCount] = i;
                     }
+
+                    for(int i = 0; i < centpos; i++)
+                    {
+                        AddItemBottom(f);
+                    }
                 }
                 else
                 {
@@ -96,19 +101,11 @@ namespace BMSPlayer
                             itemidx[cnt + i] = i;
                         }
                     }
-
-                    /*for (int i = itemList.Count - 8; i < itemList.Count; i++)
-                    {
-                        itemidx[i - (itemList.Count - 8)] = i;
-                    }
-                    for (int i = 0; i < 10; i++)
-                    {
-                        itemidx[i + 8] = i;
-                    }*/
                 }
 
                 // 리스트에 아이템 채우기
                 AddItem(f);
+                currentIdx = centpos;
             }
         }
 

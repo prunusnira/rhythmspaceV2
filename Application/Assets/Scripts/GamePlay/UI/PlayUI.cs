@@ -62,9 +62,15 @@ namespace BMSPlayer
         private TextMesh txtLoading;
 
         // Skin
-        public SpriteRenderer[] skinGear;
-        public Sprite[] skinGearNormal;
-        public Sprite[] skinGearDark;
+        public SpriteRenderer[] skinGearStd;
+        public SpriteRenderer[] skinGearW125;
+        public SpriteRenderer[] skinGearW150;
+        public Sprite[] skinGearStdNormal;
+        public Sprite[] skinGearStdDark;
+        public Sprite[] skinGearW125Normal;
+        public Sprite[] skinGearW125Dark;
+        public Sprite[] skinGearW150Normal;
+        public Sprite[] skinGearW150Dark;
 
         // Note Effect
         private Coroutine[] effectCoroutine;
@@ -372,11 +378,15 @@ namespace BMSPlayer
 
             if (Const.GearSkin == SkinType.NORMAL)
             {
-                skinGear[Const.PlayerSide].sprite = skinGearNormal[Const.PlayerSide];
+                skinGearStd[Const.PlayerSide].sprite = skinGearStdNormal[Const.PlayerSide];
+                skinGearW125[Const.PlayerSide].sprite = skinGearW125Normal[Const.PlayerSide];
+                skinGearW150[Const.PlayerSide].sprite = skinGearW150Normal[Const.PlayerSide];
             }
             else if (Const.GearSkin == SkinType.DARK)
             {
-                skinGear[Const.PlayerSide].sprite = skinGearDark[Const.PlayerSide];
+                skinGearStd[Const.PlayerSide].sprite = skinGearStdDark[Const.PlayerSide];
+                skinGearW125[Const.PlayerSide].sprite = skinGearW125Dark[Const.PlayerSide];
+                skinGearW150[Const.PlayerSide].sprite = skinGearW150Dark[Const.PlayerSide];
             }
 
             int PlaySide = Const.PlayerSide;

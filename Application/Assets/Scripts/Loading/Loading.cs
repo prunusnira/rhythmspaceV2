@@ -23,12 +23,20 @@ namespace BMSPlayer
         public TextMeshPro level;
         public TextMeshPro bpm;
 
+        public TextMeshPro cancelMsg;
+
         public Image Fader;
         private bool FadeDone = false;
         private bool FadeStart = false;
         private bool FadeReady = false;
         private bool FadeReadyStart = false;
         private bool ESCPressed = false;
+
+        private void Awake()
+        {
+            Keys.LoadButtonSetting();
+            cancelMsg.text = Const.StageCancel[(int)Const.Language];
+        }
 
         void Start()
         {
@@ -91,7 +99,10 @@ namespace BMSPlayer
 
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) && !FadeReady)
+            if (!FadeReady &&
+                (Input.GetKeyDown(KeyCode.Escape) ||
+                    (Keys.GetBtn(2) && Keys.GetBtn(4) && Keys.GetBtn(6))
+                ))
             {
                 ESCPressed = true;
                 if (!FadeDone && !FadeStart)

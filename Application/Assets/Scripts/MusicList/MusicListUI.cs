@@ -23,6 +23,7 @@ namespace BMSPlayer
         public TextMeshProUGUI txtDescUpperFolder;
         public TextMeshProUGUI txtDescPage;
         public TextMeshProUGUI txtTip;
+        public TextMeshProUGUI txtTip2;
 
         public GameObject[] DescSet;
         private int curDesc = 0;
@@ -145,6 +146,7 @@ namespace BMSPlayer
 
         private int selectedIdx = 0;
         private Thread listLoadThread = null;
+        private bool isLoading = false;
         private bool isLoadingFinish = false;
         public GameObject loadingList;
 
@@ -224,7 +226,7 @@ namespace BMSPlayer
             }
 
             // 곡 선택이 front인 경우에만 동작
-            if(isTop)
+            if(isTop && !isLoading)
             {
                 // 키보드를 움직였을 때 메뉴가 움직이도록 설정
                 if (Input.GetKeyDown(KeyCode.DownArrow) ||
@@ -274,8 +276,9 @@ namespace BMSPlayer
                     OpenSystemOption();
                 }
 
+                // 전용 커스텀 버튼 체크
                 if (Input.GetKeyDown(KeyCode.Return) ||
-                    Keys.GetBtnWhite())
+                    GetBtnWhite())
                 {
                     if(Const.selectedOnList.Type == ItemType.DIRECTORY)
                     {
@@ -288,13 +291,22 @@ namespace BMSPlayer
                     }
                 }
 
-                if(Input.GetKeyDown(KeyCode.Backspace) ||
+                // 전용 커스텀 버튼 체크
+                if (Input.GetKeyDown(KeyCode.Backspace) ||
                     Input.GetMouseButtonDown(1) ||
-                    Keys.GetBtnBlue())
+                    GetBtnBlue())
                 {
                     if(searchMode)
                     {
                         // 본래대로 돌아감
+                        if(Const.ListDepth.Count > 0)
+                        {
+                            Const.ListPos = Const.ListDepth[Const.ListDepth.Count - 1];
+                        }
+                        else
+                        {
+                            Const.ListPos = 0;
+                        }
                         searchMode = false;
                         musicRect.Clear();
                         musicRect.ResetIndex();
@@ -305,8 +317,8 @@ namespace BMSPlayer
                     }
                     if(Const.ListDepth.Count > 0)
                     {
+                        Const.ListPos = Const.ListDepth[Const.ListDepth.Count - 1];
                         Const.ListDepth.RemoveAt(Const.ListDepth.Count - 1);
-                        Const.ListPos = 0;
                         musicRect.Clear();
                         musicRect.ResetIndex();
                         ListLoadThread();
@@ -327,6 +339,7 @@ namespace BMSPlayer
 
                 ListTreeGenerator();
                 Const.ListPos = 0;
+                Const.ListDepth.Clear();
                 ListLoadThread();
                 /*SelectListGenerator();
                 musicRect.Init(bmslist, 0, ObjectSetup);
@@ -338,12 +351,15 @@ namespace BMSPlayer
             if(isLoadingFinish)
             {
                 isLoadingFinish = false;
+
                 musicRect.Init(bmslist, Const.ListPos, ObjectSetup);
                 if (musicRect.GetItemCount() > 0)
                 {
                     showInfo(musicRect.GetCurrent());
                 }
                 loadingList.SetActive(false);
+
+                isLoading = false;
             }
         }
 
@@ -912,6 +928,7 @@ namespace BMSPlayer
                     bmslist.Add(child);
                 }
             }
+            isLoadingFinish = true;
         }
 
         public void UpdateDescription()
@@ -922,12 +939,13 @@ namespace BMSPlayer
             txtDescPlay.text = Const.listPlay[(int)lang];
             txtDescUpperFolder.text = Const.listUpper[(int)lang];
             txtDescPage.text = Const.playOpPage[(int)lang];
-            txtTip.text = "* TIP: "+Const.listTip[(int)lang];
+            txtTip.text = Const.listTip[(int)lang];
+            txtTip2.text = Const.listTip2[(int)lang];
         }
 
         private void SwitchDesc()
         {
-            if(curDesc == 2)
+            if(curDesc == 4)
             {
                 curDesc = 0;
             }
@@ -952,11 +970,11 @@ namespace BMSPlayer
 
         public void ListLoadThread()
         {
+            isLoading = true;
             loadingList.SetActive(true);
             listLoadThread = new Thread(new ThreadStart(delegate
             {
                 SelectListGenerator();
-                isLoadingFinish = true;
             }));
             listLoadThread.Start();
         }
@@ -965,6 +983,30 @@ namespace BMSPlayer
         {
             MusicListManager.Instance.Close();
             rdm.Close();
+        }
+
+        public static bool GetBtnWhite()
+        {
+            return
+                GetBtnDown(1) ||
+                GetBtnDown(3) ||
+                GetBtnDown(5) ||
+                GetBtnDown(7);
+        }
+
+        public static bool GetBtnBlue()
+        {
+            return
+                GetBtnDown(2) ||
+                GetBtnDown(4) ||
+                GetBtnDown(6);
+        }
+
+        public static bool GetBtnDown(int i)
+        {
+            return
+                (!Keys.btnAxisSet1[i] && Keys.GetKeyDown(Keys.btnSet1[i])) ||
+                (!Keys.btnAxisSet2[i] && Keys.GetKeyDown(Keys.btnSet2[i]));
         }
     }
 }
