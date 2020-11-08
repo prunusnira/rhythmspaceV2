@@ -16,15 +16,14 @@ namespace BMSPlayer
         public SpriteRenderer layerImage;
         public RectTransform layerRect;
         public VideoPlayer bgaVideo;
-        public GameObject bgaVideoLayer;
+        public SpriteRenderer bgaVideoLayer;
         public GameObject bgaErrorLayer;
 
         // VLC Player
-        public Renderer bgaVideoRenderer;
         /*private LibVLC libVLC;
         private MediaPlayer mediaPlayer;
-        private Texture2D tex = null;
-        private bool play = false;*/
+        private Texture2D tex = null;*/
+        private bool play = false;
 
         public static int playerWidth = 0;
         public static int playerHeight = 0;
@@ -55,15 +54,15 @@ namespace BMSPlayer
                             true,
                             texptr
                         );
-                        ((SpriteRenderer)bgaVideoRenderer).sprite =
+                        bgaVideoLayer.sprite =
                             Tools.TextureToSprite(
                                 tex,
                                 (int)width,
                                 (int)height,
-                                bgaVideoRenderer.GetComponent<RectTransform>().pivot);
-                        bgaVideoRenderer.material.mainTexture = tex;
-                        ((SpriteRenderer)bgaVideoRenderer).drawMode = SpriteDrawMode.Sliced;
-                        ((SpriteRenderer)bgaVideoRenderer).size = new Vector2(playerWidth, playerHeight);
+                                bgaVideoLayer.GetComponent<RectTransform>().pivot);
+                        bgaVideoLayer.material.mainTexture = tex;
+                        bgaVideoLayer.drawMode = SpriteDrawMode.Sliced;
+                        bgaVideoLayer.size = new Vector2(playerWidth, playerHeight);
                     }
                 }
                 else
@@ -89,7 +88,7 @@ namespace BMSPlayer
 
         public void BGAVideoActivate()
         {
-            bgaVideoLayer.SetActive(true);
+            bgaVideoLayer.gameObject.SetActive(true);
         }
 
         public void BGAVideoPreload(string file)
@@ -102,10 +101,10 @@ namespace BMSPlayer
                 libVLC,
                 new Uri("file://" + file)
             );
-            mediaPlayer.SetLogoInt(VideoLogoOption.Opacity, 0);
-            mediaPlayer.Play();
+            mediaPlayer.SetLogoInt(VideoLogoOption.Opacity, 0);*/
+            //mediaPlayer.Play();
 
-            play = true;*/
+            play = true;
         }
 
         public void BGAImageActivate()

@@ -268,7 +268,7 @@ namespace BMSPlayer
                 targetDiff.text = scorediff.ToString();
             }
 
-            if (vcb == 0 && Const.Auto == AutoPlayType.OFF)
+            if (vcb == 0)
             {
                 if (vgd == 0 && vgr == 0)
                 {

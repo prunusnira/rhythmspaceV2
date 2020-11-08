@@ -570,7 +570,10 @@ namespace BMSPlayer {
             try
             {
                 if (Const.selectedOnList != null)
+                {
                     scroller.UpdateBPM(Const.selectedOnList.Info.BPMstart);
+                    scroller.RecalcSpd();
+                }
 
                 analyzer.FullAnalyzer(Data.BMS, encoding);
 
@@ -586,6 +589,7 @@ namespace BMSPlayer {
                 Data.BPS = Data.CurrentBPM / 240;
                 Data.SPB = (double)(240 * 1000) / Data.CurrentBPM;
                 scroller.UpdateBPM(Data.CurrentBPM);
+                scroller.RecalcSpd();
                 // BPM = 분당 비트수, 1분에 1/4박자(bar 1개)의 개수
                 // beat per second는 bpm/60, 여기에 4 bar = 1박이므로 4로 추가로 나눈다
                 // 모든 시간은 ms 단위로 한다

@@ -91,7 +91,8 @@ namespace BMSPlayer
             // 배속 조절시 속도 변경 적용
             if(isSpeedChanged)
             {
-                if(Const.SpdType == SpdType.STANDARD)
+                isSpeedChanged = false;
+                if (Const.SpdType == SpdType.STANDARD)
                 {
                     Const.SpeedCon = (int)(speed * BPM / 100);
                 }
@@ -101,7 +102,6 @@ namespace BMSPlayer
                     Const.SpeedStd = (int)(speedfl / BPM * 100);
                 }
                 UI.UpdateSpeed();
-                isSpeedChanged = false;
             }
         }
 
@@ -642,6 +642,7 @@ namespace BMSPlayer
                 {
                     bpm = current.BPMValue;
                     bps = bpm / 240;
+                    UpdateBPM(bpm);
                     current.Used = true;
                     removeCandidate.Add(current);
                     UI.SetGearCurBPM(bpm);
@@ -1481,6 +1482,10 @@ namespace BMSPlayer
         public void UpdateBPM(double bpm)
         {
             BPM = bpm;
+        }
+
+        public void RecalcSpd()
+        {
             isSpeedChanged = true;
         }
 
