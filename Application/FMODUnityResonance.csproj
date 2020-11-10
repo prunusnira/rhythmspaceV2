@@ -274,12 +274,6 @@
     <Reference Include="Mono.Data.Sqlite">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/Mono.Data.Sqlite.dll</HintPath>
     </Reference>
-    <Reference Include="TextMeshPro-5.6-Editor">
-      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-5.6-Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="TextMeshPro-5.6-Runtime">
-      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-5.6-Runtime.dll</HintPath>
-    </Reference>
     <Reference Include="LibVLCSharp">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/VLCUnity/Plugins/x86_64/LibVLCSharp.dll</HintPath>
     </Reference>

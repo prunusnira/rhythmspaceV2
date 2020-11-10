@@ -16,6 +16,7 @@
 
 ## Developing
 * Bug Fixes
+* Level table parser (Satellite & Stella)
 
-## Bugs for now (2020/10/31)
-* Controller settings for beatcon
+## Bugs for now (2020/11/11)
+* Note display error when note has too much gimmick within short time period

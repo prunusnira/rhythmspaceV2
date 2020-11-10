@@ -34,7 +34,6 @@ namespace BMSPlayer
 
         // Browser
         public Text txtBrowserDesc;
-        public string[] extensions;
 
         // Loading
         public GameObject layerLoading;

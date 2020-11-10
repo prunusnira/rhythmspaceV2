@@ -79,7 +79,6 @@ namespace BMSPlayer
         public TextMeshProUGUI infoTotalNote;
         public TextMeshProUGUI infoPlayTime;
         public TextMeshProUGUI infoJudgeRank;
-        public GameObject btnStart;
 
         // Difficulty
         public SpriteRenderer diffBeg;

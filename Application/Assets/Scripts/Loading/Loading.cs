@@ -11,19 +11,16 @@ namespace BMSPlayer
 {
     public class Loading : MonoBehaviour
     {
-        [SerializeField]
-        public Image progressBar;
+        public TextMeshProUGUI gerne;
+        public TextMeshProUGUI title;
+        public TextMeshProUGUI subtitle;
+        public TextMeshProUGUI artist;
+        public TextMeshProUGUI subartist;
+        public TextMeshProUGUI difficulty;
+        public TextMeshProUGUI level;
+        public TextMeshProUGUI bpm;
 
-        public TextMeshPro gerne;
-        public TextMeshPro title;
-        public TextMeshPro subtitle;
-        public TextMeshPro artist;
-        public TextMeshPro subartist;
-        public TextMeshPro difficulty;
-        public TextMeshPro level;
-        public TextMeshPro bpm;
-
-        public TextMeshPro cancelMsg;
+        public TextMeshProUGUI cancelMsg;
 
         public Image Fader;
         private bool FadeDone = false;
@@ -141,7 +138,7 @@ namespace BMSPlayer
             FadeReady = true;
         }
 
-        IEnumerator LoadAnim(TextMeshPro mesh, int idx)
+        IEnumerator LoadAnim(TextMeshProUGUI mesh, int idx)
         {
             yield return new WaitForSeconds(0.05f * idx);
             Animator anim = mesh.GetComponent<Animator>();
