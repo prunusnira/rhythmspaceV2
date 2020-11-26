@@ -442,7 +442,7 @@ namespace BMSPlayer
                 fstream.Close();
                 md5.Clear();
 
-                string hash = BitConverter.ToString(bytehash);
+                string hash = BitConverter.ToString(bytehash).Replace("-", "").ToLower();
 
                 // 기존 기록 값 가져오기
                 RecordData prev = rdm.GetFullClearStat(hash);

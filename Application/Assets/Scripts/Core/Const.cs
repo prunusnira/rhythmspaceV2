@@ -30,6 +30,7 @@ namespace BMSPlayer
         public static ListItemTree BMSTree;
         public static ListItemNode selectedOnList = null;
         public static List<int> ListDepth = new List<int>();
+        public static List<string> ListPath = new List<string>();
         public static int ListPos = 0;
         public static bool ChangeLayout = true;
 
@@ -43,7 +44,7 @@ namespace BMSPlayer
         public static int[] CurrentLayout = { 1, 2, 3, 4, 5, 6, 7 };
 
         // Language
-        #region Language
+        #region Text on System Setting
         public static string[] settingTitlePath = new string[3]
         {
             "BMS 경로",
@@ -55,6 +56,12 @@ namespace BMSPlayer
             "화면 해상도",
             "画面解像度",
             "Resolution"
+        };
+        public static string[] settingTitleFrameRate = new string[3]
+        {
+            "최대 프레임 제한",
+            "最大フレーム制限",
+            "Max Frame Rate"
         };
         public static string[] settingTitleScrMode = new string[3]
         {
@@ -86,6 +93,12 @@ namespace BMSPlayer
             "操作設定",
             "Control Setting"
         };
+        public static string[] settingTitleDiffTable = new string[3]
+        {
+            "난이도 표 연동",
+            "難易度表連動",
+            "Difficulty Table"
+        };
         public static string[] settingTitleReset = new string[3]
         {
             "설정 초기화",
@@ -93,33 +106,11 @@ namespace BMSPlayer
             "Reset All Setting"
         };
 
-
         public static string[] settingDesc = new string[3]
         {
             "게임 설정을 변경합니다",
             "ゲームの設定を変更します",
             "Change your game settings"
-        };
-
-        public static string[] settingPathTitle = new string[3]
-        {
-            "BMS 경로 변경",
-            "BMS経路更新",
-            "BMS path"
-        };
-
-        public static string[] settingPathCurrent = new string[3]
-        {
-            "현재 경로",
-            "現在経路",
-            "Current path"
-        };
-
-        public static string[] settingPathSelector = new string[3]
-        {
-            "BMS 파일이 있는 경로를 선택해주세요",
-            "BMSの経路を選択してください",
-            "Select folder where BMS files exist"
         };
 
         public static string[] settingNoPathFound = new string[3]
@@ -150,6 +141,93 @@ namespace BMSPlayer
             "If you change path or encoding, it will load all BMS files from scratch\nwhich takes lots of time"
         };
 
+        public static string[] settingBtnBMSOpen = new string[3]
+        {
+            "브라우저 열기",
+            "ブラウザを開く",
+            "Open Browser"
+        };
+        public static string[] settingBtnRefreshChange = new string[3]
+        {
+            "변경사항 갱신",
+            "更新",
+            "Update"
+        };
+        public static string[] settingBtnRefreshReload = new string[3]
+        {
+            "전체 새로 갱신",
+            "リロード",
+            "Reload All"
+        };
+
+        public static string[] settingBtnFrameUpdate = new string[3]
+        {
+            "변경",
+            "更新",
+            "Update"
+        };
+
+        public static string[] settingBtnScrModeWin = new string[3]
+        {
+            "창 모드",
+            "ウインドウ",
+            "Windowed"
+        };
+        public static string[] settingBtnScrModeFull = new string[3]
+        {
+            "전체 화면",
+            "フルスクリーン",
+            "Full Screen"
+        };
+        public static string[] settingBtnScrModeBorder = new string[3]
+        {
+            "전체 창 모드",
+            "ボーダーレス",
+            "Borderless"
+        };
+
+        public static string[] settingBtnEncJP = new string[3]
+        {
+            "일본어 기준(Shift-JIS)",
+            "日本語基準(Shift-JIS)",
+            "JP Based(Shift-JIS)"
+        };
+        public static string[] settingBtnEncKR = new string[3]
+        {
+            "한국어 기준(EUC-KR)",
+            "韓国語基準(EUC-KR)",
+            "KR Based(EUC-KR)"
+        };
+
+        public static string[] settingBtnKeyChange = new string[3]
+        {
+            "조작 변경",
+            "操作設定",
+            "Change Control"
+        };
+
+        public static string[] settingBtnTableEdit = new string[3]
+        {
+            "난이도표 수정",
+            "難易度表修正",
+            "Edit Table"
+        };
+        public static string[] settingBtnTableRefresh = new string[3]
+        {
+            "난이도표 갱신",
+            "難易度表更新",
+            "Update Table"
+        };
+
+        public static string[] settingBtnReset = new string[3]
+        {
+            "모든 옵션 리셋",
+            "全設定をリセット",
+            "Reset all setting"
+        };
+        #endregion
+
+        #region Other messages
         public static string[] videoCodecMsg = new string[3]
         {
             "Microsoft Store에서 MPEG-2 Video Extension을 설치해주세요\n" +
@@ -348,15 +426,172 @@ namespace BMSPlayer
             "でステージをキャンセル",
             "to cancel stage"
         };
+
+        public static string[] musiclistEmpty = new string[3]
+        {
+            "목록이 비어있습니다\n\n" +
+            "* 난이도표가 비어있는 경우 URL을 확인한 후 다시 갱신해주시고\n" +
+            "* BMS 데이터가 비어있는 경우 갱신을 다시 수행해주세요",
+            "データがありません\n\n" +
+            "* 難易度表の場合：URLを確認して再更新してください\n" +
+            "* BMSデータが更新失敗した場合はもう一度更新してください",
+            "List is empty\n\n" +
+            "* In case of Difficulty Table: Please check URL and update again\n" +
+            "* In case of BMS update failure: Please try again"
+        };
+        #endregion
+
+        #region Dialog Text
+        public static string[] DialogExitMsg = new string[3]
+        {
+            "게임을 종료합니다",
+            "ゲームを終了します",
+            "Exit to desktop"
+        };
+
+        public static string[] DialogTableEdit = new string[3]
+        {
+            "테이블 이름과 URL을 지정해주세요",
+            "テーブルの名称とURLを指定してください",
+            "Please set name and URL"
+        };
+
+        public static string[] DialogResetAll = new string[3]
+        {
+            "리셋 뒤에는 게임을 재시작해야 합니다\n" +
+                "리셋 하시겠습니까?\n" +
+                "(게임이 종료됩니다)",
+            "リセット後、ゲームを再起動する必要があります\n" +
+                "リセットしますか？\n" +
+                "（ゲームを終了します）",
+            "After reset, you must restart the game.\n"+
+                "Are you sure?\n"+
+                "(Game will be terminated)"
+        };
+
+        public static string[] DialogNoPattern = new string[3]
+        {
+            "이 패턴에 해당하는 파일이 없습니다.\n"
+                +"* 새로 파일을 추가했다면 [시스템 설정] - [BMS 경로] - [Refresh] 를 진행해주세요.\n"
+                +"* 파일이 아직 없다면, 아래의 난이도표에서 제공하는 BMS URL에서 찾아보세요.\n"
+                +"  (차분 패턴은 없을 수 있으므로 난이도표를 참고해주세요)\n\n"
+                +"[Open] 버튼을 누르면 브라우저를 실행합니다",
+            "譜面がありません。\n"
+                +"* 追加ファイルがある場合は、「システム設定」から「BMS経路」の「Refresh」を押してください\n"
+                +"* ファイルがない場合、以下の難易度表から提供するURLでけんさくしてください。\n"
+                +"  (差分はない場合もありますので難易度表を参考にしてください)\n\n"
+                +"[Open]ボタンを押すとウェブブラウザが開きます",
+            "No file for this pattern found.\n"
+                +"* If you added new file, Go to [System setting] - [BMS Path] and press [Refresh] button.\n"
+                +"* If you don't have file, Please go to URL provided from difficulty table.\n"
+                +"  (It might not have additional pattern. Please check table itself)\n\n"
+                +"Press [Open] button to open web browser."
+        };
+        #endregion
+
+        #region Initial Setting Text
+        public static string[] InitSettingSkin = new string[3]
+        {
+            "초기 설정 - 스텝 2: 스킨 설정\n" +
+            "아래의 사진을 보고 스킨을 선택해주세요",
+            "初期設定・ステップ２：スキン\n" +
+            "下のイメージを見てスキンを選択してください",
+            "Initial Setting - Step 2: Skin\n" +
+            "Please select your prefered skin set"
+        };
+
+        public static string[] InitSettingJudgeTiming = new string[3]
+        {
+            "초기 설정 - 스텝 3: 판정 기준 설정\n\n" +
+            "ARCADE: PG 16.67ms 기반의 판정으로 패턴에 설정된 랭크값과 무관합니다.\n" +
+            "        (실제 아케이드와는 일부 다른 부분이 있습니다)\n" +
+            "ORIGINAL: RT 자체의 판정 범위입니다\n" +
+            "LR2: Lunatic Rave 2의 판정 범위를 사용합니다\n" +
+            "BEATORAJA: Beatoraja의 판정 범위를 사용합니다\n\n" +
+            "이 설정은 하단의 [플레이 옵션]에서 변경할 수 있습니다",
+            "初期設定・ステップ4：判定基準設定\n\n" +
+            "ARCADE: PG 16.67msのアーケードに似てる判定です。BMSのランク数値と関係ありません\n" +
+            "　　　　（実際の筐体とは異なる部分があります）\n" +
+            "ORIGINAL: RTの自体的な判定システムです\n" +
+            "LR2: Lunatic Rave 2の判定範囲を適用します\n" +
+            "BEATORAJA: Beatorajaの判定範囲を適用します\n\n" +
+            "この設定は画面下の「プレイオプション」で設定できます",
+            "Initial Setting - Step 4: Judge timing setting\n\n" +
+            "ARCADE: It uses PG 16.67ms and does not vary by rank value of BMS\n" +
+            "        (Not exactly same with arcade)\n" +
+            "ORIGINAL: Original timing\n" +
+            "LR2: Lunatic Rave 2 styled timing\n" +
+            "BEATORAJA: Beatoraja styled timing\n\n" +
+            "You can change it from the bottom of screen, [Play Option]"
+        };
+
+        public static string[] InitSettingTable = new string[3]
+        {
+            "초기 설정 - 스텝 4: 난이도 표 설정\n\n" +
+            "버튼을 눌러 난이도 표 데이터를 갱신 해주세요.\n" +
+            "URL이 변경되지 않았다면 그대로 사용할 수 있습니다\n" +
+            "현재는 새틀라이트, 스텔라, 제노사이드 제1발광 표를 지원합니다\n" +
+            "난이도 표 URL의 변경은 [시스템 설정]에서 할 수 있습니다",
+            "初期設定・ステップ3：難易度表の設定\n\n" +
+            "ボタンを押して難易度表を更新します。\n" +
+            "URLが変更してなかったらそのまま使えます。\n" +
+            "現在はSatellite・Stella・GENOCIDEの第１発狂が使えます。\n" +
+            "URLの更新は「システム設定」で行えます",
+            "Initial Setting - Step 3: Difficulty Table\n\n" +
+            "Press the button to update table data.\n" +
+            "If URL is not changed, it can be used as it is.\n" +
+            "Satellite, Stella, Genocide 1st Insane Table are supported.\n" +
+            "You can change URL from [System Setting]"
+        };
+
+        public static string[] InitSettingBMSPath = new string[3]
+        {
+            "초기 설정 - 스텝 5: BMS 경로 설정\n\n" +
+            "난이도표 설정을 해도 BMS 파일이 설정된 것은 아니므로 실제 BMS 데이터를 등록해야 합니다.\n" +
+            "아래 버튼을 눌러 탐색기를 열고 최상위 BMS 경로 하나를 지정해주세요\n" +
+            "지정된 경로에 따라 자동으로 리프레시를 수행합니다 (BMS 파일 10000개 기준 30분 이상 소요)\n\n" +
+            "이 설정은 [시스템 설정]에서 변경할 수 있습니다",
+            "初期設定・ステップ5：BMS経路設定\n\n" +
+            "難易度表を設定してもBMSファイルはありませんので実際のBMSファイルを読み込む段階です\n" +
+            "下のボタンを押すとBMS経路を設定できます\n" +
+            "最上位フォルダーを選択するとすべてのファイルを読みます（BMSファイル10000基準30分以上）\n\n" +
+            "この設定は「システム設定」でやり直せます",
+            "Initial Setting - Step 5: BMS Path setting\n\n" +
+            "Even difficulty table is set, you did not configured actual BMS file.\n" +
+            "Press button to select top folder of your BMS\n" +
+            "It does automatic refresh (It takes more than 30 mins for 10000 BMS files)\n\n" +
+            "You can change it from [System Setting]"
+        };
         #endregion
 
         // System Setting Values
         #region System Setting
+        public static bool InitialSetting
+        {
+            get
+            {
+                int val = PlayerPrefs.GetInt("initsetting", 0);
+                if (val == 1) return true;
+                else return false;
+            }
+            set
+            {
+                if(value)
+                {
+                    PlayerPrefs.SetInt("initsetting", 1);
+                }
+                else
+                {
+                    PlayerPrefs.SetInt("initsetting", 0);
+                }
+            }
+        }
+
         public static string BMSFolderPath
         {
             get
             {
-                return PlayerPrefs.GetString("bmspath", settingNoPathFound[(int)Language]);
+                return PlayerPrefs.GetString("bmspath", "");
             }
             set
             {
@@ -373,6 +608,18 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetString("playbms", value);
+            }
+        }
+
+        public static int FrameRate
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("maxframe", 2000);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("maxframe", value);
             }
         }
 
@@ -440,7 +687,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("scrWidth", 1920);
+                return PlayerPrefs.GetInt("scrWidth", 1280);
             }
             set
             {
@@ -451,7 +698,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("scrHeight", 1080);
+                return PlayerPrefs.GetInt("scrHeight", 720);
             }
             set
             {
@@ -463,7 +710,7 @@ namespace BMSPlayer
         {
             get
             {
-                return (FullScreenMode)PlayerPrefs.GetInt("scrMode", (int)FullScreenMode.MaximizedWindow);
+                return (FullScreenMode)PlayerPrefs.GetInt("scrMode", (int)FullScreenMode.Windowed);
             }
             set
             {
@@ -924,7 +1171,7 @@ namespace BMSPlayer
         {
             get
             {
-                return (GraphType)PlayerPrefs.GetInt("graphType", (int)GraphType.NORMAL);
+                return (GraphType)PlayerPrefs.GetInt("graphType", (int)GraphType.SMALL);
             }
             set
             {
@@ -1331,6 +1578,44 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("customKey7", value);
+            }
+        }
+        #endregion
+
+        // Difficulty Table
+        #region Difficulty Table URL
+        public static string StellaURL {
+            get
+            {
+                return PlayerPrefs.GetString("diff_stella", "https://stellabms.xyz/st/score.json");
+            }
+            set
+            {
+                PlayerPrefs.SetString("diff_stella", value);
+            }
+        }
+
+        public static string SatelliteURL
+        {
+            get
+            {
+                return PlayerPrefs.GetString("diff_satellite", "https://stellabms.xyz/sl/score.json");
+            }
+            set
+            {
+                PlayerPrefs.SetString("diff_satellite", value);
+            }
+        }
+
+        public static string GenocideURL
+        {
+            get
+            {
+                return PlayerPrefs.GetString("diff_geno", "http://nekokan.dyndns.info/~lobsak/genocide/insane.html");
+            }
+            set
+            {
+                PlayerPrefs.SetString("diff_geno", value);
             }
         }
         #endregion

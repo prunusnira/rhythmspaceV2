@@ -4,32 +4,33 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using UnityEngine;
 
 namespace BMSPlayer
 {
-    public class MusicListManager
+    public class MusicDataManager
     {
         MD5 md5;
 
-        private static MusicListManager instance;
-        public static MusicListManager Instance
+        private static MusicDataManager instance;
+        public static MusicDataManager Instance
         {
             get
             {
                 if(instance == null)
                 {
-                    instance = new MusicListManager();
+                    instance = new MusicDataManager();
                 }
                 if(instance.isExecutorNull())
                 {
                     instance.Close();
-                    instance = new MusicListManager();
+                    instance = new MusicDataManager();
                 }
                 return instance;
             }
         }
 
-        private MusicListManager()
+        private MusicDataManager()
         {
             md5 = MD5.Create();
         }
@@ -53,7 +54,13 @@ namespace BMSPlayer
                 BMSAnalyzer analyzer = new BMSAnalyzer();
                 analyzer.FullAnalyzer(Data.BMS, encoding);
                 if (Data.BMS.Player != 1) return null;
-                
+
+                if (Data.BMS.LNType == LNType.Obj)
+                {
+                    LNObjConverter LNConverter = new LNObjConverter();
+                    LNConverter.FixLongNoteLNOBJ(Data.BMS);
+                }
+
                 NoteGenerator generator = new NoteGenerator();
                 generator.AnalyzeNotes(Data, new int[] { 1, 2, 3, 4, 5, 6, 7 });
                 generator.PositionToTiming(Data);
@@ -95,14 +102,23 @@ namespace BMSPlayer
 
         public List<MusicListData> FindBMSWithName(string text)
         {
-            return SQLiteExecutor.Instance.FindMusicList(text);
+            return SQLiteExecutor.Instance.FindBMSWithTitle(text);
+        }
+
+        public MusicListData FindBMSWithPath(string path)
+        {
+            return SQLiteExecutor.Instance.FindBMSWithPath(path);
+        }
+
+        public void DropList()
+        {
+            SQLiteExecutor.Instance.DropList();
         }
 
         public void AddDataToDB(List<MusicListData> list, ref string strLoading)
         {
             if (list.Count != 0)
             {
-                SQLiteExecutor.Instance.DropList();
                 List<MusicListData> dataList = new List<MusicListData>();
                 // 리스트의 각 파일을 DB에 등록(이 때 MD5 Hash값도 계산)
                 for (int i = 0; i < list.Count; i++)
@@ -113,13 +129,30 @@ namespace BMSPlayer
                     var bytehash = md5.ComputeHash(fstream);
                     fstream.Close();
 
-                    string hash = BitConverter.ToString(bytehash);
+                    string hash = BitConverter.ToString(bytehash).Replace("-", "").ToLower();
                     d.MD5Hash = hash;
                     dataList.Add(d);
                     fstream.Close();
                 }
-                strLoading = "Registering into Database";
+                strLoading = "Registering into database";
                 SQLiteExecutor.Instance.InsertBMS(dataList);
+            }
+        }
+
+        public void RemoveDataFromDB(List<MusicListData> list, ref string strLoading)
+        {
+            if (list.Count != 0)
+            {
+                List<string> dataList = new List<string>();
+                // MD5 Hash를 계산해서 이 값으로 파일 삭제 처리
+                for (int i = 0; i < list.Count; i++)
+                {
+                    // DB에 path 값이 있으면 삭제함
+                    MusicListData d = FindBMSWithPath(list[i].Path);
+                    if (d != null) dataList.Add(d.Path);
+                }
+                strLoading = "Removing unnecesary files from database";
+                SQLiteExecutor.Instance.DeleteBMS(dataList);
             }
         }
     }

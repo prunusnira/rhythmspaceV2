@@ -89,7 +89,7 @@ namespace DatabaseManager
                 bpmmin float not null,
                 bpmmax float not null,
                 path varchar(1000) not null,
-                md5hash varchar(1000) not null,
+                md5hash varchar(100) not null,
                 level integer not null,
                 diff integer default 2,
                 fname varchar (100) not null,
@@ -126,6 +126,53 @@ namespace DatabaseManager
             dbcommand.ExecuteNonQuery();
         }
 
+        public void InitDiffSl()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string table =
+                @"create table diffSl (
+                id integer primary key autoincrement,
+                md5hash varchar(100) unique not null,
+                title varchar(100) not null,
+                artist varchar (100) not null,
+                url varchar not null,
+                level integer not null)";
+
+            dbcommand.CommandText = table;
+            dbcommand.ExecuteNonQuery();
+        }
+
+        public void InitDiffSt()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string table =
+                @"create table diffSt (
+                id integer primary key autoincrement,
+                md5hash varchar(100) unique not null,
+                title varchar(100) not null,
+                artist varchar (100) not null,
+                url varchar not null,
+                level integer not null)";
+
+            dbcommand.CommandText = table;
+            dbcommand.ExecuteNonQuery();
+        }
+
+        public void InitDiffGe()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string table =
+                @"create table diffGe (
+                id integer primary key autoincrement,
+                title varchar(100) not null,
+                artist varchar (100) not null,
+                url varchar not null,
+                level integer not null)";
+
+            dbcommand.CommandText = table;
+            dbcommand.ExecuteNonQuery();
+        }
+
         public void DropList()
         {
             dbcommand = dbconn.CreateCommand();
@@ -142,6 +189,30 @@ namespace DatabaseManager
         {
             dbcommand = dbconn.CreateCommand();
             string query = @"drop table record";
+            dbcommand.CommandText = query;
+            dbcommand.ExecuteNonQuery();
+        }
+
+        public void DropTableSl()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string query = @"delete from diffSl";
+            dbcommand.CommandText = query;
+            dbcommand.ExecuteNonQuery();
+        }
+
+        public void DropTableSt()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string query = @"delete from diffSt";
+            dbcommand.CommandText = query;
+            dbcommand.ExecuteNonQuery();
+        }
+
+        public void DropTableGe()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string query = @"delete from diffGe";
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
         }
@@ -246,6 +317,80 @@ namespace DatabaseManager
             dbcommand.ExecuteNonQuery();
         }
 
+        public void InsertDiffTableStSl(DiffTableMode type, List<DiffTableData> paramList)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            for (int i = 0; i < paramList.Count; i++)
+            {
+                DiffTableData param = paramList[i];
+                param.Title = param.Title.Replace("'", "''");
+                param.Artist = param.Artist.Replace("'", "''");
+            }
+
+            string table = "";
+            switch(type)
+            {
+                case DiffTableMode.SATELLITE: table = "diffSl"; break;
+                case DiffTableMode.STELLA: table = "diffSt"; break;
+            }
+
+            string query =
+                "insert into " + table +
+                " (title, artist, level, url, md5hash) values ";
+
+            foreach (DiffTableData param in paramList)
+            {
+                query += "('" +
+                        param.Title + "','" +
+                        param.Artist + "'," +
+                        param.Level + ",'" +
+                        param.URL + "','" +
+                        param.MD5 + "')";
+
+                if (paramList.IndexOf(param) != paramList.Count - 1)
+                {
+                    query += ",";
+                }
+            }
+
+            dbcommand.CommandText = query;
+            dbcommand.ExecuteNonQuery();
+        }
+
+        public void InsertDiffTableGe(List<DiffTableData> paramList)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            for (int i = 0; i < paramList.Count; i++)
+            {
+                DiffTableData param = paramList[i];
+                param.Title = param.Title.Replace("'", "''");
+                param.Artist = param.Artist.Replace("'", "''");
+            }
+
+            string query =
+                @"insert into diffGe
+                 (title, artist, level, url) values ";
+
+            foreach (DiffTableData param in paramList)
+            {
+                query += "('" +
+                        param.Title + "','" +
+                        param.Artist + "'," +
+                        param.Level + ",'" +
+                        param.URL + "')";
+
+                if (paramList.IndexOf(param) != paramList.Count - 1)
+                {
+                    query += ",";
+                }
+            }
+
+            dbcommand.CommandText = query;
+            dbcommand.ExecuteNonQuery();
+        }
+
         public bool CheckListTableExist()
         {
             dbcommand = dbconn.CreateCommand();
@@ -276,6 +421,57 @@ namespace DatabaseManager
             {
                 string name = dbreader.GetString(0);
                 if (name == "record") existrec = true;
+            }
+            return existrec;
+        }
+
+        public bool CheckDiffTableStExist()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string query = "SELECT name FROM sqlite_master WHERE type='table'";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            bool existrec = false;
+            while (dbreader.Read())
+            {
+                string name = dbreader.GetString(0);
+                if (name == "diffSt") existrec = true;
+            }
+            return existrec;
+        }
+
+        public bool CheckDiffTableSlExist()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string query = "SELECT name FROM sqlite_master WHERE type='table'";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            bool existrec = false;
+            while (dbreader.Read())
+            {
+                string name = dbreader.GetString(0);
+                if (name == "diffSl") existrec = true;
+            }
+            return existrec;
+        }
+
+        public bool CheckDiffTableGeExist()
+        {
+            dbcommand = dbconn.CreateCommand();
+            string query = "SELECT name FROM sqlite_master WHERE type='table'";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            bool existrec = false;
+            while (dbreader.Read())
+            {
+                string name = dbreader.GetString(0);
+                if (name == "diffGe") existrec = true;
             }
             return existrec;
         }
@@ -330,7 +526,7 @@ namespace DatabaseManager
             return musiclist;
         }
 
-        public List<MusicListData> FindMusicList(string queryText)
+        public List<MusicListData> FindBMSWithTitle(string queryText)
         {
             List<MusicListData> musiclist = new List<MusicListData>();
 
@@ -374,6 +570,48 @@ namespace DatabaseManager
             }
 
             return musiclist;
+        }
+
+        public MusicListData FindBMSWithPath(string path)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            path = path.Replace("'", "''");
+            string query = "select * from list where path='"
+                + path + "' collate nocase";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            if(dbreader.Read())
+            {
+                int lid = dbreader.GetInt32(0);
+                string ltitle = dbreader.GetString(1);
+                string lsubtitle = dbreader.GetString(2);
+                string lartist = dbreader.GetString(3);
+                string lsubartist = dbreader.GetString(4);
+                string lgerne = dbreader.GetString(5);
+                float lbpmstart = dbreader.GetFloat(6);
+                float lbpmmin = dbreader.GetFloat(7);
+                float lbpmmax = dbreader.GetFloat(8);
+                string lpath = dbreader.GetString(9);
+                string lmd5 = dbreader.GetString(10);
+                int llv = dbreader.GetInt32(11);
+                int ldiff = dbreader.GetInt32(12);
+                string lfname = dbreader.GetString(13);
+                string ljacket = dbreader.GetString(14);
+                int ltotalnotes = dbreader.GetInt32(15);
+                int ltime = dbreader.GetInt32(16);
+                int lrank = dbreader.GetInt32(17);
+
+                return new MusicListData(
+                    lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
+                    lbpmstart, lbpmmin, lbpmmax,
+                    lpath, lmd5, llv, ldiff, lfname,
+                    ljacket, ltotalnotes, ltime, lrank);
+            }
+
+            return null;
         }
 
         public RecordData SelectRecord(string param = null)
@@ -457,6 +695,193 @@ namespace DatabaseManager
             else
             {
                 return 0;
+            }
+        }
+
+        public List<DiffTableData> GetDiffTableStSl(int lv, DiffTableMode mode)
+        {
+            List<DiffTableData> musiclist = new List<DiffTableData>();
+
+            dbcommand = dbconn.CreateCommand();
+
+            string table = "";
+            if (mode == DiffTableMode.SATELLITE) table = "diffSl";
+            else if (mode == DiffTableMode.STELLA) table = "diffSt";
+
+            string query = "select * from " + table + " where level = " + lv;
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            while (dbreader.Read())
+            {
+                string ltitle = dbreader.GetString(2);
+                string lartist = dbreader.GetString(3);
+                int llv = dbreader.GetInt32(5);
+                string lurl = dbreader.GetString(4);
+                string lmd5 = dbreader.GetString(1);
+
+                DiffTableData data = new DiffTableData(
+                    ltitle, lartist, llv, lurl, lmd5);
+
+                musiclist.Add(data);
+            }
+
+            return musiclist;
+        }
+
+        public List<DiffTableData> GetDiffTableGe(int lv)
+        {
+            List<DiffTableData> musiclist = new List<DiffTableData>();
+
+            dbcommand = dbconn.CreateCommand();
+
+            string query = "select * from diffGe where level = " + lv;
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            while (dbreader.Read())
+            {
+                string ltitle = dbreader.GetString(1);
+                string lartist = dbreader.GetString(2);
+                int llv = dbreader.GetInt32(4);
+                string lurl = dbreader.GetString(3);
+
+                DiffTableData data = new DiffTableData(
+                    ltitle, lartist, llv, lurl, "");
+
+                musiclist.Add(data);
+            }
+
+            return musiclist;
+        }
+
+        public List<int> GetTableLevelList(int type)
+        {
+            List<int> levelList = new List<int>();
+
+            dbcommand = dbconn.CreateCommand();
+
+            string table = "";
+            switch(type)
+            {
+                case 0: table = "diffSl"; break;
+                case 1: table = "diffSt"; break;
+                case 2: table = "diffGe"; break;
+            }
+            string query = "select distinct level from " + table;
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            while (dbreader.Read())
+            {
+                int lv = dbreader.GetInt32(0);
+
+                levelList.Add(lv);
+            }
+
+            return levelList;
+        }
+
+        public MusicListData GetMusicOfMD5Hash(string hash)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            string query = "select * from list where md5hash='" + hash + "'";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            if(dbreader.Read())
+            {
+                int lid = dbreader.GetInt32(0);
+                string ltitle = dbreader.GetString(1);
+                string lsubtitle = dbreader.GetString(2);
+                string lartist = dbreader.GetString(3);
+                string lsubartist = dbreader.GetString(4);
+                string lgerne = dbreader.GetString(5);
+                float lbpmstart = dbreader.GetFloat(6);
+                float lbpmmin = dbreader.GetFloat(7);
+                float lbpmmax = dbreader.GetFloat(8);
+                string lpath = dbreader.GetString(9);
+                string lmd5 = dbreader.GetString(10);
+                int llv = dbreader.GetInt32(11);
+                int ldiff = dbreader.GetInt32(12);
+                string lfname = dbreader.GetString(13);
+                string ljacket = dbreader.GetString(14);
+                int ltotalnotes = dbreader.GetInt32(15);
+                int ltime = dbreader.GetInt32(16);
+                int lrank = dbreader.GetInt32(17);
+
+                return new MusicListData(
+                    lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
+                    lbpmstart, lbpmmin, lbpmmax,
+                    lpath, lmd5, llv, ldiff, lfname,
+                    ljacket, ltotalnotes, ltime, lrank);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public MusicListData GetMusicOfTitle(string title)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            title = title.Replace("'", "''");
+            string query = "select * from list where title='" + title + "'";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            if (dbreader.Read())
+            {
+                int lid = dbreader.GetInt32(0);
+                string ltitle = dbreader.GetString(1);
+                string lsubtitle = dbreader.GetString(2);
+                string lartist = dbreader.GetString(3);
+                string lsubartist = dbreader.GetString(4);
+                string lgerne = dbreader.GetString(5);
+                float lbpmstart = dbreader.GetFloat(6);
+                float lbpmmin = dbreader.GetFloat(7);
+                float lbpmmax = dbreader.GetFloat(8);
+                string lpath = dbreader.GetString(9);
+                string lmd5 = dbreader.GetString(10);
+                int llv = dbreader.GetInt32(11);
+                int ldiff = dbreader.GetInt32(12);
+                string lfname = dbreader.GetString(13);
+                string ljacket = dbreader.GetString(14);
+                int ltotalnotes = dbreader.GetInt32(15);
+                int ltime = dbreader.GetInt32(16);
+                int lrank = dbreader.GetInt32(17);
+
+                return new MusicListData(
+                    lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
+                    lbpmstart, lbpmmin, lbpmmax,
+                    lpath, lmd5, llv, ldiff, lfname,
+                    ljacket, ltotalnotes, ltime, lrank);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void DeleteBMS(List<string> pathList)
+        {
+            dbcommand = dbconn.CreateCommand();
+
+            foreach(string s in pathList)
+            {
+                string path = s.Replace("'", "''");
+
+                string query = "delete from list where path='" +
+                    path + "'";
+                dbcommand.CommandText = query;
+                dbcommand.ExecuteNonQuery();
             }
         }
     }

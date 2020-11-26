@@ -124,6 +124,7 @@ namespace BMSCore
                         List<int> idxlist = new List<int>();
                         idxlist.Add(lastidx);
 
+                        Debug.Log(i+" "+j+" "+bar);
                         string lnPrevStr = bms.PlayNote[tempBar[j]][lnLane[j]];
                         List<string> lnPrevList = GetNoteListFromString(lnPrevStr);
 
@@ -181,7 +182,8 @@ namespace BMSCore
             List<string> newStrList = strlist.ConvertAll(s => s);
             foreach (int i in poslist)
             {
-                newStrList[i] = "00";
+                if(i != -1)
+                    newStrList[i] = "00";
             }
             return string.Join("", newStrList);
         }
@@ -206,7 +208,8 @@ namespace BMSCore
             
             foreach (int i in poslist)
             {
-                lnlist[i] = strlist[i];
+                if(i != -1)
+                    lnlist[i] = strlist[i];
             }
             return string.Join("", lnlist);
         }

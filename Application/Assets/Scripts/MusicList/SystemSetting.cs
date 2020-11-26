@@ -7,6 +7,7 @@ using BMSCore;
 using SimpleFileBrowser;
 using System.Threading;
 using TMPro;
+using System;
 
 namespace BMSPlayer
 {
@@ -17,17 +18,15 @@ namespace BMSPlayer
         public AudioClip sfxSource;
         public AudioClip sfxMove;
 
-        // Path changer
-        private List<MusicListData> musicList;
-        private ListItemTree tree;
-
         // BMS Path
         public Text titlePath;
         public Text txtPathVar;
-        public Button btnChange;
-        public Button btnRefresh;
+        public Button btnPathChange;
+        public Button btnPathRefreshChange;
+        public Button btnPathRefreshReload;
         private string bmsPath;
-        private Thread refreshThread = null;
+        private Thread refreshChangeThread = null;
+        private Thread refreshReloadThread = null;
         private int encoding;
         private bool refreshed = false;
         private bool isRefreshing = false;
@@ -54,6 +53,12 @@ namespace BMSPlayer
         public Button btn768p;
         public Button btn720p;
         public Text txtResol;
+
+        // Frame Rate
+        public Text titleFrame;
+        public Text frameval;
+        public InputField inputFrame;
+        public Button btnFrame;
 
         // Screen mode Change
         public Text titleScrMode;
@@ -82,28 +87,37 @@ namespace BMSPlayer
         public GameObject layerKeySetting;
         public Button btnKeySetting;
 
+        // Table Editor
+        public Text titleTable;
+        public Button btnTableEdit;
+        public Button btnTableRefresh;
+        public GameObject dlgTableEdit;
+
         // Reset All
         public Text titleReset;
         public Button btnResetAll;
+        public GameObject dlgResetSetting;
+
+        public static bool pathFromInit = false;
 
         public override void Awake()
         {
             base.Awake();
             encoding = Const.Encoding;
             bmsPath = Const.BMSFolderPath;
-            musicList = new List<MusicListData>();
 
             rows = 8;
             btn = new int[] { 2, 4, 3, 3, 3, 2, 1, 1 };
 
-            EncolorBtn(0, 0);
+            //EncolorBtn(0, 0);
 
             // 각 버튼 onclick 설정
-            btnChange.onClick.AddListener(delegate
+            btnPathChange.onClick.AddListener(delegate
             {
                 changePath();
             });
-            btnRefresh.onClick.AddListener(pathRefresh);
+            btnPathRefreshChange.onClick.AddListener(PathRefreshChanges);
+            btnPathRefreshReload.onClick.AddListener(PathRefreshReload);
             btn1080p.onClick.AddListener(delegate
             {
                 Const.ScrWidth = 1920;
@@ -127,6 +141,15 @@ namespace BMSPlayer
                 Const.ScrWidth = 1280;
                 Const.ScrHeight = 720;
                 changeVideoSetting();
+            });
+            btnFrame.onClick.AddListener(delegate
+            {
+                int frame = Convert.ToInt32(inputFrame.text);
+                if (frame < 300) frame = 300;
+                else if (frame > 5000) frame = 5000;
+                Const.FrameRate = frame;
+                Application.targetFrameRate = frame;
+                frameval.text = inputFrame.text;
             });
             btnWindowed.onClick.AddListener(delegate
             {
@@ -173,9 +196,13 @@ namespace BMSPlayer
                 changeEncoding(949);
             });
             btnKeySetting.onClick.AddListener(ShowKeySetting);
+            btnTableEdit.onClick.AddListener(ShowTableEditor);
+            btnTableRefresh.onClick.AddListener(delegate {
+                DialogTableEdit.refreshFromOutside = true;
+            });
             btnResetAll.onClick.AddListener(delegate
             {
-                PlayerPrefs.DeleteAll();
+                ShowResetDlg();
             });
         }
 
@@ -197,6 +224,8 @@ namespace BMSPlayer
                     break;
             }
             changeLang(lang);
+
+            frameval.text = Const.FrameRate.ToString();
             
             switch(enc)
             {
@@ -247,157 +276,25 @@ namespace BMSPlayer
                 layerLoading.SetActive(false);
                 refreshed = false;
             }
-        }
 
-        public override void EncolorBtn(int row, int col)
-        {
-            // 1. 모든 버튼의 색상 리셋
-            Button[] btnlist = settingAll.GetComponentsInChildren<Button>();
-            foreach(Button b in btnlist)
+            if(pathFromInit)
             {
-                b.GetComponent<Image>().sprite = normalBtn;
-            }
-
-            // 2. 현재 버튼 색상 변경
-            switch (row)
-            {
-                case 0:
-                    if (col == 0) ChangeSprite(btnChange);
-                    else if (col == 1) ChangeSprite(btnRefresh);
-                    break;
-                case 1:
-                    // Resolution
-                    if (col == 0) ChangeSprite(btn1080p);
-                    else if (col == 1) ChangeSprite(btn900p);
-                    else if (col == 2) ChangeSprite(btn768p);
-                    else if (col == 3) ChangeSprite(btn720p);
-                    break;
-                case 2:
-                    // Screen Mode
-                    if (col == 0) ChangeSprite(btnWindowed);
-                    else if (col == 1) ChangeSprite(btnFullScr);
-                    else if (col == 2) ChangeSprite(btnBorderless);
-                    break;
-                case 3:
-                    if (col == 0) ChangeSprite(btnKor);
-                    else if (col == 1) ChangeSprite(btnJpn);
-                    else if (col == 2) ChangeSprite(btnEng);
-                    break;
-                case 4:
-                    if (col == 0) ChangeSprite(btnAutoSync);
-                    else if (col == 1) ChangeSprite(btnSyncDown);
-                    else if (col == 2) ChangeSprite(btnSyncUp);
-                    break;
-                case 5:
-                    if (col == 0) ChangeSprite(btn932);
-                    else if (col == 1) ChangeSprite(btn949);
-                    break;
-                case 6:
-                    ChangeSprite(btnKeySetting);
-                    break;
-                case 7:
-                    ChangeSprite(btnResetAll);
-                    break;
-            }
-            sfxPlay.PlayOneShot(sfxMove);
-        }
-
-        public override void ExecuteOption(int row, int col)
-        {
-            switch (row)
-            {
-                case 0:
-                    switch (col)
-                    {
-                        case 0:
-                            changePath();
-                            break;
-                        case 1:
-                            pathRefresh();
-                            break;
-                    }
-                    break;
-                case 1:
-                    switch (col)
-                    {
-                        case 0:
-                            Const.ScrWidth = 1920;
-                            Const.ScrHeight = 1080;
-                            break;
-                        case 1:
-                            Const.ScrWidth = 1600;
-                            Const.ScrHeight = 900;
-                            break;
-                        case 2:
-                            Const.ScrWidth = 1366;
-                            Const.ScrHeight = 768;
-                            break;
-                        case 3:
-                            Const.ScrWidth = 1280;
-                            Const.ScrHeight = 720;
-                            break;
-                    }
-                    changeVideoSetting();
-                    break;
-                case 2:
-                    switch (col)
-                    {
-                        case 0:
-                            // Windowed
-                            Const.ScreenMode = FullScreenMode.Windowed;
-                            break;
-                        case 1:
-                            // FullScreen
-                            Const.ScreenMode = FullScreenMode.ExclusiveFullScreen;
-                            break;
-                        case 2:
-                            // Borderless
-                            Const.ScreenMode = FullScreenMode.MaximizedWindow;
-                            break;
-                    }
-                    changeVideoSetting();
-                    break;
-                case 3:
-                    changeLang((LanguageType)col);
-                    break;
-                case 4:
-                    switch(col)
-                    {
-                        case 0:
-                            SetAutoSync();
-                            break;
-                        case 1:
-                            changeSync(false);
-                            break;
-                        case 2:
-                            changeSync(true);
-                            break;
-                    }
-                    break;
-                case 5:
-                    switch(col)
-                    {
-                        case 0:
-                            changeEncoding(932);
-                            break;
-                        case 1:
-                            changeEncoding(949);
-                            break;
-                    }
-                    break;
-                case 6:
-                    ShowKeySetting();
-                    break;
-                case 7:
-                    PlayerPrefs.DeleteAll();
-                    break;
+                pathFromInit = false;
+                changePath();
             }
         }
 
         public void UpdateOption()
         {
             LanguageType lang = Const.Language;
-            txtPathVar.text = Const.BMSFolderPath;
+            if(Const.BMSFolderPath == "")
+            {
+                txtPathVar.text = Const.settingNoPathFound[(int)lang];
+            }
+            else
+            {
+                txtPathVar.text = Const.BMSFolderPath;
+            }
             settingDesc.text = Const.settingDesc[(int)lang];
             showSync();
             changeEncoding(Const.Encoding);
@@ -406,12 +303,29 @@ namespace BMSPlayer
 
             titlePath.text = Const.settingTitlePath[(int)lang];
             titleResol.text = Const.settingTitleScrRes[(int)lang];
+            titleFrame.text = Const.settingTitleFrameRate[(int)lang];
             titleScrMode.text = Const.settingTitleScrMode[(int)lang];
             titleLang.text = Const.settingTitleLang[(int)lang];
             titleSync.text = Const.settingTitleSync[(int)lang];
             titleEncoding.text = Const.settingTitleEncoding[(int)lang];
             titleKey.text = Const.settingTitleKey[(int)lang];
+            titleTable.text = Const.settingTitleDiffTable[(int)lang];
             titleReset.text = Const.settingTitleReset[(int)lang];
+
+            // 버튼 언어 변경
+            btnPathChange.GetComponentInChildren<Text>().text = Const.settingBtnBMSOpen[(int)Const.Language];
+            btnPathRefreshChange.GetComponentInChildren<Text>().text = Const.settingBtnRefreshChange[(int)Const.Language];
+            btnPathRefreshReload.GetComponentInChildren<Text>().text = Const.settingBtnRefreshReload[(int)Const.Language];
+            btnFrame.GetComponentInChildren<Text>().text = Const.settingBtnFrameUpdate[(int)Const.Language];
+            btnWindowed.GetComponentInChildren<Text>().text = Const.settingBtnScrModeWin[(int)Const.Language];
+            btnFullScr.GetComponentInChildren<Text>().text = Const.settingBtnScrModeFull[(int)Const.Language];
+            btnBorderless.GetComponentInChildren<Text>().text = Const.settingBtnScrModeBorder[(int)Const.Language];
+            btn932.GetComponentInChildren<Text>().text = Const.settingBtnEncJP[(int)Const.Language];
+            btn949.GetComponentInChildren<Text>().text = Const.settingBtnEncKR[(int)Const.Language];
+            btnKeySetting.GetComponentInChildren<Text>().text = Const.settingBtnKeyChange[(int)Const.Language];
+            btnTableEdit.GetComponentInChildren<Text>().text = Const.settingBtnTableEdit[(int)Const.Language];
+            btnTableRefresh.GetComponentInChildren<Text>().text = Const.settingBtnTableRefresh[(int)Const.Language];
+            btnResetAll.GetComponentInChildren<Text>().text = Const.settingBtnReset[(int)Const.Language];
         }
 
         public void changePath()
@@ -431,16 +345,41 @@ namespace BMSPlayer
             }
         }
 
-        public void pathRefresh()
+        public void PathRefreshChanges()
         {
-            if (!isRefreshing)
+            if(!File.Exists(Const.JSONPath))
             {
-                isRefreshing = true;
-                musicList.RemoveRange(0, musicList.Count);
-                layerLoading.SetActive(true);
-                refreshThread = new Thread(new ThreadStart(refresh));
-                refreshThread.Start();
-                sfxPlay.PlayOneShot(sfxSource);
+                // 기존 파일이 존재하지 않아 갱신할 수 없음을 알림
+            }
+            else
+            {
+                if (!isRefreshing)
+                {
+                    isRefreshing = true;
+                    layerLoading.SetActive(true);
+                    refreshChangeThread = new Thread(new ThreadStart(RefreshChanges));
+                    refreshChangeThread.Start();
+                    sfxPlay.PlayOneShot(sfxSource);
+                }
+            }
+        }
+
+        public void PathRefreshReload()
+        {
+            if(Const.BMSFolderPath == "")
+            {
+                // 경로가 지정되어있지 않아 갱신할 수 없음을 알림
+            }
+            else
+            {
+                if (!isRefreshing)
+                {
+                    isRefreshing = true;
+                    layerLoading.SetActive(true);
+                    refreshReloadThread = new Thread(new ThreadStart(RefreshReload));
+                    refreshReloadThread.Start();
+                    sfxPlay.PlayOneShot(sfxSource);
+                }
             }
         }
 
@@ -452,18 +391,96 @@ namespace BMSPlayer
             string directory = Directory.GetDirectoryRoot(path[0]);
             txtPathVar.text = path[0];
 
-            pathRefresh();
+            PathRefreshReload();
         }
 
-        private void refresh()
+        private void RefreshChanges()
         {
+            /**
+             * 여기서는 기존에 있는 structure.json 파일을 읽어서 json 구조체를 만들고
+             * 전체 폴더 목록을 읽으면서 structure.json에 없는 폴더만
+             * 새로 읽어서 추가하는 방식으로 진행해야 함
+             */
+            // 1. refreshAll과 동일하게 트리 생성 (단, bms 파일은 읽지 않음)
             // Generate Folder Tree
             strLoading = "Generate new file tree";
-            tree = new ListItemTree(bmsPath);
+            ListItemTree tree = new ListItemTree(bmsPath);
 
             strLoading = "Loading file and directories";
             tree.Head = tree.CreateTree(
-                tree.Head, ref strLoading, musicList, encoding);
+                tree.Head, ref strLoading, null, encoding, false);
+
+            // 2. 기존의 json과 새로 만들어진 json을 상호비교하여
+            //    추가할 파일과 삭제 할 파일을 결정
+            // * 여기서 BMS 파일 목록을 다 불러와야 새로 추가할 파일을 더 정할 수 있지 않나...?
+            JSONObject newJson = new JSONObject(tree.JSONStr);
+            JSONObject oldJson = new JSONObject(File.ReadAllText(Const.JSONPath));
+
+            // 비교를 편하게 하기 위해 각 JSON을 path의 list로 생성
+            HashSet<string> newPaths = new HashSet<string>();
+            tree.GetPathsFromJSON(newPaths, newJson);
+
+            HashSet<string> oldPaths = new HashSet<string>();
+            tree.GetPathsFromJSON(oldPaths, oldJson);
+
+            strLoading = "Check duplication";
+            HashSet<string> addSet = new HashSet<string>(newPaths);
+            HashSet<string> rmSet = new HashSet<string>(oldPaths);
+            addSet.ExceptWith(oldPaths);
+            rmSet.ExceptWith(newPaths);
+
+            List<MusicListData> addList = new List<MusicListData>();
+            List<MusicListData> rmList = new List<MusicListData>();
+
+            foreach(string s in addSet)
+            {
+                if(!File.GetAttributes(s).HasFlag(FileAttributes.Directory))
+                    addList.Add(MusicDataManager.Instance.LoadBMSFromPath(s, addList.Count, encoding));
+            }
+            foreach (string s in rmSet)
+            {
+                rmList.Add(new MusicListData
+                {
+                    Path = s
+                });
+            }
+
+            // 3. 추가/삭제 항목에 대해 처리
+            strLoading = "Add new BMS files";
+            MusicDataManager.Instance.AddDataToDB(addList, ref strLoading);
+
+            strLoading = "Deleted removed BMS files";
+            MusicDataManager.Instance.RemoveDataFromDB(rmList, ref strLoading);
+
+            // 4. JSON 파일은 새로 가져온 것으로 다시 저장
+            strLoading = "Saving JSON File";
+            if (!File.Exists(Const.JSONPath))
+            {
+                Directory.CreateDirectory(Directory.GetParent(Const.JSONPath).FullName);
+            }
+            else
+            {
+                File.Delete(Const.JSONPath);
+            }
+            File.Create(Const.JSONPath).Close();
+            File.WriteAllText(Const.JSONPath, tree.JSONStr);
+
+            refreshed = true;
+            isRefreshing = false;
+        }
+
+        private void RefreshReload()
+        {
+            MusicDataManager.Instance.DropList();
+            List<MusicListData> musicList = new List<MusicListData>();
+            
+            // Generate Folder Tree
+            strLoading = "Generate new file tree";
+            ListItemTree tree = new ListItemTree(bmsPath);
+
+            strLoading = "Loading file and directories";
+            tree.Head = tree.CreateTree(
+                tree.Head, ref strLoading, musicList, encoding, true);
 
             // Save as JSON file
             strLoading = "Saving JSON File";
@@ -480,7 +497,7 @@ namespace BMSPlayer
 
             // 수집한 BMS 데이터를 DB에 등록
             strLoading = "Database process...";
-            MusicListManager.Instance.AddDataToDB(musicList, ref strLoading);
+            MusicDataManager.Instance.AddDataToDB(musicList, ref strLoading);
             
             refreshed = true;
             isRefreshing = false;
@@ -569,18 +586,32 @@ namespace BMSPlayer
             Screen.SetResolution(
                 Const.ScrWidth,
                 Const.ScrHeight,
-                Const.ScreenMode
+                Const.ScreenMode,
+                Const.FrameRate
             );
             sfxPlay.PlayOneShot(sfxSource);
         }
 
         public void ShowKeySetting()
         {
-            PlayKeySetting.KeySettingON = true;
-            CloseSetting();
             MusicListUI.SetNotOnTop();
             layerKeySetting.SetActive(true);
             GetComponent<PlayKeySetting>().EnableWindow();
+            sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        public void ShowTableEditor()
+        {
+            MusicListUI.SetNotOnTop();
+            dlgTableEdit.SetActive(true);
+            GetComponent<DialogTableEdit>().EnableWindow();
+            sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        public void ShowResetDlg()
+        {
+            MusicListUI.SetNotOnTop();
+            dlgResetSetting.SetActive(true);
             sfxPlay.PlayOneShot(sfxSource);
         }
     }

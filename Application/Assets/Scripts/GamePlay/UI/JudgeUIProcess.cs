@@ -75,7 +75,7 @@ namespace BMSPlayer
             if (txtJudgeBM.gameObject.activeSelf && timing % 1.5 < 0.1)
             {
                 // 판정별 색상 변경 처리
-                StartCoroutine(comboChangeBM(currentJudge));
+                StartCoroutine(ComboChangeBM(currentJudge));
             }
         }
 
@@ -87,8 +87,6 @@ namespace BMSPlayer
             switch (judgetype)
             {
                 case TimingType.PERFECT:
-                    judgeStr = "GREAT";
-                    break;
                 case TimingType.GREAT:
                     judgeStr = "GREAT";
                     break;
@@ -161,7 +159,7 @@ namespace BMSPlayer
             timeLastTimingPopup = (double)DateTime.Now.Ticks / 1000000;
         }
 
-        IEnumerator comboChangeBM(TimingType type)
+        IEnumerator ComboChangeBM(TimingType type)
         {
             if (type == TimingType.PERFECT)
             {

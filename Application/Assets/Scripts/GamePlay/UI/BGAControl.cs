@@ -136,7 +136,7 @@ namespace BMSPlayer
 
             // 레이어 띄우기
             bgaErrorLayer.SetActive(true);
-            bgaErrorLayer.GetComponentsInChildren<TextMeshPro>()[0].text =
+            bgaErrorLayer.GetComponentsInChildren<TextMeshProUGUI>()[0].text =
                 Const.videoCodecMsg[(int)Const.Language];
         }
 

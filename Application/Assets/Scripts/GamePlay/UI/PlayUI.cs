@@ -16,6 +16,7 @@ namespace BMSPlayer
         private List<GameObject> NoteOnScreen;
         public GameObject layerJudgeAll;
         public TextMesh FPSCounter;
+        private float counterCheck;
 
         // Side judge
         public Text txtAvgDiff;
@@ -111,6 +112,8 @@ namespace BMSPlayer
         {
             try
             {
+                counterCheck = 0;
+
                 // Dark Skin
                 if(Const.GearSkin == SkinType.DARK)
                 {
@@ -153,7 +156,12 @@ namespace BMSPlayer
 
         private void Update()
         {
-            FPSCounter.text = "FPS " + ((int)(1f / Time.unscaledDeltaTime)).ToString();
+            counterCheck += Time.deltaTime;
+            if(counterCheck > 0.5f)
+            {
+                FPSCounter.text = "FPS " + ((int)(1f / Time.unscaledDeltaTime)).ToString();
+                counterCheck = 0;
+            }
             
             if(FadeReady && !FadeStart)
             {

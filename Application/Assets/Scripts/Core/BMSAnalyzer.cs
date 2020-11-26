@@ -365,12 +365,30 @@ namespace BMSCore
                                     filenameCheck += filename[i] + ".";
                                 }
 
-                                if (File.Exists(bms.FolderPath + filenameCheck + "bmp")) filenameCheck += "bmp";
-                                else if (File.Exists(bms.FolderPath + filenameCheck + "jpg")) filenameCheck += "jpg";
-                                else if (File.Exists(bms.FolderPath + filenameCheck + "jpeg")) filenameCheck += "jpeg";
-                                else if (File.Exists(bms.FolderPath + filenameCheck + "png")) filenameCheck += "png";
+                                bool isFileExist = false;
+                                if (File.Exists(bms.FolderPath + filenameCheck + "bmp"))
+                                {
+                                    filenameCheck += "bmp";
+                                    isFileExist = true;
+                                }
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "jpg"))
+                                {
+                                    filenameCheck += "jpg";
+                                    isFileExist = true;
+                                }
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "jpeg"))
+                                {
+                                    filenameCheck += "jpeg";
+                                    isFileExist = true;
+                                }
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "png"))
+                                {
+                                    filenameCheck += "png";
+                                    isFileExist = true;
+                                }
 
-                                bms.BGAPaths.Add(tag.Substring(4, 2), bms.FolderPath + filenameCheck);
+                                if(isFileExist)
+                                    bms.BGAPaths.Add(tag.Substring(4, 2), bms.FolderPath + filenameCheck);
                             }
                         }
                         else if (tag != "#BPM" && chkWav == "#BPM")

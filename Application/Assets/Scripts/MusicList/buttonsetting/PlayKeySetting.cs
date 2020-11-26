@@ -23,8 +23,6 @@ namespace BMSPlayer
 
         public Text keySettingDesc;
 
-        public static bool KeySettingON = false;
-
         public override void Awake()
         {
             base.Awake();
@@ -168,17 +166,11 @@ namespace BMSPlayer
                 UpdateButton();
                 MusicListUI.isKeyChanged = false;
             }
-
-            if(KeySettingON)
-            {
-                ErrorHandler.LogError("Axis Y Value: "+Input.GetAxis("axisY"));
-            }
         }
 
         public override void CloseSetting()
         {
             base.CloseSetting();
-            KeySettingON = false;
         }
 
         public void UpdateButton()

@@ -109,6 +109,10 @@ namespace BMSPlayer
         public AudioSource sfxPlay;
         public AudioClip sfxSource;
 
+        // Initial Setting
+        public static bool gearSizeInit = false;
+        public static bool judgeInit = false;
+
         public void Awake()
         {
             // 버튼 설정
@@ -258,21 +262,7 @@ namespace BMSPlayer
             }
 
             // 판정
-            switch(Const.JudgeType)
-            {
-                case JudgeType.ARCADE:
-                    txtJudgeType.text = "ARCADE";
-                    break;
-                case JudgeType.ORIGINAL:
-                    txtJudgeType.text = "ORIGINAL";
-                    break;
-                case JudgeType.LR2:
-                    txtJudgeType.text = "LR2";
-                    break;
-                case JudgeType.BEATORAJA:
-                    txtJudgeType.text = "BEATORAJA";
-                    break;
-            }
+            InitJudge();
 
             // 배치
             switch(Const.NoteLayout)
@@ -322,18 +312,7 @@ namespace BMSPlayer
             }
 
             // 기어 사이즈
-            switch (Const.GearSize)
-            {
-                case SkinSize.STANDARD:
-                    txtGearSize.text = "STANDARD";
-                    break;
-                case SkinSize.WIDE125:
-                    txtGearSize.text = "WIDE(1.25)";
-                    break;
-                case SkinSize.WIDE150:
-                    txtGearSize.text = "WIDE(1.50)";
-                    break;
-            }
+            InitSkinSize();
 
             // 노트 스킨
             switch (Const.NoteSkin)
@@ -593,8 +572,57 @@ namespace BMSPlayer
                     RateChange();
                 }
             }
+
+            if(gearSizeInit)
+            {
+                gearSizeInit = false;
+                InitSkinSize();
+            }
+
+            if(judgeInit)
+            {
+                judgeInit = false;
+                InitJudge();
+            }
+        }
+        
+        // Init
+        private void InitSkinSize()
+        {
+            switch (Const.GearSize)
+            {
+                case SkinSize.STANDARD:
+                    txtGearSize.text = "STANDARD";
+                    break;
+                case SkinSize.WIDE125:
+                    txtGearSize.text = "WIDE(1.25)";
+                    break;
+                case SkinSize.WIDE150:
+                    txtGearSize.text = "WIDE(1.50)";
+                    break;
+            }
         }
 
+        private void InitJudge()
+        {
+            switch (Const.JudgeType)
+            {
+                case JudgeType.ARCADE:
+                    txtJudgeType.text = "ARCADE";
+                    break;
+                case JudgeType.ORIGINAL:
+                    txtJudgeType.text = "ORIGINAL";
+                    break;
+                case JudgeType.LR2:
+                    txtJudgeType.text = "LR2";
+                    break;
+                case JudgeType.BEATORAJA:
+                    txtJudgeType.text = "BEATORAJA";
+                    break;
+            }
+        }
+
+        // Changes
         private void PageChange()
         {
             if(Page == 0)

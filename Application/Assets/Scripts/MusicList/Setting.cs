@@ -39,11 +39,6 @@ namespace BMSPlayer
         {
             try
             {
-                if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.Escape))
-                {
-                    CloseSetting();
-                }
-
                 if (settingAll.activeSelf && Input.GetKeyDown(KeyCode.UpArrow))
                 {
                     // 옵션 항목 이동

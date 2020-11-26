@@ -74,6 +74,7 @@
     <Compile Include="Assets\Scripts\Core\ErrorHandler.cs" />
     <Compile Include="Assets\Scripts\Core\LNObjConverter.cs" />
     <Compile Include="Assets\Scripts\Core\Tools.cs" />
+    <Compile Include="Assets\Scripts\Data\DiffTableData.cs" />
     <Compile Include="Assets\Scripts\Data\JSONObject.cs" />
     <Compile Include="Assets\Scripts\Data\ListItemNode.cs" />
     <Compile Include="Assets\Scripts\Data\ListItemTree.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Assets\Scripts\Data\MusicListData.cs" />
     <Compile Include="Assets\Scripts\Data\RecordData.cs" />
     <Compile Include="Assets\Scripts\Data\RecordDataManager.cs" />
+    <Compile Include="Assets\Scripts\Data\TableDataManager.cs" />
     <Compile Include="Assets\Scripts\Data\enum\ItemType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\BMSRuntimeLoader.cs" />
     <Compile Include="Assets\Scripts\GamePlay\HPController.cs" />
@@ -118,6 +120,14 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\UILayoutType.cs" />
     <Compile Include="Assets\Scripts\Loading\Loading.cs" />
     <Compile Include="Assets\Scripts\MusicList\CustomPattern.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DialogNoPattern.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DialogQuit.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DialogResetAll.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DialogTableEdit.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DiffTable\DiffTableGeno.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DiffTable\DiffTableStSl.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DiffTable\IDiffTable.cs" />
+    <Compile Include="Assets\Scripts\MusicList\InitialSetting.cs" />
     <Compile Include="Assets\Scripts\MusicList\MusicListUI.cs" />
     <Compile Include="Assets\Scripts\MusicList\PlayOptionSetting.cs" />
     <Compile Include="Assets\Scripts\MusicList\SelectedInfo.cs" />
@@ -368,6 +378,9 @@
     </Reference>
     <Reference Include="Mono.Data.Sqlite">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/HttpAgilityPack/HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="LibVLCSharp">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/VLCUnity/Plugins/x86_64/LibVLCSharp.dll</HintPath>

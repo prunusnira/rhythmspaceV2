@@ -83,6 +83,7 @@ namespace BMSPlayer
                 data.LineChangePos.Add(data.TotalLength);
             }
             LongnoteSetup(data.NotePlay, data.NoteLong);
+            data.TotalNotes += data.NoteLong.Count;
 
             bool isSRan = (Layout == null) ? true : false;
             if(isSRan)
@@ -163,8 +164,6 @@ namespace BMSPlayer
             int cbar,
             int[] Layout)
         {
-            int longcnt = 0;
-
             // 라인별 노트 추가
             for (int cline = 0; cline < 18; cline++)
             {
@@ -207,8 +206,8 @@ namespace BMSPlayer
                                     case 6:
                                     case 7:
                                         note.PlayNoteType = NoteType.SINGLE;
-                                        data.TotalNotes++;
                                         data.NoteCount++;
+                                        data.TotalNotes++;
                                         break;
                                     case 10:
                                     case 11:
@@ -219,7 +218,7 @@ namespace BMSPlayer
                                     case 16:
                                     case 17:
                                         note.PlayNoteType = NoteType.LNTEMP;
-                                        longcnt++;
+                                        data.NoteCount++;
                                         break;
                                 }
 
@@ -273,8 +272,6 @@ namespace BMSPlayer
                     }
                 }
             }
-            data.NoteCount += longcnt / 2;
-            data.TotalNotes += longcnt / 2;
         }
 
         public void LongnoteSetup(
@@ -452,8 +449,6 @@ namespace BMSPlayer
             int cbar,
             int[] Layout)
         {
-            int longcnt = 0;
-
             // 라인별 노트 추가
             for (int cline = 0; cline < 8; cline++)
             {
@@ -493,8 +488,6 @@ namespace BMSPlayer
                     }
                 }
             }
-            data.NoteCount += longcnt / 2;
-            data.TotalNotes += longcnt / 2;
         }
 
         public void NoteAdderBPM(BPMNoteType type, PlayData data, int cbar)

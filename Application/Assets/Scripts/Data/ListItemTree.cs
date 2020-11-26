@@ -33,13 +33,16 @@ namespace BMSPlayer
         }
 
         public ListItemNode CreateTree(
-            ListItemNode current, ref string strLoading,
-            List<MusicListData> musicList, int encoding)
+            ListItemNode current,
+            ref string strLoading,
+            List<MusicListData> musicList,
+            int encoding,
+            bool readBMS)
         {
+            strLoading = current.Path;
+
             JSONStr += "{\n\"Path\":\"" + current.Path.Replace("\\", "/") + "\",\n" +
-                "\"BMS\":\"" +
-                HasBMS(current, ref strLoading, musicList, encoding).ToString() +
-                "\",\n" +
+                "\"Type\":\"folder\",\n" +
                 "\"Children\":[\n";
 
             string[] dirs = GetSubFolders(current);
@@ -69,21 +72,22 @@ namespace BMSPlayer
                     AddChild(
                         current,
                         CreateTree(
-                            GenerateFolderNode(dirs[i], cdepth), ref strLoading,
-                            musicList, encoding
+                            GenerateFolderNode(dirs[i], cdepth),
+                            ref strLoading,
+                            musicList,
+                            encoding,
+                            readBMS
                         )
                     );
 
-                    if (i == dirs.Length - 1)
-                    {
-                        JSONStr += "\n";
-                    }
-                    else
+                    if (i != dirs.Length - 1)
                     {
                         JSONStr += ",\n";
                     }
                 }
             }
+
+            addBMSinFolder(dirs.Length, current, ref strLoading, musicList, encoding, readBMS);
 
             JSONStr += "]\n}";
             return current;
@@ -95,26 +99,34 @@ namespace BMSPlayer
             ListItemNode node = new ListItemNode();
             node.Children = new List<ListItemNode>();
 
-            node.HasBMS = bool.Parse(json.GetField("BMS").str);
+            string type = json.GetField("Type").str;
+            switch(type)
+            {
+                case "folder": node.Type = ItemType.DIRECTORY; break;
+                case "bms": node.Type = ItemType.BMS; break;
+            }
             node.Path = json.GetField("Path").str;
             node.Parent = depth;
             JSONObject children = json.GetField("Children");
 
-            for (int i = 0; i < children.list.Count; i++)
+            if(children != null)
             {
-                // Depth 가져오기
-                List<int> cdepth;
-                if (depth == null)
+                for (int i = 0; i < children.list.Count; i++)
                 {
-                    cdepth = new List<int>();
-                }
-                else
-                {
-                    cdepth = DepthClone(depth);
-                }
-                cdepth.Add(i);
+                    // Depth 가져오기
+                    List<int> cdepth;
+                    if (depth == null)
+                    {
+                        cdepth = new List<int>();
+                    }
+                    else
+                    {
+                        cdepth = DepthClone(depth);
+                    }
+                    cdepth.Add(i);
 
-                node.Children.Add(JSONtoFolderNode(children.list[i], cdepth));
+                    node.Children.Add(JSONtoFolderNode(children.list[i], cdepth));
+                }
             }
             return node;
         }
@@ -125,7 +137,7 @@ namespace BMSPlayer
             ListItemNode node = new ListItemNode();
             node.Children = new List<ListItemNode>();
             node.Path = path;
-            node.HasBMS = false;
+            node.Type = ItemType.DIRECTORY;
             node.Parent = depth;
             return node;
         }
@@ -135,9 +147,13 @@ namespace BMSPlayer
             return node.Children.Count > 0 ? true : false;
         }
 
-        public bool HasBMS(
-            ListItemNode node, ref string strLoading,
-            List<MusicListData> musicList, int encoding)
+        public void addBMSinFolder(
+            int dirsize,
+            ListItemNode node,
+            ref string strLoading,
+            List<MusicListData> musicList,
+            int encoding,
+            bool readBMS)
         {
             string[] bmsfiles = Directory.GetFiles(node.Path, "*.*", SearchOption.TopDirectoryOnly)
                         .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")
@@ -145,17 +161,32 @@ namespace BMSPlayer
 
             if (bmsfiles.Length > 0)
             {
+                if(dirsize > 0) JSONStr += ",\n";
                 foreach (string bms in bmsfiles)
                 {
-                    strLoading = bms;
-                    MusicListData bmsdata = MusicListManager.Instance.LoadBMSFromPath(bms, musicList.Count, encoding);
-                    if (bmsdata != null) musicList.Add(bmsdata);
+                    if (readBMS)
+                    {
+                        strLoading = bms;
+                        MusicListData bmsdata = MusicDataManager.Instance.LoadBMSFromPath(bms, musicList.Count, encoding);
+                        if (bmsdata != null) musicList.Add(bmsdata);
+                    }
+                    JSONStr +=
+                        "{\n\"Path\":\"" + bms.Replace("\\", "/") + "\",\n" +
+                        "\"Type\":\"bms\"\n}";
+
+                    if(bmsfiles[bmsfiles.Length-1] != bms)
+                    {
+                        JSONStr += ",\n";
+                    }
+                    else
+                    {
+                        JSONStr += "\n";
+                    }
                 }
-                return true;
             }
             else
             {
-                return false;
+                JSONStr += "\n";
             }
         }
 
@@ -180,6 +211,24 @@ namespace BMSPlayer
                 clone.Add(i);
             }
             return clone;
+        }
+
+        public void GetPathsFromJSON(HashSet<string> list, JSONObject json)
+        {
+            // 현재 노드에서 추가
+            list.Add(json.GetField("Path").str);
+
+            JSONObject children = json.GetField("Children");
+            if (children != null)
+            {
+                if (children.list.Count > 0)
+                {
+                    foreach (JSONObject o in json.GetField("Children").list)
+                    {
+                        GetPathsFromJSON(list, o);
+                    }
+                }
+            }
         }
     }
 }
