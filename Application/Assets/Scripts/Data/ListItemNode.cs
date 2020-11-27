@@ -1,5 +1,7 @@
 ﻿using BMSCore;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace BMSPlayer
 {
@@ -14,6 +16,7 @@ namespace BMSPlayer
         public string Path { get; set; }
         public string Display { get; set; }
 
+        public bool HaveBMS { get; set; }
         public MusicListData Info { get; set; }
 
         // Table Data

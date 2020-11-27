@@ -43,6 +43,7 @@ namespace BMSPlayer
 
             JSONStr += "{\n\"Path\":\"" + current.Path.Replace("\\", "/") + "\",\n" +
                 "\"Type\":\"folder\",\n" +
+                "\"HaveBMS\":\""+CheckHaveBMS(current.Path).ToString()+"\",\n" +
                 "\"Children\":[\n";
 
             string[] dirs = GetSubFolders(current);
@@ -87,7 +88,7 @@ namespace BMSPlayer
                 }
             }
 
-            addBMSinFolder(dirs.Length, current, ref strLoading, musicList, encoding, readBMS);
+            AddBMSinFolder(dirs.Length, current, ref strLoading, musicList, encoding, readBMS);
 
             JSONStr += "]\n}";
             return current;
@@ -107,6 +108,14 @@ namespace BMSPlayer
             }
             node.Path = json.GetField("Path").str;
             node.Parent = depth;
+
+            string haveBMS = json.GetField("HaveBMS").str;
+            switch(haveBMS)
+            {
+                case "True": node.HaveBMS = true; break;
+                case "False": node.HaveBMS = false; break;
+            }
+
             JSONObject children = json.GetField("Children");
 
             if(children != null)
@@ -147,7 +156,16 @@ namespace BMSPlayer
             return node.Children.Count > 0 ? true : false;
         }
 
-        public void addBMSinFolder(
+        public bool CheckHaveBMS(string path)
+        {
+            string[] bmsfiles = Directory.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly)
+                        .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")
+                        || s.ToLower().EndsWith(".bml")).ToArray();
+            if (bmsfiles.Length > 0) return true;
+            else return false;
+        }
+
+        public void AddBMSinFolder(
             int dirsize,
             ListItemNode node,
             ref string strLoading,
@@ -171,8 +189,11 @@ namespace BMSPlayer
                         if (bmsdata != null) musicList.Add(bmsdata);
                     }
                     JSONStr +=
-                        "{\n\"Path\":\"" + bms.Replace("\\", "/") + "\",\n" +
-                        "\"Type\":\"bms\"\n}";
+                        "{\n" +
+                        "\"Path\":\"" + bms.Replace("\\", "/") + "\",\n" +
+                        "\"Type\":\"bms\",\n" +
+                        "\"HaveBMS\":\"False\"" +
+                        "\n}";
 
                     if(bmsfiles[bmsfiles.Length-1] != bms)
                     {

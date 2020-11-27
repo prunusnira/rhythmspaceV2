@@ -124,7 +124,8 @@ namespace BMSCore
                         List<int> idxlist = new List<int>();
                         idxlist.Add(lastidx);
 
-                        Debug.Log(i+" "+j+" "+bar);
+                        // 이전에 노트가 없는데 ZZ가 나온 경우 스킵
+                        if (tempBar[j] == -1 || lastidx == -1) continue;
                         string lnPrevStr = bms.PlayNote[tempBar[j]][lnLane[j]];
                         List<string> lnPrevList = GetNoteListFromString(lnPrevStr);
 
@@ -206,6 +207,11 @@ namespace BMSCore
                 lnlist = prevlist;
             }
             
+            if(lnlist.Count != strlist.Count)
+            {
+                return string.Join("", lnlist);
+            }
+
             foreach (int i in poslist)
             {
                 if(i != -1)

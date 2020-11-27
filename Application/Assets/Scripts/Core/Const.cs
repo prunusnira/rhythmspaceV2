@@ -507,22 +507,19 @@ namespace BMSPlayer
             "        (실제 아케이드와는 일부 다른 부분이 있습니다)\n" +
             "ORIGINAL: RT 자체의 판정 범위입니다\n" +
             "LR2: Lunatic Rave 2의 판정 범위를 사용합니다\n" +
-            "BEATORAJA: Beatoraja의 판정 범위를 사용합니다\n\n" +
-            "이 설정은 하단의 [플레이 옵션]에서 변경할 수 있습니다",
+            "BEATORAJA: Beatoraja의 판정 범위를 사용합니다",
             "初期設定・ステップ4：判定基準設定\n\n" +
             "ARCADE: PG 16.67msのアーケードに似てる判定です。BMSのランク数値と関係ありません\n" +
             "　　　　（実際の筐体とは異なる部分があります）\n" +
             "ORIGINAL: RTの自体的な判定システムです\n" +
             "LR2: Lunatic Rave 2の判定範囲を適用します\n" +
-            "BEATORAJA: Beatorajaの判定範囲を適用します\n\n" +
-            "この設定は画面下の「プレイオプション」で設定できます",
+            "BEATORAJA: Beatorajaの判定範囲を適用します",
             "Initial Setting - Step 4: Judge timing setting\n\n" +
             "ARCADE: It uses PG 16.67ms and does not vary by rank value of BMS\n" +
             "        (Not exactly same with arcade)\n" +
             "ORIGINAL: Original timing\n" +
             "LR2: Lunatic Rave 2 styled timing\n" +
-            "BEATORAJA: Beatoraja styled timing\n\n" +
-            "You can change it from the bottom of screen, [Play Option]"
+            "BEATORAJA: Beatoraja styled timing"
         };
 
         public static string[] InitSettingTable = new string[3]

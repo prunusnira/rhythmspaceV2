@@ -446,6 +446,11 @@ namespace BMSCore
 
             // 랜덤 처리
             AddRandomNotes(bms);
+
+            // 롱노트 예외 처리
+            // 극히 일부 곡에서 LNOBJ와 LNTYPE1을 같이 쓰는경우가 있음
+            // 그냥 LNOBJ를 무시해버리자
+            if (CheckIfLNExist(bms)) bms.LNType = LNType.Type1;
         }        
 
         public bool IsVideoExist()
@@ -738,6 +743,29 @@ namespace BMSCore
                     }
                 }
             }
+        }
+
+        private bool CheckIfLNExist(BMS bms)
+        {
+            bool isLNExist = false;
+            string[] lnlist = { "51", "52", "53", "54", "55", "56", "58", "59" };
+
+            foreach(int key in bms.PlayNote.Keys)
+            {
+                Dictionary<string, string> noteInBar = bms.PlayNote[key];
+                foreach(string k in lnlist)
+                {
+                    if(noteInBar[k] != null)
+                    {
+                        isLNExist = true;
+                        break;
+                    }
+                }
+
+                if (isLNExist) break;
+            }
+
+            return isLNExist;
         }
     }
 }

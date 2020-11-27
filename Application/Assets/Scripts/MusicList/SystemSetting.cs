@@ -432,17 +432,25 @@ namespace BMSPlayer
             List<MusicListData> addList = new List<MusicListData>();
             List<MusicListData> rmList = new List<MusicListData>();
 
+            int idx = 0;
             foreach(string s in addSet)
             {
-                if(!File.GetAttributes(s).HasFlag(FileAttributes.Directory))
+                strLoading = "Add files (" + idx + "/" + addSet.Count + "):\n" + s;
+                if (!File.GetAttributes(s).HasFlag(FileAttributes.Directory))
                     addList.Add(MusicDataManager.Instance.LoadBMSFromPath(s, addList.Count, encoding));
+
+                idx++;
             }
+
+            idx = 0;
             foreach (string s in rmSet)
             {
+                strLoading = "Remove files (" + idx + "/" + rmSet.Count + "):\n" + s;
                 rmList.Add(new MusicListData
                 {
                     Path = s
                 });
+                idx++;
             }
 
             // 3. 추가/삭제 항목에 대해 처리

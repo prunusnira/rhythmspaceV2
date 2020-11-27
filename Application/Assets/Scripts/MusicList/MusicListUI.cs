@@ -1044,7 +1044,8 @@ namespace BMSPlayer
                     current = current.Children[d];
                 }
 
-                if (current.Type == ItemType.DIRECTORY)
+                if (current.Type == ItemType.DIRECTORY &&
+                    current.HaveBMS)
                 {
                     List<MusicListData> list = MusicDataManager.Instance.LoadBMSFromFolder(current.Path);
                     for (int j = 0; j < list.Count; j++)
@@ -1067,7 +1068,7 @@ namespace BMSPlayer
                 {
                     ListItemNode child = current.Children[i];
 
-                    if (child.Type == ItemType.DIRECTORY)
+                    if(child.HaveBMS)
                     {
                         // child의 children에서 BMS 정보 가져오기
                         // 해당 폴더의 서브폴더는 신경쓰지 않음
