@@ -268,19 +268,26 @@ namespace BMSPlayer
                 targetDiff.text = scorediff.ToString();
             }
 
-            if (vcb == 0)
+            if(Const.ResultProcessedNote < Const.ResultTotalNote)
             {
-                if (vgd == 0 && vgr == 0)
+                Const.Clear = ClearType.FAIL;
+            }
+            else
+            {
+                if (vcb == 0)
                 {
-                    fcpfmark.gameObject.SetActive(true);
-                    fcpfmark.sprite = pfmark;
-                    Const.Clear = ClearType.PERFECT;
-                }
-                else
-                {
-                    fcpfmark.gameObject.SetActive(true);
-                    fcpfmark.sprite = fcmark;
-                    Const.Clear = ClearType.FULLCB;
+                    if (vgd == 0 && vgr == 0)
+                    {
+                        fcpfmark.gameObject.SetActive(true);
+                        fcpfmark.sprite = pfmark;
+                        Const.Clear = ClearType.PERFECT;
+                    }
+                    else
+                    {
+                        fcpfmark.gameObject.SetActive(true);
+                        fcpfmark.sprite = fcmark;
+                        Const.Clear = ClearType.FULLCB;
+                    }
                 }
             }
 

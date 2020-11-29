@@ -10,6 +10,7 @@ namespace BMSPlayer
     {
         private TimingType currentJudge;
 
+        // 패슬, 레이트, 타겟
         public TextMesh[] txtInfo1CNr;
         public TextMesh[] txtInfo2CNr;
         public TextMesh[] txtInfo3CNr;
@@ -32,11 +33,19 @@ namespace BMSPlayer
         private TextMesh txtInfoTarget;
         private TextMesh txtInfoRate;
 
+        // 판정 콤보
         public TextMeshPro[] txtJudgeBMNr;
         public TextMeshPro[] txtJudgeBMW125;
         public TextMeshPro[] txtJudgeBMW150;
         private TextMeshPro txtJudgeBM;
         private int infoNumA = 0;
+
+        // 풀콤 퍼펙
+        public SpriteRenderer[] spFCNr;
+        public SpriteRenderer[] spFCW125;
+        public SpriteRenderer[] spFCW150;
+        private SpriteRenderer spFCMark;
+        public Sprite spPF;
 
         private double timeLastComboPopup;
         private double timeLastTimingPopup;
@@ -47,12 +56,15 @@ namespace BMSPlayer
             {
                 case SkinSize.STANDARD:
                     txtJudgeBM = txtJudgeBMNr[Const.PlayerSide];
+                    spFCMark = spFCNr[Const.PlayerSide];
                     break;
                 case SkinSize.WIDE125:
                     txtJudgeBM = txtJudgeBMW125[Const.PlayerSide];
+                    spFCMark = spFCW125[Const.PlayerSide];
                     break;
                 case SkinSize.WIDE150:
                     txtJudgeBM = txtJudgeBMW150[Const.PlayerSide];
+                    spFCMark = spFCW150[Const.PlayerSide];
                     break;
             }
             SideInfoDisplayPosition();
@@ -157,6 +169,18 @@ namespace BMSPlayer
 
             timeLastComboPopup = (double)DateTime.Now.Ticks / 1000000;
             timeLastTimingPopup = (double)DateTime.Now.Ticks / 1000000;
+        }
+
+        public void ShowFCPFMark(int type)
+        {
+            switch(type)
+            {
+                case 0:
+                    spFCMark.sprite = spPF;
+                    break;
+            }
+
+            spFCMark.gameObject.SetActive(true);
         }
 
         IEnumerator ComboChangeBM(TimingType type)

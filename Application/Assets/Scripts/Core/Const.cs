@@ -1112,6 +1112,30 @@ namespace BMSPlayer
                 PlayerPrefs.SetInt("rst_target", value);
             }
         }
+
+        public static int ResultTotalNote
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("rst_total", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_total", value);
+            }
+        }
+
+        public static int ResultProcessedNote
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("rst_processed", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_processed", value);
+            }
+        }
         #endregion
 
         // Play Skin Setting

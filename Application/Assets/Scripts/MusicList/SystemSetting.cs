@@ -97,6 +97,7 @@ namespace BMSPlayer
         public Text titleReset;
         public Button btnResetAll;
         public GameObject dlgResetSetting;
+        public TextMeshProUGUI txtResetMsg;
 
         public static bool pathFromInit = false;
 
@@ -311,6 +312,7 @@ namespace BMSPlayer
             titleKey.text = Const.settingTitleKey[(int)lang];
             titleTable.text = Const.settingTitleDiffTable[(int)lang];
             titleReset.text = Const.settingTitleReset[(int)lang];
+            txtResetMsg.text = Const.DialogResetAll[(int)lang];
 
             // 버튼 언어 변경
             btnPathChange.GetComponentInChildren<Text>().text = Const.settingBtnBMSOpen[(int)Const.Language];

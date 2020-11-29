@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using BMSCore;
 using UnityEngine;
+using System.Linq;
 
 namespace BMSPlayer
 {
@@ -734,6 +735,8 @@ namespace BMSPlayer
             Dictionary<int, List<StopNote>> StopChangeCheck =
                 new Dictionary<int, List<StopNote>>();
 
+            Dictionary<int, double> TimingFixTemp = new Dictionary<int, double>();
+
             // 작업 진행 전에 bar마다 bpm/stop 체크
             foreach(BPMNote n in data.NoteBPM)
             {
@@ -901,7 +904,18 @@ namespace BMSPlayer
                             if (isStop && n.Position == stopPos)
                             {
                                 CalculateTiming(n, bps, stopTime, PosStart);
-                                data.BPMTimingFix.Add(n.Timing);
+                                if(TimingFixTemp.ContainsKey(data.NoteBPM.IndexOf(n)))
+                                {
+                                    if(TimingFixTemp[data.NoteBPM.IndexOf(n)] > n.Timing)
+                                    {
+                                        TimingFixTemp[data.NoteBPM.IndexOf(n)] = n.Timing;
+                                    }
+                                }
+                                else
+                                {
+                                    TimingFixTemp.Add(data.NoteBPM.IndexOf(n), n.Timing);
+                                }
+                                //data.BPMTimingFix.Add(n.Timing);
                             }
                             else if (n.Bar == bar &&
                                     n.Position >= PosStart &&
@@ -909,7 +923,18 @@ namespace BMSPlayer
                                 )
                             {
                                 CalculateTiming(n, bps, prevTime, PosStart);
-                                data.BPMTimingFix.Add(n.Timing);
+                                if (TimingFixTemp.ContainsKey(data.NoteBPM.IndexOf(n)))
+                                {
+                                    if (TimingFixTemp[data.NoteBPM.IndexOf(n)] > n.Timing)
+                                    {
+                                        TimingFixTemp[data.NoteBPM.IndexOf(n)] = n.Timing;
+                                    }
+                                }
+                                else
+                                {
+                                    TimingFixTemp.Add(data.NoteBPM.IndexOf(n), n.Timing);
+                                }
+                                //data.BPMTimingFix.Add(n.Timing);
                             }
 
                             if (n.Timing > data.LastTiming)
@@ -1146,6 +1171,13 @@ namespace BMSPlayer
                     prevTime += barLength / bps * 10;
                 }
             }
+
+            List<int> keys = TimingFixTemp.Select(value => value.Key).ToList();
+            foreach (int k in keys)
+            {
+                data.BPMTimingFix.Add(TimingFixTemp[k]);
+            }
+            data.BPMTimingFix.Sort();
         }
 
         private void CalculateTiming(NoteObject n, double bps, double prevTime, double prevPos)

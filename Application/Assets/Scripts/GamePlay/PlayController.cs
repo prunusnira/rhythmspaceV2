@@ -20,6 +20,7 @@ namespace BMSPlayer {
 		private PlayData Data;
 		private PlayUI UI;
         private HPBarUI HPUI;
+        private JudgeUIProcess JudgeUI;
         private BGAControl BGAControl;
         private Graph Graph;
         private CoverLiftControl Cover;
@@ -86,6 +87,7 @@ namespace BMSPlayer {
             BGAControl = GetComponent<BGAControl>();
             Graph = GetComponent<Graph>();
             Cover = GetComponent<CoverLiftControl>();
+            JudgeUI = GetComponent<JudgeUIProcess>();
 
             encoding = Const.Encoding;
 
@@ -401,6 +403,21 @@ namespace BMSPlayer {
                     // Type 2: 노트가 다 사용되었을 때
                     if (!isGameOver && scroller.GetProcessedNotes() >= Data.TotalNotes)
                     {
+                        // 풀콤/퍼펙여부 확인 후 화면에 표시
+                        if(scroller.GetBreak() == 0)
+                        {
+                            if(scroller.GetGood() == 0)
+                            {
+                                // 퍼펙트
+                                JudgeUI.ShowFCPFMark(0);
+                            }
+                            else
+                            {
+                                // 풀콤보
+                                JudgeUI.ShowFCPFMark(1);
+                            }
+                        }
+
                         // 게이지 타입과 퍼센트에 따라 클리어 유무 결정
                         switch (Const.GaugeType)
                         {
@@ -540,6 +557,13 @@ namespace BMSPlayer {
                 // 일시정지 메뉴 소환
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
+                    if(scroller.GetProcessedNotes() == Data.TotalNotes)
+                    {
+                        // 바로 리절트로 이동
+                        isGameOver = true;
+                        return;
+                    }
+
                     isPaused = !isPaused;
                     double currentTick = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
 

@@ -284,7 +284,8 @@ namespace BMSPlayer
                 if (Input.GetKeyDown(KeyCode.Return) ||
                     GetBtnWhite())
                 {
-                    if(Const.selectedOnList.Type == ItemType.DIRECTORY)
+                    if(Const.selectedOnList.Type == ItemType.DIRECTORY
+                        || Const.selectedOnList.Type == ItemType.TABLE)
                     {
                         MoveIntoFolder();
                     }
@@ -1091,11 +1092,14 @@ namespace BMSPlayer
                     else
                     {
                         // 해당 폴더 자체를 목록에 등록함
-                        string dirname = Path.GetFileName(child.Path);
-                        child.Display = dirname;
-                        child.Path = child.Path;
-                        child.Type = ItemType.DIRECTORY;
-                        bmslist.Add(child);
+                        if(child.Type == ItemType.DIRECTORY)
+                        {
+                            string dirname = Path.GetFileName(child.Path);
+                            child.Display = dirname;
+                            child.Path = child.Path;
+                            child.Type = ItemType.DIRECTORY;
+                            bmslist.Add(child);
+                        }
                     }
                 }
             }

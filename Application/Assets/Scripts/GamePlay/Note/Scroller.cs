@@ -1432,6 +1432,9 @@ namespace BMSPlayer
             Const.ResultScore = score;
             Const.ResultMaxCombo = maxcombo;
             Const.ResultRank = GetRank(score, processedNotes);
+
+            Const.ResultTotalNote = totalNotes;
+            Const.ResultProcessedNote = processedNotes;
         }
 
         public void SpeedUpFixed()
@@ -1529,5 +1532,12 @@ namespace BMSPlayer
 
             return rank;
         }
+
+        public int GetPerfect() { return perfect; }
+        public int GetGreat() { return great; }
+        public int GetGood() { return good; }
+        public int GetBad() { return ok; }
+        public int GetPoor() { return miss; }
+        public int GetBreak() { return cb; }
     }
 }

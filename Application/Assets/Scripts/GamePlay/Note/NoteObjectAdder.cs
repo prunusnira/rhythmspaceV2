@@ -9,15 +9,21 @@ namespace BMSPlayer
     {
         // Display Note
         public GameObject[] white;
+        public GameObject[] whiteLn;
         public GameObject[] blue;
+        public GameObject[] blueLn;
         public GameObject[] turn;
+        public GameObject[] turnLn;
         public GameObject[] turnAuto;
         public GameObject[] mine;
         public GameObject[] split;
 
         private GameObject noteWhite;
+        private GameObject noteWhiteLn;
         private GameObject noteBlue;
+        private GameObject noteBlueLn;
         private GameObject noteTurn;
+        private GameObject noteTurnLn;
         private GameObject noteTurnAuto;
         private GameObject noteMine;
         private GameObject splitLine;
@@ -31,8 +37,11 @@ namespace BMSPlayer
         {
             // 노트 종류 변경
             noteWhite = white[(int)Const.NoteSkin];
+            noteWhiteLn = whiteLn[(int)Const.NoteSkin];
             noteBlue = blue[(int)Const.NoteSkin];
+            noteBlueLn = blueLn[(int)Const.NoteSkin];
             noteTurn = turn[(int)Const.NoteSkin];
+            noteTurnLn = turnLn[(int)Const.NoteSkin];
             noteTurnAuto = turnAuto[(int)Const.NoteSkin];
             noteMine = mine[(int)Const.NoteSkin];
             splitLine = split[(int)Const.GearSize];
@@ -77,16 +86,14 @@ namespace BMSPlayer
                     break;
             }
 
-            noteWhite.transform.localScale = new Vector3(
-                widthScaleW, noteSize, 1);
-            noteBlue.transform.localScale = new Vector3(
-                widthScaleB, noteSize, 1);
-            noteTurn.transform.localScale = new Vector3(
-                widthScaleTT, noteSize, 1);
-            noteTurnAuto.transform.localScale = new Vector3(
-                widthScaleTT, noteSize, 1);
-            noteMine.transform.localScale = new Vector3(
-                widthScaleB, noteSize, 1);
+            noteWhite.transform.localScale = new Vector3(widthScaleW, noteSize, 1);
+            noteWhiteLn.transform.localScale = new Vector3(widthScaleW, noteSize, 1);
+            noteBlue.transform.localScale = new Vector3(widthScaleB, noteSize, 1);
+            noteBlueLn.transform.localScale = new Vector3(widthScaleB, noteSize, 1);
+            noteTurn.transform.localScale = new Vector3(widthScaleTT, noteSize, 1);
+            noteTurnLn.transform.localScale = new Vector3(widthScaleTT, noteSize, 1);
+            noteTurnAuto.transform.localScale = new Vector3(widthScaleTT, noteSize, 1);
+            noteMine.transform.localScale = new Vector3(widthScaleB, noteSize, 1);
         }
 
         public void DisplaySplitLine(SplitLine line)
@@ -109,7 +116,7 @@ namespace BMSPlayer
         {
             if (note.PlayNoteType == NoteType.SINGLE)
             {
-                GameObject noteObj = AddNewNote(note.Line, note.Timing, noteParent.transform);
+                GameObject noteObj = AddNewNote(note.Line, note.Timing, noteParent.transform, note.PlayNoteType);
                 noteObj.transform.SetParent(noteParent.transform, false);
                 note.OnScreen = true;
                 note.NoteObject = noteObj;
@@ -123,7 +130,7 @@ namespace BMSPlayer
                 // 시작노트
                 if (note.PlayNoteType == NoteType.LNSTART)
                 {
-                    GameObject noteObj = AddNewNote(note.Line, note.Timing, noteParent.transform);
+                    GameObject noteObj = AddNewNote(note.Line, note.Timing, noteParent.transform, note.PlayNoteType);
                     noteObj.transform.SetParent(noteParent.transform, false);
                     note.OnScreen = true;
                     note.NoteObject = noteObj;
@@ -135,14 +142,14 @@ namespace BMSPlayer
                         {
                             // 가운데노트
                             PlayNote lnNote = lnlist[i].Mid;
-                            GameObject lnObj = AddNewNote(lnNote.Line, lnNote.Timing, noteParent.transform);
+                            GameObject lnObj = AddNewNote(lnNote.Line, lnNote.Timing, noteParent.transform, note.PlayNoteType);
                             lnObj.transform.SetParent(noteParent.transform, false);
                             lnNote.OnScreen = true;
                             lnNote.NoteObject = lnObj;
 
                             // 끝노트
                             PlayNote endNote = lnlist[i].End;
-                            GameObject endObj = AddNewNote(endNote.Line, endNote.Timing, noteParent.transform);
+                            GameObject endObj = AddNewNote(endNote.Line, endNote.Timing, noteParent.transform, note.PlayNoteType);
                             endObj.transform.SetParent(noteParent.transform, false);
                             endNote.OnScreen = true;
                             endNote.NoteObject = endObj;
@@ -154,7 +161,7 @@ namespace BMSPlayer
             }
         }
 
-        public GameObject AddNewNote(int clane, double timing, Transform parent)
+        public GameObject AddNewNote(int clane, double timing, Transform parent, NoteType noteType)
         {
             /**
              * lanes 중 clane에 노트 오브젝트르 생성함
@@ -172,20 +179,34 @@ namespace BMSPlayer
                 case 3:
                 case 5:
                 case 7:
-                    noteObject = Instantiate(noteWhite, pos, Quaternion.identity, parent);
+                    if (noteType == NoteType.LNSTART || noteType == NoteType.LNEND || noteType == NoteType.LNMID)
+                        noteObject = Instantiate(noteWhiteLn, pos, Quaternion.identity, parent);
+                    else
+                        noteObject = Instantiate(noteWhite, pos, Quaternion.identity, parent);
+
                     noteObject.transform.localPosition = pos;
                     break;
                 case 2:
                 case 4:
                 case 6:
-                    noteObject = Instantiate(noteBlue, pos, Quaternion.identity, parent);
+                    if (noteType == NoteType.LNSTART || noteType == NoteType.LNEND || noteType == NoteType.LNMID)
+                        noteObject = Instantiate(noteBlueLn, pos, Quaternion.identity, parent);
+                    else
+                        noteObject = Instantiate(noteBlue, pos, Quaternion.identity, parent);
+
                     noteObject.transform.localPosition = pos;
                     break;
                 case 0:
                     if (Const.Auto == AutoPlayType.TURNTABLE)
+                    {
                         noteObject = Instantiate(noteTurnAuto, pos, Quaternion.identity, parent);
-                    else
-                        noteObject = Instantiate(noteTurn, pos, Quaternion.identity, parent);
+                    }
+                    else {
+                        if (noteType == NoteType.LNSTART || noteType == NoteType.LNEND || noteType == NoteType.LNMID)
+                            noteObject = Instantiate(noteTurnLn, pos, Quaternion.identity, parent);
+                        else
+                            noteObject = Instantiate(noteTurn, pos, Quaternion.identity, parent);
+                    }
                     noteObject.transform.localPosition = pos;
                     break;
             }

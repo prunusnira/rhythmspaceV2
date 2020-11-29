@@ -10,7 +10,6 @@ namespace BMSPlayer
     {
         public TextMeshProUGUI desc;
         public Button btnOK;
-        public Button btnRefresh;
         public Button btnCancel;
 
         public TMP_InputField urlSt;
@@ -35,16 +34,11 @@ namespace BMSPlayer
             btnOK.onClick.AddListener(delegate
             {
                 UpdateURL();
+                Refresh();
                 CloseSetting();
             });
 
-            btnRefresh.onClick.AddListener(Refresh);
-
             btnCancel.onClick.AddListener(CloseSetting);
-
-            urlSt.text = Const.StellaURL;
-            urlSl.text = Const.SatelliteURL;
-            urlGe.text = Const.GenocideURL;
 
             diffTable = new List<IDiffTable>();
         }
@@ -81,6 +75,15 @@ namespace BMSPlayer
                 refreshFromOutside = false;
                 Refresh();
             }
+        }
+
+        public override void EnableWindow()
+        {
+            base.EnableWindow();
+
+            urlSt.text = Const.StellaURL;
+            urlSl.text = Const.SatelliteURL;
+            urlGe.text = Const.GenocideURL;
         }
 
         public void Refresh()
