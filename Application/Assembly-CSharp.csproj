@@ -102,6 +102,7 @@
     <Compile Include="Assets\Scripts\GamePlay\UI\HPBarUI.cs" />
     <Compile Include="Assets\Scripts\GamePlay\UI\JudgeUIProcess.cs" />
     <Compile Include="Assets\Scripts\GamePlay\UI\PlayUI.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\UI\StageFailed.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\AutoPlayType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\AutoSyncType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\ClearType.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\GraphTargetType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\GraphType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\JudgeType.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enum\LNProcessType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\LanguageType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\NoteLayout.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\NoteSkin.cs" />

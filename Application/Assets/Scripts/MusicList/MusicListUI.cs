@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using BMSCore;
-using DatabaseManager;
 using UnityEngine.EventSystems;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System;

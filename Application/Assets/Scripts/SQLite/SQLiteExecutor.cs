@@ -533,7 +533,7 @@ namespace DatabaseManager
             dbcommand = dbconn.CreateCommand();
 
             queryText = queryText.Replace("'", "''");
-            string query = "select * from list where title like '%"
+            string query = "select * from list where replace(title, ' ', '') like '%"
                 +queryText+"%' collate nocase";
 
             dbcommand.CommandText = query;

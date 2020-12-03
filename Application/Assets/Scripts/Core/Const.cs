@@ -22,6 +22,9 @@ namespace BMSPlayer
         public static int SPEEDMULTIPLIER = 5;
         public static int DEFAULTPOS = 0;
         public static int LINE = 8;
+        public static int TIMEBAR = 690;
+        public static int SHUTTER = 725;
+        public static int SHUTTERL = 890;
         public static float NoteSizeCalc = 7.5f;
 
         public static List<RecordData> record = new List<RecordData>();
@@ -830,7 +833,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("suddenPos", 725);
+                return PlayerPrefs.GetInt("suddenPos", 0);
             }
             set
             {
@@ -842,7 +845,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("hiddenPos", 725);
+                return PlayerPrefs.GetInt("hiddenPos", 0);
             }
             set
             {
@@ -1002,6 +1005,18 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("rst_m", value);
+            }
+        }
+
+        public static int ResultEPoor
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("rst_ep", 0);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("rst_ep", value);
             }
         }
 
@@ -1221,6 +1236,18 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("bgaonoff", value);
+            }
+        }
+
+        public static LNProcessType LNProcType
+        {
+            get
+            {
+                return (LNProcessType)PlayerPrefs.GetInt("lnproctype", (int)LNProcessType.LN);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("lnproctype", (int)value);
             }
         }
 

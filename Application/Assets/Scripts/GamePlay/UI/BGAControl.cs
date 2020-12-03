@@ -20,18 +20,18 @@ namespace BMSPlayer
         public GameObject bgaErrorLayer;
 
         // VLC Player
-        /*private LibVLC libVLC;
+        private LibVLC libVLC;
         private MediaPlayer mediaPlayer;
-        private Texture2D tex = null;*/
+        private Texture2D tex = null;
         private bool play = false;
 
         public static int playerWidth = 0;
         public static int playerHeight = 0;
 
-        /*private void Awake()
+        private void Awake()
         {
             Core.Initialize(Application.dataPath);
-            libVLC = new LibVLC("--no-osd", "--verbose=2");
+            libVLC = new LibVLC(/*"--no-osd", "--verbose=2"*/);
             mediaPlayer = new MediaPlayer(libVLC);
         }
 
@@ -84,7 +84,7 @@ namespace BMSPlayer
 
             libVLC.Dispose();
             libVLC = null;
-        }*/
+        }
 
         public void BGAVideoActivate()
         {
@@ -93,15 +93,15 @@ namespace BMSPlayer
 
         public void BGAVideoPreload(string file)
         {
-            bgaVideo.url = "file://" + file;
+            /*bgaVideo.url = "file://" + file;
             bgaVideo.errorReceived += BGAErrorLayer;
-            bgaVideo.Prepare();
+            bgaVideo.Prepare();*/
 
-            /*mediaPlayer.Media = new Media(
+            mediaPlayer.Media = new Media(
                 libVLC,
                 new Uri("file://" + file)
             );
-            mediaPlayer.SetLogoInt(VideoLogoOption.Opacity, 0);*/
+            mediaPlayer.SetLogoInt(VideoLogoOption.Opacity, 0);
             //mediaPlayer.Play();
 
             play = true;
@@ -119,14 +119,14 @@ namespace BMSPlayer
 
         public void BGAVideoPlay()
         {
-            bgaVideo.Play();
-            //mediaPlayer.Play();
+            //bgaVideo.Play();
+            mediaPlayer.Play();
         }
 
         public bool isBGAPlaying()
         {
-            return bgaVideo.isPlaying;
-            //return mediaPlayer.IsPlaying;
+            //return bgaVideo.isPlaying;
+            return mediaPlayer.IsPlaying;
         }
 
         public void BGAErrorLayer(VideoPlayer source, string msg)
@@ -182,14 +182,14 @@ namespace BMSPlayer
 
         public void PauseBGAVideo()
         {
-            bgaVideo.Pause();
-            //mediaPlayer.Pause();
+            //bgaVideo.Pause();
+            mediaPlayer.Pause();
         }
 
         public void ResumeBGAVideo()
         {
-            bgaVideo.Play();
-            //mediaPlayer.Play();
+            //bgaVideo.Play();
+            mediaPlayer.Play();
         }
     }
 }

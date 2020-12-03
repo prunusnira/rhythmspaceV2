@@ -73,6 +73,12 @@ namespace BMSPlayer
         public Sprite[] skinGearW150Normal;
         public Sprite[] skinGearW150Dark;
 
+        // Time
+        public GameObject[] timeNr;
+        public GameObject[] timeW125;
+        public GameObject[] timeW150;
+        private GameObject timer;
+
         // Note Effect
         private Coroutine[] effectCoroutine;
         public SpriteRenderer[] noteEffects;
@@ -142,6 +148,9 @@ namespace BMSPlayer
                 {
                     txtAutoPlay.gameObject.SetActive(true);
                 }
+
+                // time bar 표시
+                timer.SetActive(true);
 
                 NoteOnScreen = new List<GameObject>();
 
@@ -252,14 +261,14 @@ namespace BMSPlayer
         }
 
         public void UpdateSideJudge(
-            int p, int gr, int gd, int o, int m, int cb, int fast, int slow,
+            int p, int gr, int gd, int o, int m, int ep, int cb, int fast, int slow,
             string a, string d)
         {
             txtPerfect.text = p.ToString();
             txtGreat.text = gr.ToString();
             txtGood.text = gd.ToString();
             txtOk.text = o.ToString();
-            txtMiss.text = m.ToString();
+            txtMiss.text = (m+ep).ToString();
             txtComboBreak.text = cb.ToString();
             txtAvgRate.text = a;
             txtAvgDiff.text = d;
@@ -338,12 +347,20 @@ namespace BMSPlayer
             keyInfo.SetActive(false);
         }
 
-        public void UpdateTimerCur(double time)
+        public void UpdateTimerCur(double time, double total)
         {
             string min = (Convert.ToInt32(time) / 600).ToString("00");
             string sec = (Convert.ToInt32(time) % 600 / 10).ToString("00");
 
             txtCurrentTime.text = min + ":" + sec;
+
+            float ypos = (float)(Const.TIMEBAR * time / total * -1) + 345;
+            if (ypos < -690) ypos = -690;
+
+            timer.transform.localPosition = new Vector3(
+                timer.transform.localPosition.x,
+                ypos,
+                timer.transform.localPosition.z);
         }
 
         public void UpdateTimerTotal(double time)
@@ -352,6 +369,11 @@ namespace BMSPlayer
             string sec = (Convert.ToInt32(time) % 600 / 10).ToString("00");
 
             txtTotalTime.text = min + ":" + sec;
+        }
+
+        public void RemovePanels()
+        {
+            bgaFollowingObj.gameObject.SetActive(false);
         }
 
         #region Gear/BGA/Graph/Frame/Text Position
@@ -373,14 +395,17 @@ namespace BMSPlayer
                 case SkinSize.STANDARD:
                     txtLoading = txtLoadingNr[Const.PlayerSide];
                     txtAutoPlay = txtAutoPlayNr[Const.PlayerSide];
+                    timer = timeNr[Const.PlayerSide];
                     break;
                 case SkinSize.WIDE125:
                     txtLoading = txtLoadingW125[Const.PlayerSide];
                     txtAutoPlay = txtAutoPlayW125[Const.PlayerSide];
+                    timer = timeW125[Const.PlayerSide];
                     break;
                 case SkinSize.WIDE150:
                     txtLoading = txtLoadingW150[Const.PlayerSide];
                     txtAutoPlay = txtAutoPlayW150[Const.PlayerSide];
+                    timer = timeW150[Const.PlayerSide];
                     break;
             }
 

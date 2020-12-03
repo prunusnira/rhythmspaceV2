@@ -9,6 +9,7 @@ public enum GraphTargetType
     AA = 2,
     AAA = 3,
     MAX = 4,
-    IRTOP = 5,
-    IRAVG = 6
+    RECORD = 5,
+    IRTOP = 6,
+    IRAVG = 7
 }

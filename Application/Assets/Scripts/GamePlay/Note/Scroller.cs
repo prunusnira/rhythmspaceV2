@@ -507,11 +507,23 @@ namespace BMSPlayer
                             !data.NoteLong[current.LNNum].Processing)
                         {
                             // 시작 위치에서는 롱노트 전체 형태를 유지해야 하므로 없애지 않음
+                            int lnNum = current.LNNum;
                             miss++;
                             cb++;
                             hpController.hpChangeMiss();
                             UpdateTiming(judgeTiming, true);
-                            data.NoteLong[current.LNNum].Processing = true;
+
+                            isLnWorking[current.Line] = false;
+                            data.NoteLong[lnNum].End.Used = true;
+                            data.NoteLong[lnNum].Used = true;
+                            current.Used = true;
+                            processedNotes++;
+                            data.NoteLong[lnNum].Processing = false;
+
+                            // 롱노트 구성요소를 모두 삭제처리
+                            removeCandidate.Add(current);
+                            removeCandidate.Add(data.NoteLong[lnNum].End);
+                            removeCandidate.Add(data.NoteLong[lnNum].Mid);
                         }
                         else if (current.PlayNoteType == NoteType.LNMID &&
                             !current.Used)
@@ -918,15 +930,14 @@ namespace BMSPlayer
                             double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
 
                             // Timing Window 내에 노트가 있으면
-                            if (time < POOR && time >= BAD)
+                            if (time <= POOR && time > BAD)
                             {
                                 // 빠른 공푸어 처리
-                                // 이 경우에는 콤보 초기화가 있음
-                                combo = 0;
                                 epoor++;
-                                cb++;
+                                UI.UpdateSideJudge(perfect, great, good, ok, miss, epoor, cb, fast, slow,
+                                    avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
                             }
-                            else if (time < BAD && time >= BAD * -1)
+                            else if (time <= BAD && time >= BAD * -1)
                             {
                                 // 판정 처리 수행
                                 if (cnote.PlayNoteType == NoteType.LNSTART)
@@ -982,7 +993,51 @@ namespace BMSPlayer
                             }
                         }
                         // 롱노트 처리가 끝났는데 버튼을 떼지 않았다면
-                        // 미스처리... 를 해야하는데 이건 MoveNotes에서 해야...
+                        // 모드가 CN이라면 미스처리 -> MoveNotes에서
+                        // 모드가 LN이 아니라면 성공처리
+                        else if(isLnWorking[i] && Const.LNProcType == LNProcessType.LN)
+                        {
+                            // 1. 현재 라인을 가져옴
+                            //List<PlayNote> currentLine = notePlay[i];
+                            List<PlayNote> currentLine;
+                            if (i == 8)
+                            {
+                                currentLine = notePlay[0];
+                            }
+                            else
+                            {
+                                currentLine = notePlay[i];
+                            }
+
+                            // 2. 현재 라인의 첫 노트를 가져옴
+                            if (currentLine.Count == 0) continue;
+
+                            PlayNote cnote = currentLine[1];
+
+                            if(cnote.PlayNoteType == NoteType.LNEND)
+                            {
+                                // 4. 판정 처리하기
+                                // 여기부터는 타이밍으로 간 봐야 할것
+                                double time = 0;
+                                if (i == 8) time = lnTiming[0];
+                                else time = lnTiming[i];
+
+                                if(cnote.Timing < timePassed)
+                                {
+                                    // 롱놋 처리된 것으로 처리
+                                    int lnNum = cnote.LNNum;
+                                    AfterTouchLongEnd(time);
+
+                                    cnote.Used = true;
+                                    isLnWorking[i] = false;
+                                    lnlist[lnNum].Processing = false;
+
+                                    removeCandidate.Add(lnlist[lnNum].Start);
+                                    removeCandidate.Add(lnlist[lnNum].Mid);
+                                    removeCandidate.Add(cnote);
+                                }
+                            }
+                        }
                     }
                     // 롱노트인데 버튼을 떼었을 때
                     else
@@ -1013,8 +1068,8 @@ namespace BMSPlayer
                         if (isLnWorking[i])
                         {
                             double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
-
-                            // Timing Window 내에 롱노트 끝이 있으면 끝 판정 처리
+                            
+                            // Timing Window 내에 롱노트 끝이 있으면 끝 판정 처리 (끝 판정은 들어갈 때 판정과 동일하게 처리함
                             // 롱노트 시작할 때 이미 틀린 판정처리 났으면 아무런 처리를 하지 않음
                             if (cnote.PlayNoteType == NoteType.LNEND &&
                                 !lnlist[cnote.LNNum].Used)
@@ -1040,9 +1095,10 @@ namespace BMSPlayer
                                 removeCandidate.Add(lnlist[lnNum].Mid);
                                 removeCandidate.Add(cnote);
                             }
-                            // 그 보다 위에 있으면 미스처리
+                            // 그 보다 위에 있으면 미스처리하고 삭제함
                             else
                             {
+                                int lnNum = cnote.LNNum;
                                 // 노트 이펙트 켜기
                                 miss++;
                                 cb++;
@@ -1057,6 +1113,14 @@ namespace BMSPlayer
                                 {
                                     UI.TurnOnNoteEffectLN(i, false);
                                 }
+
+                                cnote.Used = true;
+                                isLnWorking[i] = false;
+                                lnlist[lnNum].Processing = false;
+
+                                removeCandidate.Add(lnlist[lnNum].Start);
+                                removeCandidate.Add(lnlist[lnNum].Mid);
+                                removeCandidate.Add(cnote);
                             }
                         }
                     }
@@ -1371,7 +1435,7 @@ namespace BMSPlayer
 
             avgRate = Math.Round(sumRate * 100 / processedNotes) / 100;
             avgTimeDiff = sumTimeDiff / processedNotes;
-            UI.UpdateSideJudge(perfect, great, good, ok, miss, cb, fast, slow,
+            UI.UpdateSideJudge(perfect, great, good, ok, miss, epoor, cb, fast, slow,
                 avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
 
             if(Const.AutoSync == AutoSyncType.ON)
@@ -1424,6 +1488,7 @@ namespace BMSPlayer
             Const.ResultGood = good;
             Const.ResultOk = ok;
             Const.ResultMiss = miss;
+            Const.ResultEPoor = epoor;
             Const.ResultComboBreak = cb;
             Const.ResultFast = fast;
             Const.ResultSlow = slow;
@@ -1431,7 +1496,7 @@ namespace BMSPlayer
             Const.ResultTimeDiff = (float)avgTimeDiff;
             Const.ResultScore = score;
             Const.ResultMaxCombo = maxcombo;
-            Const.ResultRank = GetRank(score, processedNotes);
+            Const.ResultRank = GetRank(score, totalNotes);
 
             Const.ResultTotalNote = totalNotes;
             Const.ResultProcessedNote = processedNotes;
@@ -1441,7 +1506,7 @@ namespace BMSPlayer
         {
             if (speed < 2000)
             {
-                speed += 1;
+                speed += 25;
                 Const.SpeedStd = speed;
                 isSpeedChanged = true;
             }
@@ -1451,7 +1516,7 @@ namespace BMSPlayer
         {
             if (speed > 50)
             {
-                speed -= 1;
+                speed -= 25;
                 Const.SpeedStd = speed;
                 isSpeedChanged = true;
             }
@@ -1461,7 +1526,7 @@ namespace BMSPlayer
         {
             if (speedfl < 2000)
             {
-                speedfl += 1;
+                speedfl += 25;
                 Const.SpeedCon = speedfl;
                 isSpeedChanged = true;
             }
@@ -1471,7 +1536,7 @@ namespace BMSPlayer
         {
             if (speedfl > 100)
             {
-                speedfl -= 1;
+                speedfl -= 25;
                 Const.SpeedCon = speedfl;
                 isSpeedChanged = true;
             }
@@ -1492,10 +1557,10 @@ namespace BMSPlayer
             isSpeedChanged = true;
         }
 
-        private string GetRank(int ex, int proc)
+        private string GetRank(int ex, int notes)
         {
             string rank = "f";
-            float currentRankState = (float)ex / (proc * 2);
+            float currentRankState = (float)ex / (notes * 2);
 
             if (currentRankState >= 8f / 9)
             {
@@ -1538,6 +1603,7 @@ namespace BMSPlayer
         public int GetGood() { return good; }
         public int GetBad() { return ok; }
         public int GetPoor() { return miss; }
+        public int GetEPoor() { return epoor; }
         public int GetBreak() { return cb; }
     }
 }

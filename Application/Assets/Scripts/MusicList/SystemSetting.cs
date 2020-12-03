@@ -100,6 +100,7 @@ namespace BMSPlayer
         public TextMeshProUGUI txtResetMsg;
 
         public static bool pathFromInit = false;
+        public static bool langFromInit = false;
 
         public override void Awake()
         {
@@ -282,6 +283,12 @@ namespace BMSPlayer
             {
                 pathFromInit = false;
                 changePath();
+            }
+
+            if (langFromInit)
+            {
+                langFromInit = false;
+                UpdateOption();
             }
         }
 
@@ -571,7 +578,6 @@ namespace BMSPlayer
                     curLang.text = "English";
                     break;
             }
-            Const.Language = lang;
             UpdateOption();
             sfxPlay.PlayOneShot(sfxSource);
         }

@@ -24,6 +24,7 @@ namespace BMSPlayer {
         private BGAControl BGAControl;
         private Graph Graph;
         private CoverLiftControl Cover;
+        private StageFailed stageFailed;
 
         // Pause Menu: 편의성을 위해 컨트롤러에서 관리
         public GameObject layerPauseMenu;
@@ -88,6 +89,7 @@ namespace BMSPlayer {
             Graph = GetComponent<Graph>();
             Cover = GetComponent<CoverLiftControl>();
             JudgeUI = GetComponent<JudgeUIProcess>();
+            stageFailed = GetComponent<StageFailed>();
 
             encoding = Const.Encoding;
 
@@ -182,13 +184,16 @@ namespace BMSPlayer {
             try
             {
                 // 플레이 키 (최 우선 체크)
-                scroller.ButtonPushState();
-                scroller.Beam();
+                if(!isGameOver)
+                {
+                    scroller.ButtonPushState();
+                    scroller.Beam();
+                }
 
                 // 게임 플레이와 독립적으로 조절 가능해야 하는 부분들
                 // 스피드 조절
-                if (Input.GetKey(KeyCode.Alpha1) ||
-                    (Keys.GetBtn(9) && Keys.GetBtn(1)))
+                if (Input.GetKeyDown(KeyCode.Alpha1) ||
+                    (Keys.GetBtn(9) && Keys.GetBtnDown(1)))
                 {
                     if (Const.SpdType == SpdType.STANDARD)
                     {
@@ -199,8 +204,8 @@ namespace BMSPlayer {
                         scroller.SpeedDownFluid();
                     }
                 }
-                if (Input.GetKey(KeyCode.Alpha2) ||
-                    (Keys.GetBtn(9) && Keys.GetBtn(2)))
+                if (Input.GetKeyDown(KeyCode.Alpha2) ||
+                    (Keys.GetBtn(9) && Keys.GetBtnDown(2)))
                 {
                     if (Const.SpdType == SpdType.STANDARD)
                     {
@@ -363,9 +368,12 @@ namespace BMSPlayer {
                         }
                     }
 
-                    scroller.MoveNotes(Data, PlayTimePassed, ref bps);
-                    scroller.MoveMine(Data, PlayTimePassed, bps);
-                    scroller.MoveSplitLine(Data, PlayTimePassed, bps);
+                    if(!isGameOver)
+                    {
+                        scroller.MoveNotes(Data, PlayTimePassed, ref bps);
+                        scroller.MoveMine(Data, PlayTimePassed, bps);
+                        scroller.MoveSplitLine(Data, PlayTimePassed, bps);
+                    }
 
                     if(Const.BGAOnOff == 1)
                     {
@@ -475,6 +483,12 @@ namespace BMSPlayer {
                     // 게임오버 처리
                     if (isGameOver && !gameOverTriggered)
                     {
+                        if (Const.Clear == ClearType.FAIL && scroller.GetProcessedNotes() < Data.TotalNotes)
+                        {
+                            // 스테이지 페일 사운드 및 효과 재생
+                            UI.RemovePanels();
+                            stageFailed.ShowGameOver();
+                        }
                         // 게임오버로 가기 전에 페이드
                         StartCoroutine("GameOver");
                     }
@@ -495,7 +509,7 @@ namespace BMSPlayer {
                         SceneManager.LoadScene("Result");
                     }
 
-                    UI.UpdateTimerCur(PlayTimePassed);
+                    UI.UpdateTimerCur(PlayTimePassed, Data.LastTiming);
 
                     PrevTickTime = PlayTimePassed;
 

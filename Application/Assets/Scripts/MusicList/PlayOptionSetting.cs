@@ -467,7 +467,7 @@ namespace BMSPlayer
             if(Page == 0)
             {
 
-                if (Input.GetKey(KeyCode.F1))
+                if (Input.GetKeyDown(KeyCode.F1))
                 {
                     if (Const.SpdType == SpdType.STANDARD)
                     {
@@ -478,7 +478,7 @@ namespace BMSPlayer
                         SpeedDownFluid();
                     }
                 }
-                else if (Input.GetKey(KeyCode.F2))
+                else if (Input.GetKeyDown(KeyCode.F2))
                 {
                     if (Const.SpdType == SpdType.STANDARD)
                     {
@@ -651,7 +651,7 @@ namespace BMSPlayer
 
         private void SpeedUpFixed()
         {
-            if(speed < 2000) speed++;
+            if(speed < 2000) speed += 25;
             Const.SpeedStd = speed;
 
             // 폴더일 때는 변경 없이 처리
@@ -667,7 +667,7 @@ namespace BMSPlayer
 
         private void SpeedDownFixed()
         {
-            if (speed > 50) speed--;
+            if (speed > 50) speed -= 25;
             Const.SpeedStd = speed;
 
             // 폴더일 때는 변경 없이 처리
@@ -683,7 +683,7 @@ namespace BMSPlayer
 
         private void SpeedUpFluid()
         {
-            if (speedfl < 2000) speedfl++;
+            if (speedfl < 2000) speedfl += 25;
             Const.SpeedCon = speedfl;
 
             // 폴더일 때는 변경 없이 처리
@@ -699,7 +699,7 @@ namespace BMSPlayer
 
         private void SpeedDownFluid()
         {
-            if (speedfl > 100) speedfl--;
+            if (speedfl > 100) speedfl -= 25;
             Const.SpeedCon = speedfl;
 
             // 폴더일 때는 변경 없이 처리

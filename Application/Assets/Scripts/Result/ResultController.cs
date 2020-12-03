@@ -29,6 +29,7 @@ namespace BMSPlayer
         public Text good;
         public Text ok;
         public Text miss;
+        public Text epoor;
         public Text avgrate;
         public Text combo;
         public Text combobreak;
@@ -97,6 +98,7 @@ namespace BMSPlayer
         // Others
         public Text Judgement;
         public Text Pattern;
+        public TextMeshProUGUI noteLayout;
 
         void Awake()
         {
@@ -152,10 +154,10 @@ namespace BMSPlayer
                     layout = "MIRROR";
                     break;
                 case NoteLayout.SRAN:
-                    layout = "S-RAN";
+                    layout = "S-RANDOM";
                     break;
                 case NoteLayout.CRAN:
-                    layout = "C-RAN";
+                    layout = "C-RANDOM";
                     break;
                 case NoteLayout.CUSTOM:
                     layout = "CUSTOM";
@@ -229,11 +231,23 @@ namespace BMSPlayer
                     break;
             }
 
+            // 노트 배치
+            string noteLayoutStr = layout + " ";
+            if(Const.CurrentLayout != null)
+            {
+                foreach (int i in Const.CurrentLayout)
+                {
+                    noteLayoutStr += i.ToString() + " ";
+                }
+            }
+            noteLayout.text = noteLayoutStr;
+
             // 판정
             int vgr = Const.ResultGreat;
             int vgd = Const.ResultGood;
             int vok = Const.ResultOk;
             int vmiss = Const.ResultMiss;
+            int vep = Const.ResultEPoor;
             int vcb = Const.ResultComboBreak;
             float rate = Const.ResultAvgRate / 100;
             float vdiff = Const.ResultTimeDiff;
@@ -243,7 +257,8 @@ namespace BMSPlayer
             great.text = Const.ResultGreat.ToString();
             good.text = vgd.ToString();
             ok.text = vok.ToString();
-            miss.text = vmiss.ToString();
+            miss.text = (vmiss+vep).ToString();
+            epoor.text = vep.ToString();
             combobreak.text = vcb.ToString();
             fast.text = Const.ResultFast.ToString();
             slow.text = Const.ResultSlow.ToString();
