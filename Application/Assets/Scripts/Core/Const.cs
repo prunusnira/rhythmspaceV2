@@ -30,12 +30,15 @@ namespace BMSPlayer
         public static List<RecordData> record = new List<RecordData>();
         public static int musiclistIdx = 0;
 
+        // Music List
         public static ListItemTree BMSTree;
         public static ListItemNode selectedOnList = null;
         public static List<int> ListDepth = new List<int>();
         public static List<string> ListPath = new List<string>();
         public static int ListPos = 0;
         public static bool ChangeLayout = true;
+        public static bool SearchMode = false;
+        public static string SearchText = "";
 
         public static int MyBestScore = 0;
         public static string MyBestRank = "";
@@ -441,6 +444,13 @@ namespace BMSPlayer
             "List is empty\n\n" +
             "* In case of Difficulty Table: Please check URL and update again\n" +
             "* In case of BMS update failure: Please try again"
+        };
+
+        public static string[] musiclistSearchMode = new string[3]
+        {
+            "[ 검색모드 ]",
+            "[ 検索モード ]",
+            "[ Search Mode ]"
         };
         #endregion
 

@@ -96,7 +96,9 @@ namespace DatabaseManager
                 jacket varchar (100),
                 totalnotes integer not null,
                 time integer not null,
-                rank integer default 2)";
+                rank integer default 2,
+                lnexist integer(1) not null,
+                preview varchar(1000) not null default '')";
 
             dbcommand.CommandText = list;
             dbcommand.ExecuteNonQuery();
@@ -239,11 +241,14 @@ namespace DatabaseManager
                     (title, subtitle, artist, subartist, gerne,
                     bpmstart, bpmmin, bpmmax,
                     path, md5hash, level, diff,
-                    fname, jacket, totalnotes, time, rank)
+                    fname, jacket, totalnotes, time, rank,
+                    lnexist, preview)
                     values";
 
             foreach(MusicListData param in paramList)
             {
+                int ln = param.LNExist ? 1 : 0;
+
                 query += "('" +
                         param.Title + "','" +
                         param.SubTitle + "','" +
@@ -261,7 +266,9 @@ namespace DatabaseManager
                         param.Jacket + "', " +
                         param.TotalNotes + ", " +
                         param.PlayTime + ", "+
-                        param.Rank + ")";
+                        param.Rank + ", " +
+                        ln + ", '" +
+                        param.Preview + "')";
 
                 if(paramList.IndexOf(param) != paramList.Count - 1)
                 {
@@ -513,12 +520,15 @@ namespace DatabaseManager
                 int ltotalnotes = dbreader.GetInt32(15);
                 int ltime = dbreader.GetInt32(16);
                 int lrank = dbreader.GetInt32(17);
+                bool lln = dbreader.GetInt32(18) == 1 ? true : false;
+                string lprev = dbreader.GetString(19);
 
                 MusicListData data = new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
                     lpath, lmd5, llv, ldiff, lfname,
-                    ljacket, ltotalnotes, ltime, lrank);
+                    ljacket, ltotalnotes, ltime, lrank,
+                    lln, lprev);
 
                 musiclist.Add(data);
             }
@@ -559,12 +569,15 @@ namespace DatabaseManager
                 int ltotalnotes = dbreader.GetInt32(15);
                 int ltime = dbreader.GetInt32(16);
                 int lrank = dbreader.GetInt32(17);
+                bool lln = dbreader.GetInt32(18) == 1 ? true : false;
+                string lprev = dbreader.GetString(19);
 
                 MusicListData data = new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
                     lpath, lmd5, llv, ldiff, lfname,
-                    ljacket, ltotalnotes, ltime, lrank);
+                    ljacket, ltotalnotes, ltime, lrank,
+                    lln, lprev);
 
                 musiclist.Add(data);
             }
@@ -603,12 +616,15 @@ namespace DatabaseManager
                 int ltotalnotes = dbreader.GetInt32(15);
                 int ltime = dbreader.GetInt32(16);
                 int lrank = dbreader.GetInt32(17);
+                bool lln = dbreader.GetInt32(18) == 1 ? true : false;
+                string lprev = dbreader.GetString(19);
 
                 return new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
                     lpath, lmd5, llv, ldiff, lfname,
-                    ljacket, ltotalnotes, ltime, lrank);
+                    ljacket, ltotalnotes, ltime, lrank,
+                    lln, lprev);
             }
 
             return null;
@@ -814,12 +830,15 @@ namespace DatabaseManager
                 int ltotalnotes = dbreader.GetInt32(15);
                 int ltime = dbreader.GetInt32(16);
                 int lrank = dbreader.GetInt32(17);
+                bool lln = dbreader.GetInt32(18) == 1 ? true : false;
+                string lprev = dbreader.GetString(19);
 
                 return new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
                     lpath, lmd5, llv, ldiff, lfname,
-                    ljacket, ltotalnotes, ltime, lrank);
+                    ljacket, ltotalnotes, ltime, lrank,
+                    lln, lprev);
             }
             else
             {
@@ -857,12 +876,15 @@ namespace DatabaseManager
                 int ltotalnotes = dbreader.GetInt32(15);
                 int ltime = dbreader.GetInt32(16);
                 int lrank = dbreader.GetInt32(17);
+                bool lln = dbreader.GetInt32(18) == 1 ? true : false;
+                string lprev = dbreader.GetString(19);
 
                 return new MusicListData(
                     lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
                     lbpmstart, lbpmmin, lbpmmax,
                     lpath, lmd5, llv, ldiff, lfname,
-                    ljacket, ltotalnotes, ltime, lrank);
+                    ljacket, ltotalnotes, ltime, lrank,
+                    lln, lprev);
             }
             else
             {

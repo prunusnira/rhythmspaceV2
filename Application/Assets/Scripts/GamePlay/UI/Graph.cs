@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BMSPlayer
 {
@@ -90,6 +88,9 @@ namespace BMSPlayer
             // 타겟 그래프 상승
             switch (Const.GraphTarget)
             {
+                case GraphTargetType.RECORD:
+                    Const.ResultTarget = Const.MyBestScore * procNotes / totalNotes;
+                    break;
                 case GraphTargetType.A:
                     graSprTar[(int)Const.GraphType].material.SetFloat("_Progress", ((float)procNotes) / totalNotes * 6 / 9);
                     Const.ResultTarget = procNotes * 2 * 6 / 9;
@@ -114,7 +115,6 @@ namespace BMSPlayer
             valBestDiff[(int)Const.GraphType].text = (ex - (Const.MyBestScore * procNotes / totalNotes)).ToString();
             valTar[(int)Const.GraphType].text = Const.ResultTarget.ToString();
             valTarDiff[(int)Const.GraphType].text = (ex - Const.ResultTarget).ToString();
-
         }
 
         private void ObjectPositionSetup()

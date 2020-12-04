@@ -19,6 +19,8 @@
         public int TotalNotes { get; set; }
         public int PlayTime { get; set; }
         public int Rank { get; set; }
+        public bool LNExist { get; set; }
+        public string Preview { get; set; }
 
         public MusicListData() { }
 
@@ -27,7 +29,7 @@
             double bpmstart, double bpmmin, double bpmmax,
             string path, string md5hash, int level, int diff,
             string fileName, string jacket, int totalNotes, int playtime,
-            int rank)
+            int rank, bool ln, string preview)
         {
             Id = id;
             Title = title;
@@ -47,13 +49,16 @@
             TotalNotes = totalNotes;
             PlayTime = playtime;
             Rank = rank;
+            LNExist = ln;
+            Preview = preview;
         }
 
         public MusicListData(int id, string title, string subtitle,
             string artist, string subartist, string gerne,
             double bpmstart, double bpmmin, double bpmmax,
             string path, int level, int diff, string fileName,
-            string jacket, int totalNotes, int playtime, int rank)
+            string jacket, int totalNotes, int playtime, int rank,
+            bool ln, string preview)
         {
             Id = id;
             Title = title;
@@ -72,6 +77,8 @@
             TotalNotes = totalNotes;
             PlayTime = playtime;
             Rank = rank;
+            LNExist = ln;
+            Preview = preview;
         }
     }
 }

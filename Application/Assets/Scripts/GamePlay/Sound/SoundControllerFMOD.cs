@@ -41,6 +41,25 @@ namespace BMSPlayer
             }
         }
 
+        public void PlayNormalSound(string file)
+        {
+            FMOD.Sound snd;
+            FMODUnity.RuntimeManager.CoreSystem.createSound(file, FMOD.MODE.CREATESAMPLE, out snd);
+
+            FMOD.Channel channel;
+            FMODUnity.RuntimeManager.CoreSystem.playSound(
+                snd,
+                channelGroup,
+                false,
+                out channel
+            );
+        }
+
+        public void ReleasePreview()
+        {
+
+        }
+
         public void PlayKeySound(string wavFile, BMS bms, int line)
         {
             if(bms.WavFilesFM.ContainsKey(wavFile))

@@ -44,6 +44,7 @@ namespace BMSPlayer
         public TextMeshProUGUI scorePrev;
         public TextMeshProUGUI scoreNew;
         public TextMeshProUGUI scoreDiff;
+        public TextMeshProUGUI scoreDiffR;
         public TextMeshProUGUI missPrev;
         public TextMeshProUGUI missNew;
         public TextMeshProUGUI missDiff;
@@ -116,6 +117,77 @@ namespace BMSPlayer
             analyzer.HeaderAnalyzer(Data.BMS, Const.Encoding);
             title.text = Data.BMS.Title;
             subtitle.text = Data.BMS.SubTitle;
+
+            // 점수 차이
+            int ex = Const.ResultScore;
+            int total = Const.ResultTotalNote;
+            string scoreDiffStr = "";
+            if (ex >= 2 * total * 8.5f / 9)
+            {
+                // MAX-
+                int val = total * 2 - ex;
+                scoreDiffStr += "MAX-" + val;
+            }
+            else if (ex >= 2 * total * 8f / 9)
+            {
+                // AAA+
+                int val = ex - total * 2 * 8 / 9;
+                scoreDiffStr += "AAA+" + val;
+            }
+            else if (ex >= 2 * total * 7.5f / 9)
+            {
+                // AAA-
+                int val = total * 2 * 8 / 9 - ex;
+                scoreDiffStr += "AAA-" + val;
+            }
+            else if (ex >= 2 * total * 7f / 9)
+            {
+                // AA+
+                int val = ex - total * 2 * 7 / 9;
+                scoreDiffStr += "AA+" + val;
+            }
+            else if (ex >= 2 * total * 6.5f / 9)
+            {
+                // AA-
+                int val = total * 2 * 7 / 9 - ex;
+                scoreDiffStr += "AA-" + val;
+            }
+            else if (ex >= 2 * total * 6f / 9)
+            {
+                // A+
+                int val = ex - total * 2 * 6 / 9;
+                scoreDiffStr += "A+" + val;
+            }
+            else if (ex >= 2 * total * 5.5f / 9)
+            {
+                // A-
+                int val = total * 2 * 6 / 9 - ex;
+                scoreDiffStr += "A-" + val;
+            }
+            else if (ex >= 2 * total * 5f / 9)
+            {
+                // B+
+                int val = ex - total * 2 * 5 / 9;
+                scoreDiffStr += "B+" + val;
+            }
+            else if (ex >= 2 * total * 4.5f / 9)
+            {
+                // B-
+                int val = total * 2 * 5 / 9 - ex;
+                scoreDiffStr += "B-" + val;
+            }
+            else if (ex >= 2 * total * 4f / 9)
+            {
+                // C+
+                int val = ex - total * 2 * 4 / 9;
+                scoreDiffStr += "C+" + val;
+            }
+            else
+            {
+                // C-
+                int val = total * 2 * 4 / 9 - ex;
+                scoreDiffStr += "C-" + val;
+            }
 
             // 패턴 정보
             string difficulty = "";
@@ -268,6 +340,7 @@ namespace BMSPlayer
             timediff.text = (vdiff * 100).ToString("0.00") + "ms";
 
             // 차이
+            scoreDiffR.text = scoreDiffStr;
             scorePrev.text = Const.MyBestScore.ToString();
             scoreNew.text = Const.ResultScore.ToString();
             missNew.text = vmiss.ToString();

@@ -238,6 +238,10 @@ namespace BMSPlayer
             // 그래프
             switch(Const.GraphTarget)
             {
+                case GraphTargetType.RECORD:
+                    txtTarget.text = "MY RECORD";
+                    txtTarget.color = new Color(115f / 255, 1f, 94f / 255);
+                    break;
                 case GraphTargetType.A:
                     txtTarget.text = "A";
                     txtTarget.color = new Color(196f / 255, 52f / 255, 174f / 255);
@@ -812,6 +816,11 @@ namespace BMSPlayer
             switch (Const.GraphTarget)
             {
                 case GraphTargetType.OFF:
+                    txtTarget.text = "MY RECORD";
+                    txtTarget.color = new Color(115f / 255, 1f, 94f / 255);
+                    Const.GraphTarget = GraphTargetType.RECORD;
+                    break;
+                case GraphTargetType.RECORD:
                     txtTarget.text = "A";
                     txtTarget.color = new Color(196f / 255, 52f / 255, 174f / 255);
                     Const.GraphTarget = GraphTargetType.A;

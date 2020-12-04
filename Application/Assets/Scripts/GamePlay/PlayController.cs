@@ -1,7 +1,6 @@
 ﻿using BMSCore;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,6 +24,7 @@ namespace BMSPlayer {
         private Graph Graph;
         private CoverLiftControl Cover;
         private StageFailed stageFailed;
+        private StageCleared stageCleared;
 
         // Pause Menu: 편의성을 위해 컨트롤러에서 관리
         public GameObject layerPauseMenu;
@@ -90,6 +90,7 @@ namespace BMSPlayer {
             Cover = GetComponent<CoverLiftControl>();
             JudgeUI = GetComponent<JudgeUIProcess>();
             stageFailed = GetComponent<StageFailed>();
+            stageCleared = GetComponent<StageCleared>();
 
             encoding = Const.Encoding;
 
@@ -411,6 +412,9 @@ namespace BMSPlayer {
                     // Type 2: 노트가 다 사용되었을 때
                     if (!isGameOver && scroller.GetProcessedNotes() >= Data.TotalNotes)
                     {
+                        stageCleared.ShowClearScoreStat(
+                            scroller.GetScore(), Data.TotalNotes);
+
                         // 풀콤/퍼펙여부 확인 후 화면에 표시
                         if(scroller.GetBreak() == 0)
                         {

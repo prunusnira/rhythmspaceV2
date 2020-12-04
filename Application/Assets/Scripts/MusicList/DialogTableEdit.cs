@@ -10,6 +10,7 @@ namespace BMSPlayer
     {
         public TextMeshProUGUI desc;
         public Button btnOK;
+        public Button btnReset;
         public Button btnCancel;
 
         public TMP_InputField urlSt;
@@ -37,6 +38,8 @@ namespace BMSPlayer
                 Refresh();
                 CloseSetting();
             });
+
+            btnReset.onClick.AddListener(ResetTable);
 
             btnCancel.onClick.AddListener(CloseSetting);
 
@@ -80,10 +83,7 @@ namespace BMSPlayer
         public override void EnableWindow()
         {
             base.EnableWindow();
-
-            urlSt.text = Const.StellaURL;
-            urlSl.text = Const.SatelliteURL;
-            urlGe.text = Const.GenocideURL;
+            SetInputField();
         }
 
         public void Refresh()
@@ -104,11 +104,29 @@ namespace BMSPlayer
             }
         }
 
+        public void ResetTable()
+        {
+            PlayerPrefs.DeleteKey("diff_stella");
+            PlayerPrefs.DeleteKey("diff_satellite");
+            PlayerPrefs.DeleteKey("diff_genocide");
+
+            urlSt.text = Const.StellaURL;
+            urlSl.text = Const.SatelliteURL;
+            urlGe.text = Const.GenocideURL;
+        }
+
         public void UpdateURL()
         {
             Const.StellaURL = urlSt.text;
             Const.SatelliteURL = urlSl.text;
             Const.GenocideURL = urlGe.text;
+        }
+
+        private void SetInputField()
+        {
+            urlSt.text = Const.StellaURL;
+            urlSl.text = Const.SatelliteURL;
+            urlGe.text = Const.GenocideURL;
         }
     }
 }

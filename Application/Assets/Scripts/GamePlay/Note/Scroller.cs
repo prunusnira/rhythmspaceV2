@@ -531,8 +531,11 @@ namespace BMSPlayer
                             current.Used = true;
                         }
                         else if (current.PlayNoteType == NoteType.LNEND &&
-                            !current.Used)
+                            !current.Used
+                            && Const.LNProcType == LNProcessType.CN)
                         {
+                            // LN일 때는 Play에서 처리되므로 이 아래로 내려올 일이 없음
+
                             // 롱노트 관련 데이터 처리
                             // Used일 때는 Play에서 처리하므로 여기서는 놓쳤을 때 처리를 수행
                             int lnNum = current.LNNum;
@@ -554,6 +557,7 @@ namespace BMSPlayer
                             removeCandidate.Add(data.NoteLong[lnNum].Start);
                             removeCandidate.Add(data.NoteLong[lnNum].Mid);
                         }
+                        UpdateScore(); // 그래프 갱신용
                     }
                 }
                 
@@ -564,7 +568,6 @@ namespace BMSPlayer
                     notes.Remove(n);
                 }
             }
-            UpdateScore(); // 그래프 갱신용
         }
 
         public void PlayBGA(List<BGANote> noteBGA, BMS bms, double time)
@@ -933,18 +936,15 @@ namespace BMSPlayer
                             if (time <= POOR && time > BAD)
                             {
                                 // 빠른 공푸어 처리
-                                epoor++;
-                                UI.UpdateSideJudge(perfect, great, good, ok, miss, epoor, cb, fast, slow,
-                                    avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
+                                ProcessEmptyPoor();
                             }
                             else if (time <= BAD && time >= BAD * -1)
                             {
                                 // 판정 처리 수행
                                 if (cnote.PlayNoteType == NoteType.LNSTART)
                                 {
-                                    // 롱노트는 애초에 공푸어에 관여하지 않음
                                     TimingType timing = GetTimingType(time, false);
-                                    if (timing != TimingType.BAD && timing != TimingType.POOR)
+                                    if (timing != TimingType.BAD)
                                     {
                                         ProcessLNStartNote(cnote, lnlist, time, i);
 
@@ -960,9 +960,18 @@ namespace BMSPlayer
                                     }
                                     else
                                     {
-                                        // 틀린 처리하고 넘어감
-                                        processedNotes++;
+                                        // BAD: 틀린 처리하고 넘어감
+                                        int lnNum = cnote.LNNum;
+                                        cnote.Used = true;
+                                        isLnWorking[i] = false;
+                                        lnlist[lnNum].Processing = false;
                                         lnlist[cnote.LNNum].Used = true;
+
+                                        removeCandidate.Add(lnlist[lnNum].End);
+                                        removeCandidate.Add(lnlist[lnNum].Mid);
+                                        removeCandidate.Add(cnote);
+
+                                        AfterTouchLongEnd(time);
                                     }
 
                                     lnlist[cnote.LNNum].Processing = true;
@@ -1068,13 +1077,14 @@ namespace BMSPlayer
                         if (isLnWorking[i])
                         {
                             double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
-                            
+                            int lnNum = cnote.LNNum;
+
                             // Timing Window 내에 롱노트 끝이 있으면 끝 판정 처리 (끝 판정은 들어갈 때 판정과 동일하게 처리함
                             // 롱노트 시작할 때 이미 틀린 판정처리 났으면 아무런 처리를 하지 않음
                             if (cnote.PlayNoteType == NoteType.LNEND &&
                                 !lnlist[cnote.LNNum].Used)
                             {
-                                int lnNum = cnote.LNNum;
+                                if (time > POOR) time = POOR;
                                 AfterTouchLongEnd(time);
 
                                 // 노트 이펙트 켜기
@@ -1086,42 +1096,22 @@ namespace BMSPlayer
                                 {
                                     UI.TurnOnNoteEffectLN(i, false);
                                 }
-
-                                cnote.Used = true;
-                                isLnWorking[i] = false;
-                                lnlist[lnNum].Processing = false;
-
-                                removeCandidate.Add(lnlist[lnNum].Start);
-                                removeCandidate.Add(lnlist[lnNum].Mid);
-                                removeCandidate.Add(cnote);
                             }
-                            // 그 보다 위에 있으면 미스처리하고 삭제함
-                            else
+
+                            // 일단 뗐으니 이 노트에 대한 처리는 끝났음
+                            cnote.Used = true;
+                            isLnWorking[i] = false;
+
+                            if(i == 0 || i == 8)
                             {
-                                int lnNum = cnote.LNNum;
-                                // 노트 이펙트 켜기
-                                miss++;
-                                cb++;
-                                combo = 0;
-                                processedNotes++;
-
-                                if(i == 8)
-                                {
-                                    UI.TurnOnNoteEffectLN(0, false);
-                                }
-                                else
-                                {
-                                    UI.TurnOnNoteEffectLN(i, false);
-                                }
-
-                                cnote.Used = true;
-                                isLnWorking[i] = false;
-                                lnlist[lnNum].Processing = false;
-
-                                removeCandidate.Add(lnlist[lnNum].Start);
-                                removeCandidate.Add(lnlist[lnNum].Mid);
-                                removeCandidate.Add(cnote);
+                                isLnWorking[0] = false;
+                                isLnWorking[8] = false;
                             }
+                            lnlist[lnNum].Processing = false;
+
+                            removeCandidate.Add(lnlist[lnNum].Start);
+                            removeCandidate.Add(lnlist[lnNum].Mid);
+                            removeCandidate.Add(cnote);
                         }
                     }
                 }
@@ -1347,10 +1337,12 @@ namespace BMSPlayer
         private void ProcessEmptyPoor()
         {
             // cb나 콤보 초기화 없이 miss 개수만 늘림
-            miss++;
+            epoor++;
             hpController.hpChangeEPoor();
             HPUI.UpdateHP(hpController.CurrentHP);
             JudgeUI.UpdateJudge(TimingType.EPOOR, combo, "0.00%", 0, score);
+            UI.UpdateSideJudge(perfect, great, good, ok, miss, epoor, cb, fast, slow,
+                    avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
         }
 
         // 롱노트의 끝 노트 타이밍을 처리하는 메소드
@@ -1375,11 +1367,13 @@ namespace BMSPlayer
                 case TimingType.BAD:
                     ok++;
                     cb++;
+                    combo = 0;
                     hpController.hpChangeBad();
                     break;
                 case TimingType.POOR:
                     miss++;
                     cb++;
+                    combo = 0;
                     break;
             }
 
@@ -1464,7 +1458,7 @@ namespace BMSPlayer
             else if (time > PERFECT && time <= GREAT) return TimingType.GREAT;
             else if (time > GREAT && time <= GOOD) return TimingType.GOOD;
             else if (time > GOOD && time <= BAD) return TimingType.BAD;
-            else if (time > BAD) return TimingType.POOR;
+            else if (time > BAD && time <= POOR) return TimingType.POOR;
             else return TimingType.NONE;
         }
 
@@ -1598,6 +1592,7 @@ namespace BMSPlayer
             return rank;
         }
 
+        public int GetScore() { return score; }
         public int GetPerfect() { return perfect; }
         public int GetGreat() { return great; }
         public int GetGood() { return good; }

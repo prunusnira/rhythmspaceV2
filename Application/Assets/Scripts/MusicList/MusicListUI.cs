@@ -49,6 +49,7 @@ namespace BMSPlayer
         public GameObject patternPrefab;
         public GameObject folderPrefab;
         public GameObject tablePrefab;
+        public Sprite spNoBms;
         public Sprite rampNoPlay;
         public Sprite rampAssisted;
         public Sprite rampEasy;
@@ -66,7 +67,6 @@ namespace BMSPlayer
         // Search
         public InputField inputSearch;
         public Button btnSearchSubmit;
-        private bool searchMode;
 
         // Selected info
         public RawImage infoJacket;
@@ -139,6 +139,7 @@ namespace BMSPlayer
 
         public AudioSource sfxChange;
         public AudioSource bgLoop;
+        public AudioSource prevLoop;
         public AudioClip sfxChangeClip;
         public AudioClip sfxSelect;
         public AudioClip[] loop;
@@ -161,12 +162,21 @@ namespace BMSPlayer
             Application.targetFrameRate = Const.FrameRate;
             bmslist = new List<ListItemNode>();
             rdm = new RecordDataManager();
-            if(File.Exists(Const.JSONPath))
-            {
-                ListTreeGenerator();
-            }
 
-            ListLoadThread();
+            if(Const.SearchMode)
+            {
+                SearchResult(Const.SearchText);
+            }
+            else
+            {
+                if (File.Exists(Const.JSONPath))
+                {
+                    ListTreeGenerator();
+                }
+
+                ListLoadThread();
+                UpdatePathText();
+            }
 
             // Description
             btnDescSystemOp.onClick.AddListener(OpenSystemOption);
@@ -177,11 +187,12 @@ namespace BMSPlayer
             {
                 if(inputSearch.text != "")
                 {
-                    SearchResult();
+                    SearchResult(null);
                 }
             });
-            btnSearchSubmit.onClick.AddListener(SearchResult);
-            searchMode = false;
+            btnSearchSubmit.onClick.AddListener(delegate {
+                SearchResult(null);
+            });
         }
 
         public void Start()
@@ -299,7 +310,7 @@ namespace BMSPlayer
                     Input.GetMouseButtonDown(1) ||
                     GetBtnBlue())
                 {
-                    if(searchMode)
+                    if(Const.SearchMode)
                     {
                         // 본래대로 돌아감
                         if(Const.ListDepth.Count > 0)
@@ -310,7 +321,7 @@ namespace BMSPlayer
                         {
                             Const.ListPos = 0;
                         }
-                        searchMode = false;
+                        Const.SearchMode = false;
                         musicRect.Clear();
                         musicRect.ResetIndex();
                         ListLoadThread();
@@ -324,6 +335,7 @@ namespace BMSPlayer
                         musicRect.ResetIndex();
                         ListLoadThread();
                     }
+
                     UpdatePathText();
                     sfxChange.PlayOneShot(sfxSelect);
                 }
@@ -378,14 +390,17 @@ namespace BMSPlayer
             GetComponent<DialogQuit>().EnableWindow();
         }
 
-        public void SearchResult()
+        public void SearchResult(string keyword)
         {
-            if (inputSearch.text != "")
+            string searchStr = keyword;
+            if (searchStr == null) searchStr = inputSearch.text;
+            if (searchStr != "")
             {
-                string text = inputSearch.text;
-                List<MusicListData> searchResult = MusicDataManager.Instance.FindBMSWithName(text);
+                List<MusicListData> searchResult = MusicDataManager.Instance.FindBMSWithName(searchStr);
                 if (searchResult.Count > 0)
                 {
+                    Const.SearchText = searchStr;
+                    txtPath.text = Const.musiclistSearchMode[(int)Const.Language];
                     musicRect.Clear();
                     bmslist.Clear();
                     foreach (MusicListData d in searchResult)
@@ -402,7 +417,7 @@ namespace BMSPlayer
                     }
                     musicRect.Init(bmslist, 0, ObjectSetup);
                     showInfo(musicRect.GetCurrent());
-                    searchMode = true;
+                    Const.SearchMode = true;
                 }
                 else
                 {
@@ -671,6 +686,20 @@ namespace BMSPlayer
                     recordClearStat.sprite = clearNP;
                     recordRank.sprite = empty;
                 }
+
+                // 프리뷰 파일이 있으면 재생함
+                if(bms.Preview != null && bms.Preview.Length > 0)
+                {
+                    bgLoop.volume = 0.1f;
+                    WWW www = new WWW(bms.Preview);
+                    prevLoop.clip = www.GetAudioClip(false, true);
+                    prevLoop.Play();
+                }
+                else
+                {
+                    bgLoop.volume = 0.5f;
+                    prevLoop.Stop();
+                }
             }
             else if(node.Type == ItemType.DIRECTORY ||
                     node.Type == ItemType.TABLE)
@@ -696,6 +725,9 @@ namespace BMSPlayer
                 recordCBreak.text = "0";
                 recordClearStat.sprite = clearNP;
                 recordRank.sprite = empty;
+
+                bgLoop.volume = 0.5f;
+                prevLoop.Stop();
             }
         }
 
@@ -733,6 +765,8 @@ namespace BMSPlayer
 
                 level.text = d.Level.ToString();
                 title.text = d.Title;
+
+                if (!d.LNExist) c.GetChild(3).gameObject.SetActive(false);
 
                 // Difficulty에 따른 색상 변경
                 switch (d.Difficulty)
@@ -789,8 +823,7 @@ namespace BMSPlayer
 
                 if(n.IsFromTable && !n.Exist)
                 {
-                    music.GetComponent<Image>().color =
-                        new Color(130f / 255, 0, 31f / 255);
+                    music.GetComponent<Image>().sprite = spNoBms;
                 }
 
                 return music;
@@ -850,9 +883,9 @@ namespace BMSPlayer
             musicRect.Clear();
             musicRect.ResetIndex();
 
-            UpdatePathText();
-
             ListLoadThread();
+
+            UpdatePathText();
             sfxChange.PlayOneShot(sfxSelect);
         }
 

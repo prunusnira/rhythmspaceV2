@@ -3,6 +3,7 @@ using DatabaseManager;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using UnityEngine;
 
@@ -65,6 +66,25 @@ namespace BMSPlayer
                 generator.AnalyzeNotes(Data, new int[] { 1, 2, 3, 4, 5, 6, 7 });
                 generator.PositionToTiming(Data);
 
+                bool ln = Data.NoteLong.Count > 0 ? true : false;
+
+                // 폴더 내에 preview 이름을 가진 파일 찾기
+                string[] files = Directory.EnumerateFiles(
+                    Data.BMS.FolderPath, "*preview*.*", SearchOption.TopDirectoryOnly).ToArray();
+
+                string previewFile = "";
+                if (files.Length > 0)
+                {
+                    foreach(string f in files)
+                    {
+                        if (f.ToLower().EndsWith("ogg") || f.ToLower().EndsWith("wav"))
+                        {
+                            previewFile = f;
+                            break;
+                        }
+                    }
+                }
+
                 MusicListData data = new MusicListData(
                         index,
                         Data.BMS.Title,
@@ -82,7 +102,9 @@ namespace BMSPlayer
                         Data.BMS.StageFile,
                         Data.TotalNotes,
                         (int)Data.LastTiming,
-                        Data.BMS.Rank
+                        Data.BMS.Rank,
+                        ln,
+                        previewFile
                     );
 
                 return data;

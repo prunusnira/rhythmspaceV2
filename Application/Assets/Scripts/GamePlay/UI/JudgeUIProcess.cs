@@ -115,7 +115,9 @@ namespace BMSPlayer
             }
 
             // Combo update
-            if (judgetype == TimingType.BAD || judgetype == TimingType.POOR)
+            if (judgetype == TimingType.BAD ||
+                judgetype == TimingType.POOR ||
+                judgetype == TimingType.EPOOR)
             {
                 txtJudgeBM.text = judgeStr;
             }

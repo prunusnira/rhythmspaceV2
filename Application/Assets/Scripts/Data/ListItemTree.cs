@@ -158,7 +158,7 @@ namespace BMSPlayer
 
         public bool CheckHaveBMS(string path)
         {
-            string[] bmsfiles = Directory.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly)
+            string[] bmsfiles = Directory.EnumerateFiles(path, "*.*", SearchOption.TopDirectoryOnly)
                         .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")
                         || s.ToLower().EndsWith(".bml")).ToArray();
             if (bmsfiles.Length > 0) return true;
@@ -173,7 +173,7 @@ namespace BMSPlayer
             int encoding,
             bool readBMS)
         {
-            string[] bmsfiles = Directory.GetFiles(node.Path, "*.*", SearchOption.TopDirectoryOnly)
+            string[] bmsfiles = Directory.EnumerateFiles(node.Path, "*.*", SearchOption.TopDirectoryOnly)
                         .Where(s => s.ToLower().EndsWith(".bms") || s.ToLower().EndsWith(".bme")
                         || s.ToLower().EndsWith(".bml")).ToArray();
 
