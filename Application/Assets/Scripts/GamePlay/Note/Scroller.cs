@@ -439,8 +439,7 @@ namespace BMSPlayer
 
                     // 롱노트 가운데 노트의 위치와 넓이 설정
                     if (current.PlayNoteType == NoteType.LNSTART &&
-                        current.OnScreen &&
-                        !current.Used)
+                        current.OnScreen)
                     {
                         // isSpeedChanged는 모든 롱노트를 변경한 후에
                         // false로 바꾸어야하므로 for문 아래에 둠
@@ -768,6 +767,7 @@ namespace BMSPlayer
                         }
 
                         ProcessLNStartNote(cnote, lnlist, time, i);
+                        cnote.Used = true;
 
                         // 노트 이펙트 켜기
                         UI.TurnOnNoteEffectLN(i, true);
@@ -947,6 +947,7 @@ namespace BMSPlayer
                                     if (timing != TimingType.BAD)
                                     {
                                         ProcessLNStartNote(cnote, lnlist, time, i);
+                                        cnote.Used = true;
 
                                         // 노트 이펙트 켜기
                                         if (i == 8)
@@ -957,6 +958,8 @@ namespace BMSPlayer
                                         {
                                             UI.TurnOnNoteEffectLN(i, true);
                                         }
+
+                                        lnlist[cnote.LNNum].Processing = true;
                                     }
                                     else
                                     {
@@ -965,7 +968,7 @@ namespace BMSPlayer
                                         cnote.Used = true;
                                         isLnWorking[i] = false;
                                         lnlist[lnNum].Processing = false;
-                                        lnlist[cnote.LNNum].Used = true;
+                                        lnlist[lnNum].Used = true;
 
                                         removeCandidate.Add(lnlist[lnNum].End);
                                         removeCandidate.Add(lnlist[lnNum].Mid);
@@ -973,8 +976,6 @@ namespace BMSPlayer
 
                                         AfterTouchLongEnd(time);
                                     }
-
-                                    lnlist[cnote.LNNum].Processing = true;
                                 }
                                 else if (cnote.PlayNoteType == NoteType.SINGLE)
                                 {
@@ -984,6 +985,7 @@ namespace BMSPlayer
                                     // 노트 이펙트 켜기
                                     UI.TurnOnNoteEffect(i % 8);
                                     cnote.Used = true;
+                                    TimingType timing = GetTimingType(time, false);
                                 }
                             }
                             else if (time < BAD * -1 && time >= POOR * -1)
@@ -1036,7 +1038,7 @@ namespace BMSPlayer
                                     // 롱놋 처리된 것으로 처리
                                     int lnNum = cnote.LNNum;
                                     AfterTouchLongEnd(time);
-
+                                    
                                     cnote.Used = true;
                                     isLnWorking[i] = false;
                                     lnlist[lnNum].Processing = false;
@@ -1074,9 +1076,10 @@ namespace BMSPlayer
                             cnote = currentLine[1];
                         }
 
+                        double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
+
                         if (isLnWorking[i])
                         {
-                            double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
                             int lnNum = cnote.LNNum;
 
                             // Timing Window 내에 롱노트 끝이 있으면 끝 판정 처리 (끝 판정은 들어갈 때 판정과 동일하게 처리함
@@ -1086,7 +1089,7 @@ namespace BMSPlayer
                             {
                                 if (time > POOR) time = POOR;
                                 AfterTouchLongEnd(time);
-
+                                
                                 // 노트 이펙트 켜기
                                 if (i == 8)
                                 {

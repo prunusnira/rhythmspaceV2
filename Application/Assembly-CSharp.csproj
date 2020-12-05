@@ -94,6 +94,7 @@
     <Compile Include="Assets\Scripts\GamePlay\PlayData.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Sound\ISoundController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Sound\SoundControllerFMOD.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\Sound\SoundControllerNAudio.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Sound\SoundControllerUnity.cs" />
     <Compile Include="Assets\Scripts\GamePlay\UI\BGAControl.cs" />
     <Compile Include="Assets\Scripts\GamePlay\UI\BeamUI.cs" />
@@ -384,6 +385,9 @@
     </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/HttpAgilityPack/HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/NAudio/NAudio.dll</HintPath>
     </Reference>
     <Reference Include="LibVLCSharp">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/VLCUnity/Plugins/x86_64/LibVLCSharp.dll</HintPath>

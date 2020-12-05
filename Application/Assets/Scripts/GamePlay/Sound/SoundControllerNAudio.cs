@@ -5,28 +5,23 @@ using UnityEngine;
 
 namespace BMSPlayer
 {
-    public class SoundControllerFMOD : ISoundController
+    public class SoundControllerNAudio : ISoundController
     {
-        private FMOD.ChannelGroup channelGroup;
-        private List<FMOD.Channel> channels;
-
-        private static SoundControllerFMOD instance;
-        public static SoundControllerFMOD Instance
+        private static SoundControllerNAudio instance;
+        public static SoundControllerNAudio Instance
         {
             get
             {
                 if(instance == null)
                 {
-                    instance = new SoundControllerFMOD();
+                    instance = new SoundControllerNAudio();
                 }
                 return instance;
             }
         }
 
-        public SoundControllerFMOD()
+        public SoundControllerNAudio()
         {
-            channels = new List<FMOD.Channel>();
-            channelGroup = new FMOD.ChannelGroup();
         }
 
         // Execute after BMSAnalyzer.FullAnalyzer worked
@@ -45,55 +40,46 @@ namespace BMSPlayer
         {
             if(bms.WavFilesFM.ContainsKey(wavFile))
             {
-                FMOD.Channel channel;
-                FMODUnity.RuntimeManager.CoreSystem.playSound(
-                    bms.WavFilesFM[wavFile],
-                    channelGroup,
-                    false,
-                    out channel
-                );
-                channel.setVolume(0.5f);
-                channel.setLoopCount(0);
-                channels.Add(channel);
+                
             }
         }
 
         public bool CheckSoundPlaying()
         {
             bool isPlaying = false;
-            foreach(FMOD.Channel c in channels)
+            /*foreach(FMOD.Channel c in channels)
             {
                 c.isPlaying(out isPlaying);
                 if(isPlaying)
                 {
                     break;
                 }
-            }
+            }*/
             return isPlaying;
         }
 
         public void StopAll()
         {
-            foreach (FMOD.Channel c in channels)
+            /*foreach (FMOD.Channel c in channels)
             {
                 c.stop();
-            }
+            }*/
         }
 
         public void PauseAll()
         {
-            foreach (FMOD.Channel c in channels)
+            /*foreach (FMOD.Channel c in channels)
             {
                 c.setPaused(true);
-            }
+            }*/
         }
 
         public void ResumeAll()
         {
-            foreach (FMOD.Channel c in channels)
+            /*foreach (FMOD.Channel c in channels)
             {
                 c.setPaused(false);
-            }
+            }*/
         }
 
         public void FreeMemory(BMS bms)
@@ -101,14 +87,6 @@ namespace BMSPlayer
             foreach (FMOD.Sound snd in bms.WavFilesFM.Values)
             {
                 snd.release();
-            }
-        }
-
-        public void FMODErrorCheck(FMOD.RESULT result)
-        {
-            if(result != FMOD.RESULT.OK)
-            {
-                Debug.LogError(FMOD.Error.String(result));
             }
         }
     }

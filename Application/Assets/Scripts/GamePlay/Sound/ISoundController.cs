@@ -6,8 +6,6 @@ namespace BMSPlayer
     {
         void PreloadSound(BMS bms);
 
-        void PlayNormalSound(string file);
-
         void PlayKeySound(string wavFile, BMS bms, int line);
 
         bool CheckSoundPlaying();

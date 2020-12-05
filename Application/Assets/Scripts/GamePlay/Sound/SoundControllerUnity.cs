@@ -45,11 +45,6 @@ namespace BMSPlayer
             }
         }
 
-        public void PlayNormalSound(string file)
-        {
-
-        }
-
         public void PlayKeySound(string wavFile, BMS bms, int line)
         {
             try
