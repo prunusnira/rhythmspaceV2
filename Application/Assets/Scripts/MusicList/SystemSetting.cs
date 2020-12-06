@@ -44,15 +44,12 @@ namespace BMSPlayer
         public Button btnKor;
         public Button btnJpn;
         public Button btnEng;
-        public Text curLang;
 
         // Resolution Change
         public Text titleResol;
-        public Button btn1080p;
-        public Button btn900p;
-        public Button btn768p;
-        public Button btn720p;
         public Text txtResol;
+        public Button btnResLeft;
+        public Button btnResRight;
 
         // Frame Rate
         public Text titleFrame;
@@ -62,18 +59,16 @@ namespace BMSPlayer
 
         // Screen mode Change
         public Text titleScrMode;
-        public Button btnWindowed;
-        public Button btnFullScr;
-        public Button btnBorderless;
         public Text txtScrMode;
+        public Button btnWinLeft;
+        public Button btnWinRight;
 
         // Sync changer
         public Text titleSync;
         public Button btnAutoSync;
-        public Button btnSyncUp;
-        public Button btnSyncDown;
+        public Button btnSyncLeft;
+        public Button btnSyncRight;
         public Text syncval;
-        public Text syncdesc;
 
         // Encoding
         public Text titleEncoding;
@@ -120,30 +115,18 @@ namespace BMSPlayer
             });
             btnPathRefreshChange.onClick.AddListener(PathRefreshChanges);
             btnPathRefreshReload.onClick.AddListener(PathRefreshReload);
-            btn1080p.onClick.AddListener(delegate
+
+            // 해상도 변경
+            btnResLeft.onClick.AddListener(delegate
             {
-                Const.ScrWidth = 1920;
-                Const.ScrHeight = 1080;
-                changeVideoSetting();
+                ChangeResolution(false);
             });
-            btn900p.onClick.AddListener(delegate
+            btnResRight.onClick.AddListener(delegate
             {
-                Const.ScrWidth = 1600;
-                Const.ScrHeight = 900;
-                changeVideoSetting();
+                ChangeResolution(true);
             });
-            btn768p.onClick.AddListener(delegate
-            {
-                Const.ScrWidth = 1366;
-                Const.ScrHeight = 768;
-                changeVideoSetting();
-            });
-            btn720p.onClick.AddListener(delegate
-            {
-                Const.ScrWidth = 1280;
-                Const.ScrHeight = 720;
-                changeVideoSetting();
-            });
+
+            // 프레임
             btnFrame.onClick.AddListener(delegate
             {
                 int frame = Convert.ToInt32(inputFrame.text);
@@ -153,21 +136,16 @@ namespace BMSPlayer
                 Application.targetFrameRate = frame;
                 frameval.text = inputFrame.text;
             });
-            btnWindowed.onClick.AddListener(delegate
+
+            btnWinLeft.onClick.AddListener(delegate
             {
-                Const.ScreenMode = FullScreenMode.Windowed;
-                changeVideoSetting();
+                ChangeScreenMode(false);
             });
-            btnFullScr.onClick.AddListener(delegate
+            btnWinRight.onClick.AddListener(delegate
             {
-                Const.ScreenMode = FullScreenMode.ExclusiveFullScreen;
-                changeVideoSetting();
+                ChangeScreenMode(true);
             });
-            btnBorderless.onClick.AddListener(delegate
-            {
-                Const.ScreenMode = FullScreenMode.MaximizedWindow;
-                changeVideoSetting();
-            });
+
             btnKor.onClick.AddListener(delegate
             {
                 changeLang(LanguageType.KO);
@@ -181,13 +159,13 @@ namespace BMSPlayer
                 changeLang(LanguageType.EN);
             });
             btnAutoSync.onClick.AddListener(SetAutoSync);
-            btnSyncDown.onClick.AddListener(delegate
+            btnSyncLeft.onClick.AddListener(delegate
             {
-                changeSync(false);
+                ChangeSync(false);
             });
-            btnSyncUp.onClick.AddListener(delegate
+            btnSyncRight.onClick.AddListener(delegate
             {
-                changeSync(true);
+                ChangeSync(true);
             });
             btn932.onClick.AddListener(delegate
             {
@@ -213,18 +191,6 @@ namespace BMSPlayer
             LanguageType lang = Const.Language;
             int enc = Const.Encoding;
 
-            switch(lang)
-            {
-                case LanguageType.KO:
-                    curLang.text = "Korean";
-                    break;
-                case LanguageType.JA:
-                    curLang.text = "Japanese";
-                    break;
-                case LanguageType.EN:
-                    curLang.text = "English";
-                    break;
-            }
             changeLang(lang);
 
             frameval.text = Const.FrameRate.ToString();
@@ -232,21 +198,21 @@ namespace BMSPlayer
             switch(enc)
             {
                 case 932:
-                    curEncoding.text = "JP-Based";
+                    curEncoding.text = "Shift-JIS";
                     break;
                 case 949:
-                    curEncoding.text = "KR-Based";
+                    curEncoding.text = "EUC-KR";
                     break;
             }
             showSync();
 
             if (Const.AutoSync == AutoSyncType.OFF)
             {
-                btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync OFF"; 
+                btnAutoSync.GetComponentInChildren<Text>().text = "Auto OFF"; 
             }
             else
             {
-                btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync ON";
+                btnAutoSync.GetComponentInChildren<Text>().text = "Auto ON";
             }
 
             switch (Const.ScreenMode)
@@ -306,7 +272,6 @@ namespace BMSPlayer
             settingDesc.text = Const.settingDesc[(int)lang];
             showSync();
             changeEncoding(Const.Encoding);
-            syncdesc.text = Const.settingSyncDesc[(int)lang];
             encdesc.text = Const.settingEncodingDesc[(int)lang];
 
             titlePath.text = Const.settingTitlePath[(int)lang];
@@ -326,9 +291,6 @@ namespace BMSPlayer
             btnPathRefreshChange.GetComponentInChildren<Text>().text = Const.settingBtnRefreshChange[(int)Const.Language];
             btnPathRefreshReload.GetComponentInChildren<Text>().text = Const.settingBtnRefreshReload[(int)Const.Language];
             btnFrame.GetComponentInChildren<Text>().text = Const.settingBtnFrameUpdate[(int)Const.Language];
-            btnWindowed.GetComponentInChildren<Text>().text = Const.settingBtnScrModeWin[(int)Const.Language];
-            btnFullScr.GetComponentInChildren<Text>().text = Const.settingBtnScrModeFull[(int)Const.Language];
-            btnBorderless.GetComponentInChildren<Text>().text = Const.settingBtnScrModeBorder[(int)Const.Language];
             btn932.GetComponentInChildren<Text>().text = Const.settingBtnEncJP[(int)Const.Language];
             btn949.GetComponentInChildren<Text>().text = Const.settingBtnEncKR[(int)Const.Language];
             btnKeySetting.GetComponentInChildren<Text>().text = Const.settingBtnKeyChange[(int)Const.Language];
@@ -525,17 +487,17 @@ namespace BMSPlayer
             if (Const.AutoSync == AutoSyncType.OFF)
             {
                 Const.AutoSync = AutoSyncType.ON;
-                btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync ON";
+                btnAutoSync.GetComponentInChildren<Text>().text = "Auto ON";
             }
             else
             {
                 Const.AutoSync = AutoSyncType.OFF;
-                btnAutoSync.GetComponentInChildren<Text>().text = "Auto Sync OFF";
+                btnAutoSync.GetComponentInChildren<Text>().text = "Auto OFF";
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void changeSync(bool up)
+        public void ChangeSync(bool up)
         {
             if (up)
             {
@@ -554,11 +516,11 @@ namespace BMSPlayer
             int sync = Const.Sync;
             if (sync < 0)
             {
-                syncval.text = sync.ToString();
+                syncval.text = sync + " ms";
             }
             else
             {
-                syncval.text = "+" + sync;
+                syncval.text = "+" + sync + " ms";
             }
         }
 
@@ -566,18 +528,7 @@ namespace BMSPlayer
         {
             Const.Language = lang;
             MusicListUI.isLangChanged = true;
-            switch (lang)
-            {
-                case LanguageType.KO:
-                    curLang.text = "Korean";
-                    break;
-                case LanguageType.JA:
-                    curLang.text = "Japanese";
-                    break;
-                case LanguageType.EN:
-                    curLang.text = "English";
-                    break;
-            }
+            PlayOptionSetting.langChange = true;
             UpdateOption();
             sfxPlay.PlayOneShot(sfxSource);
         }
@@ -588,24 +539,93 @@ namespace BMSPlayer
             switch (enc)
             {
                 case 932:
-                    curEncoding.text = "JP-Based";
+                    curEncoding.text = "Shift-JIS";
                     break;
                 case 949:
-                    curEncoding.text = "KR-Based";
+                    curEncoding.text = "EUC-KR";
                     break;
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void changeVideoSetting()
+        public void UpdateVideoSetting()
         {
             Screen.SetResolution(
                 Const.ScrWidth,
                 Const.ScrHeight,
-                Const.ScreenMode,
-                Const.FrameRate
+                Const.ScreenMode
             );
             sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        public void ChangeResolution(bool up)
+        {
+            Resolution[] res = Screen.resolutions;
+            int curpos = 0;
+            for(int i = 0; i < res.Length; i++)
+            {
+                if (res[i].height == Const.ScrHeight)
+                {
+                    curpos = i;
+                    break;
+                }
+            }
+
+            if(up)
+            {
+                if(curpos < res.Length - 1)
+                {
+                    curpos++;
+                }
+            }
+            else
+            {
+                if (curpos > 0)
+                {
+                    curpos--;
+                }
+            }
+
+            Const.ScrWidth = res[curpos].width;
+            Const.ScrHeight = res[curpos].height;
+
+            UpdateVideoSetting();
+        }
+
+        public void ChangeScreenMode(bool up)
+        {
+            if(up)
+            {
+                switch(Const.ScreenMode)
+                {
+                    case FullScreenMode.ExclusiveFullScreen:
+                        Const.ScreenMode = FullScreenMode.Windowed;
+                        break;
+                    case FullScreenMode.MaximizedWindow:
+                        Const.ScreenMode = FullScreenMode.ExclusiveFullScreen;
+                        break;
+                    case FullScreenMode.Windowed:
+                        Const.ScreenMode = FullScreenMode.MaximizedWindow;
+                        break;
+                }
+            }
+            else
+            {
+                switch (Const.ScreenMode)
+                {
+                    case FullScreenMode.ExclusiveFullScreen:
+                        Const.ScreenMode = FullScreenMode.MaximizedWindow;
+                        break;
+                    case FullScreenMode.MaximizedWindow:
+                        Const.ScreenMode = FullScreenMode.Windowed;
+                        break;
+                    case FullScreenMode.Windowed:
+                        Const.ScreenMode = FullScreenMode.ExclusiveFullScreen;
+                        break;
+                }
+            }
+
+            UpdateVideoSetting();
         }
 
         public void ShowKeySetting()

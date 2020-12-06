@@ -50,6 +50,148 @@ namespace BMSPlayer
         public static int[] CurrentLayout = { 1, 2, 3, 4, 5, 6, 7 };
 
         // Language
+        #region Text on Play Option
+        public static string[] playopDesc = new string[3]
+        {
+            "게임 플레이와 관련된 옵션을 변경합니다",
+            "ゲームプレイに関する設定を変更できます",
+            "Game related options can be changed"
+        };
+
+        public static string[] playopSpeed = new string[3]
+        {
+            "배속",
+            "スピード",
+            "Speed"
+        };
+
+        public static string[] playopSpdType = new string[3]
+        {
+            "배속종류",
+            "スピードタイプ",
+            "Speed Type"
+        };
+
+        public static string[] playopGaugeType = new string[3]
+        {
+            "게이지 타입",
+            "ゲージタイプ",
+            "Gauge Type"
+        };
+
+        public static string[] playopNoteLayout = new string[3]
+        {
+            "배치",
+            "配置",
+            "Note Layout"
+        };
+
+        public static string[] playopJudgeType = new string[3]
+        {
+            "판정기준",
+            "判定タイプ",
+            "Judge Type"
+        };
+
+        public static string[] playopAuto = new string[3]
+        {
+            "오토플레이",
+            "オートプレイ",
+            "Auto Play"
+        };
+
+        public static string[] playopGraphTarget = new string[3]
+        {
+            "그래프 목표",
+            "グラフターゲット",
+            "Graph Target"
+        };
+
+        public static string[] playopPlaySide = new string[3]
+        {
+            "플레이 위치",
+            "プレイ側",
+            "Play Side"
+        };
+
+        public static string[] playopGearSkin = new string[3]
+        {
+            "기어 스킨",
+            "ギアースキン",
+            "Gear Skin"
+        };
+
+        public static string[] playopGearSize = new string[3]
+        {
+            "기어 너비",
+            "ギアーの広さ",
+            "Gear Size"
+        };
+
+        public static string[] playopNoteSkin = new string[3]
+        {
+            "노트 스킨",
+            "ノーツスキン",
+            "Note Skin"
+        };
+
+        public static string[] playopNoteSize = new string[3]
+        {
+            "노트 두께",
+            "ノーツの厚さ",
+            "Note Size"
+        };
+
+        public static string[] playopGraphType = new string[3]
+        {
+            "그래프 크기",
+            "グラフのサイズ",
+            "Graph Type"
+        };
+
+        public static string[] playopUILayout = new string[3]
+        {
+            "UI구성",
+            "UIの構成",
+            "UI Layout"
+        };
+
+        public static string[] playopBGA = new string[3]
+        {
+            "BGA 표시",
+            "BGAの表示",
+            "BGA On/Off"
+        };
+
+        public static string[] playopJudgePanel = new string[3]
+        {
+            "판정 패널 표시",
+            "判定パンネル表示",
+            "Judge Panel"
+        };
+
+        public static string[] playopFastSlow = new string[3]
+        {
+            "Fast/Slow 표시",
+            "Fast/Slowの表示",
+            "Fast/Slow"
+        };
+
+        public static string[] playopTargetDiff = new string[3]
+        {
+            "목표치와의 차이",
+            "ターゲットとの差",
+            "Target Difference"
+        };
+
+        public static string[] playopRate = new string[3]
+        {
+            "노트 처리 레이트",
+            "ノーツ処理レート",
+            "Note Rate"
+        };
+        #endregion
+
         #region Text on System Setting
         public static string[] settingTitlePath = new string[3]
         {
@@ -133,13 +275,6 @@ namespace BMSPlayer
             "Set encoding for parsing BMS"
         };
 
-        public static string[] settingSyncDesc = new string[3]
-        {
-            "1 변동시 마다 1ms씩 판정 위치가 변경됩니다.",
-            "１変更について1msの判定変化があります",
-            "Judge timing changes by 1ms per 1"
-        };
-
         public static string[] settingChangeWarning = new string[3]
         {
             "경로 혹은 인코딩 변경 시 모든 BMS 파일을 새로 읽어들이므로\n로딩에 시간이 소요됩니다",
@@ -194,15 +329,15 @@ namespace BMSPlayer
 
         public static string[] settingBtnEncJP = new string[3]
         {
-            "일본어 기준(Shift-JIS)",
-            "日本語基準(Shift-JIS)",
-            "JP Based(Shift-JIS)"
+            "일본어(Shift-JIS)",
+            "日本語(Shift-JIS)",
+            "Japanese(Shift-JIS)"
         };
         public static string[] settingBtnEncKR = new string[3]
         {
-            "한국어 기준(EUC-KR)",
-            "韓国語基準(EUC-KR)",
-            "KR Based(EUC-KR)"
+            "한국어(EUC-KR)",
+            "韓国語(EUC-KR)",
+            "Korean(EUC-KR)"
         };
 
         public static string[] settingBtnKeyChange = new string[3]
@@ -255,6 +390,13 @@ namespace BMSPlayer
             "곡 선택",
             "曲を選択",
             "SELECT"
+        };
+
+        public static string[] listPlayOp = new string[3]
+        {
+            "플레이 옵션",
+            "プレイ設定",
+            "PLAY OPTION"
         };
 
         public static string[] listSystemOp = new string[3]

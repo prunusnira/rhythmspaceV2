@@ -58,7 +58,7 @@ namespace BMSPlayer {
         private bool isPositionFixed = false;
 
         // Data in thread
-        private int encoding = 939;
+        private int encoding = 932;
 
         // 시간 관리
         private double StartTime = 0;

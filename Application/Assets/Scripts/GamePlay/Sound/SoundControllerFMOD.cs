@@ -29,6 +29,12 @@ namespace BMSPlayer
             channelGroup = new FMOD.ChannelGroup();
         }
 
+        public void Reset()
+        {
+            channels = new List<FMOD.Channel>();
+            channelGroup = new FMOD.ChannelGroup();
+        }
+
         // Execute after BMSAnalyzer.FullAnalyzer worked
         public void PreloadSound(BMS bms)
         {
@@ -58,7 +64,7 @@ namespace BMSPlayer
             }
         }
 
-        public bool CheckSoundPlaying()
+        public bool CheckSoundPlaying(BMS bms = null)
         {
             bool isPlaying = false;
             foreach(FMOD.Channel c in channels)
@@ -72,7 +78,7 @@ namespace BMSPlayer
             return isPlaying;
         }
 
-        public void StopAll()
+        public void StopAll(BMS bms = null)
         {
             foreach (FMOD.Channel c in channels)
             {
@@ -80,7 +86,7 @@ namespace BMSPlayer
             }
         }
 
-        public void PauseAll()
+        public void PauseAll(BMS bms = null)
         {
             foreach (FMOD.Channel c in channels)
             {
@@ -88,7 +94,7 @@ namespace BMSPlayer
             }
         }
 
-        public void ResumeAll()
+        public void ResumeAll(BMS bms = null)
         {
             foreach (FMOD.Channel c in channels)
             {

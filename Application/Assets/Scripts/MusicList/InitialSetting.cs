@@ -43,6 +43,7 @@ namespace BMSPlayer
                 Const.Language = LanguageType.EN;
                 MusicListUI.isLangChanged = true;
                 SystemSetting.langFromInit = true;
+                PlayOptionSetting.langChange = true;
                 UpdateText();
                 ShowNextStep(2);
             });
@@ -51,6 +52,7 @@ namespace BMSPlayer
                 Const.Language = LanguageType.KO;
                 MusicListUI.isLangChanged = true;
                 SystemSetting.langFromInit = true;
+                PlayOptionSetting.langChange = true;
                 UpdateText();
                 ShowNextStep(2);
             });
@@ -59,6 +61,7 @@ namespace BMSPlayer
                 Const.Language = LanguageType.JA;
                 MusicListUI.isLangChanged = true;
                 SystemSetting.langFromInit = true;
+                PlayOptionSetting.langChange = true;
                 UpdateText();
                 ShowNextStep(2);
             });

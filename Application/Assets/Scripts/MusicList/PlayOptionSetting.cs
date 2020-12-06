@@ -1,109 +1,140 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
 
 namespace BMSPlayer
 {
-    public class PlayOptionSetting: MonoBehaviour
+    public class PlayOptionSetting: Setting
     {
-        // Page
-        private int Page = 0;
-        public Button btnPageChanger;
-        public GameObject PageSet0;
-        public GameObject PageSet1;
-        public GameObject PageSet2;
+        public static bool langChange = false;
 
+        public Text desc;
+
+        /*
+         * Game Play Settings
+         */
         // Speed
+        public Text titleSpeed;
         public Button btnSpdDown;
         public Button btnSpdUp;
         public Text txtSpeed;
-        public Text txtSpdAnother;
         private int speed;
         private int speedfl;
 
         // Speed Type
-        public Button btnSpdType;
-        public Text txtSpdType;
-
-        // Auto
-        public Button btnAuto;
-        public Text txtAuto;
-
-        // Judge
-        public Button btnJudgePanel;
-        public Text txtJudgePanel;
+        public Text titleSpdType;
+        public Button btnSpdStd;
+        public Button btnSpdCon;
 
         // Gauge Type
-        public Button btnGauge;
+        public Text titleGaugeType;
+        public Button btnGaugeLeft;
+        public Button btnGaugeRight;
         public Text txtGauge;
 
-        // Target Graph Type
-        public Button btnTarget;
-        public Text txtTarget;
-
         // Note Layout
-        public Button btnNoteLayout;
+        public Text titleNoteLayout;
+        public Button btnLayoutLeft;
+        public Button btnLayoutRight;
         public Text txtNoteLayout;
-        public Text txtNoteDesc;
-
-        // Custom Random
         public Button btnCustomRandom;
         public GameObject customRandom;
 
         // Judgement Type
-        public Button btnJudgeType;
+        public Text titleJudgeType;
+        public Button btnJudgeTypeLeft;
+        public Button btnJudgeTypeRight;
         public Text txtJudgeType;
 
+        // Auto
+        public Text titleAuto;
+        public Button btnAutoLeft;
+        public Button btnAutoRight;
+        public Text txtAuto;
+
+        // Graph Target
+        public Text titleGraphTarget;
+        public Button btnTargetLeft;
+        public Button btnTargetRight;
+        public Text txtTarget;
+
+        // PlaySide
+        public Text titlePlaySide;
+        public Button btnPlaySideLeft;
+        public Button btnPlaySideRight;
+        public Text txtPlaySide;
+
+        /*
+         * In-Game UI Settings
+         */
         // GearSkin
-        public Button btnGearSkin;
+        public Text titleGearSkin;
+        public Button btnGearSkinLeft;
+        public Button btnGearSkinRight;
         public Text txtGearSkin;
 
         // GearSize
-        public Button btnGearSize;
+        public Text titleGearSize;
+        public Button btnGearSizeLeft;
+        public Button btnGearSizeRight;
         public Text txtGearSize;
 
         // NoteSkin
-        public Button btnNoteSkin;
+        public Text titleNoteSkin;
+        public Button btnNoteSkinLeft;
+        public Button btnNoteSkinRight;
         public Text txtNoteSkin;
 
         // NoteSize
-        public Button btnNoteSize;
+        public Text titleNoteSize;
+        public Button btnNoteSizeLeft;
+        public Button btnNoteSizeRight;
         public Text txtNoteSize;
 
         // GraphSize
-        public Button btnGraphType;
+        public Text titleGraphType;
+        public Button btnGraphTypeLeft;
+        public Button btnGraphTypeRight;
         public Text txtGraphType;
 
-        // Layout
-        public Button btnLayoutType;
-        public Text txtLayoutType;
-        public Text txtLayoutDesc;
+        // UI Layout
+        public Text titleUILayout;
+        public Button btnUILayoutTypeLeft;
+        public Button btnUILayoutTypeRight;
+        public Text txtUILayoutType;
+        public Text txtUILayoutDesc;
 
         // BGA ON/OFF
-        public Button btnBGA;
+        public Text titleBGA;
+        public Button btnBGALeft;
+        public Button btnBGARight;
         public Text txtBGAOnOff;
 
-        // PlaySide
-        public Button btnPlaySide;
-        public Text txtPlaySide;
+        // Judge Panel
+        public Text titleJudgePanel;
+        public Button btnJudgePanelLeft;
+        public Button btnJudgePanelRight;
+        public Text txtJudgePanel;
 
+        /*
+         * In-Game UI Settings
+         */
         // Fast/Slow
-        public Button btnFastSlow;
+        public Text titleFastSlow;
+        public Button btnFastSlowLeft;
+        public Button btnFastSlowRight;
         public Text txtFastSlow;
-        public Text txtFastSlowDesc;
 
         // Target Difference
-        public Button btnTargetDiff;
+        public Text titleTargetDiff;
+        public Button btnTargetDiffLeft;
+        public Button btnTargetDiffRight;
         public Text txtTargetDiff;
-        public Text txtTargetDiffDesc;
 
         // Rate diff
-        public Button btnRate;
+        public Text titleRate;
+        public Button btnRateLeft;
+        public Button btnRateRight;
         public Text txtRateDiff;
-        public Text txtRateDiffDesc;
 
         // SFX Play
         public AudioSource sfxPlay;
@@ -113,10 +144,9 @@ namespace BMSPlayer
         public static bool gearSizeInit = false;
         public static bool judgeInit = false;
 
-        public void Awake()
+        public override void Awake()
         {
-            // 버튼 설정
-            btnPageChanger.onClick.AddListener(PageChange);
+            base.Awake();
 
             // Page 1
             btnSpdDown.onClick.AddListener(delegate
@@ -141,44 +171,107 @@ namespace BMSPlayer
                     SpeedUpFluid();
                 }
             });
-            btnSpdType.onClick.AddListener(SpeedTypeChange);
-            btnAuto.onClick.AddListener(AutoOnOff);
-            btnJudgePanel.onClick.AddListener(JudgeUIOnOff);
-            btnGauge.onClick.AddListener(GaugeTypeChange);
-            btnTarget.onClick.AddListener(GraphTargetChange);
-            btnNoteLayout.onClick.AddListener(NoteLayoutChange);
+
+            btnSpdStd.onClick.AddListener(delegate {
+                SpeedTypeChange(false);
+            });
+            btnSpdCon.onClick.AddListener(delegate {
+                SpeedTypeChange(true);
+            });
+
+            btnGaugeLeft.onClick.AddListener(delegate {
+                GaugeTypeChange(false);
+            });
+            btnGaugeRight.onClick.AddListener(delegate {
+                GaugeTypeChange(true);
+            });
+
+            btnLayoutLeft.onClick.AddListener(delegate {
+                NoteLayoutChange(false);
+            });
+            btnLayoutRight.onClick.AddListener(delegate {
+                NoteLayoutChange(true);
+            });
             btnCustomRandom.onClick.AddListener(OpenCustomRandom);
-            btnJudgeType.onClick.AddListener(JudgeTypeChange);
+
+            btnJudgeTypeLeft.onClick.AddListener(delegate {
+                JudgeTypeChange(false);
+            });
+            btnJudgeTypeRight.onClick.AddListener(delegate {
+                JudgeTypeChange(true);
+            });
+
+            btnAutoLeft.onClick.AddListener(AutoOnOff);
+            btnAutoRight.onClick.AddListener(AutoOnOff);
+
+            btnTargetLeft.onClick.AddListener(delegate {
+                GraphTargetChange(false);
+            });
+            btnTargetRight.onClick.AddListener(delegate {
+                GraphTargetChange(true);
+            });
+
+            btnPlaySideLeft.onClick.AddListener(PlaySideChange);
+            btnPlaySideRight.onClick.AddListener(PlaySideChange);
 
             // Page 2
-            btnGearSkin.onClick.AddListener(GearSkinChange);
-            btnGearSize.onClick.AddListener(GearSizeChange);
-            btnNoteSkin.onClick.AddListener(NoteSkinChange);
-            btnNoteSize.onClick.AddListener(NoteSizeChange);
-            btnGraphType.onClick.AddListener(GraphSizeChange);
-            btnLayoutType.onClick.AddListener(LayoutChange);
-            btnBGA.onClick.AddListener(BGAChange);
+            btnGearSkinLeft.onClick.AddListener(GearSkinChange);
+            btnGearSkinRight.onClick.AddListener(GearSkinChange);
+
+            btnGearSizeLeft.onClick.AddListener(delegate {
+                GearSizeChange(false);
+            });
+            btnGearSizeRight.onClick.AddListener(delegate {
+                GearSizeChange(true);
+            });
+
+            btnNoteSkinLeft.onClick.AddListener(NoteSkinChange);
+            btnNoteSkinRight.onClick.AddListener(NoteSkinChange);
+
+            btnNoteSizeLeft.onClick.AddListener(delegate {
+                NoteSizeChange(false);
+            });
+            btnNoteSizeRight.onClick.AddListener(delegate {
+                NoteSizeChange(true);
+            });
+
+            btnGraphTypeLeft.onClick.AddListener(delegate {
+                GraphSizeChange(false);
+            });
+            btnGraphTypeRight.onClick.AddListener(delegate {
+                GraphSizeChange(true);
+            });
+
+            btnUILayoutTypeLeft.onClick.AddListener(LayoutChange);
+            btnUILayoutTypeRight.onClick.AddListener(LayoutChange);
+
+            btnBGALeft.onClick.AddListener(BGAChange);
+            btnBGARight.onClick.AddListener(BGAChange);
 
             // Page 3
-            btnPlaySide.onClick.AddListener(PlaySideChange);
-            btnFastSlow.onClick.AddListener(FastSlowChange);
-            btnTargetDiff.onClick.AddListener(TargetDiffChange);
-            btnRate.onClick.AddListener(RateChange);
+            btnJudgePanelLeft.onClick.AddListener(JudgeUIOnOff);
+            btnJudgePanelRight.onClick.AddListener(JudgeUIOnOff);
+
+            btnFastSlowLeft.onClick.AddListener(FastSlowChange);
+            btnFastSlowRight.onClick.AddListener(FastSlowChange);
+
+            btnTargetDiffLeft.onClick.AddListener(TargetDiffChange);
+            btnTargetDiffRight.onClick.AddListener(TargetDiffChange);
+
+            btnRateLeft.onClick.AddListener(RateChange);
+            btnRateRight.onClick.AddListener(RateChange);
 
             // 오토 설정
             switch (Const.Auto)
             {
                 case AutoPlayType.OFF:
                     txtAuto.text = "OFF";
-                    txtAuto.color = Color.white;
                     break;
                 case AutoPlayType.TURNTABLE:
                     txtAuto.text = "TURNTABLE";
-                    txtAuto.color = Color.magenta;
                     break;
                 case AutoPlayType.ALL:
                     txtAuto.text = "ALL";
-                    txtAuto.color = Color.red;
                     break;
             }
 
@@ -186,27 +279,21 @@ namespace BMSPlayer
             if(Const.DisplayJudge == 0)
             {
                 txtJudgePanel.text = "OFF";
-                txtJudgePanel.color = Color.white;
             }
             else
             {
                 txtJudgePanel.text = "ON";
-                txtJudgePanel.color = new Color(1f, 120f / 255, 0f);
             }
 
             // 속도
             if(Const.SpdType == SpdType.STANDARD)
             {
                 speed = Const.SpeedStd;
-                txtSpdType.text = "STANDARD";
-                txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
                 txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
             }
             else
             {
                 speedfl = Const.SpeedCon;
-                txtSpdType.text = "CONSTANT";
-                txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
                 txtSpeed.text = speedfl.ToString();
             }
 
@@ -215,23 +302,18 @@ namespace BMSPlayer
             {
                 case GaugeType.ASSISTED:
                     txtGauge.text = "ASSISTED";
-                    txtGauge.color = new Color(206f / 255, 159f / 255, 1f);
                     break;
                 case GaugeType.EASY:
                     txtGauge.text = "EASY";
-                    txtGauge.color = new Color(159f / 255, 1f, 180f / 255);
                     break;
                 case GaugeType.NORMAL:
                     txtGauge.text = "NORMAL";
-                    txtGauge.color = new Color(159f / 255, 215f / 255, 1f);
                     break;
                 case GaugeType.HARD:
                     txtGauge.text = "HARD";
-                    txtGauge.color = new Color(1f, 159f / 255, 159f / 255);
                     break;
                 case GaugeType.EXHARD:
                     txtGauge.text = "EX-HARD";
-                    txtGauge.color = new Color(1f, 207f / 255, 79f / 255);
                     break;
             }
 
@@ -240,28 +322,22 @@ namespace BMSPlayer
             {
                 case GraphTargetType.RECORD:
                     txtTarget.text = "MY RECORD";
-                    txtTarget.color = new Color(115f / 255, 1f, 94f / 255);
                     break;
                 case GraphTargetType.A:
                     txtTarget.text = "A";
-                    txtTarget.color = new Color(196f / 255, 52f / 255, 174f / 255);
                     break;
                 case GraphTargetType.AA:
                     txtTarget.text = "AA";
-                    txtTarget.color = new Color(1f, 133f / 255, 45f / 255);
                     break;
                 case GraphTargetType.AAA:
                     txtTarget.text = "AAA";
-                    txtTarget.color = new Color(1f, 64f / 255, 64f / 255);
                     break;
                 case GraphTargetType.MAX:
                     txtTarget.text = "MAX";
-                    txtTarget.color = new Color(164f / 255, 71f / 255, 117f / 255);
                     break;
                 case GraphTargetType.OFF:
                 default:
                     txtTarget.text = "OFF";
-                    txtTarget.color = Color.white;
                     break;
             }
 
@@ -273,34 +349,22 @@ namespace BMSPlayer
             {
                 case NoteLayout.RANDOM:
                     txtNoteLayout.text = "RANDOM";
-                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
-                    txtNoteDesc.text = Const.RandomDescRD[(int)Const.Language];
                     break;
                 case NoteLayout.MIRROR:
                     txtNoteLayout.text = "MIRROR";
-                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
-                    txtNoteDesc.text = Const.RandomDescMR[(int)Const.Language];
                     break;
                 case NoteLayout.SRAN:
                     txtNoteLayout.text = "S-RAN";
-                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
-                    txtNoteDesc.text = Const.RandomDescSR[(int)Const.Language];
                     break;
                 case NoteLayout.CRAN:
                     txtNoteLayout.text = "C-RAN";
-                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
-                    txtNoteDesc.text = Const.RandomDescCR[(int)Const.Language];
                     break;
                 case NoteLayout.CUSTOM:
                     txtNoteLayout.text = "CUSTOM";
-                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
-                    txtNoteDesc.text = Const.RandomDescCU[(int)Const.Language];
                     break;
                 case NoteLayout.NORMAL:
                 default:
                     txtNoteLayout.text = "NORMAL";
-                    txtNoteLayout.color = Color.white;
-                    txtNoteDesc.text = Const.RandomDescNR[(int)Const.Language];
                     break;
             }
 
@@ -367,12 +431,12 @@ namespace BMSPlayer
             switch (Const.LayoutType)
             {
                 case UILayoutType.TYPEA:
-                    txtLayoutType.text = "TYPE A";
-                    txtLayoutDesc.text = Const.LayoutDesc[0, (int)Const.Language];
+                    txtUILayoutType.text = "TYPE A";
+                    txtUILayoutDesc.text = Const.LayoutDesc[0, (int)Const.Language];
                     break;
                 case UILayoutType.TYPEB:
-                    txtLayoutType.text = "TYPE B";
-                    txtLayoutDesc.text = Const.LayoutDesc[1, (int)Const.Language];
+                    txtUILayoutType.text = "TYPE B";
+                    txtUILayoutDesc.text = Const.LayoutDesc[1, (int)Const.Language];
                     break;
             }
 
@@ -411,9 +475,7 @@ namespace BMSPlayer
                     txtFastSlow.text = "TYPE B";
                     break;
             }
-            txtFastSlowDesc.text =
-                Const.FSDiffDisplayDesc[(int)Const.FastSlow, (int)Const.Language];
-
+            
             // 타겟 비교
             switch (Const.TargetDiff)
             {
@@ -427,9 +489,7 @@ namespace BMSPlayer
                     txtTargetDiff.text = "TYPE B";
                     break;
             }
-            txtTargetDiffDesc.text =
-                Const.FSDiffDisplayDesc[(int)Const.TargetDiff, (int)Const.Language];
-
+            
             // 정확도
             switch (Const.RateDiff)
             {
@@ -443,138 +503,43 @@ namespace BMSPlayer
                     txtRateDiff.text = "TYPE B";
                     break;
             }
-            txtRateDiffDesc.text =
-                Const.FSDiffDisplayDesc[(int)Const.RateDiff, (int)Const.Language];
+
+            UpdateOption();
         }
 
-        public void Start()
+        public void UpdateOption()
         {
-            Page = 0;
-            PageSet0.SetActive(true);
-            PageSet1.SetActive(false);
+            desc.text = Const.playopDesc[(int)Const.Language];
+            titleSpeed.text = Const.playopSpeed[(int)Const.Language];
+            titleSpdType.text = Const.playopSpdType[(int)Const.Language];
+            titleGaugeType.text = Const.playopGaugeType[(int)Const.Language];
+            titleNoteLayout.text = Const.playopNoteLayout[(int)Const.Language];
+            titleJudgeType.text = Const.playopJudgeType[(int)Const.Language];
+            titleAuto.text = Const.playopAuto[(int)Const.Language];
+            titleGraphTarget.text = Const.playopGraphTarget[(int)Const.Language];
+            titlePlaySide.text = Const.playopPlaySide[(int)Const.Language];
+            titleGearSkin.text = Const.playopGearSkin[(int)Const.Language];
+            titleGearSize.text = Const.playopGearSize[(int)Const.Language];
+            titleNoteSkin.text = Const.playopNoteSkin[(int)Const.Language];
+            titleNoteSize.text = Const.playopNoteSize[(int)Const.Language];
+            titleGraphType.text = Const.playopGraphType[(int)Const.Language];
+            titleUILayout.text = Const.playopUILayout[(int)Const.Language];
+            titleBGA.text = Const.playopBGA[(int)Const.Language];
+            titleJudgePanel.text = Const.playopJudgePanel[(int)Const.Language];
+            titleFastSlow.text = Const.playopFastSlow[(int)Const.Language];
+            titleTargetDiff.text = Const.playopTargetDiff[(int)Const.Language];
+            titleRate.text = Const.playopRate[(int)Const.Language];
         }
 
-        public void Update()
+        public override void Update()
         {
+            base.Update();
+
             if(MusicListUI.isCustomRandom)
             {
                 MusicListUI.isCustomRandom = false;
                 Const.NoteLayout = NoteLayout.CRAN;
-                NoteLayoutChange();
-            }
-
-            if(Input.GetKeyDown(KeyCode.Tab))
-            {
-                PageChange();
-            }
-
-            if(Page == 0)
-            {
-
-                if (Input.GetKeyDown(KeyCode.F1))
-                {
-                    if (Const.SpdType == SpdType.STANDARD)
-                    {
-                        SpeedDownFixed();
-                    }
-                    else if (Const.SpdType == SpdType.CONSTANT)
-                    {
-                        SpeedDownFluid();
-                    }
-                }
-                else if (Input.GetKeyDown(KeyCode.F2))
-                {
-                    if (Const.SpdType == SpdType.STANDARD)
-                    {
-                        SpeedUpFixed();
-                    }
-                    else if (Const.SpdType == SpdType.CONSTANT)
-                    {
-                        SpeedUpFluid();
-                    }
-                }
-                else if (Input.GetKeyDown(KeyCode.F3))
-                {
-                    SpeedTypeChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F4))
-                {
-                    AutoOnOff();
-                }
-                else if (Input.GetKeyDown(KeyCode.F5))
-                {
-                    JudgeUIOnOff();
-                }
-                else if (Input.GetKeyDown(KeyCode.F6))
-                {
-                    GaugeTypeChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F7))
-                {
-                    GraphTargetChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F8))
-                {
-                    NoteLayoutChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F9))
-                {
-                    OpenCustomRandom();
-                }
-                else if (Input.GetKeyDown(KeyCode.F10))
-                {
-                    JudgeTypeChange();
-                }
-            }
-            else if(Page == 1)
-            {
-                if (Input.GetKeyDown(KeyCode.F1))
-                {
-                    GearSkinChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F2))
-                {
-                    GraphSizeChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F3))
-                {
-                    NoteSkinChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F4))
-                {
-                    NoteSizeChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F5))
-                {
-                    GraphSizeChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F6))
-                {
-                    LayoutChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F7))
-                {
-                    BGAChange();
-                }
-            }
-            else
-            {
-                if (Input.GetKeyDown(KeyCode.F1))
-                {
-                    PlaySideChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F2))
-                {
-                    FastSlowChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F3))
-                {
-                    TargetDiffChange();
-                }
-                else if (Input.GetKeyDown(KeyCode.F4))
-                {
-                    RateChange();
-                }
+                txtNoteLayout.text = "CUSTOM";
             }
 
             if(gearSizeInit)
@@ -587,6 +552,12 @@ namespace BMSPlayer
             {
                 judgeInit = false;
                 InitJudge();
+            }
+
+            if(langChange)
+            {
+                langChange = false;
+                UpdateOption();
             }
         }
         
@@ -626,33 +597,6 @@ namespace BMSPlayer
             }
         }
 
-        // Changes
-        private void PageChange()
-        {
-            if(Page == 0)
-            {
-                Page = 1;
-                PageSet0.SetActive(false);
-                PageSet1.SetActive(true);
-                PageSet2.SetActive(false);
-            }
-            else if(Page == 1)
-            {
-                Page = 2;
-                PageSet0.SetActive(false);
-                PageSet1.SetActive(false);
-                PageSet2.SetActive(true);
-            }
-            else if(Page == 2)
-            {
-                Page = 0;
-                PageSet0.SetActive(true);
-                PageSet1.SetActive(false);
-                PageSet2.SetActive(false);
-            }
-            sfxPlay.PlayOneShot(sfxSource);
-        }
-
         private void SpeedUpFixed()
         {
             if(speed < 2000) speed += 25;
@@ -666,7 +610,6 @@ namespace BMSPlayer
             }
 
             txtSpeed.text = ((float)speed/100).ToString("0.00") + "x";
-            txtSpdAnother.text = "CON " + speedfl.ToString();
         }
 
         private void SpeedDownFixed()
@@ -682,7 +625,6 @@ namespace BMSPlayer
             }
 
             txtSpeed.text = ((float)speed / 100).ToString("0.00") + "x";
-            txtSpdAnother.text = "CON " + speedfl.ToString();
         }
 
         private void SpeedUpFluid()
@@ -698,7 +640,6 @@ namespace BMSPlayer
             }
 
             txtSpeed.text = speedfl.ToString();
-            txtSpdAnother.text = "STD " + ((float)speed / 100).ToString("0.00") + "x";
         }
 
         private void SpeedDownFluid()
@@ -714,7 +655,6 @@ namespace BMSPlayer
             }
 
             txtSpeed.text = speedfl.ToString();
-            txtSpdAnother.text = "STD " + ((float)speed / 100).ToString("0.00") + "x";
         }
 
         private void JudgeUIOnOff()
@@ -723,13 +663,11 @@ namespace BMSPlayer
             {
                 Const.DisplayJudge = 1;
                 txtJudgePanel.text = "ON";
-                txtJudgePanel.color = new Color(1f, 120f / 255, 0f);
             }
             else
             {
                 Const.DisplayJudge = 0;
                 txtJudgePanel.text = "OFF";
-                txtJudgePanel.color = Color.white;
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
@@ -740,153 +678,220 @@ namespace BMSPlayer
             {
                 case AutoPlayType.OFF:
                     txtAuto.text = "TURNTABLE";
-                    txtAuto.color = Color.magenta;
                     Const.Auto = AutoPlayType.TURNTABLE;
                     break;
                 case AutoPlayType.TURNTABLE:
                     txtAuto.text = "ALL";
-                    txtAuto.color = Color.red;
                     Const.Auto = AutoPlayType.ALL;
                     break;
                 case AutoPlayType.ALL:
                     txtAuto.text = "OFF";
-                    txtAuto.color = Color.white;
                     Const.Auto = AutoPlayType.OFF;
                     break;
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void GaugeTypeChange()
+        private void GaugeTypeChange(bool next)
         {
-            switch (Const.GaugeType)
+            if(next)
             {
-                case GaugeType.ASSISTED:
-                    txtGauge.text = "EASY";
-                    txtGauge.color = new Color(159f / 255, 1f, 180f / 255);
-                    Const.GaugeType = GaugeType.EASY;
-                    break;
-                case GaugeType.EASY:
-                    txtGauge.text = "NORMAL";
-                    txtGauge.color = new Color(159f / 255, 215f / 255, 1f);
-                    Const.GaugeType = GaugeType.NORMAL;
-                    break;
-                case GaugeType.NORMAL:
-                    txtGauge.text = "HARD";
-                    txtGauge.color = new Color(1f, 159f / 255, 159f / 255);
-                    Const.GaugeType = GaugeType.HARD;
-                    break;
-                case GaugeType.HARD:
-                    txtGauge.text = "EX-HARD";
-                    txtGauge.color = new Color(1f, 207f / 255, 79f / 255);
-                    Const.GaugeType = GaugeType.EXHARD;
-                    break;
-                case GaugeType.EXHARD:
-                    txtGauge.text = "ASSISTED";
-                    txtGauge.color = new Color(206f / 255, 159f / 255, 1f);
-                    Const.GaugeType = GaugeType.ASSISTED;
-                    break;
-            }
-            sfxPlay.PlayOneShot(sfxSource);
-        }
-
-        private void SpeedTypeChange()
-        {
-            if (Const.SpdType == SpdType.STANDARD)
-            {
-                txtSpdType.text = "CONSTANT";
-                txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
-                Const.SpdType = SpdType.CONSTANT;
-                txtSpeed.text = speedfl.ToString();
-                txtSpdAnother.text = "STD " + ((float)speed / 100).ToString("0.00") + "x";
+                switch (Const.GaugeType)
+                {
+                    case GaugeType.ASSISTED:
+                        txtGauge.text = "EASY";
+                        Const.GaugeType = GaugeType.EASY;
+                        break;
+                    case GaugeType.EASY:
+                        txtGauge.text = "NORMAL";
+                        Const.GaugeType = GaugeType.NORMAL;
+                        break;
+                    case GaugeType.NORMAL:
+                        txtGauge.text = "HARD";
+                        Const.GaugeType = GaugeType.HARD;
+                        break;
+                    case GaugeType.HARD:
+                        txtGauge.text = "EX-HARD";
+                        Const.GaugeType = GaugeType.EXHARD;
+                        break;
+                    case GaugeType.EXHARD:
+                        txtGauge.text = "ASSISTED";
+                        Const.GaugeType = GaugeType.ASSISTED;
+                        break;
+                }
             }
             else
             {
-                txtSpdType.text = "STANDARD";
-                txtSpdType.color = new Color(80f / 255, 201f / 255, 125f / 255);
+                switch (Const.GaugeType)
+                {
+                    case GaugeType.ASSISTED:
+                        txtGauge.text = "EX-HARD";
+                        Const.GaugeType = GaugeType.EXHARD;
+                        break;
+                    case GaugeType.EASY:
+                        txtGauge.text = "ASSISTED";
+                        Const.GaugeType = GaugeType.ASSISTED;
+                        break;
+                    case GaugeType.NORMAL:
+                        txtGauge.text = "EASY";
+                        Const.GaugeType = GaugeType.EASY;
+                        break;
+                    case GaugeType.HARD:
+                        txtGauge.text = "NORMAL";
+                        Const.GaugeType = GaugeType.NORMAL;
+                        break;
+                    case GaugeType.EXHARD:
+                        txtGauge.text = "HARD";
+                        Const.GaugeType = GaugeType.HARD;
+                        break;
+                }
+            }
+            sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        private void SpeedTypeChange(bool con)
+        {
+            if(con)
+            {
+                Const.SpdType = SpdType.CONSTANT;
+                txtSpeed.text = speedfl.ToString();
+            }
+            else
+            {
                 Const.SpdType = SpdType.STANDARD;
-                txtSpeed.text = ((float)speed/100).ToString("0.00");
-                txtSpdAnother.text = "CON " + speedfl.ToString();
+                txtSpeed.text = ((float)speed / 100).ToString("0.00");
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void GraphTargetChange()
+        private void GraphTargetChange(bool next)
         {
-            switch (Const.GraphTarget)
+            if(next)
             {
-                case GraphTargetType.OFF:
-                    txtTarget.text = "MY RECORD";
-                    txtTarget.color = new Color(115f / 255, 1f, 94f / 255);
-                    Const.GraphTarget = GraphTargetType.RECORD;
-                    break;
-                case GraphTargetType.RECORD:
-                    txtTarget.text = "A";
-                    txtTarget.color = new Color(196f / 255, 52f / 255, 174f / 255);
-                    Const.GraphTarget = GraphTargetType.A;
-                    break;
-                case GraphTargetType.A:
-                    txtTarget.text = "AA";
-                    txtTarget.color = new Color(1f, 133f / 255, 45f / 255);
-                    Const.GraphTarget = GraphTargetType.AA;
-                    break;
-                case GraphTargetType.AA:
-                    txtTarget.text = "AAA";
-                    txtTarget.color = new Color(1f, 64f / 255, 64f / 255);
-                    Const.GraphTarget = GraphTargetType.AAA;
-                    break;
-                case GraphTargetType.AAA:
-                    txtTarget.text = "MAX";
-                    txtTarget.color = new Color(164f / 255, 71f / 255, 117f / 255);
-                    Const.GraphTarget = GraphTargetType.MAX;
-                    break;
-                case GraphTargetType.MAX:
-                default:
-                    txtTarget.text = "OFF";
-                    txtTarget.color = Color.white;
-                    Const.GraphTarget = GraphTargetType.OFF;
-                    break;
+                switch (Const.GraphTarget)
+                {
+                    case GraphTargetType.OFF:
+                        txtTarget.text = "MY RECORD";
+                        Const.GraphTarget = GraphTargetType.RECORD;
+                        break;
+                    case GraphTargetType.RECORD:
+                        txtTarget.text = "A";
+                        Const.GraphTarget = GraphTargetType.A;
+                        break;
+                    case GraphTargetType.A:
+                        txtTarget.text = "AA";
+                        Const.GraphTarget = GraphTargetType.AA;
+                        break;
+                    case GraphTargetType.AA:
+                        txtTarget.text = "AAA";
+                        Const.GraphTarget = GraphTargetType.AAA;
+                        break;
+                    case GraphTargetType.AAA:
+                        txtTarget.text = "MAX";
+                        Const.GraphTarget = GraphTargetType.MAX;
+                        break;
+                    case GraphTargetType.MAX:
+                    default:
+                        txtTarget.text = "OFF";
+                        Const.GraphTarget = GraphTargetType.OFF;
+                        break;
+                }
+            }
+            else
+            {
+                switch (Const.GraphTarget)
+                {
+                    case GraphTargetType.OFF:
+                        txtTarget.text = "MAX";
+                        Const.GraphTarget = GraphTargetType.MAX;
+                        break;
+                    case GraphTargetType.RECORD:
+                        txtTarget.text = "OFF";
+                        Const.GraphTarget = GraphTargetType.OFF;
+                        break;
+                    case GraphTargetType.A:
+                        txtTarget.text = "MY RECORD";
+                        Const.GraphTarget = GraphTargetType.RECORD;
+                        break;
+                    case GraphTargetType.AA:
+                        txtTarget.text = "A";
+                        Const.GraphTarget = GraphTargetType.A;
+                        break;
+                    case GraphTargetType.AAA:
+                        txtTarget.text = "AA";
+                        Const.GraphTarget = GraphTargetType.AA;
+                        break;
+                    case GraphTargetType.MAX:
+                    default:
+                        txtTarget.text = "AAA";
+                        Const.GraphTarget = GraphTargetType.AAA;
+                        break;
+                }
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void NoteLayoutChange()
+        private void NoteLayoutChange(bool next)
         {
-            switch (Const.NoteLayout)
+            if(next)
             {
-                case NoteLayout.NORMAL:
-                    txtNoteLayout.text = "RANDOM";
-                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
-                    txtNoteDesc.text = Const.RandomDescRD[(int)Const.Language];
-                    Const.NoteLayout = NoteLayout.RANDOM;
-                    break;
-                case NoteLayout.RANDOM:
-                    txtNoteLayout.text = "MIRROR";
-                    txtNoteDesc.text = Const.RandomDescMR[(int)Const.Language];
-                    Const.NoteLayout = NoteLayout.MIRROR;
-                    break;
-                case NoteLayout.MIRROR:
-                    txtNoteLayout.text = "S-RAN";
-                    txtNoteDesc.text = Const.RandomDescSR[(int)Const.Language];
-                    Const.NoteLayout = NoteLayout.SRAN;
-                    break;
-                case NoteLayout.SRAN:
-                    txtNoteLayout.text = "C-RAN";
-                    txtNoteDesc.text = Const.RandomDescCR[(int)Const.Language];
-                    Const.NoteLayout = NoteLayout.CRAN;
-                    break;
-                case NoteLayout.CRAN:
-                    txtNoteLayout.text = "CUSTOM";
-                    txtNoteLayout.color = new Color(1f, 231f / 255, 142f / 255);
-                    txtNoteDesc.text = Const.RandomDescCU[(int)Const.Language];
-                    Const.NoteLayout = NoteLayout.CUSTOM;
-                    break;
-                case NoteLayout.CUSTOM:
-                    txtNoteLayout.text = "NORMAL";
-                    txtNoteLayout.color = Color.white;
-                    txtNoteDesc.text = Const.RandomDescNR[(int)Const.Language];
-                    Const.NoteLayout = NoteLayout.NORMAL;
-                    break;
+                switch (Const.NoteLayout)
+                {
+                    case NoteLayout.NORMAL:
+                        txtNoteLayout.text = "RANDOM";
+                        Const.NoteLayout = NoteLayout.RANDOM;
+                        break;
+                    case NoteLayout.RANDOM:
+                        txtNoteLayout.text = "MIRROR";
+                        Const.NoteLayout = NoteLayout.MIRROR;
+                        break;
+                    case NoteLayout.MIRROR:
+                        txtNoteLayout.text = "S-RAN";
+                        Const.NoteLayout = NoteLayout.SRAN;
+                        break;
+                    case NoteLayout.SRAN:
+                        txtNoteLayout.text = "C-RAN";
+                        Const.NoteLayout = NoteLayout.CRAN;
+                        break;
+                    case NoteLayout.CRAN:
+                        txtNoteLayout.text = "CUSTOM";
+                        Const.NoteLayout = NoteLayout.CUSTOM;
+                        break;
+                    case NoteLayout.CUSTOM:
+                        txtNoteLayout.text = "NORMAL";
+                        Const.NoteLayout = NoteLayout.NORMAL;
+                        break;
+                }
+            }
+            else
+            {
+                switch (Const.NoteLayout)
+                {
+                    case NoteLayout.NORMAL:
+                        txtNoteLayout.text = "CUSTOM";
+                        Const.NoteLayout = NoteLayout.CUSTOM;
+                        break;
+                    case NoteLayout.RANDOM:
+                        txtNoteLayout.text = "NORMAL";
+                        Const.NoteLayout = NoteLayout.NORMAL;
+                        break;
+                    case NoteLayout.MIRROR:
+                        txtNoteLayout.text = "RANDOM";
+                        Const.NoteLayout = NoteLayout.RANDOM;
+                        break;
+                    case NoteLayout.SRAN:
+                        txtNoteLayout.text = "MIRROR";
+                        Const.NoteLayout = NoteLayout.MIRROR;
+                        break;
+                    case NoteLayout.CRAN:
+                        txtNoteLayout.text = "S-RAN";
+                        Const.NoteLayout = NoteLayout.SRAN;
+                        break;
+                    case NoteLayout.CUSTOM:
+                        txtNoteLayout.text = "C-RAN";
+                        Const.NoteLayout = NoteLayout.CRAN;
+                        break;
+                }
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
@@ -898,26 +903,51 @@ namespace BMSPlayer
             GetComponent<CustomPattern>().EnableWindow();
         }
 
-        private void JudgeTypeChange()
+        private void JudgeTypeChange(bool next)
         {
-            switch (Const.JudgeType)
+            if(next)
             {
-                case JudgeType.ARCADE:
-                    txtJudgeType.text = "ORIGINAL";
-                    Const.JudgeType = JudgeType.ORIGINAL;
-                    break;
-                case JudgeType.ORIGINAL:
-                    txtJudgeType.text = "LR2";
-                    Const.JudgeType = JudgeType.LR2;
-                    break;
-                case JudgeType.LR2:
-                    txtJudgeType.text = "BEATORAJA";
-                    Const.JudgeType = JudgeType.BEATORAJA;
-                    break;
-                case JudgeType.BEATORAJA:
-                    txtJudgeType.text = "ARCADE";
-                    Const.JudgeType = JudgeType.ARCADE;
-                    break;
+                switch (Const.JudgeType)
+                {
+                    case JudgeType.ARCADE:
+                        txtJudgeType.text = "ORIGINAL";
+                        Const.JudgeType = JudgeType.ORIGINAL;
+                        break;
+                    case JudgeType.ORIGINAL:
+                        txtJudgeType.text = "LR2";
+                        Const.JudgeType = JudgeType.LR2;
+                        break;
+                    case JudgeType.LR2:
+                        txtJudgeType.text = "BEATORAJA";
+                        Const.JudgeType = JudgeType.BEATORAJA;
+                        break;
+                    case JudgeType.BEATORAJA:
+                        txtJudgeType.text = "ARCADE";
+                        Const.JudgeType = JudgeType.ARCADE;
+                        break;
+                }
+            }
+            else
+            {
+                switch (Const.JudgeType)
+                {
+                    case JudgeType.ARCADE:
+                        txtJudgeType.text = "BEATORAJA";
+                        Const.JudgeType = JudgeType.BEATORAJA;
+                        break;
+                    case JudgeType.ORIGINAL:
+                        txtJudgeType.text = "ARCADE";
+                        Const.JudgeType = JudgeType.ARCADE;
+                        break;
+                    case JudgeType.LR2:
+                        txtJudgeType.text = "ORIGINAL";
+                        Const.JudgeType = JudgeType.ORIGINAL;
+                        break;
+                    case JudgeType.BEATORAJA:
+                        txtJudgeType.text = "LR2";
+                        Const.JudgeType = JudgeType.LR2;
+                        break;
+                }
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
@@ -938,22 +968,43 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void GearSizeChange()
+        private void GearSizeChange(bool next)
         {
-            switch (Const.GearSize)
+            if(next)
             {
-                case SkinSize.STANDARD:
-                    Const.GearSize = SkinSize.WIDE125;
-                    txtGearSize.text = "WIDE(1.25)";
-                    break;
-                case SkinSize.WIDE125:
-                    Const.GearSize = SkinSize.WIDE150;
-                    txtGearSize.text = "WIDE(1.50)";
-                    break;
-                case SkinSize.WIDE150:
-                    Const.GearSize = SkinSize.STANDARD;
-                    txtGearSize.text = "STANDARD";
-                    break;
+                switch (Const.GearSize)
+                {
+                    case SkinSize.STANDARD:
+                        Const.GearSize = SkinSize.WIDE125;
+                        txtGearSize.text = "WIDE(1.25)";
+                        break;
+                    case SkinSize.WIDE125:
+                        Const.GearSize = SkinSize.WIDE150;
+                        txtGearSize.text = "WIDE(1.50)";
+                        break;
+                    case SkinSize.WIDE150:
+                        Const.GearSize = SkinSize.STANDARD;
+                        txtGearSize.text = "STANDARD";
+                        break;
+                }
+            }
+            else
+            {
+                switch (Const.GearSize)
+                {
+                    case SkinSize.STANDARD:
+                        Const.GearSize = SkinSize.WIDE150;
+                        txtGearSize.text = "WIDE(1.50)";
+                        break;
+                    case SkinSize.WIDE125:
+                        Const.GearSize = SkinSize.STANDARD;
+                        txtGearSize.text = "STANDARD";
+                        break;
+                    case SkinSize.WIDE150:
+                        Const.GearSize = SkinSize.WIDE125;
+                        txtGearSize.text = "WIDE(1.25)";
+                        break;
+                }
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
@@ -975,51 +1026,102 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void NoteSizeChange()
+        private void NoteSizeChange(bool next)
         {
-            // 노트 사이즈
-            switch (Const.NoteSize)
+            if(next)
             {
-                case NoteSize.NORMAL:
-                    Const.NoteSize = NoteSize.SLIM;
-                    txtNoteSize.text = "SLIM";
-                    break;
-                case NoteSize.SLIM:
-                    Const.NoteSize = NoteSize.FAT;
-                    txtNoteSize.text = "FAT";
-                    break;
-                case NoteSize.FAT:
-                    Const.NoteSize = NoteSize.NORMAL;
-                    txtNoteSize.text = "NORMAL";
-                    break;
+                // 노트 사이즈
+                switch (Const.NoteSize)
+                {
+                    case NoteSize.NORMAL:
+                        Const.NoteSize = NoteSize.SLIM;
+                        txtNoteSize.text = "SLIM";
+                        break;
+                    case NoteSize.SLIM:
+                        Const.NoteSize = NoteSize.FAT;
+                        txtNoteSize.text = "FAT";
+                        break;
+                    case NoteSize.FAT:
+                        Const.NoteSize = NoteSize.NORMAL;
+                        txtNoteSize.text = "NORMAL";
+                        break;
+                }
+            }
+            else
+            {
+                // 노트 사이즈
+                switch (Const.NoteSize)
+                {
+                    case NoteSize.NORMAL:
+                        Const.NoteSize = NoteSize.FAT;
+                        txtNoteSize.text = "FAT";
+                        break;
+                    case NoteSize.SLIM:
+                        Const.NoteSize = NoteSize.NORMAL;
+                        txtNoteSize.text = "NORMAL";
+                        break;
+                    case NoteSize.FAT:
+                        Const.NoteSize = NoteSize.SLIM;
+                        txtNoteSize.text = "SLIM";
+                        break;
+                }
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void GraphSizeChange()
+        private void GraphSizeChange(bool next)
         {
-            switch (Const.GraphType)
+            if(next)
             {
-                case GraphType.NORMAL:
-                    Const.GraphType = GraphType.SMALL;
-                    txtGraphType.text = "SMALL";
-                    break;
-                case GraphType.SMALL:
-                    Const.GraphType = GraphType.MINI;
-                    txtGraphType.text = "MINI";
-                    break;
-                case GraphType.MINI:
-                    Const.GraphType = GraphType.OFFGEAR;
-                    txtGraphType.text = "OFF(GEAR)";
-                    break;
-                case GraphType.OFFGEAR:
-                    Const.GraphType = GraphType.OFFBGA;
-                    txtGraphType.text = "OFF(BGA)";
-                    break;
-                case GraphType.OFFBGA:
-                    Const.GraphType = GraphType.NORMAL;
-                    txtGraphType.text = "NORMAL";
-                    break;
+                switch (Const.GraphType)
+                {
+                    case GraphType.NORMAL:
+                        Const.GraphType = GraphType.SMALL;
+                        txtGraphType.text = "SMALL";
+                        break;
+                    case GraphType.SMALL:
+                        Const.GraphType = GraphType.MINI;
+                        txtGraphType.text = "MINI";
+                        break;
+                    case GraphType.MINI:
+                        Const.GraphType = GraphType.OFFGEAR;
+                        txtGraphType.text = "OFF(GEAR)";
+                        break;
+                    case GraphType.OFFGEAR:
+                        Const.GraphType = GraphType.OFFBGA;
+                        txtGraphType.text = "OFF(BGA)";
+                        break;
+                    case GraphType.OFFBGA:
+                        Const.GraphType = GraphType.NORMAL;
+                        txtGraphType.text = "NORMAL";
+                        break;
+                }
+            }
+            else
+            {
+                switch (Const.GraphType)
+                {
+                    case GraphType.NORMAL:
+                        Const.GraphType = GraphType.OFFBGA;
+                        txtGraphType.text = "OFF(BGA)";
+                        break;
+                    case GraphType.SMALL:
+                        Const.GraphType = GraphType.NORMAL;
+                        txtGraphType.text = "NORMAL";
+                        break;
+                    case GraphType.MINI:
+                        Const.GraphType = GraphType.SMALL;
+                        txtGraphType.text = "SMALL";
+                        break;
+                    case GraphType.OFFGEAR:
+                        Const.GraphType = GraphType.MINI;
+                        txtGraphType.text = "MINI";
+                        break;
+                    case GraphType.OFFBGA:
+                        Const.GraphType = GraphType.OFFGEAR;
+                        txtGraphType.text = "OFF(GEAR)";
+                        break;
+                }
             }
             sfxPlay.PlayOneShot(sfxSource);
         }
@@ -1030,13 +1132,13 @@ namespace BMSPlayer
             {
                 case UILayoutType.TYPEA:
                     Const.LayoutType = UILayoutType.TYPEB;
-                    txtLayoutType.text = "TYPE B";
-                    txtLayoutDesc.text = Const.LayoutDesc[1, (int)Const.Language];
+                    txtUILayoutType.text = "TYPE B";
+                    txtUILayoutDesc.text = Const.LayoutDesc[1, (int)Const.Language];
                     break;
                 case UILayoutType.TYPEB:
                     Const.LayoutType = UILayoutType.TYPEA;
-                    txtLayoutType.text = "TYPE A";
-                    txtLayoutDesc.text = Const.LayoutDesc[0, (int)Const.Language];
+                    txtUILayoutType.text = "TYPE A";
+                    txtUILayoutDesc.text = Const.LayoutDesc[0, (int)Const.Language];
                     break;
             }
             sfxPlay.PlayOneShot(sfxSource);
@@ -1091,8 +1193,6 @@ namespace BMSPlayer
                     Const.FastSlow = DisplayPosType.OFF;
                     break;
             }
-            txtFastSlowDesc.text =
-                Const.FSDiffDisplayDesc[(int)Const.FastSlow, (int)Const.Language];
             sfxPlay.PlayOneShot(sfxSource);
         }
 
@@ -1113,8 +1213,6 @@ namespace BMSPlayer
                     Const.TargetDiff = DisplayPosType.OFF;
                     break;
             }
-            txtTargetDiffDesc.text =
-                Const.FSDiffDisplayDesc[(int)Const.TargetDiff, (int)Const.Language];
             sfxPlay.PlayOneShot(sfxSource);
         }
 
@@ -1135,8 +1233,6 @@ namespace BMSPlayer
                     Const.RateDiff = DisplayPosType.OFF;
                     break;
             }
-            txtRateDiffDesc.text =
-                Const.FSDiffDisplayDesc[(int)Const.RateDiff, (int)Const.Language];
             sfxPlay.PlayOneShot(sfxSource);
         }
     }

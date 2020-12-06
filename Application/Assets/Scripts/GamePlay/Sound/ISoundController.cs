@@ -8,13 +8,13 @@ namespace BMSPlayer
 
         void PlayKeySound(string wavFile, BMS bms, int line);
 
-        bool CheckSoundPlaying();
+        bool CheckSoundPlaying(BMS bms = null);
 
-        void StopAll();
+        void StopAll(BMS bms = null);
 
-        void PauseAll();
+        void PauseAll(BMS bms = null);
 
-        void ResumeAll();
+        void ResumeAll(BMS bms = null);
 
         void FreeMemory(BMS bms);
     }

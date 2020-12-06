@@ -62,40 +62,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Plugins\UDE\Properties\AssemblyInfo.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\Big5Prober.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\BitPackage.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\CharDistributionAnalyser.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\CharsetProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\Charsets.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\CodingStateMachine.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\EUCJPProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\EUCKRProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\EUCTWProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\EscCharsetProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\EscSM.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\GB18030Prober.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\HebrewProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\JapaneseContextAnalyser.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\LangBulgarianModel.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\LangCyrillicModel.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\LangGreekModel.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\LangHebrewModel.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\LangHungarianModel.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\LangThaiModel.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\Latin1Prober.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\MBCSGroupProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\MBCSSM.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\SBCSGroupProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\SBCharsetProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\SJISProber.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\SMModel.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\SequenceModel.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\UTF8Prober.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude.Core\UniversalDetector.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude\CharsetDetector.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude\DetectionConfidence.cs" />
-    <Compile Include="Assets\Plugins\UDE\Ude\ICharsetDetector.cs" />
+    <Compile Include="Assets\Plugins\NAudio\EndOfStreamEventArgs.cs" />
+    <Compile Include="Assets\Plugins\NAudio\VorbisSampleProvider.cs" />
+    <Compile Include="Assets\Plugins\NAudio\VorbisWaveReader.cs" />
+    <None Include="Assets\Plugins\System.Memory4.5.4\System.Memory.xml" />
+    <None Include="Assets\Plugins\System.Runtime.CompilerServices.Unsafe.4.5.3\System.Runtime.CompilerServices.Unsafe.xml" />
+    <None Include="Assets\Plugins\System.Numerics.Vectors.4.5.0\System.Numerics.Vectors.xml" />
+    <None Include="Assets\Plugins\NAudio\NAudio.xml" />
+    <None Include="Assets\Plugins\System.Buffers.4.5.1\System.Buffers.xml" />
+    <None Include="Assets\Plugins\NAudio\NVorbis.xml" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Unity2019.4.9f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
@@ -288,11 +263,29 @@
     <Reference Include="Mono.Data.Sqlite">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/Mono.Data.Sqlite.dll</HintPath>
     </Reference>
-    <Reference Include="TextMeshPro-5.6-Editor">
-      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-5.6-Editor.dll</HintPath>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/HttpAgilityPack/HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="TextMeshPro-5.6-Runtime">
-      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-5.6-Runtime.dll</HintPath>
+    <Reference Include="NAudio">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/NAudio/NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="NVorbis">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/NAudio/NVorbis.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Buffers">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/System.Buffers.4.5.1/System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/System.Memory4.5.4/System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/System.Numerics.Vectors.4.5.0/System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/Plugins/System.Runtime.CompilerServices.Unsafe.4.5.3/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="LibVLCSharp">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Assets/VLCUnity/Plugins/x86_64/LibVLCSharp.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/PackageCache/com.unity.analytics@3.3.5/Unity.Analytics.Editor.dll</HintPath>
@@ -678,6 +671,9 @@
     <Reference Include="UnityEngine.Advertisements">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEngine.Advertisements.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.TextMeshPro.Editor">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
@@ -707,6 +703,9 @@
     </Reference>
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
       <HintPath>E:/programming/unity/rhythmspaceV2/Application/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>

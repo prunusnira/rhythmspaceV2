@@ -14,12 +14,15 @@ namespace BMSPlayer
     public class MusicListUI : MonoBehaviour
     {
         // Description
+        public Button btnDescPlayOp;
         public Button btnDescSystemOp;
+        public GameObject layerPlayOpt;
+        public GameObject layerSysOpt;
         public TextMeshProUGUI txtDescMusicSel;
+        public TextMeshProUGUI txtDescPlayOp;
         public TextMeshProUGUI txtDescSystemOp;
         public TextMeshProUGUI txtDescPlay;
         public TextMeshProUGUI txtDescUpperFolder;
-        public TextMeshProUGUI txtDescPage;
         public TextMeshProUGUI txtTip;
         public TextMeshProUGUI txtTip2;
 
@@ -60,7 +63,6 @@ namespace BMSPlayer
         public Sprite rampPFC;
         public Sprite rampFail;
         public ScrollRectInfinite musicRect;
-        public GameObject layerSysOpt;
 
         public Camera uiCam;
 
@@ -81,11 +83,11 @@ namespace BMSPlayer
         public TextMeshProUGUI infoJudgeRank;
 
         // Difficulty
-        public SpriteRenderer diffBeg;
-        public SpriteRenderer diffNor;
-        public SpriteRenderer diffHyp;
-        public SpriteRenderer diffAno;
-        public SpriteRenderer diffIns;
+        public Image diffBeg;
+        public Image diffNor;
+        public Image diffHyp;
+        public Image diffAno;
+        public Image diffIns;
         public TextMeshProUGUI lvBeg;
         public TextMeshProUGUI lvNor;
         public TextMeshProUGUI lvHyp;
@@ -104,8 +106,6 @@ namespace BMSPlayer
         public Sprite insOff;
         public Sprite unkOn;
         public Sprite unkOff;
-
-        public Text optSpdAppend;
 
         public TextMeshProUGUI recordScore;
         public TextMeshProUGUI recordPerfect;
@@ -156,9 +156,16 @@ namespace BMSPlayer
         public GameObject dlgNoPattern;
         public GameObject dlgQuit;
 
+        // Preview play
+        private PreviewController prevController;
+        private bool isPrevCon = false;
+        private bool isPrevPlay = false;
+        private string prevConPath = "";
+
         void Awake()
         {
             // Initialize
+            prevController = GetComponent<PreviewController>();
             Application.targetFrameRate = Const.FrameRate;
             bmslist = new List<ListItemNode>();
             rdm = new RecordDataManager();
@@ -179,6 +186,7 @@ namespace BMSPlayer
             }
 
             // Description
+            btnDescPlayOp.onClick.AddListener(OpenPlayOption);
             btnDescSystemOp.onClick.AddListener(OpenSystemOption);
             UpdateDescription();
 
@@ -372,6 +380,25 @@ namespace BMSPlayer
 
                 isLoading = false;
             }
+
+            if(isPrevCon && !isPrevPlay)
+            {
+                isPrevPlay = true;
+                prevController.Setup(prevConPath);
+            }
+            else if(!isPrevCon && isPrevPlay)
+            {
+                isPrevPlay = false;
+                prevController.StopPlaying();
+            }
+        }
+
+        public void OpenPlayOption()
+        {
+            layerPlayOpt.SetActive(true);
+            sfxChange.PlayOneShot(sfxSelect);
+            SetNotOnTop();
+            GetComponent<PlayOptionSetting>().EnableWindow();
         }
 
         public void OpenSystemOption()
@@ -505,13 +532,11 @@ namespace BMSPlayer
                 {
                     int spdfl = (int)(bms.BPMstart * Const.SpeedStd / 100);
                     Const.SpeedCon = spdfl;
-                    optSpdAppend.text = "CON " + spdfl.ToString("0");
                 }
                 else
                 {
                     int spd = (int)(Const.SpeedCon / bms.BPMstart * 100);
                     Const.SpeedStd = spd;
-                    optSpdAppend.text = "STD " + ((float)spd / 100).ToString("0.00") + "x";
                 }
 
                 // 난이도 숫자 표기
@@ -690,6 +715,10 @@ namespace BMSPlayer
                 // 프리뷰 파일이 있으면 재생함
                 if(bms.Preview != null && bms.Preview.Length > 0)
                 {
+                    prevController.StopPlaying();
+                    prevLoop.Stop();
+                    isPrevCon = false;
+
                     bgLoop.volume = 0.1f;
                     WWW www = new WWW(bms.Preview);
                     prevLoop.clip = www.GetAudioClip(false, true);
@@ -697,8 +726,13 @@ namespace BMSPlayer
                 }
                 else
                 {
-                    bgLoop.volume = 0.5f;
+                    prevController.StopPlaying();
                     prevLoop.Stop();
+
+                    bgLoop.volume = 0.5f;
+
+                    prevConPath = bms.Path + bms.FileName;
+                    //isPrevCon = true;
                 }
             }
             else if(node.Type == ItemType.DIRECTORY ||
@@ -728,6 +762,7 @@ namespace BMSPlayer
 
                 bgLoop.volume = 0.5f;
                 prevLoop.Stop();
+                isPrevCon = false;
             }
         }
 
@@ -1164,10 +1199,10 @@ namespace BMSPlayer
         {
             LanguageType lang = Const.Language;
             txtDescMusicSel.text = Const.listSelect[(int)lang];
+            txtDescPlayOp.text = Const.listPlayOp[(int)lang];
             txtDescSystemOp.text = Const.listSystemOp[(int)lang];
             txtDescPlay.text = Const.listPlay[(int)lang];
             txtDescUpperFolder.text = Const.listUpper[(int)lang];
-            txtDescPage.text = Const.playOpPage[(int)lang];
             txtTip.text = Const.listTip[(int)lang];
             txtTip2.text = Const.listTip2[(int)lang];
 

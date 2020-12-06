@@ -57,7 +57,7 @@ namespace BMSPlayer
             }
         }
 
-        public bool CheckSoundPlaying()
+        public bool CheckSoundPlaying(BMS bms = null)
         {
             bool isPlaying = false;
             for (int i = 0; i < Const.CHANNEL; i++)
@@ -68,7 +68,7 @@ namespace BMSPlayer
             return isPlaying;
         }
 
-        public void StopAll()
+        public void StopAll(BMS bms = null)
         {
             foreach (AudioSource source in audioSource)
             {
@@ -76,7 +76,7 @@ namespace BMSPlayer
             }
         }
 
-        public void PauseAll()
+        public void PauseAll(BMS bms = null)
         {
             foreach (AudioSource source in audioSource)
             {
@@ -84,7 +84,7 @@ namespace BMSPlayer
             }
         }
 
-        public void ResumeAll()
+        public void ResumeAll(BMS bms = null)
         {
             foreach (AudioSource source in audioSource)
             {
