@@ -287,7 +287,12 @@ namespace BMSPlayer
                     }
                 }
 
-                if (Input.GetKeyDown(KeyCode.F12))
+                if (Input.GetKeyDown(KeyCode.F9))
+                {
+                    OpenPlayOption();
+                }
+
+                if (Input.GetKeyDown(KeyCode.F10))
                 {
                     OpenSystemOption();
                 }
@@ -519,13 +524,13 @@ namespace BMSPlayer
                 // BPM 표시 설정
                 if (bms.BPMmin == bms.BPMmax)
                 {
-                    infoBpm.text = "BPM " + bms.BPMstart.ToString("0.##");
+                    infoBpm.text = bms.BPMstart.ToString("0.##");
                 }
                 else
                 {
-                    infoBpm.text = "BPM " + bms.BPMmin.ToString("0.##") +
+                    infoBpm.text = bms.BPMmin.ToString("0.##") +
                         "~" + bms.BPMmax.ToString("0.##") +
-                        " (" + bms.BPMstart.ToString("0.##") + " start)";
+                        "\n(" + bms.BPMstart.ToString("0.##") + " start)";
                 }
 
                 if (Const.SpdType == SpdType.STANDARD)

@@ -529,6 +529,18 @@ namespace BMSPlayer
             titleFastSlow.text = Const.playopFastSlow[(int)Const.Language];
             titleTargetDiff.text = Const.playopTargetDiff[(int)Const.Language];
             titleRate.text = Const.playopRate[(int)Const.Language];
+
+            switch (Const.LayoutType)
+            {
+                case UILayoutType.TYPEA:
+                    txtUILayoutType.text = "TYPE A";
+                    txtUILayoutDesc.text = Const.LayoutDesc[0, (int)Const.Language];
+                    break;
+                case UILayoutType.TYPEB:
+                    txtUILayoutType.text = "TYPE B";
+                    txtUILayoutDesc.text = Const.LayoutDesc[1, (int)Const.Language];
+                    break;
+            }
         }
 
         public override void Update()
