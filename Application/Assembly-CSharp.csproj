@@ -82,6 +82,7 @@
     <Compile Include="Assets\Scripts\Data\MusicListData.cs" />
     <Compile Include="Assets\Scripts\Data\RecordData.cs" />
     <Compile Include="Assets\Scripts\Data\RecordDataManager.cs" />
+    <Compile Include="Assets\Scripts\Data\ResolutionList.cs" />
     <Compile Include="Assets\Scripts\Data\TableDataManager.cs" />
     <Compile Include="Assets\Scripts\Data\enum\ItemType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\BMSRuntimeLoader.cs" />

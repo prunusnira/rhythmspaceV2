@@ -80,25 +80,25 @@ namespace DatabaseManager
             string list =
                 @"create table list (
                 id integer primary key autoincrement,
-                title varchar(100) not null,
-                subtitle varchar(100) not null,
-                artist varchar (100) not null,
-                subartist varchar (100) not null,
-                gerne varchar (100),
+                title text not null,
+                subtitle text not null,
+                artist text not null,
+                subartist text not null,
+                gerne text,
                 bpmstart float not null,
                 bpmmin float not null,
                 bpmmax float not null,
-                path varchar(1000) not null,
-                md5hash varchar(100) not null,
+                path text not null,
+                md5hash text not null,
                 level integer not null,
                 diff integer default 2,
-                fname varchar (100) not null,
-                jacket varchar (100),
+                fname text not null,
+                jacket text,
                 totalnotes integer not null,
                 time integer not null,
                 rank integer default 2,
-                lnexist integer(1) not null,
-                preview varchar(1000) not null default '')";
+                lnexist integer not null,
+                preview text not null default '')";
 
             dbcommand.CommandText = list;
             dbcommand.ExecuteNonQuery();
@@ -110,18 +110,18 @@ namespace DatabaseManager
             string record =
                 @"create table record (
                 id integer primary key autoincrement,
-                md5hash varchar(100) unique not null,
-                rank varchar(2) not null,
-                score integer(5) not null,
-                judge integer(1) not null,
-                clear integer(1) not null,
-                pf integer(5) not null,
-                gr integer(5) not null,
-                gd integer(5) not null,
-                ok integer(5) not null,
-                pr integer(5) not null,
-                combo integer(5) not null,
-                cb integer(5) not null,
+                md5hash text unique not null,
+                rank text not null,
+                score integer not null,
+                judge integer not null,
+                clear integer not null,
+                pf integer not null,
+                gr integer not null,
+                gd integer not null,
+                ok integer not null,
+                pr integer not null,
+                combo integer not null,
+                cb integer not null,
                 playcnt integer not null)";
 
             dbcommand.CommandText = record;
@@ -134,10 +134,10 @@ namespace DatabaseManager
             string table =
                 @"create table diffSl (
                 id integer primary key autoincrement,
-                md5hash varchar(100) unique not null,
-                title varchar(100) not null,
-                artist varchar (100) not null,
-                url varchar not null,
+                md5hash text unique not null,
+                title text not null,
+                artist text not null,
+                url text not null,
                 level integer not null)";
 
             dbcommand.CommandText = table;
@@ -150,10 +150,10 @@ namespace DatabaseManager
             string table =
                 @"create table diffSt (
                 id integer primary key autoincrement,
-                md5hash varchar(100) unique not null,
-                title varchar(100) not null,
-                artist varchar (100) not null,
-                url varchar not null,
+                md5hash text unique not null,
+                title text not null,
+                artist text not null,
+                url text not null,
                 level integer not null)";
 
             dbcommand.CommandText = table;
@@ -166,9 +166,9 @@ namespace DatabaseManager
             string table =
                 @"create table diffGe (
                 id integer primary key autoincrement,
-                title varchar(100) not null,
-                artist varchar (100) not null,
-                url varchar not null,
+                title text not null,
+                artist text not null,
+                url text not null,
                 level integer not null)";
 
             dbcommand.CommandText = table;

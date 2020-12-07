@@ -46,6 +46,7 @@ namespace BMSPlayer
         public Button btnEng;
 
         // Resolution Change
+        private Resolutions res;
         public Text titleResol;
         public Text txtResol;
         public Button btnResLeft;
@@ -53,7 +54,6 @@ namespace BMSPlayer
 
         // Frame Rate
         public Text titleFrame;
-        public Text frameval;
         public InputField inputFrame;
         public Button btnFrame;
 
@@ -100,6 +100,8 @@ namespace BMSPlayer
         public override void Awake()
         {
             base.Awake();
+            res = new Resolutions();
+
             encoding = Const.Encoding;
             bmsPath = Const.BMSFolderPath;
 
@@ -134,7 +136,6 @@ namespace BMSPlayer
                 else if (frame > 5000) frame = 5000;
                 Const.FrameRate = frame;
                 Application.targetFrameRate = frame;
-                frameval.text = inputFrame.text;
             });
 
             btnWinLeft.onClick.AddListener(delegate
@@ -193,7 +194,7 @@ namespace BMSPlayer
 
             changeLang(lang);
 
-            frameval.text = Const.FrameRate.ToString();
+            inputFrame.text = Const.FrameRate.ToString();
             
             switch(enc)
             {
@@ -218,17 +219,17 @@ namespace BMSPlayer
             switch (Const.ScreenMode)
             {
                 case FullScreenMode.Windowed:
-                    txtScrMode.text = "Windowed";
+                    txtScrMode.text = Const.settingBtnScrModeWin[(int)Const.Language];
                     break;
                 case FullScreenMode.ExclusiveFullScreen:
-                    txtScrMode.text = "Full Screen";
+                    txtScrMode.text = Const.settingBtnScrModeFull[(int)Const.Language];
                     break;
                 case FullScreenMode.MaximizedWindow:
-                    txtScrMode.text = "Borderless";
+                    txtScrMode.text = Const.settingBtnScrModeBorder[(int)Const.Language];
                     break;
             }
 
-            txtResol.text = Const.ScrWidth.ToString() + "x" + Const.ScrHeight.ToString();
+            ShowCurrentResolution();
         }
 
         public override void Update()
@@ -560,11 +561,11 @@ namespace BMSPlayer
 
         public void ChangeResolution(bool up)
         {
-            Resolution[] res = Screen.resolutions;
             int curpos = 0;
-            for(int i = 0; i < res.Length; i++)
+            for(int i = 0; i < res.reslist.Count; i++)
             {
-                if (res[i].height == Const.ScrHeight)
+                if (res.reslist[i][0] == Const.ScrWidth &&
+                    res.reslist[i][1] == Const.ScrHeight)
                 {
                     curpos = i;
                     break;
@@ -573,7 +574,7 @@ namespace BMSPlayer
 
             if(up)
             {
-                if(curpos < res.Length - 1)
+                if(curpos < res.reslist.Count - 1)
                 {
                     curpos++;
                 }
@@ -586,8 +587,10 @@ namespace BMSPlayer
                 }
             }
 
-            Const.ScrWidth = res[curpos].width;
-            Const.ScrHeight = res[curpos].height;
+            Const.ScrWidth = res.reslist[curpos][0];
+            Const.ScrHeight = res.reslist[curpos][1];
+            txtResol.text = Const.ScrWidth.ToString() + "x" + Const.ScrHeight.ToString() +
+                "("+(curpos+1)+"/"+res.reslist.Count+")";
 
             UpdateVideoSetting();
         }
@@ -600,12 +603,15 @@ namespace BMSPlayer
                 {
                     case FullScreenMode.ExclusiveFullScreen:
                         Const.ScreenMode = FullScreenMode.Windowed;
+                        txtScrMode.text = Const.settingBtnScrModeWin[(int)Const.Language];
                         break;
                     case FullScreenMode.MaximizedWindow:
                         Const.ScreenMode = FullScreenMode.ExclusiveFullScreen;
+                        txtScrMode.text = Const.settingBtnScrModeFull[(int)Const.Language];
                         break;
                     case FullScreenMode.Windowed:
                         Const.ScreenMode = FullScreenMode.MaximizedWindow;
+                        txtScrMode.text = Const.settingBtnScrModeBorder[(int)Const.Language];
                         break;
                 }
             }
@@ -615,17 +621,37 @@ namespace BMSPlayer
                 {
                     case FullScreenMode.ExclusiveFullScreen:
                         Const.ScreenMode = FullScreenMode.MaximizedWindow;
+                        txtScrMode.text = Const.settingBtnScrModeBorder[(int)Const.Language];
                         break;
                     case FullScreenMode.MaximizedWindow:
                         Const.ScreenMode = FullScreenMode.Windowed;
+                        txtScrMode.text = Const.settingBtnScrModeWin[(int)Const.Language];
                         break;
                     case FullScreenMode.Windowed:
                         Const.ScreenMode = FullScreenMode.ExclusiveFullScreen;
+                        txtScrMode.text = Const.settingBtnScrModeFull[(int)Const.Language];
                         break;
                 }
             }
 
             UpdateVideoSetting();
+        }
+
+        public void ShowCurrentResolution()
+        {
+            int curpos = 0;
+            for (int i = 0; i < res.reslist.Count; i++)
+            {
+                if (res.reslist[i][0] == Const.ScrWidth &&
+                    res.reslist[i][1] == Const.ScrHeight)
+                {
+                    curpos = i;
+                    break;
+                }
+            }
+
+            txtResol.text = Const.ScrWidth.ToString() + "x" + Const.ScrHeight.ToString() +
+                "(" + (curpos + 1) + "/" + res.reslist.Count + ")";
         }
 
         public void ShowKeySetting()
