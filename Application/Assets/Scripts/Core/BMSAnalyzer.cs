@@ -349,7 +349,8 @@ namespace BMSCore
 
                         else if (chkWav == "#BMP")
                         {
-                            if (left.EndsWith(".mpg") || left.EndsWith(".mp4"))
+                            if (left.EndsWith(".mpg") || left.EndsWith(".mpeg") || left.EndsWith(".mp4")
+                                || left.EndsWith(".wmv") || left.EndsWith(".avi"))
                             {
                                 bms.BGAVideoFile = bms.FolderPath + left;
                                 isVideoExist = true;

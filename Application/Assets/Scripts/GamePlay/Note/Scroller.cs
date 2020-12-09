@@ -38,9 +38,6 @@ namespace BMSPlayer
         private double avgRate = 0;
         private double addStopTiming = 0;
 
-        // 공푸어 처리용
-        private int notesInTimingWindow = 0; // 개수가 0보다 크면 노트가 있음
-
         private int speed = 200;
         private int speedfl = 200;
         private double BPM = 0;
@@ -73,6 +70,7 @@ namespace BMSPlayer
         // 롱노트 처리 변수
         private bool[] isLnWorking; // 라인별 처리중 상태 on/off
         private double[] lnTiming;
+        private int[] lnNumInProcess;
 
         // 소리 재생
         private ISoundController soundController;
@@ -123,11 +121,13 @@ namespace BMSPlayer
             btnPushState = new bool[9] { false, false, false, false, false, false, false, false, false };
             btnProcState = new bool[9] { false, false, false, false, false, false, false, false, false };
             btnPushSound = new bool[9] { false, false, false, false, false, false, false, false, false };
-            isLnWorking = new bool[9] { false, false, false, false, false, false, false, false, false };
+            isLnWorking = new bool[8] { false, false, false, false, false, false, false, false };
             lnTiming = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
+            lnNumInProcess = new int[8] { -1, -1, -1, -1, -1, -1, -1, -1 };
 
-            // 초기 HP 지정
-            hpController = HPController.Instance;
+
+        // 초기 HP 지정
+        hpController = HPController.Instance;
             gaugeType = Const.GaugeType;
 
             // 사운드 컨트롤러 정의
@@ -465,7 +465,6 @@ namespace BMSPlayer
                         !current.InTimingWindow &&
                         current.PlayNoteType == NoteType.SINGLE)
                     {
-                        notesInTimingWindow++;
                         current.InTimingWindow = true;
                     }
 
@@ -494,9 +493,6 @@ namespace BMSPlayer
                             processedNotes++;
                             current.Used = true;
                             HPUI.UpdateHP(hpController.CurrentHP);
-
-                            // 타이밍 윈도우에서 없애야 함
-                            notesInTimingWindow--;
 
                             // 노트 삭제
                             removeCandidate.Add(current);
@@ -584,9 +580,13 @@ namespace BMSPlayer
                     {
                         BGAControl.BGAImageSetting(current.BGASprite);
                     }
+                    else if(BGAControl.IsVLCNeeded())
+                    {
+                        BGAControl.BGAVideoPlayVLC();
+                    }
                     else
                     {
-                        BGAControl.BGAVideoPlay();
+                        BGAControl.BGAVideoPlayNM();
                     }
                     current.Used = true;
                     removeCandidate.Add(current);
@@ -876,7 +876,6 @@ namespace BMSPlayer
 
                             removeCandidate.Add(note);
                             processedNotes++;
-                            notesInTimingWindow--;
                         }
                         else if (note.PlayNoteType == NoteType.LNSTART)
                         {
@@ -894,180 +893,128 @@ namespace BMSPlayer
                 }
                 else
                 {
+                    int line;
+                    List<PlayNote> currentLine;
+                    if (i == 8)
+                    {
+                        currentLine = notePlay[0];
+                        line = 0;
+                    }
+                    else
+                    {
+                        currentLine = notePlay[i];
+                        line = i;
+                    }
+
+                    // 현재 라인의 노트가 모두 소진되었으면 넘김
+                    if (currentLine.Count == 0) continue;
+
                     // 현재 라인이 눌려진 상태이면
                     // (롱노트가 아닌 이상 눌러지자 마자 한 번만 체크해야 함)
                     if (btnPushState[i])
                     {
-                        // 롱노트가 처리중인 상태가 아닐 때
-                        if (!isLnWorking[i] && !btnProcState[i])
+                        if (!isLnWorking[line] && !btnProcState[i])
                         {
-                            // 버튼 눌림 및 처리 상태 설정
                             btnProcState[i] = true;
 
-                            // 1. 현재 라인을 가져옴
-                            //List<PlayNote> currentLine = notePlay[i];
-                            List<PlayNote> currentLine;
-                            if(i == 8)
-                            {
-                                currentLine = notePlay[0];
-                            }
-                            else
-                            {
-                                currentLine = notePlay[i];
-                            }
-
-                            // 2. 현재 라인의 첫 노트를 가져옴
-                            if (currentLine.Count == 0) continue;
-
+                            // 최상단 노트를 가져옴
                             PlayNote cnote = currentLine[0];
 
-                            // 3. 노트 존재 유무와 상관없이 소리를 냄
+                            // 노트 존재 유무와 상관없이 소리 냄
                             if (!btnPushSound[i])
                             {
                                 soundController.PlayKeySound(cnote.Wav, bms, cnote.Line);
                                 btnPushSound[i] = true;
                             }
 
-                            // 4. 판정 처리하기
-                            // 여기부터는 타이밍으로 간 봐야 할것
+                            // 노트 타이밍 계산
                             double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
 
-                            // Timing Window 내에 노트가 있으면
-                            if (time <= POOR && time > BAD)
+                            // + 범위 & POOR~BAD 사이 (공푸어)
+                            if(time <= POOR && time > BAD)
                             {
-                                // 빠른 공푸어 처리
                                 ProcessEmptyPoor();
                             }
-                            else if (time <= BAD && time >= BAD * -1)
+                            // 내부 판정 처리
+                            else if(time <= BAD && time >= BAD * -1)
                             {
-                                // 판정 처리 수행
-                                if (cnote.PlayNoteType == NoteType.LNSTART)
+                                // 단노트
+                                if(cnote.PlayNoteType == NoteType.SINGLE)
                                 {
-                                    TimingType timing = GetTimingType(time, false);
-                                    if (timing != TimingType.BAD)
+                                    ProcessSingleNote(time, bms, cnote, removeCandidate, lnlist);
+                                    UI.TurnOnNoteEffect(line);
+                                }
+                                // 롱노트
+                                else if(cnote.PlayNoteType == NoteType.LNSTART)
+                                {
+                                    TimingType type = GetTimingType(time);
+
+                                    if (type != TimingType.BAD)
                                     {
-                                        ProcessLNStartNote(cnote, lnlist, time, i);
-                                        cnote.Used = true;
-
-                                        // 노트 이펙트 켜기
-                                        if (i == 8)
-                                        {
-                                            UI.TurnOnNoteEffectLN(0, true);
-                                        }
-                                        else
-                                        {
-                                            UI.TurnOnNoteEffectLN(i, true);
-                                        }
-
-                                        lnlist[cnote.LNNum].Processing = true;
+                                        ProcessLNStartNote(cnote, lnlist, time, line);
                                     }
                                     else
                                     {
-                                        // BAD: 틀린 처리하고 넘어감
                                         int lnNum = cnote.LNNum;
                                         cnote.Used = true;
-                                        isLnWorking[i] = false;
+                                        isLnWorking[line] = false;
                                         lnlist[lnNum].Processing = false;
                                         lnlist[lnNum].Used = true;
 
-                                        removeCandidate.Add(lnlist[lnNum].End);
+                                        removeCandidate.Add(lnlist[lnNum].Start);
                                         removeCandidate.Add(lnlist[lnNum].Mid);
-                                        removeCandidate.Add(cnote);
+                                        removeCandidate.Add(lnlist[lnNum].End);
 
                                         AfterTouchLongEnd(time);
                                     }
                                 }
-                                else if (cnote.PlayNoteType == NoteType.SINGLE)
-                                {
-                                    ProcessSingleNote(time, bms, cnote, removeCandidate, lnlist);
-                                    notesInTimingWindow--;
-
-                                    // 노트 이펙트 켜기
-                                    UI.TurnOnNoteEffect(i % 8);
-                                    cnote.Used = true;
-                                    TimingType timing = GetTimingType(time, false);
-                                }
                             }
-                            else if (time < BAD * -1 && time >= POOR * -1)
-                            {
-                                // 느린 공푸어 처리 안함
-                            }
-                            // Timing Window 내에 노트가 없는데
-                            else
-                            {
-                                // 다른 라인에 Timing Window 내에 노트가 있으면
-                                if (notesInTimingWindow > 0)
-                                {
-                                    // 공푸어 처리 (Type1 - 간접미스)
-                                    ProcessEmptyPoor();
-                                }
-                            }
+                            // 뒷부분 공푸어는 처리 없음
                         }
-                        // 롱노트 처리가 끝났는데 버튼을 떼지 않았다면
-                        // 모드가 CN이라면 미스처리 -> MoveNotes에서
-                        // 모드가 LN이 아니라면 성공처리
-                        else if(isLnWorking[i] && Const.LNProcType == LNProcessType.LN)
+                        else if(isLnWorking[line] && btnProcState[i])
                         {
-                            // 1. 현재 라인을 가져옴
-                            //List<PlayNote> currentLine = notePlay[i];
-                            List<PlayNote> currentLine;
-                            if (i == 8)
-                            {
-                                currentLine = notePlay[0];
-                            }
-                            else
-                            {
-                                currentLine = notePlay[i];
-                            }
+                            // 롱노트가 진행 중일 때
+                            // 턴테이블의 경우 0과 8이 같이 눌려진 상태인지 확인
 
-                            // 2. 현재 라인의 첫 노트를 가져옴
-                            if (currentLine.Count == 0) continue;
-
+                            // 최상단 노트를 가져옴
+                            // (0은 LNStart이므로 LNEnd를 확인함)
                             PlayNote cnote = currentLine[1];
 
-                            if(cnote.PlayNoteType == NoteType.LNEND)
+                            // 롱노트 타입이 LN이고 노트가 LNEnd이면 처리를 수행
+                            if (cnote.LNNum == lnNumInProcess[line] &&
+                                cnote.PlayNoteType == NoteType.LNEND &&
+                                Const.LNProcType == LNProcessType.LN)
                             {
-                                // 4. 판정 처리하기
-                                // 여기부터는 타이밍으로 간 봐야 할것
-                                double time = 0;
-                                if (i == 8) time = lnTiming[0];
-                                else time = lnTiming[i];
+                                // 판정 타이밍은 LNStart의 타이밍으로 처리함
+                                double time = lnTiming[line];
 
-                                if(cnote.Timing < timePassed)
+                                if (cnote.Timing <= timePassed)
                                 {
                                     // 롱놋 처리된 것으로 처리
                                     int lnNum = cnote.LNNum;
                                     AfterTouchLongEnd(time);
-                                    
+
                                     cnote.Used = true;
-                                    isLnWorking[i] = false;
+                                    isLnWorking[line] = false;
                                     lnlist[lnNum].Processing = false;
+                                    lnlist[lnNum].Used = true;
 
                                     removeCandidate.Add(lnlist[lnNum].Start);
                                     removeCandidate.Add(lnlist[lnNum].Mid);
-                                    removeCandidate.Add(cnote);
+                                    removeCandidate.Add(lnlist[lnNum].End);
                                 }
                             }
                         }
                     }
-                    // 롱노트인데 버튼을 떼었을 때
-                    else
+                    // 버튼을 떼었을 때
+                    else if (!btnPushState[i])
                     {
-                        // 1. 현재 라인을 가져옴
-                        List<PlayNote> currentLine;
-                        //currentLine = notePlay[i];
-                        if (i == 8)
-                        {
-                            currentLine = notePlay[0];
-                        }
-                        else
-                        {
-                            currentLine = notePlay[i];
-                        }
+                        // 턴테이블 한정:
+                        // 롱노트가 입력중인 상태이면 다른 버튼의 처리는 스킵
+                        if (i == 8 && btnProcState[0]) continue;
+                        if (i == 0 && btnProcState[8]) continue;
 
-                        // 2. 현재 라인의 첫 노트를 가져옴
-                        if (currentLine.Count == 0) continue;
-
+                        // 사실 일반 노트는 볼 일 없음...
                         PlayNote cnote = currentLine[0];
 
                         if (cnote.PlayNoteType == NoteType.LNSTART &&
@@ -1077,44 +1024,29 @@ namespace BMSPlayer
                         }
 
                         double time = GetJudgeTiming(cnote.Timing + Const.Sync * 0.01, timePassed);
-
-                        if (isLnWorking[i])
+                        
+                        if (isLnWorking[line])
                         {
                             int lnNum = cnote.LNNum;
 
                             // Timing Window 내에 롱노트 끝이 있으면 끝 판정 처리 (끝 판정은 들어갈 때 판정과 동일하게 처리함
                             // 롱노트 시작할 때 이미 틀린 판정처리 났으면 아무런 처리를 하지 않음
-                            if (cnote.PlayNoteType == NoteType.LNEND &&
-                                !lnlist[cnote.LNNum].Used)
+                            if (lnNum == lnNumInProcess[line] &&
+                                cnote.PlayNoteType == NoteType.LNEND)
                             {
                                 if (time > POOR) time = POOR;
                                 AfterTouchLongEnd(time);
                                 
-                                // 노트 이펙트 켜기
-                                if (i == 8)
-                                {
-                                    UI.TurnOnNoteEffectLN(0, false);
-                                }
-                                else
-                                {
-                                    UI.TurnOnNoteEffectLN(i, false);
-                                }
+                                cnote.Used = true;
+                                isLnWorking[line] = false;
+                                lnlist[lnNum].Processing = false;
+
+                                removeCandidate.Add(lnlist[lnNum].Start);
+                                removeCandidate.Add(lnlist[lnNum].Mid);
+                                removeCandidate.Add(lnlist[lnNum].End);
+
+                                UI.TurnOnNoteEffectLN(line, false);
                             }
-
-                            // 일단 뗐으니 이 노트에 대한 처리는 끝났음
-                            cnote.Used = true;
-                            isLnWorking[i] = false;
-
-                            if(i == 0 || i == 8)
-                            {
-                                isLnWorking[0] = false;
-                                isLnWorking[8] = false;
-                            }
-                            lnlist[lnNum].Processing = false;
-
-                            removeCandidate.Add(lnlist[lnNum].Start);
-                            removeCandidate.Add(lnlist[lnNum].Mid);
-                            removeCandidate.Add(cnote);
                         }
                     }
                 }
@@ -1285,27 +1217,10 @@ namespace BMSPlayer
             }
         }
 
-        public void ProcessLNStartNote(PlayNote note, List<LongNote> lnlist,
-            double time, int line)
-        {
-            LongNote n = lnlist[note.LNNum];
-
-            isLnWorking[line] = true;
-
-            if(line == 8)
-            {
-                lnTiming[0] = time;
-            }
-            else
-            {
-                lnTiming[line] = time;
-            }
-        }
-
         public void ProcessSingleNote(double time, BMS bms, PlayNote note,
             List<PlayNote> removeCandidate, List<LongNote> lnlist)
         {
-            TimingType timingType = GetTimingType(time, false);
+            TimingType timingType = GetTimingType(time);
             switch (timingType)
             {
                 case TimingType.PERFECT:
@@ -1330,28 +1245,34 @@ namespace BMSPlayer
             }
 
             HPUI.UpdateHP(hpController.CurrentHP);
+            note.Used = true;
             processedNotes++;
             UpdateTiming(time, true);
             UpdateScore();
             removeCandidate.Add(note);
         }
 
-        // 공푸어 처리
-        private void ProcessEmptyPoor()
+        public void ProcessLNStartNote(PlayNote note, List<LongNote> lnlist,
+            double time, int line)
         {
-            // cb나 콤보 초기화 없이 miss 개수만 늘림
-            epoor++;
-            hpController.hpChangeEPoor();
-            HPUI.UpdateHP(hpController.CurrentHP);
-            JudgeUI.UpdateJudge(TimingType.EPOOR, combo, "0.00%", 0, score);
-            UI.UpdateSideJudge(perfect, great, good, ok, miss, epoor, cb, fast, slow,
-                    avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
+            int lnNum = note.LNNum;
+
+            LongNote n = lnlist[lnNum];
+
+            isLnWorking[line] = true;
+
+            lnTiming[line] = time;
+            lnNumInProcess[line] = note.LNNum;
+
+            note.Used = true;
+            lnlist[lnNum].Processing = true;
+            UI.TurnOnNoteEffectLN(line, true);
         }
 
         // 롱노트의 끝 노트 타이밍을 처리하는 메소드
         public void AfterTouchLongEnd(double time)
         {
-            switch(GetTimingType(time, true))
+            switch(GetTimingType(time))
             {
                 case TimingType.PERFECT:
                     perfect++;
@@ -1386,10 +1307,22 @@ namespace BMSPlayer
             HPUI.UpdateHP(hpController.CurrentHP);
         }
 
+        // 공푸어 처리
+        private void ProcessEmptyPoor()
+        {
+            // cb나 콤보 초기화 없이 miss 개수만 늘림
+            epoor++;
+            hpController.hpChangeEPoor();
+            HPUI.UpdateHP(hpController.CurrentHP);
+            JudgeUI.UpdateJudge(TimingType.EPOOR, combo, "0.00%", 0, score);
+            UI.UpdateSideJudge(perfect, great, good, ok, miss, epoor, cb, fast, slow,
+                    avgRate.ToString("0.00") + "%", (avgTimeDiff * 100).ToString("0.0") + "ms");
+        }
+
         private void UpdateTiming(double time, bool rateadd)
         {
             double abstime = Math.Abs(time);
-            TimingType timingType = GetTimingType(abstime, false);
+            TimingType timingType = GetTimingType(abstime);
 
             double timefs = 0;
             if (time > PERFECT)
@@ -1454,7 +1387,7 @@ namespace BMSPlayer
         }
 
         // Timing value로 현재 판정을 알아내는 메소드
-        private TimingType GetTimingType(double otime, bool isLongEndCheck)
+        private TimingType GetTimingType(double otime)
         {
             double time = Math.Abs(otime);
             if (time <= PERFECT) return TimingType.PERFECT;

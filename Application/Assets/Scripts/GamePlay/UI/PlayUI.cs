@@ -87,9 +87,10 @@ namespace BMSPlayer
         // BGA
         public RectTransform bgaRect;
         public RectTransform layerRect;
-        public RectTransform bgaVideoRect;
+        public RectTransform bgaVideoRectVLC;
+        public RectTransform bgaVideoRectNormal;
         public RectTransform bgaFollowingObj;
-
+        
         // Fader
         public Image Fader;
         private bool FadeDone = false;
@@ -505,14 +506,23 @@ namespace BMSPlayer
                                 Const.BGA_1P_GraphSm_Left_PosY[(int)Const.GearSize],
                                 layerRect.localPosition.z
                             );
-                            bgaVideoRect.sizeDelta = new Vector2(
+                            bgaVideoRectVLC.sizeDelta = new Vector2(
                                 Const.BGA_GraphSm_Wid[(int)Const.GearSize],
                                 Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector3(
+                            bgaVideoRectVLC.localPosition = new Vector3(
                                 Const.BGA_1P_GraphSm_Left_PosX[(int)Const.GearSize],
                                 Const.BGA_1P_GraphSm_Left_PosY[(int)Const.GearSize],
-                                bgaVideoRect.localPosition.z
+                                bgaVideoRectVLC.localPosition.z
+                            );
+                            bgaVideoRectNormal.sizeDelta = new Vector2(
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
+                            );
+                            bgaVideoRectNormal.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphSm_Left_PosY[(int)Const.GearSize],
+                                bgaVideoRectNormal.localPosition.z
                             );
                             bgaFollowingObj.localPosition = new Vector3(
                                 Const.BGA_1P_GraphSm_Left_PosX[(int)Const.GearSize],
@@ -541,14 +551,23 @@ namespace BMSPlayer
                                 Const.BGA_2P_GraphSm_Right_PosY[(int)Const.GearSize],
                                 layerRect.localPosition.z
                             );
-                            bgaVideoRect.sizeDelta = new Vector2(
+                            bgaVideoRectVLC.sizeDelta = new Vector2(
                                 Const.BGA_GraphSm_Wid[(int)Const.GearSize],
                                 Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector3(
+                            bgaVideoRectVLC.localPosition = new Vector3(
                                 Const.BGA_2P_GraphSm_Right_PosX[(int)Const.GearSize],
                                 Const.BGA_2P_GraphSm_Right_PosY[(int)Const.GearSize],
-                                bgaVideoRect.localPosition.z
+                                bgaVideoRectVLC.localPosition.z
+                            );
+                            bgaVideoRectNormal.sizeDelta = new Vector2(
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
+                            );
+                            bgaVideoRectNormal.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphSm_Right_PosY[(int)Const.GearSize],
+                                bgaVideoRectNormal.localPosition.z
                             );
                             bgaFollowingObj.localPosition = new Vector3(
                                 Const.BGA_2P_GraphSm_Right_PosX[(int)Const.GearSize],
@@ -580,14 +599,23 @@ namespace BMSPlayer
                                 Const.BGA_1P_GraphSm_Right_PosY[(int)Const.GearSize],
                                 layerRect.localPosition.z
                             );
-                            bgaVideoRect.sizeDelta = new Vector2(
+                            bgaVideoRectVLC.sizeDelta = new Vector2(
                                 Const.BGA_GraphSm_Wid[(int)Const.GearSize],
                                 Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector3(
+                            bgaVideoRectVLC.localPosition = new Vector3(
                                 Const.BGA_1P_GraphSm_Right_PosX[(int)Const.GearSize],
                                 Const.BGA_1P_GraphSm_Right_PosY[(int)Const.GearSize],
-                                bgaVideoRect.localPosition.z
+                                bgaVideoRectVLC.localPosition.z
+                            );
+                            bgaVideoRectNormal.sizeDelta = new Vector2(
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
+                            );
+                            bgaVideoRectNormal.localPosition = new Vector3(
+                                Const.BGA_1P_GraphSm_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphSm_Right_PosY[(int)Const.GearSize],
+                                bgaVideoRectNormal.localPosition.z
                             );
                             bgaFollowingObj.localPosition = new Vector3(
                                 Const.BGA_1P_GraphSm_Right_PosX[(int)Const.GearSize],
@@ -616,14 +644,23 @@ namespace BMSPlayer
                                 Const.BGA_2P_GraphSm_Left_PosY[(int)Const.GearSize],
                                 layerRect.localPosition.z
                             );
-                            bgaVideoRect.sizeDelta = new Vector2(
+                            bgaVideoRectVLC.sizeDelta = new Vector2(
                                 Const.BGA_GraphSm_Wid[(int)Const.GearSize],
                                 Const.BGA_GraphSm_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector3(
+                            bgaVideoRectVLC.localPosition = new Vector3(
                                 Const.BGA_2P_GraphSm_Left_PosX[(int)Const.GearSize],
                                 Const.BGA_2P_GraphSm_Left_PosY[(int)Const.GearSize],
-                                bgaVideoRect.localPosition.z
+                                bgaVideoRectVLC.localPosition.z
+                            );
+                            bgaVideoRectNormal.sizeDelta = new Vector2(
+                                Const.BGA_GraphSm_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphSm_Hei[(int)Const.GearSize]
+                            );
+                            bgaVideoRectNormal.localPosition = new Vector3(
+                                Const.BGA_2P_GraphSm_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphSm_Left_PosY[(int)Const.GearSize],
+                                bgaVideoRectNormal.localPosition.z
                             );
                             bgaFollowingObj.localPosition = new Vector3(
                                 Const.BGA_2P_GraphSm_Left_PosX[(int)Const.GearSize],
@@ -658,14 +695,23 @@ namespace BMSPlayer
                             Const.BGA_1P_GraphMini_PosY[(int)Const.GearSize],
                             layerRect.localPosition.z
                         );
-                        bgaVideoRect.sizeDelta = new Vector2(
+                        bgaVideoRectVLC.sizeDelta = new Vector2(
                             Const.BGA_GraphMini_Wid[(int)Const.GearSize],
                             Const.BGA_GraphMini_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector3(
+                        bgaVideoRectVLC.localPosition = new Vector3(
                             Const.BGA_1P_GraphMini_PosX[(int)Const.GearSize],
                             Const.BGA_1P_GraphMini_PosY[(int)Const.GearSize],
-                            bgaVideoRect.localPosition.z
+                            bgaVideoRectVLC.localPosition.z
+                        );
+                        bgaVideoRectNormal.sizeDelta = new Vector2(
+                            Const.BGA_GraphMini_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphMini_Hei[(int)Const.GearSize]
+                        );
+                        bgaVideoRectNormal.localPosition = new Vector3(
+                            Const.BGA_1P_GraphMini_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphMini_PosY[(int)Const.GearSize],
+                            bgaVideoRectNormal.localPosition.z
                         );
                         bgaFollowingObj.localPosition = new Vector3(
                             Const.BGA_1P_GraphMini_PosX[(int)Const.GearSize],
@@ -694,14 +740,23 @@ namespace BMSPlayer
                             Const.BGA_2P_GraphMini_PosY[(int)Const.GearSize],
                             layerRect.localPosition.z
                         );
-                        bgaVideoRect.sizeDelta = new Vector2(
+                        bgaVideoRectVLC.sizeDelta = new Vector2(
                             Const.BGA_GraphMini_Wid[(int)Const.GearSize],
                             Const.BGA_GraphMini_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector3(
+                        bgaVideoRectVLC.localPosition = new Vector3(
                             Const.BGA_2P_GraphMini_PosX[(int)Const.GearSize],
                             Const.BGA_2P_GraphMini_PosY[(int)Const.GearSize],
-                            bgaVideoRect.localPosition.z
+                            bgaVideoRectVLC.localPosition.z
+                        );
+                        bgaVideoRectNormal.sizeDelta = new Vector2(
+                            Const.BGA_GraphMini_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphMini_Hei[(int)Const.GearSize]
+                        );
+                        bgaVideoRectNormal.localPosition = new Vector3(
+                            Const.BGA_2P_GraphMini_PosX[(int)Const.GearSize],
+                            Const.BGA_2P_GraphMini_PosY[(int)Const.GearSize],
+                            bgaVideoRectNormal.localPosition.z
                         );
                         bgaFollowingObj.localPosition = new Vector3(
                             Const.BGA_2P_GraphMini_PosX[(int)Const.GearSize],
@@ -734,14 +789,23 @@ namespace BMSPlayer
                             Const.BGA_1P_GraphOff_PosY[(int)Const.GearSize],
                             layerRect.localPosition.z
                         );
-                        bgaVideoRect.sizeDelta = new Vector2(
+                        bgaVideoRectVLC.sizeDelta = new Vector2(
                             Const.BGA_GraphOff_Wid[(int)Const.GearSize],
                             Const.BGA_GraphOff_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector3(
+                        bgaVideoRectVLC.localPosition = new Vector3(
                             Const.BGA_1P_GraphOff_PosX[(int)Const.GearSize],
                             Const.BGA_1P_GraphOff_PosY[(int)Const.GearSize],
-                            bgaVideoRect.localPosition.z
+                            bgaVideoRectVLC.localPosition.z
+                        );
+                        bgaVideoRectNormal.sizeDelta = new Vector2(
+                            Const.BGA_GraphOff_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphOff_Hei[(int)Const.GearSize]
+                        );
+                        bgaVideoRectNormal.localPosition = new Vector3(
+                            Const.BGA_1P_GraphOff_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphOff_PosY[(int)Const.GearSize],
+                            bgaVideoRectNormal.localPosition.z
                         );
                         bgaFollowingObj.localPosition = new Vector3(
                             Const.BGA_1P_GraphOff_PosX[(int)Const.GearSize],
@@ -770,14 +834,23 @@ namespace BMSPlayer
                             Const.BGA_2P_GraphOff_PosY[(int)Const.GearSize],
                             layerRect.localPosition.z
                         );
-                        bgaVideoRect.sizeDelta = new Vector2(
+                        bgaVideoRectVLC.sizeDelta = new Vector2(
                             Const.BGA_GraphOff_Wid[(int)Const.GearSize],
                             Const.BGA_GraphOff_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector3(
+                        bgaVideoRectVLC.localPosition = new Vector3(
                             Const.BGA_2P_GraphOff_PosX[(int)Const.GearSize],
                             Const.BGA_2P_GraphOff_PosY[(int)Const.GearSize],
-                            bgaVideoRect.localPosition.z
+                            bgaVideoRectVLC.localPosition.z
+                        );
+                        bgaVideoRectNormal.sizeDelta = new Vector2(
+                            Const.BGA_GraphOff_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphOff_Hei[(int)Const.GearSize]
+                        );
+                        bgaVideoRectNormal.localPosition = new Vector3(
+                            Const.BGA_2P_GraphOff_PosX[(int)Const.GearSize],
+                            Const.BGA_2P_GraphOff_PosY[(int)Const.GearSize],
+                            bgaVideoRectNormal.localPosition.z
                         );
                         bgaFollowingObj.localPosition = new Vector3(
                             Const.BGA_2P_GraphOff_PosX[(int)Const.GearSize],
@@ -815,14 +888,23 @@ namespace BMSPlayer
                                 Const.BGA_1P_GraphBig_Right_PosY[(int)Const.GearSize],
                                 layerRect.localPosition.z
                             );
-                            bgaVideoRect.sizeDelta = new Vector2(
+                            bgaVideoRectVLC.sizeDelta = new Vector2(
                                 Const.BGA_GraphBig_Wid[(int)Const.GearSize],
                                 Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector3(
+                            bgaVideoRectVLC.localPosition = new Vector3(
                                 Const.BGA_1P_GraphBig_Right_PosX[(int)Const.GearSize],
                                 Const.BGA_1P_GraphBig_Right_PosY[(int)Const.GearSize],
-                                bgaVideoRect.localPosition.z
+                                bgaVideoRectVLC.localPosition.z
+                            );
+                            bgaVideoRectNormal.sizeDelta = new Vector2(
+                                Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphBig_Hei[(int)Const.GearSize]
+                            );
+                            bgaVideoRectNormal.localPosition = new Vector3(
+                                Const.BGA_1P_GraphBig_Right_PosX[(int)Const.GearSize],
+                                Const.BGA_1P_GraphBig_Right_PosY[(int)Const.GearSize],
+                                bgaVideoRectNormal.localPosition.z
                             );
                             bgaFollowingObj.localPosition = new Vector3(
                                 Const.BGA_1P_GraphBig_Right_PosX[(int)Const.GearSize],
@@ -851,14 +933,23 @@ namespace BMSPlayer
                                 Const.BGA_2P_GraphBig_Left_PosY[(int)Const.GearSize],
                                 layerRect.localPosition.z
                             );
-                            bgaVideoRect.sizeDelta = new Vector2(
+                            bgaVideoRectVLC.sizeDelta = new Vector2(
                                 Const.BGA_GraphBig_Wid[(int)Const.GearSize],
                                 Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                             );
-                            bgaVideoRect.localPosition = new Vector3(
+                            bgaVideoRectVLC.localPosition = new Vector3(
                                 Const.BGA_2P_GraphBig_Left_PosX[(int)Const.GearSize],
                                 Const.BGA_2P_GraphBig_Left_PosY[(int)Const.GearSize],
-                                bgaVideoRect.localPosition.z
+                                bgaVideoRectVLC.localPosition.z
+                            );
+                            bgaVideoRectNormal.sizeDelta = new Vector2(
+                                Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                                Const.BGA_GraphBig_Hei[(int)Const.GearSize]
+                            );
+                            bgaVideoRectNormal.localPosition = new Vector3(
+                                Const.BGA_2P_GraphBig_Left_PosX[(int)Const.GearSize],
+                                Const.BGA_2P_GraphBig_Left_PosY[(int)Const.GearSize],
+                                bgaVideoRectNormal.localPosition.z
                             );
                             bgaFollowingObj.localPosition = new Vector3(
                                 Const.BGA_2P_GraphBig_Left_PosX[(int)Const.GearSize],
@@ -888,14 +979,23 @@ namespace BMSPlayer
                             Const.BGA_1P_GraphBig_Left_PosY[(int)Const.GearSize],
                             layerRect.localPosition.z
                         );
-                        bgaVideoRect.sizeDelta = new Vector2(
+                        bgaVideoRectVLC.sizeDelta = new Vector2(
                             Const.BGA_GraphBig_Wid[(int)Const.GearSize],
                             Const.BGA_GraphBig_Hei[(int)Const.GearSize]
                         );
-                        bgaVideoRect.localPosition = new Vector3(
+                        bgaVideoRectVLC.localPosition = new Vector3(
                             Const.BGA_1P_GraphBig_Left_PosX[(int)Const.GearSize],
                             Const.BGA_1P_GraphBig_Left_PosY[(int)Const.GearSize],
-                            bgaVideoRect.localPosition.z
+                            bgaVideoRectVLC.localPosition.z
+                        );
+                        bgaVideoRectNormal.sizeDelta = new Vector2(
+                            Const.BGA_GraphBig_Wid[(int)Const.GearSize],
+                            Const.BGA_GraphBig_Hei[(int)Const.GearSize]
+                        );
+                        bgaVideoRectNormal.localPosition = new Vector3(
+                            Const.BGA_1P_GraphBig_Left_PosX[(int)Const.GearSize],
+                            Const.BGA_1P_GraphBig_Left_PosY[(int)Const.GearSize],
+                            bgaVideoRectNormal.localPosition.z
                         );
                         bgaFollowingObj.localPosition = new Vector3(
                             Const.BGA_1P_GraphBig_Left_PosX[(int)Const.GearSize],

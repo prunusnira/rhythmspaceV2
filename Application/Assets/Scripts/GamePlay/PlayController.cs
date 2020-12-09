@@ -308,8 +308,18 @@ namespace BMSPlayer {
                     if (analyzer.IsVideoExist())
                     {
                         isBGAMovieExist = true;
-                        BGAControl.BGAVideoActivate();
-                        BGAControl.BGAVideoPreload(Data.BMS.BGAVideoFile);
+                        if(Data.BMS.BGAVideoFile.EndsWith(".wmv") || Data.BMS.BGAVideoFile.EndsWith(".avi"))
+                        {
+                            BGAControl.BGAVideoActivateNM();
+                            BGAControl.BGAVideoPreloadNM(Data.BMS.BGAVideoFile);
+                            BGAControl.SetVLCNeed(false);
+                        }
+                        else
+                        {
+                            BGAControl.BGAVideoActivateVLC();
+                            BGAControl.BGAVideoPreloadVLC(Data.BMS.BGAVideoFile);
+                            BGAControl.SetVLCNeed(true);
+                        }
                     }
                     else
                     {
@@ -476,7 +486,14 @@ namespace BMSPlayer {
 
                         if (isBGAMovieExist)
                         {
-                            isPlayingBGA = BGAControl.isBGAPlaying();
+                            if (BGAControl.IsVLCNeeded())
+                            {
+                                isPlayingBGA = BGAControl.isBGAPlayingVLC();
+                            }
+                            else
+                            {
+                                isPlayingBGA = BGAControl.isBGAPlayingNM();
+                            }
                         }
 
                         if (!isPlayingMusic && !isPlayingBGA)
@@ -589,14 +606,34 @@ namespace BMSPlayer {
                     {
                         PauseStartTime = currentTick;
                         soundController.PauseAll();
-                        if(Data.BMS.BGAVideoFile != null) BGAControl.PauseBGAVideo();
+                        if (Data.BMS.BGAVideoFile != null)
+                        {
+                            if (BGAControl.IsVLCNeeded())
+                            {
+                                BGAControl.PauseBGAVideoVLC();
+                            }
+                            else
+                            {
+                                BGAControl.PauseBGAVideoNM();
+                            }
+                        }
                         ShowPauseMenu();
                     }
                     else
                     {
                         StartTime += currentTick - PauseStartTime;
                         soundController.ResumeAll();
-                        if (Data.BMS.BGAVideoFile != null) BGAControl.ResumeBGAVideo();
+                        if (Data.BMS.BGAVideoFile != null)
+                        {
+                            if (BGAControl.IsVLCNeeded())
+                            {
+                                BGAControl.ResumeBGAVideoVLC();
+                            }
+                            else
+                            {
+                                BGAControl.ResumeBGAVideoNM();
+                            }
+                        }
                         HidePauseMenu();
                     }
                 }

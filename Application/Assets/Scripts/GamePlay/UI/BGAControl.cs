@@ -15,9 +15,12 @@ namespace BMSPlayer
         public RectTransform bgaRect;
         public SpriteRenderer layerImage;
         public RectTransform layerRect;
-        public VideoPlayer bgaVideo;
-        public SpriteRenderer bgaVideoLayer;
+        public VideoPlayer bgaVideoPlayer;
+        public SpriteRenderer bgaVideoMPG;
+        public SpriteRenderer bgaVideoNormal;
         public GameObject bgaErrorLayer;
+
+        private bool isVLCNeeded = false;
 
         // VLC Player
         private LibVLC libVLC;
@@ -54,15 +57,15 @@ namespace BMSPlayer
                             true,
                             texptr
                         );
-                        bgaVideoLayer.sprite =
+                        bgaVideoMPG.sprite =
                             Tools.TextureToSprite(
                                 tex,
                                 (int)width,
                                 (int)height,
-                                bgaVideoLayer.GetComponent<RectTransform>().pivot);
-                        bgaVideoLayer.material.mainTexture = tex;
-                        bgaVideoLayer.drawMode = SpriteDrawMode.Sliced;
-                        bgaVideoLayer.size = new Vector2(playerWidth, playerHeight);
+                                bgaVideoMPG.GetComponent<RectTransform>().pivot);
+                        bgaVideoMPG.material.mainTexture = tex;
+                        bgaVideoMPG.drawMode = SpriteDrawMode.Sliced;
+                        bgaVideoMPG.size = new Vector2(playerWidth, playerHeight);
                     }
                 }
                 else
@@ -86,25 +89,32 @@ namespace BMSPlayer
             libVLC = null;
         }
 
-        public void BGAVideoActivate()
+        public void BGAVideoActivateVLC()
         {
-            bgaVideoLayer.gameObject.SetActive(true);
+            bgaVideoMPG.gameObject.SetActive(true);
         }
 
-        public void BGAVideoPreload(string file)
+        public void BGAVideoActivateNM()
         {
-            /*bgaVideo.url = "file://" + file;
-            bgaVideo.errorReceived += BGAErrorLayer;
-            bgaVideo.Prepare();*/
+            bgaVideoNormal.gameObject.SetActive(true);
+        }
 
+        public void BGAVideoPreloadVLC(string file)
+        {
             mediaPlayer.Media = new Media(
                 libVLC,
                 new Uri("file://" + file)
             );
             mediaPlayer.SetLogoInt(VideoLogoOption.Opacity, 0);
-            //mediaPlayer.Play();
 
             play = true;
+        }
+
+        public void BGAVideoPreloadNM(string file)
+        {
+            bgaVideoPlayer.url = "file://" + file;
+            bgaVideoPlayer.errorReceived += BGAErrorLayer;
+            bgaVideoPlayer.Prepare();
         }
 
         public void BGAImageActivate()
@@ -117,22 +127,30 @@ namespace BMSPlayer
             layerImage.gameObject.SetActive(true);
         }
 
-        public void BGAVideoPlay()
+        public void BGAVideoPlayVLC()
         {
-            //bgaVideo.Play();
             mediaPlayer.Play();
         }
 
-        public bool isBGAPlaying()
+        public void BGAVideoPlayNM()
         {
-            //return bgaVideo.isPlaying;
+            bgaVideoPlayer.Play();
+        }
+
+        public bool isBGAPlayingVLC()
+        {
             return mediaPlayer.IsPlaying;
+        }
+
+        public bool isBGAPlayingNM()
+        {
+            return bgaVideoPlayer.isPlaying;
         }
 
         public void BGAErrorLayer(VideoPlayer source, string msg)
         {
             // 메모리 릭 방지
-            bgaVideo.errorReceived -= BGAErrorLayer;
+            bgaVideoPlayer.errorReceived -= BGAErrorLayer;
 
             // 레이어 띄우기
             bgaErrorLayer.SetActive(true);
@@ -180,16 +198,34 @@ namespace BMSPlayer
             }
         }
 
-        public void PauseBGAVideo()
+        public void PauseBGAVideoVLC()
         {
-            //bgaVideo.Pause();
             mediaPlayer.Pause();
         }
 
-        public void ResumeBGAVideo()
+        public void PauseBGAVideoNM()
         {
-            //bgaVideo.Play();
+            bgaVideoPlayer.Pause();
+        }
+
+        public void ResumeBGAVideoVLC()
+        {
             mediaPlayer.Play();
+        }
+
+        public void ResumeBGAVideoNM()
+        {
+            bgaVideoPlayer.Play();
+        }
+
+        public void SetVLCNeed(bool need)
+        {
+            isVLCNeeded = need;
+        }
+
+        public bool IsVLCNeeded()
+        {
+            return isVLCNeeded;
         }
     }
 }
