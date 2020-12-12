@@ -2,14 +2,15 @@
 {
     public enum ClearType
     {
-        NOPLAY = 0,
-        FAIL = 1,
-        ASSISTCLEAR = 2,
-        EASYCLEAR = 3,
+        PERFECT = 0,
+        FULLCB = 1,
+        EXCLEAR = 2,
+        HARDCLEAR = 3,
         NORMALCLEAR = 4,
-        HARDCLEAR = 5,
-        EXCLEAR = 6,
-        FULLCB = 7,
-        PERFECT = 8
+        EASYCLEAR = 5,
+        ASSISTCLEAR = 6,
+        FAIL = 7,
+        NOPLAY = 8,
+        OTHER = 9
     }
 }

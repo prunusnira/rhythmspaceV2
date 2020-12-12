@@ -346,6 +346,7 @@ namespace BMSPlayer
             {
                 if (!isRefreshing)
                 {
+                    strLoading = "Starting refresh...";
                     isRefreshing = true;
                     layerLoading.SetActive(true);
                     refreshReloadThread = new Thread(new ThreadStart(RefreshReload));

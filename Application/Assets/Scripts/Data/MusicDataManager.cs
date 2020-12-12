@@ -38,12 +38,12 @@ namespace BMSPlayer
 
         private bool isExecutorNull()
         {
-            return (SQLiteExecutor.Instance == null);
+            return (SQLiteMusicList.Instance == null);
         }
 
         public void Close()
         {
-            SQLiteExecutor.Instance.closeDB();
+            SQLiteMusicList.Instance.closeDB();
             md5.Clear();
         }
 
@@ -114,27 +114,37 @@ namespace BMSPlayer
 
         public List<MusicListData> LoadBMSFromDBOverall()
         {
-            return SQLiteExecutor.Instance.SelectMusicList();
+            return SQLiteMusicList.Instance.SelectMusicList();
         }
 
         public List<MusicListData> LoadBMSFromFolder(string path)
         {
-            return SQLiteExecutor.Instance.SelectMusicList(path);
+            return SQLiteMusicList.Instance.SelectMusicList(path);
         }
 
-        public List<MusicListData> FindBMSWithName(string text)
+        public List<MusicListData> LoadBMSWithName(string text)
         {
-            return SQLiteExecutor.Instance.FindBMSWithTitle(text);
+            return SQLiteMusicList.Instance.FindBMSWithTitle(text);
         }
 
-        public MusicListData FindBMSWithPath(string path)
+        public MusicListData LoadBMSWithPath(string path)
         {
-            return SQLiteExecutor.Instance.FindBMSWithPath(path);
+            return SQLiteMusicList.Instance.FindBMSWithPath(path);
+        }
+
+        public List<MusicListData> LoadBMSListWithMD5(List<string> md5list)
+        {
+            return SQLiteMusicList.Instance.FindBMSListWithMD5(md5list);
+        }
+
+        public List<MusicListData> LoadBMSListWithName(NameType type)
+        {
+            return SQLiteMusicList.Instance.FindBMSListWithName(type);
         }
 
         public void DropList()
         {
-            SQLiteExecutor.Instance.DropList();
+            SQLiteMusicList.Instance.DropList();
         }
 
         public void AddDataToDB(List<MusicListData> list, ref string strLoading)
@@ -145,19 +155,21 @@ namespace BMSPlayer
                 // 리스트의 각 파일을 DB에 등록(이 때 MD5 Hash값도 계산)
                 for (int i = 0; i < list.Count; i++)
                 {
-                    strLoading = "Gathering data to register to database (" + (i + 1) + "/" + list.Count + ")";
+                    strLoading = "[DB Work] Gathering data for database (" + (i + 1) + "/" + list.Count + ")";
                     MusicListData d = list[i];
+                    strLoading = "[DB Work] Opening file stream (" + (i + 1) + "/" + list.Count + ")";
                     FileStream fstream = File.OpenRead(d.Path + d.FileName);
+                    strLoading = "[DB Work] Computing MD5 Hash (" + (i + 1) + "/" + list.Count + ")";
                     var bytehash = md5.ComputeHash(fstream);
-                    fstream.Close();
 
+                    strLoading = "[DB Work] Get hash string (" + (i + 1) + "/" + list.Count + ")";
                     string hash = BitConverter.ToString(bytehash).Replace("-", "").ToLower();
                     d.MD5Hash = hash;
                     dataList.Add(d);
                     fstream.Close();
                 }
-                strLoading = "Registering into database";
-                SQLiteExecutor.Instance.InsertBMS(dataList);
+                strLoading = "[DB Work] Registering into database";
+                SQLiteMusicList.Instance.InsertBMS(dataList);
             }
         }
 
@@ -170,11 +182,11 @@ namespace BMSPlayer
                 for (int i = 0; i < list.Count; i++)
                 {
                     // DB에 path 값이 있으면 삭제함
-                    MusicListData d = FindBMSWithPath(list[i].Path);
+                    MusicListData d = LoadBMSWithPath(list[i].Path);
                     if (d != null) dataList.Add(d.Path);
                 }
-                strLoading = "Removing unnecesary files from database";
-                SQLiteExecutor.Instance.DeleteBMS(dataList);
+                strLoading = "[DB Work] Removing unnecesary files from database";
+                SQLiteMusicList.Instance.DeleteBMS(dataList);
             }
         }
     }

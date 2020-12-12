@@ -6,29 +6,26 @@ using UnityEngine;
 
 namespace BMSPlayer
 {
-    public enum DiffTableMode
-    {
-        STELLA = 0,
-        SATELLITE = 1
-    }
-
     class DiffTableStSl: IDiffTable
     {
-        private DiffTableMode mode;
+        private DiffTableMode Mode;
         private string Url;
         private string JSONBody;
         private bool isWorkDone;
         private string StrLoading;
 
-        public DiffTableStSl(string fromUrl, DiffTableMode mode)
+        public DiffTableStSl(string fromUrl, DiffTableMode mode, ref string strLoading)
         {
             Url = fromUrl;
-            this.mode = mode;
+            Mode = mode;
             isWorkDone = false;
+            StrLoading = strLoading;
         }
 
         public async void CrawlTable()
         {
+            StrLoading = "Acquiring file from: "+Mode;
+
             HttpClient client = new HttpClient();
             HttpResponseMessage res = await client.GetAsync(Url);
             res.EnsureSuccessStatusCode();
@@ -49,7 +46,7 @@ namespace BMSPlayer
 
                 list.Add(new DiffTableData(title, artist, level, url, md5));
             }
-            TableDataManager.Instance.AddDataToDB(list, mode, ref StrLoading);
+            TableDataManager.Instance.AddDataToDB(list, Mode, ref StrLoading);
             isWorkDone = true;
         }
 

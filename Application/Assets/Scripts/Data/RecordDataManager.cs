@@ -10,6 +10,19 @@ namespace BMSPlayer
     {
         MD5 md5;
 
+        private static RecordDataManager instance;
+        public static RecordDataManager Instance
+        {
+            get
+            {
+                if(instance == null)
+                {
+                    instance = new RecordDataManager();
+                }
+                return instance;
+            }
+        }
+
         public RecordDataManager()
         {
             md5 = MD5.Create();
@@ -17,23 +30,23 @@ namespace BMSPlayer
 
         public void Close()
         {
-            SQLiteExecutor.Instance.closeDB();
+            SQLiteRecord.Instance.closeDB();
             md5.Clear();
         }
 
         public void CreateNewTable()
         {
-            SQLiteExecutor.Instance.InitRecordTable();
+            SQLiteRecord.Instance.InitRecordTable();
         }
 
         public void DropTable()
         {
-            SQLiteExecutor.Instance.DropRecord();
+            SQLiteRecord.Instance.DropRecord();
         }
 
         public void RegisterRecord(RecordData data)
         {
-            SQLiteExecutor.Instance.InsertRecord(
+            SQLiteRecord.Instance.InsertRecord(
                 data.MD5Hash,
                 data.Rank,
                 data.Score,
@@ -52,17 +65,22 @@ namespace BMSPlayer
 
         public int GetClearStat(string hash)
         {
-            return SQLiteExecutor.Instance.SelectRecordClear(hash);
+            return SQLiteRecord.Instance.SelectRecordClear(hash);
         }
 
         public int GetPlayCnt(string hash)
         {
-            return SQLiteExecutor.Instance.SelectRecordPlayCnt(hash);
+            return SQLiteRecord.Instance.SelectRecordPlayCnt(hash);
         }
 
         public RecordData GetFullClearStat(string hash)
         {
-            return SQLiteExecutor.Instance.SelectRecord(hash);
+            return SQLiteRecord.Instance.SelectRecord(hash);
+        }
+
+        public List<string> GetRankHash(string rank)
+        {
+            return SQLiteRecord.Instance.SelectRankHash(rank);
         }
     }
 }

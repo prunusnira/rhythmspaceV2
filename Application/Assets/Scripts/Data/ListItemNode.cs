@@ -23,5 +23,8 @@ namespace BMSPlayer
         public bool IsFromTable { get; set; }
         public string Url { get; set; }
         public bool Exist { get; set; }
+
+        // Distinguisher
+        public ClearType Clear { get; set; }
     }
 }

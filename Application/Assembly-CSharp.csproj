@@ -85,6 +85,7 @@
     <Compile Include="Assets\Scripts\Data\ResolutionList.cs" />
     <Compile Include="Assets\Scripts\Data\TableDataManager.cs" />
     <Compile Include="Assets\Scripts\Data\enum\ItemType.cs" />
+    <Compile Include="Assets\Scripts\Data\enum\NameType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\BMSRuntimeLoader.cs" />
     <Compile Include="Assets\Scripts\GamePlay\HPController.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Note\NoteGenerator.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\NoteSkin.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\ScreenModeType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\SkinType.cs" />
+    <Compile Include="Assets\Scripts\GamePlay\enum\SortType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\SpdType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\TimingType.cs" />
     <Compile Include="Assets\Scripts\GamePlay\enum\UILayoutType.cs" />
@@ -145,7 +147,9 @@
     <Compile Include="Assets\Scripts\MusicList\buttonsetting\PlayKeySetting.cs" />
     <Compile Include="Assets\Scripts\Result\GraphDrawer.cs" />
     <Compile Include="Assets\Scripts\Result\ResultController.cs" />
-    <Compile Include="Assets\Scripts\SQLite\SQLiteExecutor.cs" />
+    <Compile Include="Assets\Scripts\SQLite\SQLiteMusicList.cs" />
+    <Compile Include="Assets\Scripts\SQLite\SQLiteRecord.cs" />
+    <Compile Include="Assets\Scripts\SQLite\SQLiteTable.cs" />
     <Compile Include="Assets\Scripts\UI\GUILayoutx.cs" />
     <Compile Include="Assets\Scripts\UI\MultiScaleCamera.cs" />
     <Compile Include="Assets\Scripts\UI\OnSearch.cs" />

@@ -13,13 +13,6 @@ namespace BMSPlayer
         // user play info
         private int noteCount = 0;
         private int processedNotes = 0;
-        private double addStopTiming = 0;
-
-        // 노트 스크롤
-        private double noteTiming;
-
-        // 소리 재생
-        private ISoundController soundController = SoundControllerFMOD.Instance;
 
         public void PlaySetup(int noteCount, int rank)
         {
@@ -36,7 +29,7 @@ namespace BMSPlayer
 
                 if (current.Timing <= time && !current.Used)
                 {
-                    soundController.PlayKeySound(current.Wav, bms, 0);
+                    SoundControllerFMOD.Instance.PlayKeySound(current.Wav, bms, 0);
                     current.Used = true;
                     removeCandidate.Add(current);
                 }
@@ -69,7 +62,7 @@ namespace BMSPlayer
                 {
                     if (cnote.PlayNoteType == NoteType.SINGLE)
                     {
-                        soundController.PlayKeySound(cnote.Wav, bms, cnote.Line);
+                        SoundControllerFMOD.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
                         removeCandidate.Add(cnote);
 
                         processedNotes++;
@@ -77,7 +70,7 @@ namespace BMSPlayer
                     // 롱노트 시작 처리
                     else if (cnote.PlayNoteType == NoteType.LNSTART)
                     {
-                        soundController.PlayKeySound(cnote.Wav, bms, cnote.Line);
+                        SoundControllerFMOD.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
 
                         removeCandidate.Add(lnlist[cnote.LNNum].End);
                         removeCandidate.Add(lnlist[cnote.LNNum].Mid);

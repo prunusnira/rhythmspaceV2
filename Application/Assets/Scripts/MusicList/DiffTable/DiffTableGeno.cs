@@ -16,15 +16,20 @@ namespace BMSPlayer
         private string JSONBody;
         private bool isWorkDone;
         private string StrLoading;
+        private DiffTableMode Mode;
 
-        public DiffTableGeno(string fromUrl)
+        public DiffTableGeno(string fromUrl, DiffTableMode mode, ref string strLoading)
         {
             Url = fromUrl;
+            Mode = mode;
             isWorkDone = false;
+            StrLoading = strLoading;
         }
 
         public async void CrawlTable()
         {
+            StrLoading = "Acquiring file from: " + Mode;
+
             HttpClient client = new HttpClient();
             HttpResponseMessage msg = await client.GetAsync(Url);
             Stream stream = await msg.Content.ReadAsStreamAsync();
@@ -67,9 +72,9 @@ namespace BMSPlayer
             {
                 JSONObject obj = json.list[i];
                 string lvstr = obj.list[1].str;
-                lvstr = lvstr.Replace("\"", "").Replace("★", "");
+                lvstr = lvstr.Replace("\"", "").Replace("★", "").Replace("☆", "");
                 int lv = 0;
-                if(lvstr == "???")
+                if(lvstr == "???" || lvstr == "X")
                 {
                     lv = 99;
                 }
@@ -92,7 +97,7 @@ namespace BMSPlayer
                 // 각각을 Node로 만들어서 추가
                 list.Add(new DiffTableData(title, artist, lv, url, ""));
             }
-            TableDataManager.Instance.AddDataToDB(list, null, ref StrLoading);
+            TableDataManager.Instance.AddDataToDB(list, Mode, ref StrLoading);
             isWorkDone = true;
         }
 

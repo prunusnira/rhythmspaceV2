@@ -79,7 +79,7 @@ namespace BMSPlayer
                     int idxmax = centpos + 10;
 
                     if (idxmin < 0) idxmin = itemList.Count + idxmin - 1;
-                    if (idxmax > itemList.Count - 1) idxmax = idxmax - itemList.Count - 1;
+                    if (idxmax > itemList.Count - 1) idxmax = idxmax - itemList.Count + 1;
 
                     if (idxmax > idxmin)
                     {
@@ -210,7 +210,7 @@ namespace BMSPlayer
 
         public override void OnDrag(PointerEventData eventData)
         {
-
+            
         }
 
         public override void OnEndDrag(PointerEventData eventData)

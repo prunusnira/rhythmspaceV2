@@ -2,6 +2,6 @@
 {
     public enum ItemType
     {
-        DIRECTORY, BMS, TABLE
+        DIRECTORY, BMS, TABLE, CLEAR, NAME
     }
 }

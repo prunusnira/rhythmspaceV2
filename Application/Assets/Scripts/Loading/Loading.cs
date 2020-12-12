@@ -28,6 +28,7 @@ namespace BMSPlayer
         private bool FadeReady = false;
         private bool FadeReadyStart = false;
         private bool ESCPressed = false;
+        private bool SceneMoveRun = false;
 
         private void Awake()
         {
@@ -96,38 +97,51 @@ namespace BMSPlayer
 
         public void Update()
         {
+            // 상태에 관계없이 5초 대기
+            if (!FadeReadyStart && !FadeReady)
+            {
+                StartCoroutine("WaitFor5Sec");
+                return;
+            }
+
+            // 5초가 되기 전에 ESC를 누름
             if (!FadeReady &&
                 (Input.GetKeyDown(KeyCode.Escape) ||
                     (Keys.GetBtn(2) && Keys.GetBtn(4) && Keys.GetBtn(6))
                 ))
             {
                 ESCPressed = true;
-                if (!FadeDone && !FadeStart)
-                {
-                    StartCoroutine("FadeOut");
-                }
+                return;
             }
 
-            if (!FadeReadyStart && !FadeReady)
+            // ESC를 눌렀을 때 페이드 진입
+            if(ESCPressed && !FadeStart)
             {
-                StartCoroutine("WaitFor5Sec");
+                StartCoroutine("FadeOut");
+                return;
             }
 
-            if (FadeReady && !ESCPressed)
+            // ESC를 누르지 않고 5초가 지났을 때 페이드 진입
+            if(!ESCPressed && FadeReady && !FadeStart)
             {
-                if (!FadeDone && !FadeStart)
-                {
-                    StartCoroutine("FadeOut");
-                }
-                else if (FadeDone)
-                {
-                    SceneManager.LoadScene("PlayScreen");
-                }
+                StartCoroutine("FadeOut");
+                return;
             }
 
-            if (FadeDone && ESCPressed)
+            // ESC를 누르고 페이드가 완료되었을 때
+            if(ESCPressed && FadeDone && !SceneMoveRun)
             {
+                SceneMoveRun = true;
                 SceneManager.LoadScene("MusicSelect");
+                return;
+            }
+
+            // ESC를 누르지 않고 페이드가 완료되었을 때
+            if (!ESCPressed && FadeDone && !SceneMoveRun)
+            {
+                SceneMoveRun = true;
+                SceneManager.LoadScene("PlayScreen");
+                return;
             }
         }
 

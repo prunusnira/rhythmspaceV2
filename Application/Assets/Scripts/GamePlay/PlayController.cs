@@ -59,6 +59,8 @@ namespace BMSPlayer {
 
         // Data in thread
         private int encoding = 932;
+        private Thread loadingThread1;
+        private Thread loadingThread2;
 
         // 시간 관리
         private double StartTime = 0;
@@ -68,9 +70,6 @@ namespace BMSPlayer {
         private double PauseStartTime = 0;
 
         private int pauseSel = 0;
-
-        // Audio Management
-        private ISoundController soundController;
 
         private bool firstrun = false;
         private bool isPlayAuto;
@@ -113,9 +112,6 @@ namespace BMSPlayer {
 
             // 분석된 데이터를 바탕으로 노트를 생성
             generator = new NoteGenerator();
-
-            // 사운드 컨트롤러 초기화
-            soundController = SoundControllerFMOD.Instance;
 
             if (Const.Auto == AutoPlayType.ALL)
                 isPlayAuto = true;
@@ -262,8 +258,8 @@ namespace BMSPlayer {
                 if (!isLoadingPhase1)
                 {
                     isLoadingPhase1 = true;
-                    Thread loadingThread = new Thread(new ThreadStart(LoadBMSPhase1));
-                    loadingThread.Start();
+                    loadingThread1 = new Thread(new ThreadStart(LoadBMSPhase1));
+                    loadingThread1.Start();
                     return;
                 }
                 else if(isLoadingPhase1Finish)
@@ -286,8 +282,8 @@ namespace BMSPlayer {
                 else if(isLoadingPhase2Ready)
                 {
                     isLoadingPhase2Ready = false;
-                    Thread loadingThread = new Thread(new ThreadStart(LoadBMSPhase2));
-                    loadingThread.Start();
+                    loadingThread2 = new Thread(new ThreadStart(LoadBMSPhase2));
+                    loadingThread2.Start();
                     return;
                 }
 
@@ -481,7 +477,7 @@ namespace BMSPlayer {
                                 break;
                         }
 
-                        bool isPlayingMusic = soundController.CheckSoundPlaying();
+                        bool isPlayingMusic = SoundControllerFMOD.Instance.CheckSoundPlaying();
                         bool isPlayingBGA = false;
 
                         if (isBGAMovieExist)
@@ -517,9 +513,9 @@ namespace BMSPlayer {
                     {
                         Debug.Log("GAMEOVER");
                         // 재생중인 모든 음악 종료
-                        soundController.StopAll();
+                        SoundControllerFMOD.Instance.StopAll();
 
-                        soundController.FreeMemory(Data.BMS);
+                        SoundControllerFMOD.Instance.FreeMemory(Data.BMS);
 
                         Const.ResultGraph = Data.HPGraph;
 
@@ -605,7 +601,7 @@ namespace BMSPlayer {
                     if (isPaused)
                     {
                         PauseStartTime = currentTick;
-                        soundController.PauseAll();
+                        SoundControllerFMOD.Instance.PauseAll();
                         if (Data.BMS.BGAVideoFile != null)
                         {
                             if (BGAControl.IsVLCNeeded())
@@ -622,7 +618,7 @@ namespace BMSPlayer {
                     else
                     {
                         StartTime += currentTick - PauseStartTime;
-                        soundController.ResumeAll();
+                        SoundControllerFMOD.Instance.ResumeAll();
                         if (Data.BMS.BGAVideoFile != null)
                         {
                             if (BGAControl.IsVLCNeeded())
@@ -676,7 +672,7 @@ namespace BMSPlayer {
                 isInfoDisplay = true;
 
                 // 사운드 정의(FMOD)
-                soundController.PreloadSound(Data.BMS);
+                SoundControllerFMOD.Instance.PreloadSound(Data.BMS);
 
                 isLoadingPhase1Finish = true;
             }
@@ -799,8 +795,8 @@ namespace BMSPlayer {
 
         public void RestartGame()
         {
-            soundController.StopAll();
-            soundController.FreeMemory(Data.BMS);
+            SoundControllerFMOD.Instance.StopAll();
+            SoundControllerFMOD.Instance.FreeMemory(Data.BMS);
             Scene scene = SceneManager.GetActiveScene();
             SceneManager.LoadScene("PlayScreen");
         }

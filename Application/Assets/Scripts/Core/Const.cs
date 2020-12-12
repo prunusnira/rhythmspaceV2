@@ -6,15 +6,21 @@ namespace BMSPlayer
 {
     public class Const
     {
-        public static string DBPath = "";
+        public static string ListDBPath = "";
+        public static string RecordDBPath = "";
+        public static string TableDBPath = "";
         public static string JSONPath = "";
         static Const()
         {
 #if(UNITY_EDITOR)
-            DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db.sqlite";
+            ListDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_list.sqlite";
+            RecordDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_record.sqlite";
+            TableDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_table.sqlite";
             JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\structure.json";
 #elif(UNITY_STANDALONE)
-            DBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db.sqlite";
+            ListDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_list.sqlite";
+            RecordDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_record.sqlite";
+            TableDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_table.sqlite";
             JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\structure.json";
 #endif
         }
@@ -594,6 +600,13 @@ namespace BMSPlayer
             "[ 検索モード ]",
             "[ Search Mode ]"
         };
+
+        public static string[] musiclistGenoTableInfo = new string[3]
+        {
+            "* GENOCIDE 난이도표에서는 HASH코드를 제공하지 않으므로 일부 패턴이 부정확할 수 있습니다",
+            "* GENOCIDE難易度表ではHASHコードを提供しない上、一部の譜面がマッチングできなくなる可能性があります",
+            "* GENOCIDE table does not provide HASH code, there's possibility of wrong pattern"
+        };
         #endregion
 
         #region Dialog Text
@@ -715,6 +728,18 @@ namespace BMSPlayer
             "You can change it from [System Setting]"
         };
         #endregion
+
+        public static SortType SortType
+        {
+            get
+            {
+                return (SortType)PlayerPrefs.GetInt("list_sort", (int)SortType.TITLE);
+            }
+            set
+            {
+                PlayerPrefs.SetInt("list_sort", (int)value);
+            }
+        }
 
         // System Setting Values
         #region System Setting
@@ -1807,15 +1832,27 @@ namespace BMSPlayer
             }
         }
 
-        public static string GenocideURL
+        public static string GenocideNormalURL
         {
             get
             {
-                return PlayerPrefs.GetString("diff_geno", "http://nekokan.dyndns.info/~lobsak/genocide/insane.html");
+                return PlayerPrefs.GetString("diff_genonm", "http://nekokan.dyndns.info/~lobsak/genocide/normal.html");
             }
             set
             {
-                PlayerPrefs.SetString("diff_geno", value);
+                PlayerPrefs.SetString("diff_genonm", value);
+            }
+        }
+
+        public static string GenocideInsaneURL
+        {
+            get
+            {
+                return PlayerPrefs.GetString("diff_genoins", "http://nekokan.dyndns.info/~lobsak/genocide/insane.html");
+            }
+            set
+            {
+                PlayerPrefs.SetString("diff_genoins", value);
             }
         }
         #endregion

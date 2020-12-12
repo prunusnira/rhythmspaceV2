@@ -32,50 +32,53 @@ namespace BMSPlayer
         private TableDataManager()
         {
             md5 = MD5.Create();
-            if (!SQLiteExecutor.Instance.CheckDiffTableSlExist())
-                SQLiteExecutor.Instance.InitDiffSl();
+            if (!SQLiteTable.Instance.CheckDiffTableExist(DiffTableMode.SATELLITE))
+                SQLiteTable.Instance.InitDiffSl();
 
-            if (!SQLiteExecutor.Instance.CheckDiffTableStExist())
-                SQLiteExecutor.Instance.InitDiffSt();
+            if (!SQLiteTable.Instance.CheckDiffTableExist(DiffTableMode.STELLA))
+                SQLiteTable.Instance.InitDiffSt();
 
-            if (!SQLiteExecutor.Instance.CheckDiffTableGeExist())
-                SQLiteExecutor.Instance.InitDiffGe();
+            if (!SQLiteTable.Instance.CheckDiffTableExist(DiffTableMode.GENONM))
+                SQLiteTable.Instance.InitDiffGeNM();
+
+            if (!SQLiteTable.Instance.CheckDiffTableExist(DiffTableMode.GENOINS))
+                SQLiteTable.Instance.InitDiffGeINS();
         }
 
         private bool isExecutorNull()
         {
-            return (SQLiteExecutor.Instance == null);
+            return (SQLiteTable.Instance == null);
         }
 
         public void Close()
         {
-            SQLiteExecutor.Instance.closeDB();
+            SQLiteTable.Instance.closeDB();
             md5.Clear();
         }
 
-        public List<int> GetTableLevelList(int type)
+        public List<int> GetTableLevelList(DiffTableMode type)
         {
-            return SQLiteExecutor.Instance.GetTableLevelList(type);
+            return SQLiteTable.Instance.GetTableLevelList(type);
         }
 
         public MusicListData GetMusicOfMD5Hash(string hash)
         {
-            return SQLiteExecutor.Instance.GetMusicOfMD5Hash(hash);
+            return SQLiteMusicList.Instance.GetMusicOfMD5Hash(hash);
         }
 
         public MusicListData GetMusicOfTitle(string title)
         {
-            return SQLiteExecutor.Instance.GetMusicOfTitle(title);
+            return SQLiteMusicList.Instance.GetMusicOfTitle(title);
         }
 
         public List<DiffTableData> LoadTableStSlByLevel(int lv, DiffTableMode mode)
         {
-            return SQLiteExecutor.Instance.GetDiffTableStSl(lv, mode);
+            return SQLiteTable.Instance.GetDiffTableStSl(lv, mode);
         }
 
-        public List<DiffTableData> LoadTableGeByLevel(int lv)
+        public List<DiffTableData> LoadTableGeByLevel(int lv, DiffTableMode mode)
         {
-            return SQLiteExecutor.Instance.GetDiffTableGe(lv);
+            return SQLiteTable.Instance.GetDiffTableGe(lv, mode);
         }
 
         public void AddDataToDB(
@@ -86,17 +89,20 @@ namespace BMSPlayer
             if (list.Count != 0)
             {
                 // drop
-                if (mode == null)
+                switch (mode)
                 {
-                    SQLiteExecutor.Instance.DropTableGe();
-                }
-                else if(mode == DiffTableMode.STELLA)
-                {
-                    SQLiteExecutor.Instance.DropTableSt();
-                }
-                else if (mode == DiffTableMode.SATELLITE)
-                {
-                    SQLiteExecutor.Instance.DropTableSl();
+                    case DiffTableMode.SATELLITE:
+                        SQLiteTable.Instance.DropTableSl();
+                        break;
+                    case DiffTableMode.STELLA:
+                        SQLiteTable.Instance.DropTableSt();
+                        break;
+                    case DiffTableMode.GENONM:
+                        SQLiteTable.Instance.DropTableGeNM();
+                        break;
+                    case DiffTableMode.GENOINS:
+                        SQLiteTable.Instance.DropTableGeINS();
+                        break;
                 }
 
                 List<DiffTableData> dataList = new List<DiffTableData>();
@@ -107,13 +113,17 @@ namespace BMSPlayer
                     DiffTableData d = list[i];
                 }
                 strLoading = "Registering into Database";
-                if(mode == null)
+
+                switch (mode)
                 {
-                    SQLiteExecutor.Instance.InsertDiffTableGe(list);
-                }
-                else
-                {
-                    SQLiteExecutor.Instance.InsertDiffTableStSl((DiffTableMode)mode, list);
+                    case DiffTableMode.GENOINS:
+                    case DiffTableMode.GENONM:
+                        SQLiteTable.Instance.InsertDiffTableGe((DiffTableMode)mode, list);
+                        break;
+                    case DiffTableMode.SATELLITE:
+                    case DiffTableMode.STELLA:
+                        SQLiteTable.Instance.InsertDiffTableStSl((DiffTableMode)mode, list);
+                        break;
                 }
             }
         }

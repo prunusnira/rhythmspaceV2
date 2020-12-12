@@ -72,9 +72,6 @@ namespace BMSPlayer
         private double[] lnTiming;
         private int[] lnNumInProcess;
 
-        // 소리 재생
-        private ISoundController soundController;
-
         // 외부 클래스 연계
         private PlayUI UI;
         private HPBarUI HPUI;
@@ -126,12 +123,9 @@ namespace BMSPlayer
             lnNumInProcess = new int[8] { -1, -1, -1, -1, -1, -1, -1, -1 };
 
 
-        // 초기 HP 지정
-        hpController = HPController.Instance;
+            // 초기 HP 지정
+            hpController = HPController.Instance;
             gaugeType = Const.GaugeType;
-
-            // 사운드 컨트롤러 정의
-            soundController = SoundControllerFMOD.Instance;
         }
 
         public void PlaySetup(int noteCount, int rank)
@@ -632,7 +626,7 @@ namespace BMSPlayer
 
                 if (current.Timing <= time && !current.Used)
                 {
-                    soundController.PlayKeySound(current.Wav, bms, 0);
+                    SoundControllerFMOD.Instance.PlayKeySound(current.Wav, bms, 0);
                     current.Used = true;
                     removeCandidate.Add(current);
                 }
@@ -744,7 +738,7 @@ namespace BMSPlayer
                         // 소리 내기
                         if (!btnPushSound[i])
                         {
-                            soundController.PlayKeySound(cnote.Wav, bms, cnote.Line);
+                            SoundControllerFMOD.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
                             btnPushSound[i] = true;
                         }
 
@@ -762,7 +756,7 @@ namespace BMSPlayer
                         // 소리 내기
                         if (!btnPushSound[i])
                         {
-                            soundController.PlayKeySound(cnote.Wav, bms, cnote.Line);
+                            SoundControllerFMOD.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
                             btnPushSound[i] = true;
                         }
 
@@ -870,7 +864,7 @@ namespace BMSPlayer
                         {
                             if (!btnPushSound[0])
                             {
-                                soundController.PlayKeySound(note.Wav, bms, note.Line);
+                                SoundControllerFMOD.Instance.PlayKeySound(note.Wav, bms, note.Line);
                                 btnPushSound[0] = true;
                             }
 
@@ -881,7 +875,7 @@ namespace BMSPlayer
                         {
                             if (!btnPushSound[0])
                             {
-                                soundController.PlayKeySound(note.Wav, bms, note.Line);
+                                SoundControllerFMOD.Instance.PlayKeySound(note.Wav, bms, note.Line);
                                 btnPushSound[0] = true;
                             }
                         }
@@ -923,7 +917,7 @@ namespace BMSPlayer
                             // 노트 존재 유무와 상관없이 소리 냄
                             if (!btnPushSound[i])
                             {
-                                soundController.PlayKeySound(cnote.Wav, bms, cnote.Line);
+                                SoundControllerFMOD.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
                                 btnPushSound[i] = true;
                             }
 
