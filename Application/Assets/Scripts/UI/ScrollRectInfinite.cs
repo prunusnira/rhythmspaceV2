@@ -11,9 +11,9 @@ namespace BMSPlayer
     public class ScrollRectInfinite : ScrollRect
     {
         public GameObject prefab;
-        public delegate GameObject ObjectSetup(ListItemNode data, int i);
+        public delegate GameObject ObjectSetup(ListItem data, int i);
 
-        private Dictionary<int, ListItemNode> itemList;
+        private Dictionary<int, ListItem> itemList;
         private RectTransform objRect;
 
         private int currentIdx = 0;
@@ -22,12 +22,12 @@ namespace BMSPlayer
 
         private int[] itemidx = new int[18];
 
-        public void Init(List<ListItemNode> list, int centpos, ObjectSetup f)
+        public void Init(List<ListItem> list, int centpos, ObjectSetup f)
         {
             objRect = GetComponent<RectTransform>();
-            itemList = new Dictionary<int, ListItemNode>();
+            itemList = new Dictionary<int, ListItem>();
 
-            foreach (ListItemNode n in list)
+            foreach (ListItem n in list)
             {
                 itemList.Add(itemList.Count, n);
             }
@@ -78,10 +78,13 @@ namespace BMSPlayer
                     int idxmin = centpos - 8;
                     int idxmax = centpos + 10;
 
+                    int startmin = idxmin;
+                    int startmax = idxmax;
+
                     if (idxmin < 0) idxmin = itemList.Count + idxmin - 1;
                     if (idxmax > itemList.Count - 1) idxmax = idxmax - itemList.Count + 1;
 
-                    if (idxmax > idxmin)
+                    if (idxmax > idxmin && (startmin >= 0 && startmax < itemList.Count))
                     {
                         for (int i = idxmin; i < idxmax; i++)
                         {
@@ -176,7 +179,7 @@ namespace BMSPlayer
         }
 
         // Getter/Setter
-        public ListItemNode GetCurrent()
+        public ListItem GetCurrent()
         {
             return itemList[currentIdx];
         }

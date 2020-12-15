@@ -1,13 +1,7 @@
-﻿using BMSPlayer;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace BMSCore
 {
@@ -62,37 +56,37 @@ namespace BMSCore
                             // 여기서 걸러지지 않으면 try-catch로 거름
                             continue;
                         }
-                        else if (tag == "#PLAYER")
+                        else if (tag.ToUpper() == "#PLAYER")
                         {
                             bms.Player = int.Parse(left);
                         }
-                        else if (tag == "#GENRE")
+                        else if (tag.ToUpper() == "#GENRE")
                         {
                             bms.Gerne = left;
                         }
-                        else if (tag == "#TITLE")
+                        else if (tag.ToUpper() == "#TITLE")
                         {
                             bms.Title = left;
                         }
-                        else if (tag == "#SUBTITLE")
+                        else if (tag.ToUpper() == "#SUBTITLE")
                         {
                             bms.SubTitle = left;
                         }
-                        else if (tag == "#ARTIST")
+                        else if (tag.ToUpper() == "#ARTIST")
                         {
                             bms.Artist = left;
                         }
-                        else if (tag == "#SUBARTIST")
+                        else if (tag.ToUpper() == "#SUBARTIST")
                         {
                             bms.SubArtist = left;
                         }
-                        else if(tag == "#DIFFICULTY")
+                        else if(tag.ToUpper() == "#DIFFICULTY")
                         {
                             int diff = 2;
                             bool parse = int.TryParse(left, out diff);
                             bms.Difficulty = diff;
                         }
-                        else if (tag == "#BPM")
+                        else if (tag.ToUpper() == "#BPM")
                         {
                             float bpm;
                             float.TryParse(left, out bpm);
@@ -100,27 +94,27 @@ namespace BMSCore
                             bms.BPMMin = bpm;
                             bms.BPMMax = bpm;
                         }
-                        else if (tag == "#PLAYLEVEL")
+                        else if (tag.ToUpper() == "#PLAYLEVEL")
                         {
                             int level;
                             int.TryParse(left, out level);
                             bms.Level = level;
                         }
-                        else if (tag == "#RANK")
+                        else if (tag.ToUpper() == "#RANK")
                         {
                             bms.Rank = int.Parse(left);
                         }
-                        else if (tag == "#TOTAL")
+                        else if (tag.ToUpper() == "#TOTAL")
                         {
                             int total = 0;
                             int.TryParse(left, out total);
                             bms.TotalValue = total;
                         }
-                        else if (tag == "#STAGEFILE")
+                        else if (tag.ToUpper() == "#STAGEFILE")
                         {
                             bms.StageFile = left;
                         }
-                        else if (tag != "#BPM" && chkWav == "#BPM")
+                        else if (tag.ToUpper() != "#BPM" && chkWav.ToUpper() == "#BPM")
                         {
                             // 16진수로 표현 불가능 한 BPM 표현
                             double bpmC = 0d;
@@ -212,35 +206,35 @@ namespace BMSCore
                             // 여기서 걸러지지 않으면 try-catch로 거름
                             continue;
                         }
-                        if (tag == "#PLAYER")
+                        if (tag.ToUpper() == "#PLAYER")
                         {
                             bms.Player = int.Parse(left);
                         }
-                        else if (tag == "#GENRE")
+                        else if (tag.ToUpper() == "#GENRE")
                         {
                             bms.Gerne = left;
                         }
-                        else if (tag == "#TITLE")
+                        else if (tag.ToUpper() == "#TITLE")
                         {
                             bms.Title = left;
                         }
-                        else if (tag == "#SUBTITLE")
+                        else if (tag.ToUpper() == "#SUBTITLE")
                         {
                             bms.SubTitle = left;
                         }
-                        else if (tag == "#ARTIST")
+                        else if (tag.ToUpper() == "#ARTIST")
                         {
                             bms.Artist = left;
                         }
-                        else if (tag == "#SUBARTIST")
+                        else if (tag.ToUpper() == "#SUBARTIST")
                         {
                             bms.SubArtist = left;
                         }
-                        else if (tag == "#DIFFICULTY")
+                        else if (tag.ToUpper() == "#DIFFICULTY")
                         {
                             bms.Difficulty = int.Parse(left);
                         }
-                        else if (tag == "#BPM")
+                        else if (tag.ToUpper() == "#BPM")
                         {
                             float bpm;
                             float.TryParse(left, out bpm);
@@ -248,28 +242,28 @@ namespace BMSCore
                             bms.BPMMin = bpm;
                             bms.BPMMax = bpm;
                         }
-                        else if (tag == "#PLAYLEVEL")
+                        else if (tag.ToUpper() == "#PLAYLEVEL")
                         {
                             int level;
                             int.TryParse(left, out level);
                             bms.Level = level;
                         }
-                        else if (tag == "#RANK")
+                        else if (tag.ToUpper() == "#RANK")
                         {
                             bms.Rank = int.Parse(left);
                         }
-                        else if (tag == "#TOTAL")
+                        else if (tag.ToUpper() == "#TOTAL")
                         {
                             int total;
                             int.TryParse(left, out total);
                             bms.TotalValue = total;
                         }
-                        else if (tag == "#STAGEFILE")
+                        else if (tag.ToUpper() == "#STAGEFILE")
                         {
                             bms.StageFile = left;
                         }
                         // Long Note Type Check
-                        else if (tag == "#LNTYPE")
+                        else if (tag.ToUpper() == "#LNTYPE")
                         {
                             switch (int.Parse(left))
                             {
@@ -277,12 +271,12 @@ namespace BMSCore
                                 case 2: bms.LNType = LNType.Type2; break;
                             }
                         }
-                        else if (tag == "#LNOBJ")
+                        else if (tag.ToUpper() == "#LNOBJ")
                         {
                             bms.LNType = LNType.Obj;
                             bms.LNObj = left;
                         }
-                        else if(tag == "#RANDOM")
+                        else if(tag.ToUpper() == "#RANDOM")
                         {
                             isRandom = true;
                             bms.Random.Add(buf);
@@ -290,7 +284,7 @@ namespace BMSCore
                             bool test = false;
                             test = int.TryParse(left, out randSize);
                         }
-                        else if (tag == "#IF")
+                        else if (tag.ToUpper() == "#IF")
                         {
                             // 랜덤 내부가 아니면 무시
                             if(isRandom)
@@ -298,7 +292,7 @@ namespace BMSCore
                                 bms.Random.Add(buf);
                             }
                         }
-                        else if (tag == "#ENDIF")
+                        else if (tag.ToUpper() == "#ENDIF")
                         {
                             // 랜덤 내부가 아니면 무시
                             if (isRandom)
@@ -315,13 +309,13 @@ namespace BMSCore
                                 }
                             }
                         }
-                        else if (tag == "#ENDRANDOM")
+                        else if (tag.ToUpper() == "#ENDRANDOM")
                         {
                             isRandom = false;
                             bms.Random.Add(buf);
                         }
 
-                        else if (chkWav == "#WAV")
+                        else if (chkWav.ToUpper() == "#WAV")
                         {
                             string filename = "";
                             string[] name = left.Split('.');
@@ -335,13 +329,25 @@ namespace BMSCore
                             {
                                 filename = filename + "wav";
                             }
+                            else if (File.Exists(bms.FolderPath + filename + "WAV"))
+                            {
+                                filename = filename + "WAV";
+                            }
                             else if(File.Exists(bms.FolderPath + filename + "ogg"))
                             {
                                 filename = filename + "ogg";
                             }
+                            else if (File.Exists(bms.FolderPath + filename + "OGG"))
+                            {
+                                filename = filename + "OGG";
+                            }
                             else if (File.Exists(bms.FolderPath + filename + "mp3"))
                             {
                                 filename = filename + "mp3";
+                            }
+                            else if (File.Exists(bms.FolderPath + filename + "MP3"))
+                            {
+                                filename = filename + "MP3";
                             }
 
                             bms.WavList.Add(tag.Substring(4, 2), filename);
@@ -349,14 +355,19 @@ namespace BMSCore
 
                         else if (chkWav == "#BMP")
                         {
-                            if (left.EndsWith(".mpg") || left.EndsWith(".mpeg") || left.EndsWith(".mp4")
-                                || left.EndsWith(".wmv") || left.EndsWith(".avi"))
+                            if (left.ToLower().EndsWith(".mpg") ||
+                                left.ToLower().EndsWith(".mpeg") ||
+                                left.ToLower().EndsWith(".mp4") ||
+                                left.ToLower().EndsWith(".wmv") ||
+                                left.ToLower().EndsWith(".avi"))
                             {
                                 bms.BGAVideoFile = bms.FolderPath + left;
                                 isVideoExist = true;
                             }
-                            else if (left.EndsWith(".bmp") || left.EndsWith(".jpg")
-                                || left.EndsWith(".jpeg") || left.EndsWith(".png"))
+                            else if (left.ToLower().EndsWith(".bmp") ||
+                                left.ToLower().EndsWith(".jpg") ||
+                                left.ToLower().EndsWith(".jpeg") ||
+                                left.ToLower().EndsWith(".png"))
                             {
                                 // 파일 확장자 처리부터 수행
                                 string[] filename = left.Split('.');
@@ -372,9 +383,19 @@ namespace BMSCore
                                     filenameCheck += "bmp";
                                     isFileExist = true;
                                 }
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "BMP"))
+                                {
+                                    filenameCheck += "BMP";
+                                    isFileExist = true;
+                                }
                                 else if (File.Exists(bms.FolderPath + filenameCheck + "jpg"))
                                 {
                                     filenameCheck += "jpg";
+                                    isFileExist = true;
+                                }
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "JPG"))
+                                {
+                                    filenameCheck += "JPG";
                                     isFileExist = true;
                                 }
                                 else if (File.Exists(bms.FolderPath + filenameCheck + "jpeg"))
@@ -382,17 +403,27 @@ namespace BMSCore
                                     filenameCheck += "jpeg";
                                     isFileExist = true;
                                 }
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "JPEG"))
+                                {
+                                    filenameCheck += "JPEG";
+                                    isFileExist = true;
+                                }
                                 else if (File.Exists(bms.FolderPath + filenameCheck + "png"))
                                 {
                                     filenameCheck += "png";
                                     isFileExist = true;
                                 }
+                                else if (File.Exists(bms.FolderPath + filenameCheck + "PNG"))
+                                {
+                                    filenameCheck += "PNG";
+                                    isFileExist = true;
+                                }
 
-                                if(isFileExist)
+                                if (isFileExist)
                                     bms.BGAPaths.Add(tag.Substring(4, 2), bms.FolderPath + filenameCheck);
                             }
                         }
-                        else if (tag != "#BPM" && chkWav == "#BPM")
+                        else if (tag.ToUpper() != "#BPM" && chkWav.ToUpper() == "#BPM")
                         {
                             // 16진수로 표현 불가능 한 BPM 표현
                             double bpmC = 0d;
@@ -402,7 +433,7 @@ namespace BMSCore
                             // 등록 필요
                             bms.BPMNum.Add(tag.Substring(4, 2), bpmC);
                         }
-                        else if (chkWav == "#STO")
+                        else if (chkWav.ToUpper() == "#STO")
                         {
                             int stime = 0;
                             int.TryParse(left, out stime);
@@ -674,7 +705,7 @@ namespace BMSCore
                 }
                 int parsedTag = 0;
 
-                if(tag == "#RANDOM")
+                if(tag.ToUpper() == "#RANDOM")
                 {
                     bool test = false;
                     int randvalue;
@@ -690,7 +721,7 @@ namespace BMSCore
                 }
                 else if(RandomValue.Count > 0)
                 {
-                    if(tag == "#IF")
+                    if(tag.ToUpper() == "#IF")
                     {
                         bool test = false;
                         int ifval;
@@ -706,7 +737,7 @@ namespace BMSCore
                             }
                         }
                     }
-                    else if(tag == "#ENDIF")
+                    else if(tag.ToUpper() == "#ENDIF")
                     {
                         if(ifable)
                         {
@@ -721,7 +752,7 @@ namespace BMSCore
                             RandomValue.RemoveAt(RandomValue.Count - 1);
                         }
                     }
-                    else if (tag == "#ENDRANDOM")
+                    else if (tag.ToUpper() == "#ENDRANDOM")
                     {
                         //RandomValue.RemoveAt(RandomValue.Count - 1);
                     }

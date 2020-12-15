@@ -1,16 +1,12 @@
 ﻿using BMSCore;
 using DatabaseManager;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography;
 
 namespace BMSPlayer
 {
     public class TableDataManager
     {
-        MD5 md5;
-
         private static TableDataManager instance;
         public static TableDataManager Instance
         {
@@ -31,7 +27,6 @@ namespace BMSPlayer
 
         private TableDataManager()
         {
-            md5 = MD5.Create();
             if (!SQLiteTable.Instance.CheckDiffTableExist(DiffTableMode.SATELLITE))
                 SQLiteTable.Instance.InitDiffSl();
 
@@ -53,7 +48,6 @@ namespace BMSPlayer
         public void Close()
         {
             SQLiteTable.Instance.closeDB();
-            md5.Clear();
         }
 
         public List<int> GetTableLevelList(DiffTableMode type)
@@ -105,13 +99,6 @@ namespace BMSPlayer
                         break;
                 }
 
-                List<DiffTableData> dataList = new List<DiffTableData>();
-                // 리스트의 각 파일을 DB에 등록(이 때 MD5 Hash값도 계산)
-                for (int i = 0; i < list.Count; i++)
-                {
-                    strLoading = "Gathering data to register to database (" + (i + 1) + "/" + list.Count + ")";
-                    DiffTableData d = list[i];
-                }
                 strLoading = "Registering into Database";
 
                 switch (mode)

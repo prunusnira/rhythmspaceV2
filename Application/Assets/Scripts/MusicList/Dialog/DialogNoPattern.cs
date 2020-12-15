@@ -10,6 +10,8 @@ namespace BMSPlayer
         public Button btnCloseDlg;
         public TextMeshProUGUI desc;
 
+        public static bool LangChanged = false;
+
         private string URL;
 
         public override void Awake()
@@ -37,6 +39,12 @@ namespace BMSPlayer
         public override void Update()
         {
             base.Update();
+
+            if (LangChanged)
+            {
+                LangChanged = false;
+                desc.text = Const.DialogNoPath[(int)Const.Language];
+            }
         }
 
         public void SetURL(string url)

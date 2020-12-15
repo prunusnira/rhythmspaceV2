@@ -9,19 +9,16 @@ namespace BMSPlayer
         public static string ListDBPath = "";
         public static string RecordDBPath = "";
         public static string TableDBPath = "";
-        public static string JSONPath = "";
         static Const()
         {
 #if(UNITY_EDITOR)
             ListDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_list.sqlite";
             RecordDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_record.sqlite";
             TableDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_table.sqlite";
-            JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\structure.json";
 #elif(UNITY_STANDALONE)
             ListDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_list.sqlite";
             RecordDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_record.sqlite";
             TableDBPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\db_table.sqlite";
-            JSONPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\RhythmTracersData\\config\\structure.json";
 #endif
         }
         public static int CHANNEL = 320;
@@ -37,8 +34,7 @@ namespace BMSPlayer
         public static int musiclistIdx = 0;
 
         // Music List
-        public static ListItemTree BMSTree;
-        public static ListItemNode selectedOnList = null;
+        public static ListItem selectedOnList = null;
         public static List<int> ListDepth = new List<int>();
         public static List<string> ListPath = new List<string>();
         public static int ListPos = 0;
@@ -294,17 +290,11 @@ namespace BMSPlayer
             "ブラウザを開く",
             "Open Browser"
         };
-        public static string[] settingBtnRefreshChange = new string[3]
+        public static string[] settingBtnRefresh = new string[3]
         {
-            "변경사항 갱신",
+            "갱신",
             "更新",
-            "Update"
-        };
-        public static string[] settingBtnRefreshReload = new string[3]
-        {
-            "전체 새로 갱신",
-            "リロード",
-            "Reload All"
+            "Refresh"
         };
 
         public static string[] settingBtnFrameUpdate = new string[3]
@@ -655,6 +645,13 @@ namespace BMSPlayer
                 +"  (It might not have additional pattern. Please check table itself)\n\n"
                 +"Press [Open] button to open web browser."
         };
+
+        public static string[] DialogNoPath = new string[3]
+        {
+            "지정된 BMS 경로가 없어 갱신을 수행할 수 없습니다",
+            "指定されたBMSの経路がありません",
+            "There is no BMS path set"
+        };
         #endregion
 
         #region Initial Setting Text
@@ -695,17 +692,17 @@ namespace BMSPlayer
             "초기 설정 - 스텝 4: 난이도 표 설정\n\n" +
             "버튼을 눌러 난이도 표 데이터를 갱신 해주세요.\n" +
             "URL이 변경되지 않았다면 그대로 사용할 수 있습니다\n" +
-            "현재는 새틀라이트, 스텔라, 제노사이드 제1발광 표를 지원합니다\n" +
+            "현재는 Satellite, Stella, GENOCIDE 통상, GENOCIDE 제1발광 표를 지원합니다\n" +
             "난이도 표 URL의 변경은 [시스템 설정]에서 할 수 있습니다",
             "初期設定・ステップ3：難易度表の設定\n\n" +
             "ボタンを押して難易度表を更新します。\n" +
             "URLが変更してなかったらそのまま使えます。\n" +
-            "現在はSatellite・Stella・GENOCIDEの第１発狂が使えます。\n" +
+            "現在はSatellite・Stella・GENOCIDE通常・GENOCIDE第１発狂が使えます。\n" +
             "URLの更新は「システム設定」で行えます",
             "Initial Setting - Step 3: Difficulty Table\n\n" +
             "Press the button to update table data.\n" +
             "If URL is not changed, it can be used as it is.\n" +
-            "Satellite, Stella, Genocide 1st Insane Table are supported.\n" +
+            "Satellite, Stella, GENOCIDE Normal, GENOCIDE 1st Insane Table are supported.\n" +
             "You can change URL from [System Setting]"
         };
 
@@ -864,7 +861,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("scrWidth", 1280);
+                return PlayerPrefs.GetInt("scrWidth", 1920);
             }
             set
             {
@@ -875,7 +872,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("scrHeight", 720);
+                return PlayerPrefs.GetInt("scrHeight", 1080);
             }
             set
             {
@@ -887,7 +884,7 @@ namespace BMSPlayer
         {
             get
             {
-                return (FullScreenMode)PlayerPrefs.GetInt("scrMode", (int)FullScreenMode.Windowed);
+                return (FullScreenMode)PlayerPrefs.GetInt("scrMode", (int)FullScreenMode.MaximizedWindow);
             }
             set
             {

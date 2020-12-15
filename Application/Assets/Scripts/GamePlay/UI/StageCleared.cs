@@ -28,7 +28,7 @@ namespace BMSPlayer
 
         public void ShowClearScoreStat(int ex, int total)
         {
-            string resultStr = "STAGE CLEARED\n";
+            string resultStr = "STAGE FINISHED\n";
             if(ex >= 2 * total * 8.5f / 9)
             {
                 // MAX-

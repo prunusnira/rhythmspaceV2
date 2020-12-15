@@ -1,15 +1,11 @@
 ﻿using DatabaseManager;
-using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using UnityEngine;
 
 namespace BMSPlayer
 {
     public class RecordDataManager
     {
-        MD5 md5;
-
         private static RecordDataManager instance;
         public static RecordDataManager Instance
         {
@@ -23,15 +19,9 @@ namespace BMSPlayer
             }
         }
 
-        public RecordDataManager()
-        {
-            md5 = MD5.Create();
-        }
-
         public void Close()
         {
             SQLiteRecord.Instance.closeDB();
-            md5.Clear();
         }
 
         public void CreateNewTable()

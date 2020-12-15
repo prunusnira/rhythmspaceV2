@@ -532,7 +532,7 @@ namespace BMSPlayer
                 // 3. 스코어 무관하게 풀콤을 했다면 - 풀콤 여부 갱신
 
                 FileStream fstream = File.OpenRead(Data.BMS.FilePath);
-                MD5 md5 = MD5.Create();
+                MD5 md5 = new MD5CryptoServiceProvider();
                 var bytehash = md5.ComputeHash(fstream);
                 fstream.Close();
                 md5.Clear();
@@ -571,7 +571,7 @@ namespace BMSPlayer
                     }
 
                     // 2. 게이지 레벨 비교
-                    if(Const.Clear > prev.Clear)
+                    if(Const.Clear < prev.Clear)
                     {
                         njtype = Const.GaugeType;
                         nclear = Const.Clear;

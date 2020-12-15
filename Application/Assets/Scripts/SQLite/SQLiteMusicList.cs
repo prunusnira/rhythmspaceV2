@@ -200,16 +200,35 @@ namespace DatabaseManager
 
             if(param != null)
             {
-                param = param.Replace("'", "''");
+                param = param.Replace("'", "''").Replace("\\", "/");
                 query += " where path='"+param+"/'";
             }
 
             dbcommand.CommandText = query;
             dbreader = dbcommand.ExecuteReader();
-
+            
             while(dbreader.Read())
             {
                 musiclist.Add(GetMusicListData(dbreader));
+            }
+
+            return musiclist;
+        }
+
+        public List<string> GetPathList()
+        {
+            List<string> musiclist = new List<string>();
+
+            dbcommand = dbconn.CreateCommand();
+
+            string query = "select path, fname from list";
+
+            dbcommand.CommandText = query;
+            dbreader = dbcommand.ExecuteReader();
+
+            while (dbreader.Read())
+            {
+                musiclist.Add(dbreader.GetString(0) + dbreader.GetString(1));
             }
 
             return musiclist;
@@ -234,25 +253,6 @@ namespace DatabaseManager
             }
 
             return musiclist;
-        }
-
-        public MusicListData FindBMSWithPath(string path)
-        {
-            dbcommand = dbconn.CreateCommand();
-
-            path = path.Replace("'", "''");
-            string query = "select * from list where path='"
-                + path + "' collate nocase";
-
-            dbcommand.CommandText = query;
-            dbreader = dbcommand.ExecuteReader();
-
-            if(dbreader.Read())
-            {
-                return GetMusicListData(dbreader);
-            }
-
-            return null;
         }
 
         public List<MusicListData> FindBMSListWithMD5(List<string> md5list)
@@ -437,16 +437,27 @@ namespace DatabaseManager
             }
         }
 
-        public void DeleteBMS(List<string> pathList)
+        public void DeleteBMS(List<string> hashList)
         {
             dbcommand = dbconn.CreateCommand();
 
-            foreach(string s in pathList)
+            // 1000°³¾¿ ²÷±â
+            int len = hashList.Count / 500;
+            
+            for(int i = 0; i < len; i++)
             {
-                string path = s.Replace("'", "''");
+                string query = "delete from list where ";
 
-                string query = "delete from list where path='" +
-                    path + "'";
+                int start = 500 * i;
+                int end = 500 * (i + 1);
+                if (end > hashList.Count) end = hashList.Count;
+
+                for (int j = start; j < end; j++)
+                {
+                    query += "md5hash='" + hashList[j] + "'";
+                    if (j != end - 1) query += " or ";
+                }
+                query += ";";
                 dbcommand.CommandText = query;
                 dbcommand.ExecuteNonQuery();
             }
@@ -454,7 +465,6 @@ namespace DatabaseManager
 
         private MusicListData GetMusicListData(IDataReader dbreader)
         {
-            int lid = dbreader.GetInt32(0);
             string ltitle = dbreader.GetString(1);
             string lsubtitle = dbreader.GetString(2);
             string lartist = dbreader.GetString(3);
@@ -476,7 +486,7 @@ namespace DatabaseManager
             string lprev = dbreader.GetString(19);
 
             return new MusicListData(
-                lid, ltitle, lsubtitle, lartist, lsubartist, lgerne,
+                ltitle, lsubtitle, lartist, lsubartist, lgerne,
                 lbpmstart, lbpmmin, lbpmmax,
                 lpath, lmd5, llv, ldiff, lfname,
                 ljacket, ltotalnotes, ltime, lrank,

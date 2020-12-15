@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using BMSCore;
-using UnityEngine.EventSystems;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System;
 using TMPro;
 using System.Threading;
+using System.Linq;
 
 namespace BMSPlayer
 {
@@ -31,28 +31,25 @@ namespace BMSPlayer
         private float DescDeltaTime = 0;
 
         // Data store
-        private List<ListItemNode> bmslist;
-        private List<int> listDepth;
-        private int listPosition;
+        private List<ListItem> bmslist;
         public TextMeshProUGUI txtPath;
         public TextMeshProUGUI txtPathGenoInfo;
         public Button btnSort;
         public TextMeshProUGUI txtSortBtn;
         private SortType sortType;
         private bool isFolderChanged = true;
-
-        private EventSystem evtsystem;
-        private PointerEventData eventdata;
-        private GraphicRaycaster raycast;
         private long pressedTime;
+        private string bmsPath;
+        private int encoding;
 
         public static bool isTop = true;
         public static bool isLangChanged = false;
         public static bool isKeyChanged = false;
         public static bool isRefreshDone = false;
         public static bool isCustomRandom = false;
+        public static bool isPathChanged = false;
 
-        // Unity object
+        // List object
         public GameObject patternPrefab;
         public GameObject folderPrefab;
         public GameObject tablePrefab;
@@ -69,8 +66,6 @@ namespace BMSPlayer
         public Sprite rampPFC;
         public Sprite rampFail;
         public ScrollRectInfinite musicRect;
-
-        public Camera uiCam;
 
         // Search
         public InputField inputSearch;
@@ -175,20 +170,17 @@ namespace BMSPlayer
             // Initialize
             prevController = GetComponent<PreviewController>();
             Application.targetFrameRate = Const.FrameRate;
-            bmslist = new List<ListItemNode>();
+            bmslist = new List<ListItem>();
             sortType = Const.SortType;
+            bmsPath = Const.BMSFolderPath;
+            encoding = Const.Encoding;
 
-            if(Const.SearchMode)
+            if (Const.SearchMode)
             {
                 SearchResult(Const.SearchText);
             }
             else
             {
-                if (File.Exists(Const.JSONPath))
-                {
-                    ListTreeGenerator();
-                }
-
                 ListLoadThread();
                 UpdatePathText();
             }
@@ -221,9 +213,6 @@ namespace BMSPlayer
                 Const.ScreenMode
             );
 
-            evtsystem = GetComponent<EventSystem>();
-            raycast = GetComponent<GraphicRaycaster>();
-
             // MusicLoop on
             System.Random rand = new System.Random();
             AudioClip loopMusic = loop[rand.Next(0, loop.Length)];
@@ -248,6 +237,12 @@ namespace BMSPlayer
             {
                 UpdateDescription();
                 isLangChanged = false;
+            }
+
+            if(isPathChanged)
+            {
+                bmsPath = Const.BMSFolderPath;
+                isPathChanged = false;
             }
 
             // 곡 선택이 front인 경우에만 동작
@@ -312,18 +307,16 @@ namespace BMSPlayer
                 }
 
                 // 전용 커스텀 버튼 체크
-                if (Input.GetKeyDown(KeyCode.Return) ||
-                    GetBtnWhite())
+                if (Input.GetKeyDown(KeyCode.Return) || GetBtnWhite())
                 {
-                    if(Const.selectedOnList.Type == ItemType.DIRECTORY
-                        || Const.selectedOnList.Type == ItemType.TABLE)
-                    {
-                        MoveIntoFolder();
-                    }
-                    else if (Const.selectedOnList.Type == ItemType.BMS)
+                    if (Const.selectedOnList.Type == ItemType.BMS)
                     {
                         sfxChange.PlayOneShot(sfxSelect);
                         StartGame();
+                    }
+                    else
+                    {
+                        MoveIntoFolder();
                     }
                 }
 
@@ -372,7 +365,6 @@ namespace BMSPlayer
                 musicRect.Clear();
                 bmslist.Clear();
 
-                ListTreeGenerator();
                 Const.ListPos = 0;
                 Const.ListDepth.Clear();
                 ListLoadThread();
@@ -460,7 +452,7 @@ namespace BMSPlayer
                     bmslist.Clear();
                     foreach (MusicListData d in searchResult)
                     {
-                        ListItemNode bmsNode = new ListItemNode
+                        ListItem bmsNode = new ListItem
                         {
                             Display = d.Title,
                             Info = d,
@@ -499,7 +491,7 @@ namespace BMSPlayer
             isTop = true;
         }
 
-        public void showInfo(ListItemNode node)
+        public void showInfo(ListItem node)
         {
             Const.selectedOnList = node;
 
@@ -773,8 +765,7 @@ namespace BMSPlayer
                     //isPrevConReady = true;
                 }
             }
-            else if(node.Type == ItemType.DIRECTORY ||
-                    node.Type == ItemType.TABLE)
+            else
             {
                 infoJacket.texture = empty.texture;
                 infoGerne.text = "";
@@ -804,7 +795,7 @@ namespace BMSPlayer
             }
         }
 
-        public GameObject ObjectSetup(ListItemNode n, int i)
+        public GameObject ObjectSetup(ListItem n, int i)
         {
             if (n.Type == ItemType.BMS)
             {
@@ -978,17 +969,8 @@ namespace BMSPlayer
         public void MoveIntoFolder()
         {
             Const.ListDepth.Add(musicRect.GetCurrentIdx());
-            ListItemNode node = musicRect.GetCurrent();
-            if(node.Type == ItemType.TABLE ||
-                node.Type == ItemType.CLEAR ||
-                node.Type == ItemType.NAME)
-            {
-                Const.ListPath.Add(node.Path);
-            }
-            else
-            {
-                Const.ListPath.Add(node.Display);
-            }
+            ListItem node = musicRect.GetCurrent();
+            Const.ListPath.Add(node.Path);
             Const.ListPos = 0;
             isFolderChanged = true;
             musicRect.Clear();
@@ -1035,36 +1017,9 @@ namespace BMSPlayer
             isTop = false;
         }
 
-        // Initialize Music List
-        private void ListTreeGenerator()
-        {
-            // 해야 할 일
-            // 1. JSON 파일을 읽는다
-            // 2. Depth 정보에 따라서 폴더 내부로 들어간다
-            // 3. pos에 따라 리스트 내에서 위치를 이동시킨다
-
-            // 1. JSON 파일 읽기
-            string jsonStr = File.ReadAllText(Const.JSONPath);
-
-            // JSON 파싱
-            JSONObject jsonHead = new JSONObject(jsonStr);
-
-            // JSON to FolderNode
-            // 헤드 노드 만들기
-            Const.BMSTree = new ListItemTree(jsonHead);
-        }
-
         // 현재 리스트 불러오기
-        // 불러오는 방법
-        // 1) depth만큼 이동
-        // 2) child의 bms == true이면 -> bms를 가져옴
-        // 3) child의 bms == false이면 -> child의 children의
-        //    노드 수를 확인하고 0이 아니면 해당 child의 폴더 명을 가져옴
         public void SelectListGenerator()
         {
-            // 2. Depth 정보에 따라 불러들일 폴더 선택
-            // depth 정보는 이미 child 폴더 노드에 완성되어 있음
-            // bms 노드 추가할 때만 해당 parent 노드로 등록하면 됨
             bmslist.Clear();
 
             // Table 유무에 따른 리스트 표기 분화
@@ -1085,6 +1040,11 @@ namespace BMSPlayer
             {
                 // 난이도 표에서 리스트를 표기하는 경우
                 MusicListAdderName();
+            }
+            else if(Const.ListPath.Count == 0)
+            {
+                // 첫 페이지
+                MusicListZero();
             }
             else
             {
@@ -1117,7 +1077,7 @@ namespace BMSPlayer
                 foreach (int i in levelList)
                 {
                     bmslist.Add(
-                        new ListItemNode
+                        new ListItem
                         {
                             Display = "Level " + (i < 10 ? "0"+i : i.ToString()),
                             Type = ItemType.TABLE,
@@ -1182,7 +1142,7 @@ namespace BMSPlayer
                             exist = false;
                         }
 
-                        ListItemNode bmsNode = new ListItemNode
+                        ListItem bmsNode = new ListItem
                         {
                             Display = d.Title,
                             Type = ItemType.BMS,
@@ -1211,7 +1171,7 @@ namespace BMSPlayer
                 foreach (MusicListData d in musicList)
                 {
                     bmslist.Add(
-                        new ListItemNode
+                        new ListItem
                         {
                             Display = d.Title,
                             Info = d,
@@ -1268,7 +1228,7 @@ namespace BMSPlayer
                 foreach (MusicListData d in musicList)
                 {
                     bmslist.Add(
-                        new ListItemNode
+                        new ListItem
                         {
                             Display = d.Title,
                             Info = d,
@@ -1282,26 +1242,151 @@ namespace BMSPlayer
             }
         }
 
+        public void MusicListZero()
+        {
+            // 최상위 폴더
+            bmslist.Add(new ListItem
+            {
+                Display = "BMS",
+                Type = ItemType.DIRECTORY,
+                Path = bmsPath,
+                IsFromTable = false,
+                Exist = true
+            });
+
+            // 클리어 랭크
+            bmslist.Add(new ListItem
+            {
+                Display = "FULL COMBO",
+                Type = ItemType.CLEAR,
+                Path = "clear://fc"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "CLEAR RANK AAA",
+                Type = ItemType.CLEAR,
+                Path = "clear://aaa"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "CLEAR RANK AA",
+                Type = ItemType.CLEAR,
+                Path = "clear://aa"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "CLEAR RANK A",
+                Type = ItemType.CLEAR,
+                Path = "clear://a"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "CLEAR RANK B to F",
+                Type = ItemType.CLEAR,
+                Path = "clear://b"
+            });
+
+            // 이름
+            bmslist.Add(new ListItem
+            {
+                Display = "NAME ABCD",
+                Type = ItemType.NAME,
+                Path = "name://abcd"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "NAME EFGH",
+                Type = ItemType.NAME,
+                Path = "name://efgh"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "NAME IJKL",
+                Type = ItemType.NAME,
+                Path = "name://ijkl"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "NAME MNOP",
+                Type = ItemType.NAME,
+                Path = "name://mnop"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "NAME QRST",
+                Type = ItemType.NAME,
+                Path = "name://qrst"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "NAME UVWXYZ",
+                Type = ItemType.NAME,
+                Path = "name://uvwxyz"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "NAME Number",
+                Type = ItemType.NAME,
+                Path = "name://num"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "NAME OTHERS",
+                Type = ItemType.NAME,
+                Path = "name://others"
+            });
+
+            // 난이도 표
+            bmslist.Add(new ListItem
+            {
+                Display = "Satellite",
+                Type = ItemType.TABLE,
+                Path = "table://satellite"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "Stella",
+                Type = ItemType.TABLE,
+                Path = "table://stella"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "Genocide Normal",
+                Type = ItemType.TABLE,
+                Path = "table://genonm"
+            });
+            bmslist.Add(new ListItem
+            {
+                Display = "Genocide Insane",
+                Type = ItemType.TABLE,
+                Path = "table://genoins"
+            });
+        }
+
         public void MusicListAdderNormal()
         {
             List<int> depth = Const.ListDepth;
-            if (Const.BMSTree != null)
+
+            // Tree 유무와 관계없이 DB 검색으로 처리하기
+            string path = Const.ListPath[Const.ListPath.Count - 1];
+
+            // 1. 하위 폴더를 탐색하면서 BMS 파일이 있는지 확인
+            if(path != "")
             {
-                ListItemNode current = Const.BMSTree.Head;
+                // 2-1. 현재 폴더에 bms파일이 있는지 확인
+                string[] bmsfiles = Directory.EnumerateFiles(path, "*.*", SearchOption.TopDirectoryOnly)
+                        .Where(s =>
+                            s.ToLower().EndsWith(".bms") ||
+                            s.ToLower().EndsWith(".bme") ||
+                            s.ToLower().EndsWith(".bml")
+                        ).ToArray();
 
-                foreach (int d in depth)
+                foreach(string s in bmsfiles)
                 {
-                    current = current.Children[d];
-                }
-
-                if (current.Type == ItemType.DIRECTORY &&
-                    current.HaveBMS)
-                {
-                    List<MusicListData> list = MusicDataManager.Instance.LoadBMSFromFolder(current.Path);
-                    for (int j = 0; j < list.Count; j++)
+                    MusicListData d = MusicDataManager.Instance.LoadBMSFromPath(s, encoding);
+                    if(d != null)
                     {
-                        MusicListData d = list[j];
-                        ListItemNode bmsNode = new ListItemNode
+                        ListItem bmsNode = new ListItem
                         {
                             Display = d.Title,
                             Info = d,
@@ -1314,19 +1399,17 @@ namespace BMSPlayer
                     }
                 }
 
-                for (int i = 0; i < current.Children.Count; i++)
+                foreach (string s in Directory.EnumerateDirectories(path, "*", SearchOption.TopDirectoryOnly))
                 {
-                    ListItemNode child = current.Children[i];
+                    // 2-2. 폴더 하위에 bms 파일이 있다면
+                    List<MusicListData> list =
+                        MusicDataManager.Instance.LoadBMSFromFolder(s);
 
-                    if(child.HaveBMS)
+                    if (list != null)
                     {
-                        // child의 children에서 BMS 정보 가져오기
-                        // 해당 폴더의 서브폴더는 신경쓰지 않음
-                        List<MusicListData> list = MusicDataManager.Instance.LoadBMSFromFolder(child.Path);
-                        for (int j = 0; j < list.Count; j++)
+                        foreach (MusicListData d in list)
                         {
-                            MusicListData d = list[j];
-                            ListItemNode bmsNode = new ListItemNode
+                            ListItem bmsNode = new ListItem
                             {
                                 Display = d.Title,
                                 Info = d,
@@ -1338,135 +1421,26 @@ namespace BMSPlayer
                             bmslist.Add(bmsNode);
                         }
                     }
-                    else
+
+                    // 2-3. 폴더 하위에 다른 폴더가 있다면
+                    List<string> dirlist =
+                        new List<string>(Directory.EnumerateDirectories(s, "*", SearchOption.TopDirectoryOnly));
+                    if (dirlist.Count > 0)
                     {
-                        // 해당 폴더 자체를 목록에 등록함
-                        if(child.Type == ItemType.DIRECTORY)
+                        DirectoryInfo dir = new DirectoryInfo(s);
+                        ListItem dirNode = new ListItem
                         {
-                            string dirname = Path.GetFileName(child.Path);
-                            child.Display = dirname;
-                            child.Path = child.Path;
-                            child.Type = ItemType.DIRECTORY;
-                            child.Info = new MusicListData
+                            Display = dir.Name,
+                            Path = s,
+                            Type = ItemType.DIRECTORY,
+                            Info = new MusicListData
                             {
                                 Level = -9999
-                            };
-                            bmslist.Add(child);
-                        }
+                            }
+                        };
+                        bmslist.Add(dirNode);
                     }
                 }
-            }
-
-            // Depth 0일 경우에 다른 요소를 추가
-            if (depth.Count == 0)
-            {
-                // 클리어 랭크
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "FULL COMBO",
-                    Type = ItemType.CLEAR,
-                    Path = "clear://fc"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "CLEAR RANK AAA",
-                    Type = ItemType.CLEAR,
-                    Path = "clear://aaa"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "CLEAR RANK AA",
-                    Type = ItemType.CLEAR,
-                    Path = "clear://aa"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "CLEAR RANK A",
-                    Type = ItemType.CLEAR,
-                    Path = "clear://a"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "CLEAR RANK B to F",
-                    Type = ItemType.CLEAR,
-                    Path = "clear://b"
-                });
-
-                // 이름
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "NAME ABCD",
-                    Type = ItemType.NAME,
-                    Path = "name://abcd"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "NAME EFGH",
-                    Type = ItemType.NAME,
-                    Path = "name://efgh"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "NAME IJKL",
-                    Type = ItemType.NAME,
-                    Path = "name://ijkl"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "NAME MNOP",
-                    Type = ItemType.NAME,
-                    Path = "name://mnop"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "NAME QRST",
-                    Type = ItemType.NAME,
-                    Path = "name://qrst"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "NAME UVWXYZ",
-                    Type = ItemType.NAME,
-                    Path = "name://uvwxyz"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "NAME Number",
-                    Type = ItemType.NAME,
-                    Path = "name://num"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "NAME OTHERS",
-                    Type = ItemType.NAME,
-                    Path = "name://others"
-                });
-
-                // 난이도 표
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "Satellite",
-                    Type = ItemType.TABLE,
-                    Path = "table://satellite"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "Stella",
-                    Type = ItemType.TABLE,
-                    Path = "table://stella"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "Genocide Normal",
-                    Type = ItemType.TABLE,
-                    Path = "table://genonm"
-                });
-                bmslist.Add(new ListItemNode
-                {
-                    Display = "Genocide Insane",
-                    Type = ItemType.TABLE,
-                    Path = "table://genoins"
-                });
             }
         }
 
@@ -1597,7 +1571,8 @@ namespace BMSPlayer
                 {
                     foreach (string s in Const.ListPath)
                     {
-                        txtPath.text += s + " > ";
+                        string[] paths = s.Split(new string[] { "\\" }, StringSplitOptions.None);
+                        txtPath.text += paths[paths.Length-1] + " > ";
                     }
                 }
             }
@@ -1629,10 +1604,10 @@ namespace BMSPlayer
         private void SortMusicList()
         {
             if (sortType == SortType.TITLE)
-                bmslist.Sort((ListItemNode a, ListItemNode b) =>
+                bmslist.Sort((ListItem a, ListItem b) =>
                     a.Display.CompareTo(b.Display));
             else if (sortType == SortType.LEVEL)
-                bmslist.Sort((ListItemNode a, ListItemNode b) =>
+                bmslist.Sort((ListItem a, ListItem b) =>
                     a.Info.Level.CompareTo(b.Info.Level));
 
             isLoadingFinish = true;

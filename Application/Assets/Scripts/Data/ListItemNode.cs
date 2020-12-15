@@ -5,18 +5,13 @@ using System.Linq;
 
 namespace BMSPlayer
 {
-    public class ListItemNode
+    public class ListItem
     {
-        public List<int> Parent { get; set; }
-        public List<ListItemNode> Children { get; set; }
-
         // BMS or Folder or Table
         public ItemType Type { get; set; }
 
         public string Path { get; set; }
         public string Display { get; set; }
-
-        public bool HaveBMS { get; set; }
         public MusicListData Info { get; set; }
 
         // Table Data
@@ -26,5 +21,10 @@ namespace BMSPlayer
 
         // Distinguisher
         public ClearType Clear { get; set; }
+
+        public ListItem()
+        {
+            Clear = ClearType.NOPLAY;
+        }
     }
 }

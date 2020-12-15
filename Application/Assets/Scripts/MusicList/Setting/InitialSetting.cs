@@ -41,27 +41,21 @@ namespace BMSPlayer
             langEn.onClick.AddListener(delegate
             {
                 Const.Language = LanguageType.EN;
-                MusicListUI.isLangChanged = true;
                 SystemSetting.langFromInit = true;
-                PlayOptionSetting.langChange = true;
                 UpdateText();
                 ShowNextStep(2);
             });
             langKo.onClick.AddListener(delegate
             {
                 Const.Language = LanguageType.KO;
-                MusicListUI.isLangChanged = true;
                 SystemSetting.langFromInit = true;
-                PlayOptionSetting.langChange = true;
                 UpdateText();
                 ShowNextStep(2);
             });
             langJa.onClick.AddListener(delegate
             {
                 Const.Language = LanguageType.JA;
-                MusicListUI.isLangChanged = true;
                 SystemSetting.langFromInit = true;
-                PlayOptionSetting.langChange = true;
                 UpdateText();
                 ShowNextStep(2);
             });

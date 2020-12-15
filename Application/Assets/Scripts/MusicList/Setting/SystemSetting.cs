@@ -8,6 +8,7 @@ using SimpleFileBrowser;
 using System.Threading;
 using TMPro;
 using System;
+using System.Linq;
 
 namespace BMSPlayer
 {
@@ -22,14 +23,13 @@ namespace BMSPlayer
         public Text titlePath;
         public Text txtPathVar;
         public Button btnPathChange;
-        public Button btnPathRefreshChange;
-        public Button btnPathRefreshReload;
+        public Button btnPathRefresh;
         private string bmsPath;
-        private Thread refreshChangeThread = null;
-        private Thread refreshReloadThread = null;
+        private Thread refreshThread = null;
         private int encoding;
         private bool refreshed = false;
         private bool isRefreshing = false;
+        public GameObject dlgNoPath;
 
         // Browser
         public Text txtBrowserDesc;
@@ -113,10 +113,9 @@ namespace BMSPlayer
             // 각 버튼 onclick 설정
             btnPathChange.onClick.AddListener(delegate
             {
-                changePath();
+                ChangePath();
             });
-            btnPathRefreshChange.onClick.AddListener(PathRefreshChanges);
-            btnPathRefreshReload.onClick.AddListener(PathRefreshReload);
+            btnPathRefresh.onClick.AddListener(PathRefresh);
 
             // 해상도 변경
             btnResLeft.onClick.AddListener(delegate
@@ -149,15 +148,15 @@ namespace BMSPlayer
 
             btnKor.onClick.AddListener(delegate
             {
-                changeLang(LanguageType.KO);
+                ChangeLang(LanguageType.KO);
             });
             btnJpn.onClick.AddListener(delegate
             {
-                changeLang(LanguageType.JA);
+                ChangeLang(LanguageType.JA);
             });
             btnEng.onClick.AddListener(delegate
             {
-                changeLang(LanguageType.EN);
+                ChangeLang(LanguageType.EN);
             });
             btnAutoSync.onClick.AddListener(SetAutoSync);
             btnSyncLeft.onClick.AddListener(delegate
@@ -170,11 +169,11 @@ namespace BMSPlayer
             });
             btn932.onClick.AddListener(delegate
             {
-                changeEncoding(932);
+                ChangeEncoding(932);
             });
             btn949.onClick.AddListener(delegate
             {
-                changeEncoding(949);
+                ChangeEncoding(949);
             });
             btnKeySetting.onClick.AddListener(ShowKeySetting);
             btnTableEdit.onClick.AddListener(ShowTableEditor);
@@ -192,7 +191,7 @@ namespace BMSPlayer
             LanguageType lang = Const.Language;
             int enc = Const.Encoding;
 
-            changeLang(lang);
+            ChangeLang(lang);
 
             inputFrame.text = Const.FrameRate.ToString();
             
@@ -205,7 +204,7 @@ namespace BMSPlayer
                     curEncoding.text = "EUC-KR";
                     break;
             }
-            showSync();
+            ShowSync();
 
             if (Const.AutoSync == AutoSyncType.OFF)
             {
@@ -249,17 +248,17 @@ namespace BMSPlayer
             if(pathFromInit)
             {
                 pathFromInit = false;
-                changePath();
+                ChangePath();
             }
 
             if (langFromInit)
             {
                 langFromInit = false;
-                UpdateOption();
+                ChangeLang(Const.Language);
             }
         }
 
-        public void UpdateOption()
+        private void UpdateOption()
         {
             LanguageType lang = Const.Language;
             if(Const.BMSFolderPath == "")
@@ -271,8 +270,8 @@ namespace BMSPlayer
                 txtPathVar.text = Const.BMSFolderPath;
             }
             settingDesc.text = Const.settingDesc[(int)lang];
-            showSync();
-            changeEncoding(Const.Encoding);
+            ShowSync();
+            ChangeEncoding(Const.Encoding);
             encdesc.text = Const.settingEncodingDesc[(int)lang];
 
             titlePath.text = Const.settingTitlePath[(int)lang];
@@ -289,8 +288,7 @@ namespace BMSPlayer
 
             // 버튼 언어 변경
             btnPathChange.GetComponentInChildren<Text>().text = Const.settingBtnBMSOpen[(int)Const.Language];
-            btnPathRefreshChange.GetComponentInChildren<Text>().text = Const.settingBtnRefreshChange[(int)Const.Language];
-            btnPathRefreshReload.GetComponentInChildren<Text>().text = Const.settingBtnRefreshReload[(int)Const.Language];
+            btnPathRefresh.GetComponentInChildren<Text>().text = Const.settingBtnRefresh[(int)Const.Language];
             btnFrame.GetComponentInChildren<Text>().text = Const.settingBtnFrameUpdate[(int)Const.Language];
             btn932.GetComponentInChildren<Text>().text = Const.settingBtnEncJP[(int)Const.Language];
             btn949.GetComponentInChildren<Text>().text = Const.settingBtnEncKR[(int)Const.Language];
@@ -300,12 +298,12 @@ namespace BMSPlayer
             btnResetAll.GetComponentInChildren<Text>().text = Const.settingBtnReset[(int)Const.Language];
         }
 
-        public void changePath()
+        private void ChangePath()
         {
             if(!isRefreshing)
             {
                 FileBrowser.ShowLoadDialog(
-                    (path) => pathCallback(path),
+                    (path) => PathCallback(path),
                     null,
                     true,
                     false,
@@ -317,46 +315,27 @@ namespace BMSPlayer
             }
         }
 
-        public void PathRefreshChanges()
+        private void PathRefresh()
         {
-            if(!File.Exists(Const.JSONPath))
+            if(bmsPath == "")
             {
-                // 기존 파일이 존재하지 않아 갱신할 수 없음을 알림
+                // 경로가 지정되지 않음
+                dlgNoPath.SetActive(true);
+                return;
             }
-            else
+
+            if (!isRefreshing)
             {
-                if (!isRefreshing)
-                {
-                    isRefreshing = true;
-                    layerLoading.SetActive(true);
-                    refreshChangeThread = new Thread(new ThreadStart(RefreshChanges));
-                    refreshChangeThread.Start();
-                    sfxPlay.PlayOneShot(sfxSource);
-                }
+                strLoading = "Starting refresh...";
+                isRefreshing = true;
+                layerLoading.SetActive(true);
+                refreshThread = new Thread(new ThreadStart(Refresh));
+                refreshThread.Start();
+                sfxPlay.PlayOneShot(sfxSource);
             }
         }
 
-        public void PathRefreshReload()
-        {
-            if(Const.BMSFolderPath == "")
-            {
-                // 경로가 지정되어있지 않아 갱신할 수 없음을 알림
-            }
-            else
-            {
-                if (!isRefreshing)
-                {
-                    strLoading = "Starting refresh...";
-                    isRefreshing = true;
-                    layerLoading.SetActive(true);
-                    refreshReloadThread = new Thread(new ThreadStart(RefreshReload));
-                    refreshReloadThread.Start();
-                    sfxPlay.PlayOneShot(sfxSource);
-                }
-            }
-        }
-
-        public void pathCallback(string[] path)
+        private void PathCallback(string[] path)
         {
             Const.BMSFolderPath = path[0];
             bmsPath = path[0];
@@ -364,127 +343,56 @@ namespace BMSPlayer
             string directory = Directory.GetDirectoryRoot(path[0]);
             txtPathVar.text = path[0];
 
-            PathRefreshReload();
+            PathRefresh();
         }
 
-        private void RefreshChanges()
+        private void Refresh()
         {
-            /**
-             * 여기서는 기존에 있는 structure.json 파일을 읽어서 json 구조체를 만들고
-             * 전체 폴더 목록을 읽으면서 structure.json에 없는 폴더만
-             * 새로 읽어서 추가하는 방식으로 진행해야 함
-             */
-            // 1. refreshAll과 동일하게 트리 생성 (단, bms 파일은 읽지 않음)
-            // Generate Folder Tree
-            strLoading = "Generate new file tree";
-            ListItemTree tree = new ListItemTree(bmsPath);
+            // PATH에서 하위 모든 파일 목록을 가져옴
+            strLoading = "Gathering file list from disk";
+            List<string> filesDir = Directory.EnumerateFiles(bmsPath, "*.*", SearchOption.AllDirectories).Where(s =>
+                    s.ToLower().EndsWith(".bms") ||
+                    s.ToLower().EndsWith(".bme") ||
+                    s.ToLower().EndsWith(".bml")).ToList();
 
-            strLoading = "Loading file and directories";
-            tree.Head = tree.CreateTree(
-                tree.Head, ref strLoading, null, encoding, false);
+            strLoading = "Gathering file list from DB";
+            List<string> filesDB = MusicDataManager.Instance.GetPathList();
 
-            // 2. 기존의 json과 새로 만들어진 json을 상호비교하여
-            //    추가할 파일과 삭제 할 파일을 결정
-            // * 여기서 BMS 파일 목록을 다 불러와야 새로 추가할 파일을 더 정할 수 있지 않나...?
-            JSONObject newJson = new JSONObject(tree.JSONStr);
-            JSONObject oldJson = new JSONObject(File.ReadAllText(Const.JSONPath));
+            strLoading = "Processing list";
+            HashSet<string> newFiles = new HashSet<string>(filesDir);
+            newFiles.ExceptWith(filesDB);
 
-            // 비교를 편하게 하기 위해 각 JSON을 path의 list로 생성
-            HashSet<string> newPaths = new HashSet<string>();
-            tree.GetPathsFromJSON(newPaths, newJson);
+            HashSet<string> delFiles = new HashSet<string>(filesDB);
+            delFiles.ExceptWith(filesDir);
 
-            HashSet<string> oldPaths = new HashSet<string>();
-            tree.GetPathsFromJSON(oldPaths, oldJson);
-
-            strLoading = "Check duplication";
-            HashSet<string> addSet = new HashSet<string>(newPaths);
-            HashSet<string> rmSet = new HashSet<string>(oldPaths);
-            addSet.ExceptWith(oldPaths);
-            rmSet.ExceptWith(newPaths);
-
+            // Add new files
             List<MusicListData> addList = new List<MusicListData>();
-            List<MusicListData> rmList = new List<MusicListData>();
-
             int idx = 0;
-            foreach(string s in addSet)
+            foreach (string s in newFiles)
             {
-                strLoading = "Add files (" + idx + "/" + addSet.Count + "):\n" + s;
+                strLoading = "Analyzing BMS files (" + idx + "/" + newFiles.Count + "):\n" + s;
                 if (!File.GetAttributes(s).HasFlag(FileAttributes.Directory))
-                    addList.Add(MusicDataManager.Instance.LoadBMSFromPath(s, addList.Count, encoding));
-
-                idx++;
-            }
-
-            idx = 0;
-            foreach (string s in rmSet)
-            {
-                strLoading = "Remove files (" + idx + "/" + rmSet.Count + "):\n" + s;
-                rmList.Add(new MusicListData
                 {
-                    Path = s
-                });
+                    MusicListData d = MusicDataManager.Instance.LoadBMSFromPath(s, encoding);
+                    if (d != null) addList.Add(d);
+                }
+
                 idx++;
             }
 
-            // 3. 추가/삭제 항목에 대해 처리
+            // 삭제 항목에 대해 처리
+            strLoading = "Deleted removed BMS files";
+            MusicDataManager.Instance.RemoveDataFromDB(new List<string>(delFiles), ref strLoading, encoding);
+
+            // 추가 항목에 대해 처리
             strLoading = "Add new BMS files";
             MusicDataManager.Instance.AddDataToDB(addList, ref strLoading);
 
-            strLoading = "Deleted removed BMS files";
-            MusicDataManager.Instance.RemoveDataFromDB(rmList, ref strLoading);
-
-            // 4. JSON 파일은 새로 가져온 것으로 다시 저장
-            strLoading = "Saving JSON File";
-            if (!File.Exists(Const.JSONPath))
-            {
-                Directory.CreateDirectory(Directory.GetParent(Const.JSONPath).FullName);
-            }
-            else
-            {
-                File.Delete(Const.JSONPath);
-            }
-            File.Create(Const.JSONPath).Close();
-            File.WriteAllText(Const.JSONPath, tree.JSONStr);
-
             refreshed = true;
             isRefreshing = false;
         }
 
-        private void RefreshReload()
-        {
-            MusicDataManager.Instance.DropList();
-            List<MusicListData> musicList = new List<MusicListData>();
-            
-            // Generate Folder Tree
-            strLoading = "Generate new file tree";
-            ListItemTree tree = new ListItemTree(bmsPath);
-
-            strLoading = "Loading file and directories";
-            tree.Head = tree.CreateTree(
-                tree.Head, ref strLoading, musicList, encoding, true);
-
-            // Save as JSON file
-            strLoading = "Saving JSON File";
-            if (!File.Exists(Const.JSONPath))
-            {
-                Directory.CreateDirectory(Directory.GetParent(Const.JSONPath).FullName);
-            }
-            else
-            {
-                File.Delete(Const.JSONPath);
-            }
-            File.Create(Const.JSONPath).Close();
-            File.WriteAllText(Const.JSONPath, tree.JSONStr);
-
-            // 수집한 BMS 데이터를 DB에 등록
-            strLoading = "Database process...";
-            MusicDataManager.Instance.AddDataToDB(musicList, ref strLoading);
-            
-            refreshed = true;
-            isRefreshing = false;
-        }
-
-        public void SetAutoSync()
+        private void SetAutoSync()
         {
             if (Const.AutoSync == AutoSyncType.OFF)
             {
@@ -499,7 +407,7 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void ChangeSync(bool up)
+        private void ChangeSync(bool up)
         {
             if (up)
             {
@@ -509,11 +417,11 @@ namespace BMSPlayer
             {
                 Const.Sync--;
             }
-            showSync();
+            ShowSync();
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void showSync()
+        private void ShowSync()
         {
             int sync = Const.Sync;
             if (sync < 0)
@@ -526,16 +434,18 @@ namespace BMSPlayer
             }
         }
 
-        public void changeLang(LanguageType lang)
+        private void ChangeLang(LanguageType lang)
         {
             Const.Language = lang;
             MusicListUI.isLangChanged = true;
             PlayOptionSetting.langChange = true;
+            DialogNoPath.LangChanged = true;
+            DialogNoPattern.LangChanged = true;
             UpdateOption();
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void changeEncoding(int enc)
+        private void ChangeEncoding(int enc)
         {
             Const.Encoding = enc;
             switch (enc)
@@ -550,7 +460,7 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void UpdateVideoSetting()
+        private void UpdateVideoSetting()
         {
             Screen.SetResolution(
                 Const.ScrWidth,
@@ -560,7 +470,7 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void ChangeResolution(bool up)
+        private void ChangeResolution(bool up)
         {
             int curpos = 0;
             for(int i = 0; i < res.reslist.Count; i++)
@@ -596,7 +506,7 @@ namespace BMSPlayer
             UpdateVideoSetting();
         }
 
-        public void ChangeScreenMode(bool up)
+        private void ChangeScreenMode(bool up)
         {
             if(up)
             {
@@ -638,7 +548,7 @@ namespace BMSPlayer
             UpdateVideoSetting();
         }
 
-        public void ShowCurrentResolution()
+        private void ShowCurrentResolution()
         {
             int curpos = 0;
             for (int i = 0; i < res.reslist.Count; i++)
@@ -655,7 +565,7 @@ namespace BMSPlayer
                 "(" + (curpos + 1) + "/" + res.reslist.Count + ")";
         }
 
-        public void ShowKeySetting()
+        private void ShowKeySetting()
         {
             MusicListUI.SetNotOnTop();
             layerKeySetting.SetActive(true);
@@ -663,7 +573,7 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void ShowTableEditor()
+        private void ShowTableEditor()
         {
             MusicListUI.SetNotOnTop();
             dlgTableEdit.SetActive(true);
@@ -671,7 +581,7 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        public void ShowResetDlg()
+        private void ShowResetDlg()
         {
             MusicListUI.SetNotOnTop();
             dlgResetSetting.SetActive(true);
