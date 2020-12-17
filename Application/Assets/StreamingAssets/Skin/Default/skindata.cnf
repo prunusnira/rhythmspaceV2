@@ -63,6 +63,7 @@ SkinName=Default|Dark
 
 # For example: Player 1's Normal size Default skin => P1Std_Default
 
+# Default Size
 P1Std_Default=play/gear/standard/default-nr-p1.png
 P2Std_Default=play/gear/standard/default-nr-p2.png
 P1Std_Dark=play/gear/standard/dark-nr-p1.png
@@ -71,6 +72,7 @@ CoverSuddenStd=play/gear/standard/coversud-normal.png
 CoverHiddenStd=play/gear/standard/coverhid-normal.png
 CoverLiftStd=play/gear/standard/coverlift-normal.png
 
+# Wide125 Size
 P1W125_Default=play/gear/wide125/default-w125-p1.png
 P2W125_Default=play/gear/wide125/default-w125-p2.png
 P1W125_Dark=play/gear/wide125/dark-w125-p1.png
@@ -79,6 +81,7 @@ CoverSuddenW125=play/gear/standard/coversud-wide125.png
 CoverHiddenW125=play/gear/standard/coverhid-wide125.png
 CoverLiftW125=play/gear/standard/coverlift-wide125.png
 
+# Wide150 Size
 P1W150_Default=play/gear/wide150/default-w150-p1.png
 P2W150_Default=play/gear/wide150/default-w150-p2.png
 P1W150_Dark=play/gear/wide150/dark-w150-p1.png

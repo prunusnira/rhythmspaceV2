@@ -17,10 +17,10 @@ namespace BMSPlayer
         private RectTransform objRect;
 
         private int currentIdx = 0;
-        private int upperSize = 8;
-        private int bottomSize = 10;
+        private int upperSize = 14;
+        private int bottomSize = 15;
 
-        private int[] itemidx = new int[18];
+        private int[] itemidx = new int[30];
 
         public void Init(List<ListItem> list, int centpos, ObjectSetup f)
         {
@@ -75,8 +75,8 @@ namespace BMSPlayer
                 }
                 else
                 {
-                    int idxmin = centpos - 8;
-                    int idxmax = centpos + 10;
+                    int idxmin = centpos - 14;
+                    int idxmax = centpos + 15;
 
                     int startmin = idxmin;
                     int startmax = idxmax;

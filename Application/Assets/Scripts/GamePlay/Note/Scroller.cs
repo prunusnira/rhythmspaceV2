@@ -128,10 +128,10 @@ namespace BMSPlayer
             gaugeType = Const.GaugeType;
         }
 
-        public void PlaySetup(int noteCount, int rank)
+        public void PlaySetup(int noteCount, int totalval, int rank)
         {
             this.noteCount = noteCount;
-            hpController.SetHPJudgeType(gaugeType, noteCount);
+            hpController.SetHPJudgeType(Const.JudgeType, rank, gaugeType, totalval, noteCount);
 
             // 판정 타입에 따른 판정 값 변경
             switch (Const.JudgeType)

@@ -336,7 +336,7 @@ namespace BMSPlayer {
                         && Const.GraphType != GraphType.OFFGEAR)
                         Graph.SetInitialGraph(Data.TotalNotes);
 
-                    scroller.PlaySetup(Data.TotalNotes, Data.BMS.Rank);
+                    scroller.PlaySetup(Data.TotalNotes, Data.BMS.TotalValue, Data.BMS.Rank);
 
                     UI.UpdateTimerTotal(Data.LastTiming);
                     HPUI.UpdateHP(hpController.CurrentHP);

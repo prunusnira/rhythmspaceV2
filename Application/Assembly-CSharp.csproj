@@ -75,7 +75,6 @@
     <Compile Include="Assets\Scripts\Core\LNObjConverter.cs" />
     <Compile Include="Assets\Scripts\Core\Tools.cs" />
     <Compile Include="Assets\Scripts\Data\DiffTableData.cs" />
-    <Compile Include="Assets\Scripts\Data\FileWatcher\BMSPathWatcher.cs" />
     <Compile Include="Assets\Scripts\Data\JSONObject.cs" />
     <Compile Include="Assets\Scripts\Data\ListItemNode.cs" />
     <Compile Include="Assets\Scripts\Data\MusicDataManager.cs" />
