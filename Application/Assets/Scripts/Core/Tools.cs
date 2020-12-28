@@ -8,12 +8,13 @@ namespace BMSCore
 {
     public class Tools
     {
-        public static Sprite createSpriteFromFile(string FilePath, float PixelsPerUnit = 0.1f)
+        public static Sprite createSpriteFromFile(string FilePath, float PixelsPerUnit = 1f, float pivotx = 0f, float pivoty = 0f)
         {
 
             // Load a PNG or JPG image from disk to a Texture2D, assign this texture to a new sprite and return its reference
             Texture2D SpriteTexture = LoadTexture(FilePath);
-            Sprite NewSprite = Sprite.Create(SpriteTexture, new Rect(0, 0, SpriteTexture.width, SpriteTexture.height), new Vector2(0, 0), PixelsPerUnit);
+            //Debug.Log(FilePath);
+            Sprite NewSprite = Sprite.Create(SpriteTexture, new Rect(0, 0, SpriteTexture.width, SpriteTexture.height), new Vector2(pivotx, pivoty), PixelsPerUnit);
 
             return NewSprite;
         }

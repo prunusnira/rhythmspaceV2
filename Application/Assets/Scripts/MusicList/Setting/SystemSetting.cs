@@ -15,11 +15,13 @@ namespace BMSPlayer
     public class SystemSetting : Setting
     {
         // SFX Play
+        [Header("SFX Play")]
         public AudioSource sfxPlay;
         public AudioClip sfxSource;
         public AudioClip sfxMove;
 
         // BMS Path
+        [Header("BMS Path")]
         public Text titlePath;
         public Text txtPathVar;
         public Button btnPathChange;
@@ -32,20 +34,24 @@ namespace BMSPlayer
         public GameObject dlgNoPath;
 
         // Browser
+        [Header("Browser")]
         public Text txtBrowserDesc;
 
         // Loading
+        [Header("Loading")]
         public GameObject layerLoading;
         public TextMeshProUGUI txtLoadingPath;
         private string strLoading = "";
 
         // Lang changer
+        [Header("Lang Changer")]
         public Text titleLang;
         public Button btnKor;
         public Button btnJpn;
         public Button btnEng;
 
         // Resolution Change
+        [Header("Resolution Change")]
         private Resolutions res;
         public Text titleResol;
         public Text txtResol;
@@ -53,17 +59,20 @@ namespace BMSPlayer
         public Button btnResRight;
 
         // Frame Rate
+        [Header("Frame Rate")]
         public Text titleFrame;
         public InputField inputFrame;
         public Button btnFrame;
 
         // Screen mode Change
+        [Header("Screen Mode")]
         public Text titleScrMode;
         public Text txtScrMode;
         public Button btnWinLeft;
         public Button btnWinRight;
 
         // Sync changer
+        [Header("Sync Change")]
         public Text titleSync;
         public Button btnAutoSync;
         public Button btnSyncLeft;
@@ -71,6 +80,7 @@ namespace BMSPlayer
         public Text syncval;
 
         // Encoding
+        [Header("Encoding")]
         public Text titleEncoding;
         public Button btn932;
         public Button btn949;
@@ -78,17 +88,26 @@ namespace BMSPlayer
         public Text encdesc;
 
         // Key Change
+        [Header("Key Change")]
         public Text titleKey;
         public GameObject layerKeySetting;
         public Button btnKeySetting;
 
         // Table Editor
+        [Header("Table")]
         public Text titleTable;
         public Button btnTableEdit;
         public Button btnTableRefresh;
         public GameObject dlgTableEdit;
 
+        // Skin Change
+        [Header("Skin Change")]
+        public Text titleSkin;
+        public GameObject dlgSkin;
+        public Button btnSkin;
+
         // Reset All
+        [Header("Reset")]
         public Text titleReset;
         public Button btnResetAll;
         public GameObject dlgResetSetting;
@@ -131,8 +150,8 @@ namespace BMSPlayer
             btnFrame.onClick.AddListener(delegate
             {
                 int frame = Convert.ToInt32(inputFrame.text);
-                if (frame < 300) frame = 300;
-                else if (frame > 5000) frame = 5000;
+                if (frame < 240) frame = 240;
+                else if (frame > 2000) frame = 2000;
                 Const.FrameRate = frame;
                 Application.targetFrameRate = frame;
             });
@@ -180,6 +199,7 @@ namespace BMSPlayer
             btnTableRefresh.onClick.AddListener(delegate {
                 DialogTableEdit.refreshFromOutside = true;
             });
+            btnSkin.onClick.AddListener(ShowSkinDialog);
             btnResetAll.onClick.AddListener(delegate
             {
                 ShowResetDlg();
@@ -283,6 +303,7 @@ namespace BMSPlayer
             titleEncoding.text = Const.settingTitleEncoding[(int)lang];
             titleKey.text = Const.settingTitleKey[(int)lang];
             titleTable.text = Const.settingTitleDiffTable[(int)lang];
+            titleSkin.text = Const.settingTitleSkin[(int)lang];
             titleReset.text = Const.settingTitleReset[(int)lang];
             txtResetMsg.text = Const.DialogResetAll[(int)lang];
 
@@ -294,6 +315,7 @@ namespace BMSPlayer
             btn949.GetComponentInChildren<Text>().text = Const.settingBtnEncKR[(int)Const.Language];
             btnKeySetting.GetComponentInChildren<Text>().text = Const.settingBtnKeyChange[(int)Const.Language];
             btnTableEdit.GetComponentInChildren<Text>().text = Const.settingBtnTableEdit[(int)Const.Language];
+            btnSkin.GetComponentInChildren<Text>().text = Const.settingBtnSkin[(int)Const.Language];
             btnTableRefresh.GetComponentInChildren<Text>().text = Const.settingBtnTableRefresh[(int)Const.Language];
             btnResetAll.GetComponentInChildren<Text>().text = Const.settingBtnReset[(int)Const.Language];
         }
@@ -578,6 +600,14 @@ namespace BMSPlayer
             MusicListUI.SetNotOnTop();
             dlgTableEdit.SetActive(true);
             GetComponent<DialogTableEdit>().EnableWindow();
+            sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        private void ShowSkinDialog()
+        {
+            MusicListUI.SetNotOnTop();
+            dlgSkin.SetActive(true);
+            GetComponent<DialogSkinSelector>().EnableWindow();
             sfxPlay.PlayOneShot(sfxSource);
         }
 

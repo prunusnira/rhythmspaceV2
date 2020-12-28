@@ -1,0 +1,119 @@
+# NOTE (English)
+# 1. Please use '#' to make line as comment
+# 2. DO NOT CHANGE SIZE OR EMPTY SPACE OF IMAGE. Which can lead to inefficient display.
+# 3. Please save config file as UTF-8
+# 4. This file must remain in the root of skin folder and keep name skindata.cnf
+# 5. Relative path is not usable
+
+# NOTE (한국어)
+# 1. '#'를 사용하여 파일 내에서 코멘트로 사용할 수 있습니다
+# 2. 이미지의 크기나 빈 공간을 채우는 등은 하지 마세요. 게임 상에서 정상적으로 보이지 않습니다
+# 3. 파일을 저장할 때 UTF-8 인코딩인지 꼭 확인하세요
+# 4. 이 파일은 커스텀 스킨의 데이터를 읽어오는 파일로 반드시 스킨 별 루트 폴더에 위치하며 skindata.cnf라는 이름을 가져야합니다.
+# 5. 상대경로는 사용할 수 없습니다
+
+# NOTE (日本語)
+# 1. '#'を利用してコメントに使えます
+# 2. イメージのサイズや空き空間を埋めたりしないでください。ゲーム上で正常的な形になりません
+# 3. ファイルを保存する時、UTF-8インコーディングを確認してください
+# 4. このファイルはskin folderのルーツに必ず置いてください。skindata.cnfって言うファイル名もそのままにしてください
+# 5. 相対パスは使うことができません
+
+
+# DO NOT USE '=' IN PATH AND FILE NAME
+
+# Background Images and Videos
+# Please use MP4 for videos
+# Also, use JPG, JPEG, PNG for images
+
+
+# SkinSetName MUST be the first line which does not have comment or empty line
+SkinSetName=Classic
+
+
+
+# Music List Screen
+
+
+# Background ( true: video / false: image )
+# Please use mp4 file for video
+
+IsListBGVideo=true
+ListBGFilePath=musiclist/selectloop.mp4
+
+# List
+
+FolderImg=musiclist/list/list-folder.png
+TableImg=musiclist/list/list-table.png
+NameImg=musiclist/list/list-name.png
+RankImg=musiclist/list/list-rank.png
+PatternImg=musiclist/list/list-bms.png
+PatternNotExistImg=musiclist/list/list-bms-none.png
+
+# PatternImg must include ramp (39x50 size)
+
+RampNoPlay=musiclist/ramp/listRampNoPlay.png
+RampAssist=musiclist/ramp/listRampAssisted.png
+RampEasy=musiclist/ramp/listRampEClear.png
+RampNormal=musiclist/ramp/listRampNClear.png
+RampHard=musiclist/ramp/listRampHClear.png
+RampEXHard=musiclist/ramp/listRampEXClear.png
+RampFullCombo=musiclist/ramp/listRampFullCombo.png
+RampPerfect=musiclist/ramp/listRampPerfect.png
+RampFailed=musiclist/ramp/listRampFail.png
+
+# Title
+ListTitle=musiclist/frame/title.png
+
+# Difficulty
+DiffBegOff=musiclist/frame/beg_off.png
+DiffBegOn=musiclist/frame/beg_on.png
+DiffNorOff=musiclist/frame/nor_off.png
+DiffNorOn=musiclist/frame/nor_on.png
+DiffHypOff=musiclist/frame/hyp_off.png
+DiffHypOn=musiclist/frame/hyp_on.png
+DiffAnoOff=musiclist/frame/ano_off.png
+DiffAnoOn=musiclist/frame/ano_on.png
+DiffInsOff=musiclist/frame/ins_off.png
+DiffInsOn=musiclist/frame/ins_on.png
+DiffUnkOff=musiclist/frame/unk_off.png
+DiffUnkOn=musiclist/frame/unk_on.png
+
+# Loop
+SelectLoop=music/selectloop.mp3
+
+
+
+# Loading Screen
+
+
+# Background ( true: video / false: image )
+# Please use mp4 file for video
+
+IsLoadingBGVideo=true
+LoadingBGFilePath=loading/loading.mp4
+
+# BGM
+LoadingBGM=music/loading.mp3
+
+
+# Result
+
+
+# Background ( true: video / false: image )
+# Please use mp4 file for video
+IsResultBGVideo=true
+ResultBGFilePath=result/resultloop.mp4
+
+# Loop
+ResultLoop=music/resultloop.mp3
+
+# Rank
+RankAAA=rank/rankaaa.png
+RankAA=rank/rankaa.png
+RankA=rank/ranka.png
+RankB=rank/rankb.png
+RankC=rank/rankc.png
+RankD=rank/rankd.png
+RankE=rank/ranke.png
+RankF=rank/rankf.png

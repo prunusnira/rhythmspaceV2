@@ -1,0 +1,72 @@
+# NOTE (English)
+# 1. Please use '#' to make line as comment
+# 2. DO NOT CHANGE SIZE OR EMPTY SPACE OF IMAGE. Which can lead to inefficient display.
+# 3. Please save config file as UTF-8
+# 4. This file must remain in the root of skin folder and keep name notedata.cnf
+# 5. Relative path is not usable
+
+# NOTE (한국어)
+# 1. '#'를 사용하여 파일 내에서 코멘트로 사용할 수 있습니다
+# 2. 이미지의 크기나 빈 공간을 채우는 등은 하지 마세요. 게임 상에서 정상적으로 보이지 않습니다
+# 3. 파일을 저장할 때 UTF-8 인코딩인지 꼭 확인하세요
+# 4. 이 파일은 커스텀 스킨의 데이터를 읽어오는 파일로 반드시 스킨 별 루트 폴더에 위치하며 notedata.cnf라는 이름을 가져야합니다.
+# 5. 상대경로는 사용할 수 없습니다
+
+# NOTE (日本語)
+# 1. '#'を利用してコメントに使えます
+# 2. イメージのサイズや空き空間を埋めたりしないでください。ゲーム上で正常的な形になりません
+# 3. ファイルを保存する時、UTF-8インコーディングを確認してください
+# 4. このファイルはskin folderのルーツに必ず置いてください。notedata.cnfって言うファイル名もそのままにしてください
+# 5. 相対パスは使うことができません
+
+
+# DO NOT USE '=' IN PATH AND FILE NAME
+
+
+# NoteSetName MUST be the first line which does not have comment or empty line
+NoteSetName=Pastel
+
+
+# Note
+# IMPORTANT: Please keep image size 200*30 when editing image
+
+
+NoteScr=scr.png
+NoteScrLn=scr_ln.png
+NoteScrAuto=scr_auto.png
+NoteBtn1=white.png
+NoteBtn1Ln=white_ln.png
+NoteBtn2=blue.png
+NoteBtn2Ln=blue_ln.png
+NoteBtn3=white.png
+NoteBtn3Ln=white_ln.png
+NoteBtn4=blue.png
+NoteBtn4Ln=blue_ln.png
+NoteBtn5=white.png
+NoteBtn5Ln=white_ln.png
+NoteBtn6=blue.png
+NoteBtn6Ln=blue_ln.png
+NoteBtn7=white.png
+NoteBtn7Ln=white_ln.png
+NoteMine=mine.png
+
+
+# DP Note (2P) - currently unavailable
+
+Note2PScr=scr.png
+Note2PScrLn=scr_ln.png
+Note2PScrAuto=scr_auto.png
+Note2PBtn1=white.png
+Note2PBtn1Ln=white_ln.png
+Note2PBtn2=blue.png
+Note2PBtn2Ln=blue_ln.png
+Note2PBtn3=white.png
+Note2PBtn3Ln=white_ln.png
+Note2PBtn4=blue.png
+Note2PBtn4Ln=blue_ln.png
+Note2PBtn5=white.png
+Note2PBtn5Ln=white_ln.png
+Note2PBtn6=blue.png
+Note2PBtn6Ln=blue_ln.png
+Note2PBtn7=white.png
+Note2PBtn7Ln=white_ln.png

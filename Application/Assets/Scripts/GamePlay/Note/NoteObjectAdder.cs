@@ -7,27 +7,21 @@ namespace BMSPlayer
 {
     public class NoteObjectAdder : MonoBehaviour
     {
-        // Display Note
-        public GameObject[] white;
-        public GameObject[] whiteLn;
-        public GameObject[] blue;
-        public GameObject[] blueLn;
-        public GameObject[] turn;
-        public GameObject[] turnLn;
-        public GameObject[] turnAuto;
-        public GameObject[] mine;
+        [Header("Split line")]
         public GameObject[] split;
 
-        private GameObject noteWhite;
-        private GameObject noteWhiteLn;
-        private GameObject noteBlue;
-        private GameObject noteBlueLn;
-        private GameObject noteTurn;
-        private GameObject noteTurnLn;
-        private GameObject noteTurnAuto;
-        private GameObject noteMine;
+        [Header("Note Prefab")]
+        public GameObject noteWhite;
+        public GameObject noteWhiteLn;
+        public GameObject noteBlue;
+        public GameObject noteBlueLn;
+        public GameObject noteTurn;
+        public GameObject noteTurnLn;
+        public GameObject noteTurnAuto;
+        public GameObject noteMine;
         private GameObject splitLine;
 
+        [Header("Parent Objects")]
         public GameObject[] noteParentObjNr;
         public GameObject[] noteParentObjW125;
         public GameObject[] noteParentObjW150;
@@ -36,21 +30,13 @@ namespace BMSPlayer
         public void Awake()
         {
             // 노트 종류 변경
-            noteWhite = white[(int)Const.NoteSkin];
-            noteWhiteLn = whiteLn[(int)Const.NoteSkin];
-            noteBlue = blue[(int)Const.NoteSkin];
-            noteBlueLn = blueLn[(int)Const.NoteSkin];
-            noteTurn = turn[(int)Const.NoteSkin];
-            noteTurnLn = turnLn[(int)Const.NoteSkin];
-            noteTurnAuto = turnAuto[(int)Const.NoteSkin];
-            noteMine = mine[(int)Const.NoteSkin];
             splitLine = split[(int)Const.GearSize];
 
             // 노트 사이즈 변경
-            int widthScaleTT = 73;
-            int widthScaleW = 50;
-            int widthScaleB = 50;
-            float noteSize = 15f;
+            float widthScaleTT = 73;
+            float widthScaleW = 50;
+            float widthScaleB = 50;
+            float heightScale = 1;
             switch (Const.GearSize)
             {
                 case SkinSize.STANDARD:
@@ -58,42 +44,46 @@ namespace BMSPlayer
                     break;
                 case SkinSize.WIDE125:
                     noteParent = noteParentObjW125[Const.PlayerSide];
-                    widthScaleTT = 91;
-                    widthScaleW = 63;
-                    widthScaleB = 62;
+                    widthScaleTT = 91f / 73;
+                    widthScaleW = 63f / 50;
+                    widthScaleB = 62f / 50;
                     break;
                 case SkinSize.WIDE150:
                     noteParent = noteParentObjW150[Const.PlayerSide];
-                    widthScaleTT = 110;
-                    widthScaleW = 75;
-                    widthScaleB = 75;
+                    widthScaleTT = 110f / 73;
+                    widthScaleW = 75f / 50;
+                    widthScaleB = 75f / 50;
                     break;
             }
 
             switch(Const.NoteSize)
             {
-                case NoteSize.NORMAL:
-                    noteSize = 15f;
-                    Const.NoteSizeCalc = noteSize / 2;
+                case NoteSize.SUPERSLIM:
+                    heightScale = 0.3f;
                     break;
                 case NoteSize.SLIM:
-                    noteSize = 10f;
-                    Const.NoteSizeCalc = noteSize / 2;
+                    heightScale = 0.6f;
                     break;
-                case NoteSize.FAT:
-                    noteSize = 20f;
-                    Const.NoteSizeCalc = noteSize / 2;
+                case NoteSize.NORMAL:
+                    break;
+                case NoteSize.THICK:
+                    heightScale = 1.3f;
+                    break;
+                case NoteSize.SUPERTHICK:
+                    heightScale = 1.6f;
                     break;
             }
+            Const.SplitLineSizeCalc = heightScale * 15;
+            Const.LnHeightCalc = 15f;
 
-            noteWhite.transform.localScale = new Vector3(widthScaleW, noteSize, 1);
-            noteWhiteLn.transform.localScale = new Vector3(widthScaleW, noteSize, 1);
-            noteBlue.transform.localScale = new Vector3(widthScaleB, noteSize, 1);
-            noteBlueLn.transform.localScale = new Vector3(widthScaleB, noteSize, 1);
-            noteTurn.transform.localScale = new Vector3(widthScaleTT, noteSize, 1);
-            noteTurnLn.transform.localScale = new Vector3(widthScaleTT, noteSize, 1);
-            noteTurnAuto.transform.localScale = new Vector3(widthScaleTT, noteSize, 1);
-            noteMine.transform.localScale = new Vector3(widthScaleB, noteSize, 1);
+            noteWhite.transform.localScale = new Vector3(widthScaleW, heightScale, 1);
+            noteWhiteLn.transform.localScale = new Vector3(widthScaleW, heightScale, 1);
+            noteBlue.transform.localScale = new Vector3(widthScaleB, heightScale, 1);
+            noteBlueLn.transform.localScale = new Vector3(widthScaleB, heightScale, 1);
+            noteTurn.transform.localScale = new Vector3(widthScaleTT, heightScale, 1);
+            noteTurnLn.transform.localScale = new Vector3(widthScaleTT, heightScale, 1);
+            noteTurnAuto.transform.localScale = new Vector3(widthScaleTT, heightScale, 1);
+            noteMine.transform.localScale = new Vector3(widthScaleB, heightScale, 1);
         }
 
         public void DisplaySplitLine(SplitLine line)
@@ -200,14 +190,95 @@ namespace BMSPlayer
                     if (Const.Auto == AutoPlayType.TURNTABLE)
                     {
                         noteObject = Instantiate(noteTurnAuto, pos, Quaternion.identity, parent);
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteScrAuto;
                     }
                     else {
                         if (noteType == NoteType.LNSTART || noteType == NoteType.LNEND || noteType == NoteType.LNMID)
+                        {
                             noteObject = Instantiate(noteTurnLn, pos, Quaternion.identity, parent);
+                            noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteScrLn;
+                        }
                         else
+                        {
                             noteObject = Instantiate(noteTurn, pos, Quaternion.identity, parent);
+                            noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteScr;
+                        }
                     }
                     noteObject.transform.localPosition = pos;
+                    break;
+            }
+
+            switch (clane)
+            {
+                case 1:
+                    if(noteType == NoteType.SINGLE)
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn1;
+                    }
+                    else
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn1Ln;
+                    }
+                    break;
+                case 2:
+                    if (noteType == NoteType.SINGLE)
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn2;
+                    }
+                    else
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn2Ln;
+                    }
+                    break;
+                case 3:
+                    if (noteType == NoteType.SINGLE)
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn3;
+                    }
+                    else
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn3Ln;
+                    }
+                    break;
+                case 4:
+                    if (noteType == NoteType.SINGLE)
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn4;
+                    }
+                    else
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn4Ln;
+                    }
+                    break;
+                case 5:
+                    if (noteType == NoteType.SINGLE)
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn5;
+                    }
+                    else
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn5Ln;
+                    }
+                    break;
+                case 6:
+                    if (noteType == NoteType.SINGLE)
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn6;
+                    }
+                    else
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn6Ln;
+                    }
+                    break;
+                case 7:
+                    if (noteType == NoteType.SINGLE)
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn7;
+                    }
+                    else
+                    {
+                        noteObject.GetComponent<SpriteRenderer>().sprite = SkinSetting.NoteBtn7Ln;
+                    }
                     break;
             }
 

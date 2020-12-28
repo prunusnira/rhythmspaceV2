@@ -313,7 +313,7 @@ namespace BMSPlayer
                     GameObject noteobj = current.NoteObject;
                     noteobj.transform.localPosition = new Vector3(
                         noteobj.transform.localPosition.x,
-                        (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER) - Const.NoteSizeCalc,
+                        (float)(current.OnScrPos * speed * Const.SPEEDMULTIPLIER) - (Const.SplitLineSizeCalc / 2),
                         noteobj.transform.localPosition.z);
                 }
 
@@ -444,7 +444,7 @@ namespace BMSPlayer
                         // 스케일 변경
                         Vector3 scale = ln.Mid.NoteObject.transform.localScale;
                         ln.Mid.NoteObject.transform.localScale = new Vector3(
-                            scale.x, (float)(endRealPos - startRealPos), scale.z);
+                            scale.x, (float)(endRealPos - startRealPos) / Const.LnHeightCalc, scale.z);
 
                         // 위치 변경
                         Vector3 pos = ln.Mid.NoteObject.transform.localPosition;

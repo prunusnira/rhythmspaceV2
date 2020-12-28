@@ -33,21 +33,26 @@ namespace BMSPlayer
 
             List<DiffTableData> list = new List<DiffTableData>();
 
-            List<JSONObject> json = new JSONObject(JSONBody).list;
-            for (int i = 0; i < json.Count; i++)
+            JSONObject obj = new JSONObject(JSONBody);
+            if(!obj.IsNull)
             {
-                // 가져올 내용
-                // title, artist, level, md5, url
-                string title = json[i].GetField("title").str;
-                string artist = json[i].GetField("artist").str;
-                int level = Convert.ToInt32(json[i].GetField("level").str);
-                string md5 = json[i].GetField("md5").str;
-                string url = json[i].GetField("url").str;
+                List<JSONObject> json = obj.list;
+                for (int i = 0; i < json.Count; i++)
+                {
+                    // 가져올 내용
+                    // title, artist, level, md5, url
+                    string title = json[i].GetField("title").str;
+                    string artist = json[i].GetField("artist").str;
+                    int level = Convert.ToInt32(json[i].GetField("level").str);
+                    string md5 = json[i].GetField("md5").str;
+                    string url = json[i].GetField("url").str;
 
-                list.Add(new DiffTableData(title, artist, level, url, md5));
+                    list.Add(new DiffTableData(title, artist, level, url, md5));
+                }
+                if (list.Count > 0) TableDataManager.Instance.AddDataToDB(list, Mode, ref StrLoading);
             }
-            TableDataManager.Instance.AddDataToDB(list, Mode, ref StrLoading);
             isWorkDone = true;
+            Debug.Log("DONE " + Mode);
         }
 
         public bool IsWorkDone()

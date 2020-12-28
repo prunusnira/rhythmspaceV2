@@ -13,6 +13,7 @@ namespace BMSPlayer
          * Game Play Settings
          */
         // Speed
+        [Header("Speed")]
         public Text titleSpeed;
         public Button btnSpdDown;
         public Button btnSpdUp;
@@ -21,17 +22,20 @@ namespace BMSPlayer
         private int speedfl;
 
         // Speed Type
+        [Header("Speed Type")]
         public Text titleSpdType;
         public Button btnSpdStd;
         public Button btnSpdCon;
 
         // Gauge Type
+        [Header("Gauge")]
         public Text titleGaugeType;
         public Button btnGaugeLeft;
         public Button btnGaugeRight;
         public Text txtGauge;
 
         // Note Layout
+        [Header("Note Layout")]
         public Text titleNoteLayout;
         public Button btnLayoutLeft;
         public Button btnLayoutRight;
@@ -40,24 +44,28 @@ namespace BMSPlayer
         public GameObject customRandom;
 
         // Judgement Type
+        [Header("Judge Type")]
         public Text titleJudgeType;
         public Button btnJudgeTypeLeft;
         public Button btnJudgeTypeRight;
         public Text txtJudgeType;
 
         // Auto
+        [Header("Auto")]
         public Text titleAuto;
         public Button btnAutoLeft;
         public Button btnAutoRight;
         public Text txtAuto;
 
         // Graph Target
+        [Header("Graph Target")]
         public Text titleGraphTarget;
         public Button btnTargetLeft;
         public Button btnTargetRight;
         public Text txtTarget;
 
         // PlaySide
+        [Header("Speed")]
         public Text titlePlaySide;
         public Button btnPlaySideLeft;
         public Button btnPlaySideRight;
@@ -66,37 +74,29 @@ namespace BMSPlayer
         /*
          * In-Game UI Settings
          */
-        // GearSkin
-        public Text titleGearSkin;
-        public Button btnGearSkinLeft;
-        public Button btnGearSkinRight;
-        public Text txtGearSkin;
-
         // GearSize
+        [Header("Gear Size")]
         public Text titleGearSize;
         public Button btnGearSizeLeft;
         public Button btnGearSizeRight;
         public Text txtGearSize;
 
-        // NoteSkin
-        public Text titleNoteSkin;
-        public Button btnNoteSkinLeft;
-        public Button btnNoteSkinRight;
-        public Text txtNoteSkin;
-
         // NoteSize
+        [Header("Note Size")]
         public Text titleNoteSize;
         public Button btnNoteSizeLeft;
         public Button btnNoteSizeRight;
         public Text txtNoteSize;
 
         // GraphSize
+        [Header("Graph Size")]
         public Text titleGraphType;
         public Button btnGraphTypeLeft;
         public Button btnGraphTypeRight;
         public Text txtGraphType;
 
         // UI Layout
+        [Header("UI Layout")]
         public Text titleUILayout;
         public Button btnUILayoutTypeLeft;
         public Button btnUILayoutTypeRight;
@@ -104,12 +104,14 @@ namespace BMSPlayer
         public Text txtUILayoutDesc;
 
         // BGA ON/OFF
+        [Header("BGA")]
         public Text titleBGA;
         public Button btnBGALeft;
         public Button btnBGARight;
         public Text txtBGAOnOff;
 
         // Judge Panel
+        [Header("Judge Panel")]
         public Text titleJudgePanel;
         public Button btnJudgePanelLeft;
         public Button btnJudgePanelRight;
@@ -119,24 +121,28 @@ namespace BMSPlayer
          * In-Game UI Settings
          */
         // Fast/Slow
+        [Header("Fast Slow")]
         public Text titleFastSlow;
         public Button btnFastSlowLeft;
         public Button btnFastSlowRight;
         public Text txtFastSlow;
 
         // Target Difference
+        [Header("Target Diffs")]
         public Text titleTargetDiff;
         public Button btnTargetDiffLeft;
         public Button btnTargetDiffRight;
         public Text txtTargetDiff;
 
         // Rate diff
+        [Header("Rate")]
         public Text titleRate;
         public Button btnRateLeft;
         public Button btnRateRight;
         public Text txtRateDiff;
 
         // SFX Play
+        [Header("SFX")]
         public AudioSource sfxPlay;
         public AudioClip sfxSource;
 
@@ -215,8 +221,6 @@ namespace BMSPlayer
             btnPlaySideRight.onClick.AddListener(PlaySideChange);
 
             // Page 2
-            btnGearSkinLeft.onClick.AddListener(GearSkinChange);
-            btnGearSkinRight.onClick.AddListener(GearSkinChange);
 
             btnGearSizeLeft.onClick.AddListener(delegate {
                 GearSizeChange(false);
@@ -224,9 +228,6 @@ namespace BMSPlayer
             btnGearSizeRight.onClick.AddListener(delegate {
                 GearSizeChange(true);
             });
-
-            btnNoteSkinLeft.onClick.AddListener(NoteSkinChange);
-            btnNoteSkinRight.onClick.AddListener(NoteSkinChange);
 
             btnNoteSizeLeft.onClick.AddListener(delegate {
                 NoteSizeChange(false);
@@ -368,30 +369,8 @@ namespace BMSPlayer
                     break;
             }
 
-            // 기어 스킨
-            switch (Const.GearSkin)
-            {
-                case SkinType.NORMAL:
-                    txtGearSkin.text = "NORMAL";
-                    break;
-                case SkinType.DARK:
-                    txtGearSkin.text = "DARK";
-                    break;
-            }
-
             // 기어 사이즈
             InitSkinSize();
-
-            // 노트 스킨
-            switch (Const.NoteSkin)
-            {
-                case NoteSkin.NORMAL:
-                    txtNoteSkin.text = "NORMAL";
-                    break;
-                case NoteSkin.PASTEL:
-                    txtNoteSkin.text = "PASTEL";
-                    break;
-            }
 
             // 노트 사이즈
             switch (Const.NoteSize)
@@ -399,11 +378,17 @@ namespace BMSPlayer
                 case NoteSize.NORMAL:
                     txtNoteSize.text = "NORMAL";
                     break;
+                case NoteSize.SUPERSLIM:
+                    txtNoteSize.text = "SUPER SLIM";
+                    break;
                 case NoteSize.SLIM:
                     txtNoteSize.text = "SLIM";
                     break;
-                case NoteSize.FAT:
-                    txtNoteSize.text = "FAT";
+                case NoteSize.THICK:
+                    txtNoteSize.text = "THICK";
+                    break;
+                case NoteSize.SUPERTHICK:
+                    txtNoteSize.text = "SUPER THICK";
                     break;
             }
 
@@ -518,9 +503,7 @@ namespace BMSPlayer
             titleAuto.text = Const.playopAuto[(int)Const.Language];
             titleGraphTarget.text = Const.playopGraphTarget[(int)Const.Language];
             titlePlaySide.text = Const.playopPlaySide[(int)Const.Language];
-            titleGearSkin.text = Const.playopGearSkin[(int)Const.Language];
             titleGearSize.text = Const.playopGearSize[(int)Const.Language];
-            titleNoteSkin.text = Const.playopNoteSkin[(int)Const.Language];
             titleNoteSize.text = Const.playopNoteSize[(int)Const.Language];
             titleGraphType.text = Const.playopGraphType[(int)Const.Language];
             titleUILayout.text = Const.playopUILayout[(int)Const.Language];
@@ -964,22 +947,6 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void GearSkinChange()
-        {
-            switch (Const.GearSkin)
-            {
-                case SkinType.NORMAL:
-                    Const.GearSkin = SkinType.DARK;
-                    txtGearSkin.text = "DARK";
-                    break;
-                case SkinType.DARK:
-                    Const.GearSkin = SkinType.NORMAL;
-                    txtGearSkin.text = "NORMAL";
-                    break;
-            }
-            sfxPlay.PlayOneShot(sfxSource);
-        }
-
         private void GearSizeChange(bool next)
         {
             if(next)
@@ -1021,23 +988,6 @@ namespace BMSPlayer
             sfxPlay.PlayOneShot(sfxSource);
         }
 
-        private void NoteSkinChange()
-        {
-            // 노트 스킨
-            switch (Const.NoteSkin)
-            {
-                case NoteSkin.NORMAL:
-                    Const.NoteSkin = NoteSkin.PASTEL;
-                    txtNoteSkin.text = "PASTEL";
-                    break;
-                case NoteSkin.PASTEL:
-                    Const.NoteSkin = NoteSkin.NORMAL;
-                    txtNoteSkin.text = "NORMAL";
-                    break;
-            }
-            sfxPlay.PlayOneShot(sfxSource);
-        }
-
         private void NoteSizeChange(bool next)
         {
             if(next)
@@ -1045,17 +995,25 @@ namespace BMSPlayer
                 // 노트 사이즈
                 switch (Const.NoteSize)
                 {
-                    case NoteSize.NORMAL:
+                    case NoteSize.SUPERSLIM:
                         Const.NoteSize = NoteSize.SLIM;
                         txtNoteSize.text = "SLIM";
                         break;
                     case NoteSize.SLIM:
-                        Const.NoteSize = NoteSize.FAT;
-                        txtNoteSize.text = "FAT";
-                        break;
-                    case NoteSize.FAT:
                         Const.NoteSize = NoteSize.NORMAL;
                         txtNoteSize.text = "NORMAL";
+                        break;
+                    case NoteSize.NORMAL:
+                        Const.NoteSize = NoteSize.THICK;
+                        txtNoteSize.text = "THICK";
+                        break;
+                    case NoteSize.THICK:
+                        Const.NoteSize = NoteSize.SUPERTHICK;
+                        txtNoteSize.text = "SUPER THICK";
+                        break;
+                    case NoteSize.SUPERTHICK:
+                        Const.NoteSize = NoteSize.SUPERSLIM;
+                        txtNoteSize.text = "SUPER SLIM";
                         break;
                 }
             }
@@ -1064,17 +1022,25 @@ namespace BMSPlayer
                 // 노트 사이즈
                 switch (Const.NoteSize)
                 {
-                    case NoteSize.NORMAL:
-                        Const.NoteSize = NoteSize.FAT;
-                        txtNoteSize.text = "FAT";
+                    case NoteSize.SUPERSLIM:
+                        Const.NoteSize = NoteSize.THICK;
+                        txtNoteSize.text = "SUPER THICK";
                         break;
                     case NoteSize.SLIM:
+                        Const.NoteSize = NoteSize.SUPERSLIM;
+                        txtNoteSize.text = "SUPER SLIM";
+                        break;
+                    case NoteSize.NORMAL:
+                        Const.NoteSize = NoteSize.SLIM;
+                        txtNoteSize.text = "SLIM";
+                        break;
+                    case NoteSize.THICK:
                         Const.NoteSize = NoteSize.NORMAL;
                         txtNoteSize.text = "NORMAL";
                         break;
-                    case NoteSize.FAT:
-                        Const.NoteSize = NoteSize.SLIM;
-                        txtNoteSize.text = "SLIM";
+                    case NoteSize.SUPERTHICK:
+                        Const.NoteSize = NoteSize.THICK;
+                        txtNoteSize.text = "THICK";
                         break;
                 }
             }

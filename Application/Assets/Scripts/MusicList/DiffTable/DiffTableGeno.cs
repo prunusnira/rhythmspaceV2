@@ -68,37 +68,41 @@ namespace BMSPlayer
             // 읽은 내용을 List로 만들기
             List<DiffTableData> list = new List<DiffTableData>();
             JSONObject json = new JSONObject(arrstr);
-            for(int i = 0; i < json.list.Count; i++)
+            if(!json.IsNull)
             {
-                JSONObject obj = json.list[i];
-                string lvstr = obj.list[1].str;
-                lvstr = lvstr.Replace("\"", "").Replace("★", "").Replace("☆", "");
-                int lv = 0;
-                if(lvstr == "???" || lvstr == "X")
+                for (int i = 0; i < json.list.Count; i++)
                 {
-                    lv = 99;
+                    JSONObject obj = json.list[i];
+                    string lvstr = obj.list[1].str;
+                    lvstr = lvstr.Replace("\"", "").Replace("★", "").Replace("☆", "");
+                    int lv = 0;
+                    if (lvstr == "???" || lvstr == "X")
+                    {
+                        lv = 99;
+                    }
+                    else
+                    {
+                        lv = Convert.ToInt32(lvstr);
+                    }
+
+                    string title = obj.list[2].str;
+
+                    string artistTag = obj.list[4].str;
+
+                    HtmlDocument doc = new HtmlDocument();
+                    doc.LoadHtml(artistTag);
+                    HtmlNode node = doc.DocumentNode.Element("a");
+
+                    string url = node.GetAttributeValue("href", string.Empty);
+                    string artist = node.InnerText;
+
+                    // 각각을 Node로 만들어서 추가
+                    list.Add(new DiffTableData(title, artist, lv, url, ""));
                 }
-                else
-                {
-                    lv = Convert.ToInt32(lvstr);
-                }
-
-                string title = obj.list[2].str;
-
-                string artistTag = obj.list[4].str;
-
-                HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(artistTag);
-                HtmlNode node = doc.DocumentNode.Element("a");
-
-                string url = node.GetAttributeValue("href", string.Empty);
-                string artist = node.InnerText;
-
-                // 각각을 Node로 만들어서 추가
-                list.Add(new DiffTableData(title, artist, lv, url, ""));
+                if (list.Count > 0) TableDataManager.Instance.AddDataToDB(list, Mode, ref StrLoading);
             }
-            TableDataManager.Instance.AddDataToDB(list, Mode, ref StrLoading);
             isWorkDone = true;
+            Debug.Log("DONE "+Mode);
         }
 
         public bool IsWorkDone()

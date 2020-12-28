@@ -67,14 +67,6 @@ namespace BMSPlayer
         public Sprite clearFail;
 
         // Rank Sprite
-        public Sprite rankaaa;
-        public Sprite rankaa;
-        public Sprite ranka;
-        public Sprite rankb;
-        public Sprite rankc;
-        public Sprite rankd;
-        public Sprite ranke;
-        public Sprite rankf;
         public Sprite pfmark;
         public Sprite fcmark;
 
@@ -471,35 +463,35 @@ namespace BMSPlayer
             switch(rankstr)
             {
                 case "aaa":
-                    rank.sprite = rankaaa;
+                    rank.sprite = SkinSetting.RankAAA;
                     rankNew.text = "AAA";
                     break;
                 case "aa":
-                    rank.sprite = rankaa;
+                    rank.sprite = SkinSetting.RankAA;
                     rankNew.text = "AA";
                     break;
                 case "a":
-                    rank.sprite = ranka;
+                    rank.sprite = SkinSetting.RankA;
                     rankNew.text = "A";
                     break;
                 case "b":
-                    rank.sprite = rankb;
+                    rank.sprite = SkinSetting.RankB;
                     rankNew.text = "B";
                     break;
                 case "c":
-                    rank.sprite = rankc;
+                    rank.sprite = SkinSetting.RankC;
                     rankNew.text = "C";
                     break;
                 case "d":
-                    rank.sprite = rankd;
+                    rank.sprite = SkinSetting.RankD;
                     rankNew.text = "D";
                     break;
                 case "e":
-                    rank.sprite = ranke;
+                    rank.sprite = SkinSetting.RankE;
                     rankNew.text = "E";
                     break;
                 case "f":
-                    rank.sprite = rankf;
+                    rank.sprite = SkinSetting.RankF;
                     rankNew.text = "F";
                     break;
             }

@@ -28,7 +28,8 @@ namespace BMSPlayer
         public static int TIMEBAR = 690;
         public static int SHUTTER = 725;
         public static int SHUTTERL = 890;
-        public static float NoteSizeCalc = 7.5f;
+        public static float SplitLineSizeCalc = 15f;
+        public static float LnHeightCalc = 15f;
 
         public static List<RecordData> record = new List<RecordData>();
         public static int musiclistIdx = 0;
@@ -116,25 +117,11 @@ namespace BMSPlayer
             "Play Side"
         };
 
-        public static string[] playopGearSkin = new string[3]
-        {
-            "기어 스킨",
-            "ギアースキン",
-            "Gear Skin"
-        };
-
         public static string[] playopGearSize = new string[3]
         {
             "기어 너비",
             "ギアーの広さ",
             "Gear Size"
-        };
-
-        public static string[] playopNoteSkin = new string[3]
-        {
-            "노트 스킨",
-            "ノーツスキン",
-            "Note Skin"
         };
 
         public static string[] playopNoteSize = new string[3]
@@ -236,6 +223,12 @@ namespace BMSPlayer
             "인코딩",
             "インコーディング",
             "Encoding"
+        };
+        public static string[] settingTitleSkin = new string[3]
+        {
+            "스킨 설정",
+            "スキン設定",
+            "Skin Set"
         };
         public static string[] settingTitleKey = new string[3]
         {
@@ -354,6 +347,13 @@ namespace BMSPlayer
             "난이도표 갱신",
             "難易度表更新",
             "Update Table"
+        };
+
+        public static string[] settingBtnSkin = new string[3]
+        {
+            "스킨 변경",
+            "スキン変更",
+            "Skin Change"
         };
 
         public static string[] settingBtnReset = new string[3]
@@ -652,6 +652,16 @@ namespace BMSPlayer
             "指定されたBMSの経路がありません",
             "There is no BMS path set"
         };
+
+        public static string[] DialogSkin = new string[3]
+        {
+            "RhythmTracers_Data\\StreamingAssets 폴더 아래에 커스텀 스킨을 추가하세요\n" +
+                "이 작업을 수행하기 전에 반드시 동봉된 설명서를 읽어주세요",
+            "RhythmTracers_Data\\StreamingAssetsにカスタムスキンを追加してください\n" +
+                "この作業をする前には必ず説明書を読んでから進んでください",
+            "Add your custom skin under RhythmTracers_Data\\StreamingAssets.\n" +
+                "Please read description before working on it."
+        };
         #endregion
 
         #region Initial Setting Text
@@ -789,7 +799,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("maxframe", 2000);
+                return PlayerPrefs.GetInt("maxframe", 1000);
             }
             set
             {
@@ -861,7 +871,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("scrWidth", 1920);
+                return PlayerPrefs.GetInt("scrWidth", 1280);
             }
             set
             {
@@ -872,7 +882,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetInt("scrHeight", 1080);
+                return PlayerPrefs.GetInt("scrHeight", 720);
             }
             set
             {
@@ -889,6 +899,42 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("scrMode", (int)value);
+            }
+        }
+
+        public static string SkinName
+        {
+            get
+            {
+                return PlayerPrefs.GetString("skinName", "Default");
+            }
+            set
+            {
+                PlayerPrefs.SetString("skinName", value);
+            }
+        }
+
+        public static string GearName
+        {
+            get
+            {
+                return PlayerPrefs.GetString("gearName", "Standard");
+            }
+            set
+            {
+                PlayerPrefs.SetString("gearName", value);
+            }
+        }
+
+        public static string NoteName
+        {
+            get
+            {
+                return PlayerPrefs.GetString("noteName", "Normal");
+            }
+            set
+            {
+                PlayerPrefs.SetString("noteName", value);
             }
         }
         #endregion
@@ -1329,17 +1375,6 @@ namespace BMSPlayer
 
         // Play Skin Setting
         #region Play Skin
-        public static SkinType GearSkin
-        {
-            get
-            {
-                return (SkinType)PlayerPrefs.GetInt("gearskin", (int)SkinType.NORMAL);
-            }
-            set
-            {
-                PlayerPrefs.SetInt("gearskin", (int)value);
-            }
-        }
 
         public static SkinSize GearSize
         {
@@ -1350,18 +1385,6 @@ namespace BMSPlayer
             set
             {
                 PlayerPrefs.SetInt("gearsize", (int)value);
-            }
-        }
-
-        public static NoteSkin NoteSkin
-        {
-            get
-            {
-                return (NoteSkin)PlayerPrefs.GetInt("noteskin", (int)NoteSkin.NORMAL);
-            }
-            set
-            {
-                PlayerPrefs.SetInt("noteskin", (int)value);
             }
         }
 

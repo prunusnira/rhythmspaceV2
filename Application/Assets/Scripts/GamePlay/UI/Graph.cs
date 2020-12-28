@@ -11,9 +11,6 @@ namespace BMSPlayer
         public SpriteRenderer GraphBigBody;
         public SpriteRenderer GraphSmallBody;
         public SpriteRenderer GraphMiniBody;
-        public Sprite GraphBigDark;
-        public Sprite GraphSmallDark;
-        public Sprite GraphMiniDark;
 
         public TextMesh[] valCur;
         public TextMesh[] valBest;
@@ -42,14 +39,14 @@ namespace BMSPlayer
                     break;
             }
 
-            if(Const.GearSkin == SkinType.DARK)
-            {
-                GraphBigBody.sprite = GraphBigDark;
-                GraphSmallBody.sprite = GraphSmallDark;
-                GraphMiniBody.sprite = GraphMiniDark;
-            }
-
             ObjectPositionSetup();
+        }
+
+        private void Start()
+        {
+            GraphBigBody.sprite = SkinSetting.GraphBGBig;
+            GraphSmallBody.sprite = SkinSetting.GraphBGSmall;
+            GraphMiniBody.sprite = SkinSetting.GraphBGMini;
         }
 
         public void SetInitialGraph(int totalNotes)

@@ -14,10 +14,15 @@ namespace BMSPlayer
     public class MusicListUI : MonoBehaviour
     {
         // Description
+        [Header("Option Buttons")]
         public Button btnDescPlayOp;
         public Button btnDescSystemOp;
+
+        [Header("Option Layers")]
         public GameObject layerPlayOpt;
         public GameObject layerSysOpt;
+
+        [Header("Description")]
         public TextMeshProUGUI txtDescMusicSel;
         public TextMeshProUGUI txtDescPlayOp;
         public TextMeshProUGUI txtDescSystemOp;
@@ -50,28 +55,21 @@ namespace BMSPlayer
         public static bool isPathChanged = false;
 
         // List object
+        [Header("List Objects")]
         public GameObject patternPrefab;
         public GameObject folderPrefab;
         public GameObject tablePrefab;
         public GameObject clearPrefab;
         public GameObject namePrefab;
-        public Sprite spNoBms;
-        public Sprite rampNoPlay;
-        public Sprite rampAssisted;
-        public Sprite rampEasy;
-        public Sprite rampNormal;
-        public Sprite rampHard;
-        public Sprite rampEX;
-        public Sprite rampFC;
-        public Sprite rampPFC;
-        public Sprite rampFail;
         public ScrollRectInfinite musicRect;
 
         // Search
+        [Header("Search")]
         public InputField inputSearch;
         public Button btnSearchSubmit;
 
         // Selected info
+        [Header("BMS Info")]
         public RawImage infoJacket;
         public TextMeshProUGUI infoGerne;
         public TextMeshProUGUI infoTitle;
@@ -84,6 +82,7 @@ namespace BMSPlayer
         public TextMeshProUGUI infoJudgeRank;
 
         // Difficulty
+        [Header("Difficulty")]
         public Image diffBeg;
         public Image diffNor;
         public Image diffHyp;
@@ -95,19 +94,7 @@ namespace BMSPlayer
         public TextMeshProUGUI lvAno;
         public TextMeshProUGUI lvIns;
 
-        public Sprite begOn;
-        public Sprite begOff;
-        public Sprite norOn;
-        public Sprite norOff;
-        public Sprite hypOn;
-        public Sprite hypOff;
-        public Sprite anoOn;
-        public Sprite anoOff;
-        public Sprite insOn;
-        public Sprite insOff;
-        public Sprite unkOn;
-        public Sprite unkOff;
-
+        [Header("Record")]
         public TextMeshProUGUI recordScore;
         public TextMeshProUGUI recordPerfect;
         public TextMeshProUGUI recordGreat;
@@ -118,6 +105,8 @@ namespace BMSPlayer
         public TextMeshProUGUI recordCBreak;
         public Image recordRank;
         public Image recordClearStat;
+
+        [Header("Clear Txt Image")]
         public Sprite clearNP;
         public Sprite clearAC;
         public Sprite clearEC;
@@ -127,17 +116,10 @@ namespace BMSPlayer
         public Sprite clearFC;
         public Sprite clearPF;
         public Sprite clearFail;
-        public Sprite rankaaa;
-        public Sprite rankaa;
-        public Sprite ranka;
-        public Sprite rankb;
-        public Sprite rankc;
-        public Sprite rankd;
-        public Sprite ranke;
-        public Sprite rankf;
 
         public Sprite empty;
 
+        [Header("Audio")]
         public AudioSource sfxChange;
         public AudioSource bgLoop;
         public AudioSource prevLoop;
@@ -149,11 +131,14 @@ namespace BMSPlayer
         private Thread listLoadThread = null;
         private bool isLoading = false;
         private bool isLoadingFinish = false;
+
+        [Header("Loading")]
         public GameObject loadingList;
         public GameObject loadingEmpty;
         public TextMeshProUGUI emptyMsg;
 
         // Dialog
+        [Header("Dialog")]
         public GameObject dlgNoPattern;
         public GameObject dlgQuit;
 
@@ -440,7 +425,7 @@ namespace BMSPlayer
         public void SearchResult(string keyword)
         {
             string searchStr = keyword;
-            if (searchStr == null) searchStr = inputSearch.text;
+            if (searchStr == null) searchStr = inputSearch.text.Replace(" ", "");
             if (searchStr != "")
             {
                 List<MusicListData> searchResult = MusicDataManager.Instance.LoadBMSWithName(searchStr);
@@ -563,11 +548,11 @@ namespace BMSPlayer
                 switch(bms.Difficulty)
                 {
                     case 1:
-                        diffBeg.sprite = begOn;
-                        diffNor.sprite = norOff;
-                        diffHyp.sprite = hypOff;
-                        diffAno.sprite = anoOff;
-                        diffIns.sprite = insOff;
+                        diffBeg.sprite = SkinSetting.DiffBegOn;
+                        diffNor.sprite = SkinSetting.DiffNorOff;
+                        diffHyp.sprite = SkinSetting.DiffHypOff;
+                        diffAno.sprite = SkinSetting.DiffAnoOff;
+                        diffIns.sprite = SkinSetting.DiffInsOff;
 
                         lvBeg.text = bms.Level.ToString("00");
                         lvNor.text = "00";
@@ -576,11 +561,11 @@ namespace BMSPlayer
                         lvIns.text = "00";
                         break;
                     case 2:
-                        diffBeg.sprite = begOff;
-                        diffNor.sprite = norOn;
-                        diffHyp.sprite = hypOff;
-                        diffAno.sprite = anoOff;
-                        diffIns.sprite = insOff;
+                        diffBeg.sprite = SkinSetting.DiffBegOff;
+                        diffNor.sprite = SkinSetting.DiffNorOn;
+                        diffHyp.sprite = SkinSetting.DiffHypOff;
+                        diffAno.sprite = SkinSetting.DiffAnoOff;
+                        diffIns.sprite = SkinSetting.DiffInsOff;
 
                         lvBeg.text = "00";
                         lvNor.text = bms.Level.ToString("00");
@@ -589,11 +574,11 @@ namespace BMSPlayer
                         lvIns.text = "00";
                         break;
                     case 3:
-                        diffBeg.sprite = begOff;
-                        diffNor.sprite = norOff;
-                        diffHyp.sprite = hypOn;
-                        diffAno.sprite = anoOff;
-                        diffIns.sprite = insOff;
+                        diffBeg.sprite = SkinSetting.DiffBegOff;
+                        diffNor.sprite = SkinSetting.DiffNorOff;
+                        diffHyp.sprite = SkinSetting.DiffHypOn;
+                        diffAno.sprite = SkinSetting.DiffAnoOff;
+                        diffIns.sprite = SkinSetting.DiffInsOff;
 
                         lvBeg.text = "00";
                         lvNor.text = "00";
@@ -602,11 +587,11 @@ namespace BMSPlayer
                         lvIns.text = "00";
                         break;
                     case 4:
-                        diffBeg.sprite = begOff;
-                        diffNor.sprite = norOff;
-                        diffHyp.sprite = hypOff;
-                        diffAno.sprite = anoOn;
-                        diffIns.sprite = insOff;
+                        diffBeg.sprite = SkinSetting.DiffBegOff;
+                        diffNor.sprite = SkinSetting.DiffNorOff;
+                        diffHyp.sprite = SkinSetting.DiffHypOff;
+                        diffAno.sprite = SkinSetting.DiffAnoOn;
+                        diffIns.sprite = SkinSetting.DiffInsOff;
 
                         lvBeg.text = "00";
                         lvNor.text = "00";
@@ -615,11 +600,11 @@ namespace BMSPlayer
                         lvIns.text = "00";
                         break;
                     case 5:
-                        diffBeg.sprite = begOff;
-                        diffNor.sprite = norOff;
-                        diffHyp.sprite = hypOff;
-                        diffAno.sprite = anoOff;
-                        diffIns.sprite = insOn;
+                        diffBeg.sprite = SkinSetting.DiffBegOff;
+                        diffNor.sprite = SkinSetting.DiffNorOff;
+                        diffHyp.sprite = SkinSetting.DiffHypOff;
+                        diffAno.sprite = SkinSetting.DiffAnoOff;
+                        diffIns.sprite = SkinSetting.DiffInsOn;
 
                         lvBeg.text = "00";
                         lvNor.text = "00";
@@ -629,11 +614,11 @@ namespace BMSPlayer
                         lvIns.color = new Color(127f / 256, 46f / 256, 178f / 256);
                         break;
                     default:
-                        diffBeg.sprite = begOff;
-                        diffNor.sprite = norOff;
-                        diffHyp.sprite = hypOff;
-                        diffAno.sprite = anoOff;
-                        diffIns.sprite = unkOn;
+                        diffBeg.sprite = SkinSetting.DiffBegOff;
+                        diffNor.sprite = SkinSetting.DiffNorOff;
+                        diffHyp.sprite = SkinSetting.DiffHypOff;
+                        diffAno.sprite = SkinSetting.DiffAnoOff;
+                        diffIns.sprite = SkinSetting.DiffUnkOn;
 
                         lvBeg.text = "00";
                         lvNor.text = "00";
@@ -663,28 +648,28 @@ namespace BMSPlayer
                     switch (data.Rank)
                     {
                         case "aaa":
-                            recordRank.sprite = rankaaa;
+                            recordRank.sprite = SkinSetting.RankAAA;
                             break;
                         case "aa":
-                            recordRank.sprite = rankaa;
+                            recordRank.sprite = SkinSetting.RankAA;
                             break;
                         case "a":
-                            recordRank.sprite = ranka;
+                            recordRank.sprite = SkinSetting.RankA;
                             break;
                         case "b":
-                            recordRank.sprite = rankb;
+                            recordRank.sprite = SkinSetting.RankB;
                             break;
                         case "c":
-                            recordRank.sprite = rankc;
+                            recordRank.sprite = SkinSetting.RankC;
                             break;
                         case "d":
-                            recordRank.sprite = rankd;
+                            recordRank.sprite = SkinSetting.RankD;
                             break;
                         case "e":
-                            recordRank.sprite = ranke;
+                            recordRank.sprite = SkinSetting.RankE;
                             break;
                         case "f":
-                            recordRank.sprite = rankf;
+                            recordRank.sprite = SkinSetting.RankF;
                             break;
                     }
 
@@ -823,6 +808,7 @@ namespace BMSPlayer
                     }
                 });
 
+                Image img = c.GetComponent<Image>();
                 TextMeshProUGUI level = c.GetChild(0).GetComponent<TextMeshProUGUI>();
                 TextMeshProUGUI title = c.GetChild(1).GetComponent<TextMeshProUGUI>();
                 Image ramp = c.GetChild(2).GetComponent<Image>();
@@ -859,34 +845,38 @@ namespace BMSPlayer
                 switch((ClearType)RecordDataManager.Instance.GetClearStat(d.MD5Hash))
                 {
                     case ClearType.ASSISTCLEAR:
-                        ramp.sprite = rampAssisted;
+                        ramp.sprite = SkinSetting.RampAssist;
                         break;
                     case ClearType.EASYCLEAR:
-                        ramp.sprite = rampEasy;
+                        ramp.sprite = SkinSetting.RampEasy;
                         break;
                     case ClearType.NORMALCLEAR:
-                        ramp.sprite = rampNormal;
+                        ramp.sprite = SkinSetting.RampNormal;
                         break;
                     case ClearType.HARDCLEAR:
-                        ramp.sprite = rampHard;
+                        ramp.sprite = SkinSetting.RampHard;
                         break;
                     case ClearType.EXCLEAR:
-                        ramp.sprite = rampEX;
+                        ramp.sprite = SkinSetting.RampEXHard;
                         break;
                     case ClearType.FULLCB:
-                        ramp.sprite = rampFC;
+                        ramp.sprite = SkinSetting.RampFullCombo;
                         break;
                     case ClearType.PERFECT:
-                        ramp.sprite = rampPFC;
+                        ramp.sprite = SkinSetting.RampPerfect;
                         break;
                     case ClearType.FAIL:
-                        ramp.sprite = rampFail;
+                        ramp.sprite = SkinSetting.RampFailed;
                         break;
                 }
 
                 if(n.IsFromTable && !n.Exist)
                 {
-                    music.GetComponent<Image>().sprite = spNoBms;
+                    music.GetComponent<Image>().sprite = SkinSetting.PatternNotExistImg;
+                }
+                else
+                {
+                    music.GetComponent<Image>().sprite = SkinSetting.PatternImg;
                 }
 
                 return music;

@@ -41,7 +41,7 @@ namespace BMSPlayer
             btnOK.onClick.AddListener(delegate
             {
                 UpdateURL();
-                Refresh();
+                //Refresh();
                 CloseSetting();
             });
 
@@ -77,7 +77,7 @@ namespace BMSPlayer
                 }
                 if (isAllDone)
                 {
-                    Debug.Log("Refresh Finish");
+                    layerLoading.SetActive(false);
                     threads.Clear();
                     refreshing = false;
                 }
@@ -86,7 +86,7 @@ namespace BMSPlayer
             if(refreshFromOutside)
             {
                 refreshFromOutside = false;
-                Refresh();
+                if(!refreshing) Refresh();
             }
         }
 
@@ -97,13 +97,14 @@ namespace BMSPlayer
 
         public void Refresh()
         {
-            strLoading = "Start refreshing...";
+            refreshing = true;
+
+            strLoading = "Refreshing table";
             layerLoading.SetActive(true);
 
             UpdateURL();
             // 각각 테이블에 대해 갱신 수행
             // Thread로 돌림
-            refreshing = true;
             diffTable.Add(new DiffTableStSl(Const.SatelliteURL, DiffTableMode.SATELLITE, ref strLoading));
             diffTable.Add(new DiffTableStSl(Const.StellaURL, DiffTableMode.STELLA, ref strLoading));
             diffTable.Add(new DiffTableGeno(Const.GenocideNormalURL, DiffTableMode.GENONM, ref strLoading));
@@ -115,8 +116,6 @@ namespace BMSPlayer
                 threads.Add(t);
                 t.Start();
             }
-
-            StartCoroutine(CheckThreadWork());
         }
 
         public void ResetTable()
@@ -146,30 +145,6 @@ namespace BMSPlayer
             urlSl.text = Const.SatelliteURL;
             urlGeNM.text = Const.GenocideNormalURL;
             urlGeINS.text = Const.GenocideInsaneURL;
-        }
-
-        System.Collections.IEnumerator CheckThreadWork()
-        {
-            yield return null;
-            while (true)
-            {
-                bool cont = false;
-                foreach (Thread t in threads)
-                {
-                    if (t.ThreadState != ThreadState.Stopped)
-                    {
-                        cont = true;
-                        break;
-                    }
-                }
-                yield return null;
-
-                if (!cont)
-                {
-                    layerLoading.SetActive(false);
-                    break;
-                }
-            }
         }
     }
 }

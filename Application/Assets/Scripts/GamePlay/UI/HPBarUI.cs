@@ -42,12 +42,15 @@ namespace BMSPlayer
                 }
 
                 hpController = HPController.Instance;
-                SetInitialHPBar();
             }
             catch (Exception e)
             {
                 ErrorHandler.LogError(e.Message + " " + e.StackTrace);
             }
+        }
+        private void Start()
+        {
+            SetInitialHPBar();
         }
 
         private void SetInitialHPBar()
@@ -57,32 +60,32 @@ namespace BMSPlayer
                 case BMSPlayer.GaugeType.ASSISTED:
                     GaugeType.text = "ASSISTED";
                     GaugeType.color = new Color(206f / 255, 159f / 255, 1f);
-                    hpBar.sprite = hpBarAssisted;
+                    hpBar.sprite = SkinSetting.GaugeAssisted;
                     break;
                 case BMSPlayer.GaugeType.EASY:
                     GaugeType.text = "EASY";
                     GaugeType.color = new Color(159f / 255, 1f, 180f / 255);
-                    hpBar.sprite = hpBarEasy;
+                    hpBar.sprite = SkinSetting.GaugeEasy;
                     break;
                 case BMSPlayer.GaugeType.NORMAL:
                     GaugeType.text = "NORMAL";
                     GaugeType.color = new Color(159f / 255, 215f / 255, 1f);
-                    hpBar.sprite = hpBarNormal;
+                    hpBar.sprite = SkinSetting.GaugeNormal;
                     break;
                 case BMSPlayer.GaugeType.HARD:
                     GaugeType.text = "HARD";
                     GaugeType.color = new Color(1f, 159f / 255, 159f / 255);
-                    hpBar.sprite = hpBarHard;
+                    hpBar.sprite = SkinSetting.GaugeHard;
                     break;
                 case BMSPlayer.GaugeType.EXHARD:
                     GaugeType.text = "EX-HARD";
                     GaugeType.color = new Color(246f / 255, 1f, 159f / 255);
-                    hpBar.sprite = hpBarExHard;
+                    hpBar.sprite = SkinSetting.GaugeEXHard;
                     break;
                 default:
                     GaugeType.text = "NORMAL";
                     GaugeType.color = new Color(159f / 255, 215f / 255, 1f);
-                    hpBar.sprite = hpBarNormal;
+                    hpBar.sprite = SkinSetting.GaugeNormal;
                     break;
             }
         }
