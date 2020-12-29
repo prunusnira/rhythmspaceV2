@@ -377,6 +377,11 @@ namespace BMSPlayer
                     s.ToLower().EndsWith(".bme") ||
                     s.ToLower().EndsWith(".bml")).ToList();
 
+            for(int i = 0; i < filesDir.Count; i++)
+            {
+                filesDir[i] = filesDir[i].Replace("\\", "/");
+            }
+
             strLoading = "Gathering file list from DB";
             List<string> filesDB = MusicDataManager.Instance.GetPathList();
 

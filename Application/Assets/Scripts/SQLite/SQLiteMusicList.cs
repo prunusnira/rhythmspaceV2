@@ -443,6 +443,7 @@ namespace DatabaseManager
 
             // 1000°³¾¿ ²÷±â
             int len = hashList.Count / 500;
+            if (hashList.Count % 500 > 0) len++;
             
             for(int i = 0; i < len; i++)
             {

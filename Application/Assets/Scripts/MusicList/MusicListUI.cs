@@ -52,7 +52,6 @@ namespace BMSPlayer
         public static bool isKeyChanged = false;
         public static bool isRefreshDone = false;
         public static bool isCustomRandom = false;
-        public static bool isPathChanged = false;
 
         // List object
         [Header("List Objects")]
@@ -224,12 +223,6 @@ namespace BMSPlayer
                 isLangChanged = false;
             }
 
-            if(isPathChanged)
-            {
-                bmsPath = Const.BMSFolderPath;
-                isPathChanged = false;
-            }
-
             // 곡 선택이 front인 경우에만 동작
             if(isTop && !isLoading)
             {
@@ -346,12 +339,14 @@ namespace BMSPlayer
             if(isRefreshDone)
             {
                 isRefreshDone = false;
+                bmsPath = Const.BMSFolderPath;
                 // 목록을 리셋하고 새로 리프레시
                 musicRect.Clear();
                 bmslist.Clear();
 
                 Const.ListPos = 0;
                 Const.ListDepth.Clear();
+                Const.ListPath.Clear();
                 ListLoadThread();
             }
 
