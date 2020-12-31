@@ -11,6 +11,9 @@ namespace BMSPlayer
         public VideoPlayer BGVideo;
         public Image BGImage;
 
+        [Header("Title")]
+        public Image ResultTitle;
+
         [Header("Select Loop")]
         public AudioSource bgmLoop;
 
@@ -27,6 +30,8 @@ namespace BMSPlayer
                 BGVideo.gameObject.SetActive(false);
             }
 
+            ResultTitle.sprite = Tools.createSpriteFromFile(SkinSetting.SkinSetMainPath + "/" + SkinLoader.SkinData["ResultTitle"]);
+            
             bgmLoop.loop = true;
             bgmLoop.volume = 0.5f;
             WWW www = new WWW("file://" + SkinSetting.SkinSetMainPath + "/" + SkinLoader.SkinData["ResultLoop"]);

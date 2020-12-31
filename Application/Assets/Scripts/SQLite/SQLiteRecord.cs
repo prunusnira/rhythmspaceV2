@@ -235,7 +235,7 @@ namespace DatabaseManager
             string query = "select md5hash from record";
             if (rank == "fc")
             {
-                query += " where cb=0";
+                query += " where clear=0 or clear == '1'";
             }
             else if(rank == "b")
             {

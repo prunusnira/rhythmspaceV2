@@ -597,6 +597,13 @@ namespace BMSPlayer
             "* GENOCIDE難易度表ではHASHコードを提供しない上、一部の譜面がマッチングできなくなる可能性があります",
             "* GENOCIDE table does not provide HASH code, there's possibility of wrong pattern"
         };
+
+        public static string[] Reset = new string[3]
+        {
+            "리셋",
+            "リーセット",
+            "Reset"
+        };
         #endregion
 
         #region Dialog Text

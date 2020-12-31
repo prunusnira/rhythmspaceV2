@@ -13,10 +13,12 @@ namespace BMSCore
 
             // Load a PNG or JPG image from disk to a Texture2D, assign this texture to a new sprite and return its reference
             Texture2D SpriteTexture = LoadTexture(FilePath);
-            //Debug.Log(FilePath);
-            Sprite NewSprite = Sprite.Create(SpriteTexture, new Rect(0, 0, SpriteTexture.width, SpriteTexture.height), new Vector2(pivotx, pivoty), PixelsPerUnit);
-
-            return NewSprite;
+            if (SpriteTexture != null)
+            {
+                Sprite NewSprite = Sprite.Create(SpriteTexture, new Rect(0, 0, SpriteTexture.width, SpriteTexture.height), new Vector2(pivotx, pivoty), PixelsPerUnit);
+                return NewSprite;
+            }
+            else return null;
         }
 
         public static Texture2D LoadTexture(string FilePath)
@@ -34,8 +36,12 @@ namespace BMSCore
                 {
                     BMPLoader loader = new BMPLoader();
                     BMPImage img = loader.LoadBMP(FilePath);
-                    Tex2D = img.ToTexture2D();
-                    return Tex2D;
+                    if (img != null)
+                    {
+                        Tex2D = img.ToTexture2D();
+                        return Tex2D;
+                    }
+                    else return null;
                 }
                 else
                 {

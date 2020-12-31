@@ -77,6 +77,7 @@ namespace BMSPlayer
         public Button btnAutoSync;
         public Button btnSyncLeft;
         public Button btnSyncRight;
+        public Button btnSyncReset;
         public Text syncval;
 
         // Encoding
@@ -186,6 +187,7 @@ namespace BMSPlayer
             {
                 ChangeSync(true);
             });
+            btnSyncReset.onClick.AddListener(SyncReset);
             btn932.onClick.AddListener(delegate
             {
                 ChangeEncoding(932);
@@ -311,6 +313,7 @@ namespace BMSPlayer
             btnPathChange.GetComponentInChildren<Text>().text = Const.settingBtnBMSOpen[(int)Const.Language];
             btnPathRefresh.GetComponentInChildren<Text>().text = Const.settingBtnRefresh[(int)Const.Language];
             btnFrame.GetComponentInChildren<Text>().text = Const.settingBtnFrameUpdate[(int)Const.Language];
+            btnSyncReset.GetComponentInChildren<Text>().text = Const.Reset[(int)Const.Language];
             btn932.GetComponentInChildren<Text>().text = Const.settingBtnEncJP[(int)Const.Language];
             btn949.GetComponentInChildren<Text>().text = Const.settingBtnEncKR[(int)Const.Language];
             btnKeySetting.GetComponentInChildren<Text>().text = Const.settingBtnKeyChange[(int)Const.Language];
@@ -444,6 +447,13 @@ namespace BMSPlayer
             {
                 Const.Sync--;
             }
+            ShowSync();
+            sfxPlay.PlayOneShot(sfxSource);
+        }
+
+        private void SyncReset()
+        {
+            Const.Sync = 0;
             ShowSync();
             sfxPlay.PlayOneShot(sfxSource);
         }

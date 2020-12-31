@@ -108,6 +108,9 @@ LoadingBGM=music/loading.mp3
 IsResultBGVideo=true
 ResultBGFilePath=result/resultloop.mp4
 
+# Title
+ResultTitle=result/title.png
+
 # Loop
 ResultLoop=music/resultloop.mp3
 

@@ -14,16 +14,21 @@ namespace BMSPlayer
     public class ResultController : MonoBehaviour
     {
         // Music data
+        [Header("Title")]
         public TextMeshProUGUI title;
         public TextMeshProUGUI subtitle;
+        public TextMeshProUGUI artist;
+        public TextMeshProUGUI subartist;
 
         // UI
+        [Header("Retry desc")]
         public Text txtRetry;
         public Text txtRetrySame;
         public Text txtNext;
         public Text txtRetrySameDesc;
 
         // Judgement data
+        [Header("Judge details")]
         public Text perfect;
         public Text great;
         public Text good;
@@ -37,10 +42,14 @@ namespace BMSPlayer
         public Text fast;
         public Text slow;
 
+        [Header("Rank, FC mark")]
         public SpriteRenderer rank;
         public SpriteRenderer fcpfmark;
+        public Sprite pfmark;
+        public Sprite fcmark;
 
         // Difference
+        [Header("Difference from prev score")]
         public TextMeshProUGUI scorePrev;
         public TextMeshProUGUI scoreNew;
         public TextMeshProUGUI scoreDiff;
@@ -56,6 +65,7 @@ namespace BMSPlayer
         public Image clearNew;
 
         // Clear Sprite
+        [Header("Clear status sprite")]
         public Sprite clearNP;
         public Sprite clearAC;
         public Sprite clearEC;
@@ -66,13 +76,8 @@ namespace BMSPlayer
         public Sprite clearPF;
         public Sprite clearFail;
 
-        // Rank Sprite
-        public Sprite pfmark;
-        public Sprite fcmark;
-
-        public Sprite failed;
-
         // BG Sound
+        [Header("BG Sound")]
         public AudioSource bgLoop;
         public AudioClip[] loop;
 
@@ -81,6 +86,7 @@ namespace BMSPlayer
         private RecordData record;
 
         // Graph
+        [Header("Graph")]
         public GraphDrawer Graph;
         public SpriteRenderer GraphBG;
         public Sprite GraphAS;
@@ -89,8 +95,11 @@ namespace BMSPlayer
         public Sprite GraphEX;
 
         // Others
+        [Header("Play status desc")]
         public Text Judgement;
-        public Text Pattern;
+        public Text PatternType;
+        public Text PatternDifficulty;
+        public Text PatternLevel;
         public TextMeshProUGUI noteLayout;
 
         void Awake()
@@ -109,6 +118,8 @@ namespace BMSPlayer
             analyzer.HeaderAnalyzer(Data.BMS, Const.Encoding);
             title.text = Data.BMS.Title;
             subtitle.text = Data.BMS.SubTitle;
+            artist.text = Data.BMS.Artist;
+            subartist.text = Data.BMS.SubArtist;
 
             // 점수 차이
             int ex = Const.ResultScore;
@@ -187,21 +198,27 @@ namespace BMSPlayer
             {
                 case 1:
                     difficulty = "BEGINNER";
+                    PatternDifficulty.color = new Color(127f / 255, 1, 97f / 255);
                     break;
                 case 2:
                     difficulty = "NORMAL";
+                    PatternDifficulty.color = new Color(119f / 255, 251f / 255, 1);
                     break;
                 case 3:
                     difficulty = "HYPER";
+                    PatternDifficulty.color = new Color(1, 244f / 255, 134f / 255);
                     break;
                 case 4:
                     difficulty = "ANOTHER";
+                    PatternDifficulty.color = new Color(1, 124f / 255, 124f / 255);
                     break;
                 case 5:
                     difficulty = "INSANE";
+                    PatternDifficulty.color = new Color(127f / 255, 46f / 255, 178f / 255);
                     break;
                 default:
                     difficulty = "UNKNOWN";
+                    PatternDifficulty.color = Color.white;
                     break;
             }
 
@@ -228,10 +245,21 @@ namespace BMSPlayer
                     break;
             }
 
-            Pattern.text =
-                "SP " + difficulty +
-                " " + Data.BMS.Level +
-                "     |     LAYOUT: " + layout;
+            PatternType.text = "SP";
+            PatternDifficulty.text = difficulty;
+            PatternLevel.text = Data.BMS.Level.ToString();
+
+            switch(Data.BMS.Player)
+            {
+                case 1:
+                    PatternType.color = new Color(1, 51f / 255, 51f / 255);
+                    break;
+                case 3:
+                    PatternType.color = new Color(0, 102f / 255, 1);
+                    break;
+            }
+
+            PatternLevel.color = new Color(1, 204f / 255, 0);
 
             // 판정 설정
             switch(Const.JudgeType)
@@ -335,7 +363,7 @@ namespace BMSPlayer
             scoreDiffR.text = scoreDiffStr;
             scorePrev.text = Const.MyBestScore.ToString();
             scoreNew.text = Const.ResultScore.ToString();
-            missNew.text = vmiss.ToString();
+            missNew.text = vcb.ToString();
             targetScore.text = Const.ResultTarget.ToString();
             int scorediff = Const.ResultScore - Const.ResultTarget;
 
@@ -402,7 +430,7 @@ namespace BMSPlayer
             if (Const.MyBestPrev != null)
             {
                 rankPrev.text = Const.MyBestRank.ToUpper();
-                missPrev.text = Const.MyBestPrev.Poor.ToString();
+                missPrev.text = Const.MyBestPrev.CBreak.ToString();
                 switch (Const.MyBestPrev.Clear)
                 {
                     case ClearType.ASSISTCLEAR:

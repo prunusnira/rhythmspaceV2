@@ -809,7 +809,7 @@ namespace BMSPlayer
                 Image ramp = c.GetChild(2).GetComponent<Image>();
 
                 level.text = d.Level.ToString();
-                title.text = d.Title;
+                title.text = d.Title + " " + d.SubTitle;
 
                 if (!d.LNExist) c.GetChild(3).gameObject.SetActive(false);
 

@@ -13,12 +13,13 @@ namespace BMSPlayer
 	// 플레이 화면의 UI 요소 컨트롤
 	public class PlayUI : MonoBehaviour {
         // UI Object
-        private List<GameObject> NoteOnScreen;
+        [Header("UI Object")]
         public GameObject layerJudgeAll;
         public TextMesh FPSCounter;
         private float counterCheck;
 
         // Side judge
+        [Header("Side Judge")]
         public Text txtAvgDiff;
         public Text txtAvgRate;
         public Text txtPerfect;
@@ -31,16 +32,19 @@ namespace BMSPlayer
         public Text txtSlow;
 
         // Timer
+        [Header("Timer")]
         public TextMesh txtCurrentTime;
         public TextMesh txtTotalTime;
 
         // Gear and Area
+        [Header("Gear and Play area")]
         public GameObject[] Gear1P;
         public GameObject[] Gear2P;
         public GameObject[] Area1P;
         public GameObject[] Area2P;
 
         // Text display
+        [Header("Frame text data")]
         public TextMesh Combo;
         public TextMesh Score;
         public TextMesh SpeedStandard;
@@ -53,6 +57,7 @@ namespace BMSPlayer
         public TextMesh Level;
         public TextMesh GaugeType;
 
+        [Header("Loading, Autoplay text")]
         public TextMesh[] txtAutoPlayNr;
         public TextMesh[] txtAutoPlayW125;
         public TextMesh[] txtAutoPlayW150;
@@ -63,38 +68,52 @@ namespace BMSPlayer
         private TextMesh txtLoading;
 
         // Skin
+        [Header("Gear skin renderer")]
         public SpriteRenderer[] skinGearStd;
         public SpriteRenderer[] skinGearW125;
         public SpriteRenderer[] skinGearW150;
 
+        // Skin
+        [Header("Judge line")]
+        public SpriteRenderer[] judgeLineStd;
+        public SpriteRenderer[] judgeLineW125;
+        public SpriteRenderer[] judgeLineW150;
+        private SpriteRenderer judgeLine;
+
         // Time
+        [Header("Time bar object")]
         public GameObject[] timeNr;
         public GameObject[] timeW125;
         public GameObject[] timeW150;
         private GameObject timer;
 
         // Note Effect
+        [Header("Note effect")]
         private Coroutine[] effectCoroutine;
         public SpriteRenderer[] noteEffects;
         private float[] effectRotation = new float[8];
 
         // BGA
+        [Header("BGA rect, following obj")]
         public RectTransform bgaRect;
         public RectTransform layerRect;
         public RectTransform bgaVideoRectVLC;
         public RectTransform bgaVideoRectNormal;
         public RectTransform bgaFollowingObj;
-        
+
         // Fader
+        [Header("Fader")]
         public Image Fader;
         private bool FadeDone = false;
         private bool FadeStart = false;
         private bool FadeReady = false;
 
-        // Key info
+        // Button description (speed, sudden, hidden, lift)
+        [Header("Button description")]
         public GameObject keyInfo;
 
         // Music Info
+        [Header("Music info panel")]
         public GameObject stagePanel;
         public TextMeshProUGUI stageGerne;
         public TextMeshProUGUI stageTitle;
@@ -103,6 +122,7 @@ namespace BMSPlayer
         public TextMeshProUGUI stageSubartist;
 
         // frame
+        [Header("Frame")]
         public SpriteRenderer Upper;
         public SpriteRenderer Lower;
         public TextMeshPro UpperTitle;
@@ -137,8 +157,6 @@ namespace BMSPlayer
 
                 // time bar 표시
                 timer.SetActive(true);
-
-                NoteOnScreen = new List<GameObject>();
 
                 // 기어에 표시하는 정보의 위치와 개수 확인
                 //SideInfoDisplayPosition();
@@ -340,12 +358,12 @@ namespace BMSPlayer
 
             txtCurrentTime.text = min + ":" + sec;
 
-            float ypos = (float)(Const.TIMEBAR * time / total * -1) + 345;
+            float ypos = (float)(Const.TIMEBAR * time / total * -1);
             if (ypos < -690) ypos = -690;
 
             timer.transform.localPosition = new Vector3(
                 timer.transform.localPosition.x,
-                ypos,
+                ypos + 345,
                 timer.transform.localPosition.z);
         }
 
@@ -382,16 +400,44 @@ namespace BMSPlayer
                     txtLoading = txtLoadingNr[Const.PlayerSide];
                     txtAutoPlay = txtAutoPlayNr[Const.PlayerSide];
                     timer = timeNr[Const.PlayerSide];
+                    judgeLine = judgeLineStd[Const.PlayerSide];
                     break;
                 case SkinSize.WIDE125:
                     txtLoading = txtLoadingW125[Const.PlayerSide];
                     txtAutoPlay = txtAutoPlayW125[Const.PlayerSide];
                     timer = timeW125[Const.PlayerSide];
+                    judgeLine = judgeLineW125[Const.PlayerSide];
                     break;
                 case SkinSize.WIDE150:
                     txtLoading = txtLoadingW150[Const.PlayerSide];
                     txtAutoPlay = txtAutoPlayW150[Const.PlayerSide];
                     timer = timeW150[Const.PlayerSide];
+                    judgeLine = judgeLineW150[Const.PlayerSide];
+                    break;
+            }
+
+            // 설정된 노트 사이즈에 따라 판정선 두께 변경
+            switch(Const.NoteSize)
+            {
+                case NoteSize.SUPERSLIM:
+                    judgeLine.gameObject.transform.localScale
+                        = new Vector3(1.0f, 0.3f, 1.0f);
+                    break;
+                case NoteSize.SLIM:
+                    judgeLine.gameObject.transform.localScale
+                        = new Vector3(1.0f, 0.6f, 1.0f);
+                    break;
+                case NoteSize.NORMAL:
+                    judgeLine.gameObject.transform.localScale
+                        = new Vector3(1.0f, 1.0f, 1.0f);
+                    break;
+                case NoteSize.THICK:
+                    judgeLine.gameObject.transform.localScale
+                        = new Vector3(1.0f, 1.3f, 1.0f);
+                    break;
+                case NoteSize.SUPERTHICK:
+                    judgeLine.gameObject.transform.localScale
+                        = new Vector3(1.0f, 1.6f, 1.0f);
                     break;
             }
 
