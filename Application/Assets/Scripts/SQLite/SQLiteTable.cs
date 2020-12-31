@@ -110,6 +110,7 @@ namespace DatabaseManager
             string table =
                 @"create table diffGeNM (
                 id integer primary key autoincrement,
+                md5hash text unique not null,
                 title text not null,
                 artist text not null,
                 url text not null,
@@ -125,6 +126,7 @@ namespace DatabaseManager
             string table =
                 @"create table diffGeINS (
                 id integer primary key autoincrement,
+                md5hash text unique not null,
                 title text not null,
                 artist text not null,
                 url text not null,
@@ -137,7 +139,7 @@ namespace DatabaseManager
         public void DropTableSl()
         {
             dbcommand = dbconn.CreateCommand();
-            string query = @"delete from diffSl";
+            string query = @"drop table if exists diffSl";
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
         }
@@ -145,7 +147,7 @@ namespace DatabaseManager
         public void DropTableSt()
         {
             dbcommand = dbconn.CreateCommand();
-            string query = @"delete from diffSt";
+            string query = @"drop table if exists diffSt";
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
         }
@@ -153,7 +155,7 @@ namespace DatabaseManager
         public void DropTableGeNM()
         {
             dbcommand = dbconn.CreateCommand();
-            string query = @"delete from diffGeNM";
+            string query = @"drop table if exists diffGeNM";
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
         }
@@ -161,7 +163,7 @@ namespace DatabaseManager
         public void DropTableGeINS()
         {
             dbcommand = dbconn.CreateCommand();
-            string query = @"delete from diffGeINS";
+            string query = @"drop table if exists diffGeINS";
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
         }
@@ -226,7 +228,7 @@ namespace DatabaseManager
             }
 
             string query = "insert into " + table +
-                "(title, artist, level, url) values ";
+                "(title, artist, level, url, md5hash) values ";
 
             foreach (DiffTableData param in paramList)
             {
@@ -234,7 +236,8 @@ namespace DatabaseManager
                         param.Title + "','" +
                         param.Artist + "'," +
                         param.Level + ",'" +
-                        param.URL + "')";
+                        param.URL + "','" +
+                        param.MD5 + "')";
 
                 if (paramList.IndexOf(param) != paramList.Count - 1)
                 {
@@ -321,13 +324,14 @@ namespace DatabaseManager
 
             while (dbreader.Read())
             {
-                string ltitle = dbreader.GetString(1);
-                string lartist = dbreader.GetString(2);
-                int llv = dbreader.GetInt32(4);
-                string lurl = dbreader.GetString(3);
+                string ltitle = dbreader.GetString(2);
+                string lartist = dbreader.GetString(3);
+                int llv = dbreader.GetInt32(5);
+                string lurl = dbreader.GetString(4);
+                string lmd5 = dbreader.GetString(1);
 
                 DiffTableData data = new DiffTableData(
-                    ltitle, lartist, llv, lurl, "");
+                    ltitle, lartist, llv, lurl, lmd5);
 
                 musiclist.Add(data);
             }

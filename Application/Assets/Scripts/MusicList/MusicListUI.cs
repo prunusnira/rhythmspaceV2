@@ -1529,7 +1529,7 @@ namespace BMSPlayer
                     // GENOCIDE 테이블 관련 알림
                     if(pathlist[0].StartsWith("geno"))
                     {
-                        txtPathGenoInfo.gameObject.SetActive(true);
+                        //txtPathGenoInfo.gameObject.SetActive(true);
                     }
                 }
                 else if (Const.ListPath[0].StartsWith("clear://"))

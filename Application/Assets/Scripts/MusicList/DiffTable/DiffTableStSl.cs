@@ -12,20 +12,16 @@ namespace BMSPlayer
         private string Url;
         private string JSONBody;
         private bool isWorkDone;
-        private string StrLoading;
 
-        public DiffTableStSl(string fromUrl, DiffTableMode mode, ref string strLoading)
+        public DiffTableStSl(string fromUrl, DiffTableMode mode)
         {
             Url = fromUrl;
             Mode = mode;
             isWorkDone = false;
-            StrLoading = strLoading;
         }
 
         public async void CrawlTable()
         {
-            StrLoading = "Acquiring file from: "+Mode;
-
             HttpClient client = new HttpClient();
             HttpResponseMessage res = await client.GetAsync(Url);
             res.EnsureSuccessStatusCode();
@@ -49,7 +45,7 @@ namespace BMSPlayer
 
                     list.Add(new DiffTableData(title, artist, level, url, md5));
                 }
-                if (list.Count > 0) TableDataManager.Instance.AddDataToDB(list, Mode, ref StrLoading);
+                if (list.Count > 0) TableDataManager.Instance.AddDataToDB(list, Mode);
             }
             isWorkDone = true;
             Debug.Log("DONE " + Mode);

@@ -103,11 +103,7 @@ namespace DatabaseManager
         public void DropList()
         {
             dbcommand = dbconn.CreateCommand();
-            string query = "delete from list";
-            dbcommand.CommandText = query;
-            dbcommand.ExecuteNonQuery();
-            // AUTO INC RESET
-            query = "update sqlite_sequence set seq=0 where name='list'";
+            string query = "drop table if exists list";
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
         }

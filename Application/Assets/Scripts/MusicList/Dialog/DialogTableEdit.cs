@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using System.Threading;
 using TMPro;
 using UnityEngine;
@@ -64,9 +65,9 @@ namespace BMSPlayer
 
             txtLoadingPath.text = strLoading;
 
-            bool isAllDone = true;
             if(refreshing)
             {
+                bool isAllDone = true;
                 foreach (IDiffTable d in diffTable)
                 {
                     if (!d.IsWorkDone())
@@ -105,17 +106,18 @@ namespace BMSPlayer
             UpdateURL();
             // 각각 테이블에 대해 갱신 수행
             // Thread로 돌림
-            diffTable.Add(new DiffTableStSl(Const.SatelliteURL, DiffTableMode.SATELLITE, ref strLoading));
-            diffTable.Add(new DiffTableStSl(Const.StellaURL, DiffTableMode.STELLA, ref strLoading));
-            diffTable.Add(new DiffTableGeno(Const.GenocideNormalURL, DiffTableMode.GENONM, ref strLoading));
-            diffTable.Add(new DiffTableGeno(Const.GenocideInsaneURL, DiffTableMode.GENOINS, ref strLoading));
+            /*diffTable.Add(new DiffTableStSl(Const.SatelliteURL, DiffTableMode.SATELLITE));
+            diffTable.Add(new DiffTableStSl(Const.StellaURL, DiffTableMode.STELLA));
+            diffTable.Add(new DiffTableGeno(Const.GenocideNormalURL, DiffTableMode.GENONM));
+            diffTable.Add(new DiffTableGeno(Const.GenocideInsaneURL, DiffTableMode.GENOINS));
 
             foreach(IDiffTable d in diffTable)
             {
                 Thread t = new Thread(new ThreadStart(d.CrawlTable));
                 threads.Add(t);
                 t.Start();
-            }
+            }*/
+            StartCoroutine(UpdateTable());
         }
 
         public void ResetTable()
@@ -145,6 +147,22 @@ namespace BMSPlayer
             urlSl.text = Const.SatelliteURL;
             urlGeNM.text = Const.GenocideNormalURL;
             urlGeINS.text = Const.GenocideInsaneURL;
+        }
+
+        private IEnumerator UpdateTable()
+        {
+            strLoading = "Refreshing SATELLITE";
+            new DiffTableStSl(Const.SatelliteURL, DiffTableMode.SATELLITE).CrawlTable();
+            yield return null;
+            strLoading = "Refreshing STELLA";
+            new DiffTableStSl(Const.StellaURL, DiffTableMode.STELLA).CrawlTable();
+            yield return null;
+            strLoading = "Refreshing GENOCIDE NM";
+            new DiffTableGeno(Const.GenocideNormalURL, DiffTableMode.GENONM).CrawlTable();
+            yield return null;
+            strLoading = "Refreshing GENOCIDE INS";
+            new DiffTableGeno(Const.GenocideInsaneURL, DiffTableMode.GENOINS).CrawlTable();
+            yield return null;
         }
     }
 }

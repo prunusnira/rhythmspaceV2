@@ -59,6 +59,7 @@
     <Compile Include="Assets\Scripts\Data\enum\ItemType.cs" />
     <Compile Include="Assets\Scripts\MusicList\DiffTable\DiffTableStSl.cs" />
     <Compile Include="Assets\Scripts\UI\GUILayoutx.cs" />
+    <Compile Include="Assets\Scripts\MusicList\Dialog\DialogSkinSelector.cs" />
     <Compile Include="Assets\Scripts\SQLite\SQLiteTable.cs" />
     <Compile Include="Assets\Scripts\GamePlay\UI\CoverLiftControl.cs" />
     <Compile Include="Assets\VLCUnity\Demos\Scripts\MinimalPlayback.cs" />
@@ -143,7 +144,7 @@
     <Compile Include="Assets\Scripts\GamePlay\enum\SortType.cs" />
     <Compile Include="Assets\Scripts\Data\TableDataManager.cs" />
     <Compile Include="Assets\Scripts\Data\JSONObject.cs" />
-    <Compile Include="Assets\Scripts\MusicList\DiffTable\DiffTableGeno.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DiffTable\DiffTableGeno_none.cs" />
     <Compile Include="Assets\Scripts\GamePlay\UI\BeamUI.cs" />
     <Compile Include="Assets\Scripts\Result\GraphDrawer.cs" />
     <Compile Include="Assets\Scripts\GamePlay\Note\Randomizer.cs" />
@@ -157,7 +158,7 @@
     <Compile Include="Assets\Scripts\Core\Tools.cs" />
     <Compile Include="Assets\Scripts\MusicList\buttonsetting\PlayKeySetting.cs" />
     <Compile Include="Assets\Scripts\Core\Enum\NoteType.cs" />
-    <Compile Include="Assets\Scripts\MusicList\Dialog\DialogSkinSelector.cs" />
+    <Compile Include="Assets\Scripts\MusicList\DiffTable\DiffTableGeno.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\VLCUnity\Plugins\x86_64\plugins\codec\libg711_plugin.dll" />

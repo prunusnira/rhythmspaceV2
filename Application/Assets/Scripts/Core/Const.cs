@@ -1863,7 +1863,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("diff_genonm", "http://nekokan.dyndns.info/~lobsak/genocide/normal.html");
+                return PlayerPrefs.GetString("diff_genonm", "https://raw.githubusercontent.com/rib2bit/BMS-database/master/tables/%E9%80%9A%E5%B8%B8%E9%9B%A3%E6%98%93%E5%BA%A6%E8%A1%A8/data.json");
             }
             set
             {
@@ -1875,7 +1875,7 @@ namespace BMSPlayer
         {
             get
             {
-                return PlayerPrefs.GetString("diff_genoins", "http://nekokan.dyndns.info/~lobsak/genocide/insane.html");
+                return PlayerPrefs.GetString("diff_genoins", "https://raw.githubusercontent.com/rib2bit/BMS-database/master/tables/%E7%99%BA%E7%8B%82BMS%E9%9B%A3%E6%98%93%E5%BA%A6%E8%A1%A8/data.json");
             }
             set
             {

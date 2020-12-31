@@ -1,22 +1,17 @@
-# Rhythm Tracers (Temp)
+# RhythmTracers
 
 ## About
-* Unity based BMS Player (currently using Unity 2019.4.9f1)
+* Unity based BMS Player (currently using Unity 2020.2.0f1)
 * Started as Toy Project but... it will be released to public later
-* Currently testing
+* Currently under testing process
 
-## Currently Supported
-* BMS/BME/BML file with 1 player mode
-* BGA with BMP or MPEG (MPEG-1 & 2 Codec for Windows is needed [User install])
-	+ VLC-Unity will be added later (after bug on standalone build fixed)
+## Features/Functionalities
+* BMS/BME/BML file with 1 player mode (DP will be added later)
+* BGA with BMP or MPEG (Using VLC-Unity as player for MPG files and Unity Video Player for other format)
 * Key sound playing with FMOD Engine
 * LNTYPE 1 and LNOBJ supported (Not for LNTYPE 2)
 * Custom Random (user defined random)
-* Using FMOD for sound processing (with smallest buffer size)
+* Support user custom skin for frames/notes/gear/BGM
 
 ## Developing
 * Bug Fixes
-* Level table parser (Satellite & Stella)
-
-## Bugs for now (2020/11/11)
-* Note display error when note has too much gimmick within short time period

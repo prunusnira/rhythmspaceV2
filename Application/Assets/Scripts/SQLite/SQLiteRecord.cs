@@ -96,7 +96,7 @@ namespace DatabaseManager
         public void DropRecord()
         {
             dbcommand = dbconn.CreateCommand();
-            string query = @"drop table record";
+            string query = @"drop table if exists record";
             dbcommand.CommandText = query;
             dbcommand.ExecuteNonQuery();
         }

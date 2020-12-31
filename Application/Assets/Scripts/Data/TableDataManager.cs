@@ -77,8 +77,7 @@ namespace BMSPlayer
 
         public void AddDataToDB(
             List<DiffTableData> list,
-            DiffTableMode? mode,
-            ref string strLoading)
+            DiffTableMode? mode)
         {
             if (list.Count != 0)
             {
@@ -87,19 +86,21 @@ namespace BMSPlayer
                 {
                     case DiffTableMode.SATELLITE:
                         SQLiteTable.Instance.DropTableSl();
+                        SQLiteTable.Instance.InitDiffSl();
                         break;
                     case DiffTableMode.STELLA:
                         SQLiteTable.Instance.DropTableSt();
+                        SQLiteTable.Instance.InitDiffSt();
                         break;
                     case DiffTableMode.GENONM:
                         SQLiteTable.Instance.DropTableGeNM();
+                        SQLiteTable.Instance.InitDiffGeNM();
                         break;
                     case DiffTableMode.GENOINS:
                         SQLiteTable.Instance.DropTableGeINS();
+                        SQLiteTable.Instance.InitDiffGeINS();
                         break;
                 }
-
-                strLoading = "Registering into Database";
 
                 switch (mode)
                 {

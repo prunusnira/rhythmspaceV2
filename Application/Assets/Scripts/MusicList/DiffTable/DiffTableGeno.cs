@@ -1,108 +1,68 @@
 ﻿using BMSCore;
-using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace BMSPlayer
 {
     class DiffTableGeno: IDiffTable
     {
+        private DiffTableMode Mode;
         private string Url;
         private string JSONBody;
         private bool isWorkDone;
-        private string StrLoading;
-        private DiffTableMode Mode;
 
-        public DiffTableGeno(string fromUrl, DiffTableMode mode, ref string strLoading)
+        public DiffTableGeno(string fromUrl, DiffTableMode mode)
         {
             Url = fromUrl;
             Mode = mode;
             isWorkDone = false;
-            StrLoading = strLoading;
         }
 
         public async void CrawlTable()
         {
-            StrLoading = "Acquiring file from: " + Mode;
-
             HttpClient client = new HttpClient();
-            HttpResponseMessage msg = await client.GetAsync(Url);
-            Stream stream = await msg.Content.ReadAsStreamAsync();
-            TextReader reader = new StreamReader(stream, Encoding.GetEncoding(932), true) as TextReader;
-            string document = await reader.ReadToEndAsync();
+            HttpResponseMessage res = await client.GetAsync(Url);
+            res.EnsureSuccessStatusCode();
+            JSONBody = await res.Content.ReadAsStringAsync();
 
-            // 각 라인별로 읽으면서 json만 가져오기
-            string[] lines = document.Split(new string[] { "\r", "\n" }, StringSplitOptions.None);
-            string arrstr = "";
-            bool inRead = false;
-
-            foreach(string s in lines)
-            {
-                if(inRead)
-                {
-                    if(s == "];")
-                    {
-                        arrstr += "]";
-                        break;
-                    }
-                    else
-                    {
-                        arrstr += s + "\n";
-                    }
-                }
-                else
-                {
-                    if(s.Contains("mname ="))
-                    {
-                        inRead = true;
-                        arrstr += "[\n";
-                    }
-                }
-            }
-
-            // 읽은 내용을 List로 만들기
             List<DiffTableData> list = new List<DiffTableData>();
-            JSONObject json = new JSONObject(arrstr);
-            if(!json.IsNull)
+
+            JSONObject obj = new JSONObject(JSONBody);
+            if(!obj.IsNull)
             {
-                for (int i = 0; i < json.list.Count; i++)
+                List<JSONObject> json = obj.list;
+                for (int i = 0; i < json.Count; i++)
                 {
-                    JSONObject obj = json.list[i];
-                    string lvstr = obj.list[1].str;
-                    lvstr = lvstr.Replace("\"", "").Replace("★", "").Replace("☆", "");
-                    int lv = 0;
-                    if (lvstr == "???" || lvstr == "X")
+                    // 가져올 내용
+                    // title, artist, level, md5, url
+                    string title = json[i].GetField("title").str;
+                    string artist = json[i].GetField("artist").str;
+                    string lvlstr = json[i].GetField("level").str;
+
+                    int level = 0;
+                    if(lvlstr == "???")
                     {
-                        lv = 99;
+                        level = 99;
+                    }
+                    else if(lvlstr == "X")
+                    {
+                        level = 99;
                     }
                     else
                     {
-                        lv = Convert.ToInt32(lvstr);
+                        level = Convert.ToInt32(lvlstr);
                     }
+                    string md5 = json[i].GetField("md5").str;
+                    string url = json[i].GetField("url").str;
 
-                    string title = obj.list[2].str;
-
-                    string artistTag = obj.list[4].str;
-
-                    HtmlDocument doc = new HtmlDocument();
-                    doc.LoadHtml(artistTag);
-                    HtmlNode node = doc.DocumentNode.Element("a");
-
-                    string url = node.GetAttributeValue("href", string.Empty);
-                    string artist = node.InnerText;
-
-                    // 각각을 Node로 만들어서 추가
-                    list.Add(new DiffTableData(title, artist, lv, url, ""));
+                    list.Add(new DiffTableData(title, artist, level, url, md5));
                 }
-                if (list.Count > 0) TableDataManager.Instance.AddDataToDB(list, Mode, ref StrLoading);
+                if (list.Count > 0) TableDataManager.Instance.AddDataToDB(list, Mode);
             }
             isWorkDone = true;
-            Debug.Log("DONE "+Mode);
+            Debug.Log("DONE " + Mode);
         }
 
         public bool IsWorkDone()
