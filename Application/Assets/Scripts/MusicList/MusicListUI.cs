@@ -52,6 +52,7 @@ namespace BMSPlayer
         public static bool isKeyChanged = false;
         public static bool isRefreshDone = false;
         public static bool isCustomRandom = false;
+        public static bool isPrevLoaded = false;
 
         // List object
         [Header("List Objects")]
@@ -79,6 +80,7 @@ namespace BMSPlayer
         public TextMeshProUGUI infoTotalNote;
         public TextMeshProUGUI infoPlayTime;
         public TextMeshProUGUI infoJudgeRank;
+        public TextMeshProUGUI txtPreviewLoad;
 
         // Difficulty
         [Header("Difficulty")]
@@ -390,6 +392,12 @@ namespace BMSPlayer
             {
                 isPrevPlay = false;
                 prevController.StopPlaying();
+            }
+
+            if(isPrevLoaded)
+            {
+                isPrevLoaded = false;
+                txtPreviewLoad.gameObject.SetActive(false);
             }
         }
 
@@ -717,6 +725,7 @@ namespace BMSPlayer
                 {
                     prevController.StopPlaying();
                     prevConPath = "";
+                    txtPreviewLoad.gameObject.SetActive(false);
 
                     if (prevFilePath != bms.Preview)
                     {
@@ -741,8 +750,9 @@ namespace BMSPlayer
                     prevController.StopPlaying();
 
                     prevConPath = bms.Path + bms.FileName;
+                    txtPreviewLoad.gameObject.SetActive(true);
 
-                    //isPrevConReady = true;
+                    isPrevConReady = true;
                 }
             }
             else

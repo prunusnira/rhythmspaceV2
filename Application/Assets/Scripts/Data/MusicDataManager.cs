@@ -162,21 +162,28 @@ namespace BMSPlayer
         {
             if (list.Count > 0)
             {
-                List<string> hashList = new List<string>();
+                List<KeyValuePair<string, string>> pathList = new List<KeyValuePair<string, string>>();
                 // MD5 Hash를 계산해서 이 값으로 파일 삭제 처리
                 for (int i = 0; i < list.Count; i++)
                 {
                     // DB에 path 값이 있으면 삭제함
                     strLoading = "Gathering files to remove (" + i + "/" + list.Count + ")";
-                    
-                    // MD5Hash 계산
-                    var bytehash = md5.ComputeHash(File.ReadAllBytes(list[i]));
-                    string hash = BitConverter.ToString(bytehash).Replace("-", "").ToLower();
 
-                    hashList.Add(hash);
+                    string dir = Path.GetDirectoryName(list[i]);
+                    string file = Path.GetFileName(list[i]);
+
+                    pathList.Add(new KeyValuePair<string, string>(dir, file));
+                    // MD5Hash 계산
+                    /*if(File.Exists(list[i]))
+                    {
+                        var bytehash = md5.ComputeHash(File.ReadAllBytes(list[i]));
+                        string hash = BitConverter.ToString(bytehash).Replace("-", "").ToLower();
+
+                        pathList.Add(hash);
+                    }*/
                 }
                 strLoading = "Removing unnecesary files from database";
-                SQLiteMusicList.Instance.DeleteBMS(hashList);
+                SQLiteMusicList.Instance.DeleteBMS(pathList);
             }
         }
     }

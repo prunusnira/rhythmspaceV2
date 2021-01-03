@@ -64,7 +64,9 @@ namespace BMSPlayer {
                 else if(isLoadingPhase1Finish)
                 {
                     isLoadingPhase1Finish = false;
-                    StartCoroutine(PreloadSound());
+                    //StartCoroutine(PreloadSound());
+                    isLoadingPhase2Ready = true;
+                    Callback();
                     return;
                 }
                 else if(isLoadingPhase2Ready)
@@ -78,6 +80,10 @@ namespace BMSPlayer {
                 if (!isBMSReady)
                 {
                     return;
+                }
+                else
+                {
+                    MusicListUI.isPrevLoaded = true;
                 }
 
                 if (firstrun)
@@ -141,6 +147,7 @@ namespace BMSPlayer {
 
                 // 사운드 정의(FMOD)
                 //soundController.PreloadSound(Data.BMS);
+                SoundControllerBASS.Instance.PreloadSound(Data.BMS);
                 isLoadingPhase1Finish = true;
             }
             catch (Exception e)
@@ -172,8 +179,8 @@ namespace BMSPlayer {
             if(Data != null)
             {
                 // 재생중인 모든 음악 종료
-                SoundControllerFMOD.Instance.StopAll();
-                SoundControllerFMOD.Instance.FreeMemory(Data.BMS);
+                SoundControllerBASS.Instance.StopAll();
+                SoundControllerBASS.Instance.FreeMemory(Data.BMS);
 
                 Data = null;
                 isGoodToGo = false;

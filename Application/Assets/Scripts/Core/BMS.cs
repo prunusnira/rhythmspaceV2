@@ -137,8 +137,9 @@ namespace BMSCore
         public Dictionary<int, string> StopNote = new Dictionary<int, string>();
 
         // 호환성을 위해 임시로 남겨둠
-        public Dictionary<string, AudioClip> WavFilesAC = new Dictionary<string, AudioClip>();
-        
+        public Dictionary<string, AudioSource> WavFilesAC = new Dictionary<string, AudioSource>();
+        public Dictionary<string, int> WavFilesBA = new Dictionary<string, int>();
+
         // 랜덤 처리를 위해 데이터 보존
         public List<string> Random = new List<string>();
 

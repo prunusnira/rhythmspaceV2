@@ -29,12 +29,6 @@ namespace BMSPlayer
             channelGroup = new FMOD.ChannelGroup();
         }
 
-        public void Reset()
-        {
-            channels = new List<FMOD.Channel>();
-            channelGroup = new FMOD.ChannelGroup();
-        }
-
         // Execute after BMSAnalyzer.FullAnalyzer worked
         public void PreloadSound(BMS bms)
         {

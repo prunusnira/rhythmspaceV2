@@ -595,6 +595,17 @@ namespace BMSPlayer {
                         return;
                     }
 
+                    if(scroller.GetPerfect() == 0 &&
+                        scroller.GetGreat() == 0 &&
+                        scroller.GetGood() == 0 &&
+                        scroller.GetBad() == 0)
+                    {
+                        SoundControllerFMOD.Instance.StopAll();
+                        SoundControllerFMOD.Instance.FreeMemory(Data.BMS);
+                        SceneManager.LoadScene("MusicSelect");
+                        return;
+                    }
+
                     isPaused = !isPaused;
                     double currentTick = Convert.ToDouble(DateTime.Now.Ticks) / 1000000;
 

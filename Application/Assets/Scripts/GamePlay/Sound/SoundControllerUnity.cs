@@ -1,13 +1,14 @@
 ﻿using BMSCore;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BMSPlayer
 {
-    public class SoundControllerUnity : ISoundController
+    public class SoundControllerUnity : MonoBehaviour, ISoundController
     {
-        private AudioSource[] audioSource;
+        //private List<AudioSource> audioSource;
 
-        private static SoundControllerUnity instance;
+        /*private static SoundControllerUnity instance;
         public static SoundControllerUnity Instance
         {
             get
@@ -25,8 +26,13 @@ namespace BMSPlayer
             audioSource = new AudioSource[Const.CHANNEL];
             for (int i = 0; i < Const.CHANNEL; i++)
             {
-                //audioSource[i] = gameObject.GetComponent<AudioSource>();
+                audioSource[i] = gameObject.AddComponent<AudioSource>();
             }
+        }*/
+
+        private void Awake()
+        {
+            //audioSource = new List<AudioSource>();
         }
 
         // Execute after BMSAnalyzer.FullAnalyzer worked
@@ -41,7 +47,9 @@ namespace BMSPlayer
                 clip.name = val;
                 clip.LoadAudioData();
                 while (clip.loadState != AudioDataLoadState.Loaded) { }
-                bms.WavFilesAC.Add(val, clip);
+                AudioSource audio = gameObject.AddComponent<AudioSource>();
+                audio.clip = clip;
+                bms.WavFilesAC.Add(val, audio);
             }
         }
 
@@ -49,7 +57,8 @@ namespace BMSPlayer
         {
             try
             {
-                audioSource[line].PlayOneShot(bms.WavFilesAC[wavFile]);
+                //audioSource[line].PlayOneShot(bms.WavFilesAC[wavFile]);
+                bms.WavFilesAC[wavFile].Play();
             }
             catch (System.Exception e)
             {
@@ -60,44 +69,72 @@ namespace BMSPlayer
         public bool CheckSoundPlaying(BMS bms = null)
         {
             bool isPlaying = false;
-            for (int i = 0; i < Const.CHANNEL; i++)
+            /*for (int i = 0; i < Const.CHANNEL; i++)
             {
                 isPlaying = audioSource[i].isPlaying;
                 if (isPlaying) break;
+            }*/
+            foreach(AudioSource s in bms.WavFilesAC.Values)
+            {
+                if (s.isPlaying)
+                {
+                    isPlaying = true;
+                    break;
+                }
             }
             return isPlaying;
         }
 
         public void StopAll(BMS bms = null)
         {
-            foreach (AudioSource source in audioSource)
+            /*foreach (AudioSource source in audioSource)
             {
                 if (source.isPlaying) source.Stop();
+            }*/
+            foreach (AudioSource s in bms.WavFilesAC.Values)
+            {
+                if (s.isPlaying) s.Stop();
             }
         }
 
         public void PauseAll(BMS bms = null)
         {
-            foreach (AudioSource source in audioSource)
+            /*foreach (AudioSource source in audioSource)
             {
                 if (source.isPlaying) source.Pause();
+            }*/
+
+            foreach (AudioSource s in bms.WavFilesAC.Values)
+            {
+                if (s.isPlaying) s.Pause();
             }
         }
 
         public void ResumeAll(BMS bms = null)
         {
-            foreach (AudioSource source in audioSource)
+            /*foreach (AudioSource source in audioSource)
             {
                 if (source.isPlaying) source.UnPause();
+            }*/
+
+            foreach (AudioSource s in bms.WavFilesAC.Values)
+            {
+                if (s.isPlaying) s.UnPause();
             }
         }
 
         public void FreeMemory(BMS bms)
         {
-            foreach (FMOD.Sound snd in bms.WavFilesFM.Values)
+            /*foreach (AudioClip snd in bms.WavFilesAC.Values)
             {
-                snd.release();
+                snd.UnloadAudioData();
+            }*/
+
+            foreach (AudioSource s in bms.WavFilesAC.Values)
+            {
+                s.clip.UnloadAudioData();
             }
+            bms.WavFilesAC.Clear();
         }
     }
 }

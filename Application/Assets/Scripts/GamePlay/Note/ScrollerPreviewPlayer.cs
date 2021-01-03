@@ -29,7 +29,7 @@ namespace BMSPlayer
 
                 if (current.Timing <= time && !current.Used)
                 {
-                    SoundControllerFMOD.Instance.PlayKeySound(current.Wav, bms, 0);
+                    SoundControllerBASS.Instance.PlayKeySound(current.Wav, bms, 0);
                     current.Used = true;
                     removeCandidate.Add(current);
                 }
@@ -62,7 +62,7 @@ namespace BMSPlayer
                 {
                     if (cnote.PlayNoteType == NoteType.SINGLE)
                     {
-                        SoundControllerFMOD.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
+                        SoundControllerBASS.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
                         removeCandidate.Add(cnote);
 
                         processedNotes++;
@@ -70,7 +70,7 @@ namespace BMSPlayer
                     // 롱노트 시작 처리
                     else if (cnote.PlayNoteType == NoteType.LNSTART)
                     {
-                        SoundControllerFMOD.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
+                        SoundControllerBASS.Instance.PlayKeySound(cnote.Wav, bms, cnote.Line);
 
                         removeCandidate.Add(lnlist[cnote.LNNum].End);
                         removeCandidate.Add(lnlist[cnote.LNNum].Mid);

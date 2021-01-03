@@ -433,13 +433,13 @@ namespace DatabaseManager
             }
         }
 
-        public void DeleteBMS(List<string> hashList)
+        public void DeleteBMS(List<KeyValuePair<string, string>> pathList)
         {
             dbcommand = dbconn.CreateCommand();
 
             // 1000°³¾¿ ²÷±â
-            int len = hashList.Count / 500;
-            if (hashList.Count % 500 > 0) len++;
+            int len = pathList.Count / 500;
+            if (pathList.Count % 500 > 0) len++;
             
             for(int i = 0; i < len; i++)
             {
@@ -447,11 +447,11 @@ namespace DatabaseManager
 
                 int start = 500 * i;
                 int end = 500 * (i + 1);
-                if (end > hashList.Count) end = hashList.Count;
+                if (end > pathList.Count) end = pathList.Count;
 
                 for (int j = start; j < end; j++)
                 {
-                    query += "md5hash='" + hashList[j] + "'";
+                    query += "(path='" + pathList[j].Key.Replace("'", "''") + "' and fname='"+pathList[j].Value.Replace("'", "''") + "')";
                     if (j != end - 1) query += " or ";
                 }
                 query += ";";
